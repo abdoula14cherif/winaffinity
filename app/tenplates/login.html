@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="fr" data-lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WIN AFFINITY — Connexion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold:        #C9A84C;
+      --gold-light:  #E8C96A;
+      --gold-dim:    rgba(201,168,76,0.15);
+      --navy:        #07101F;
+      --navy-mid:    #0D1B2A;
+      --navy-card:   rgba(13,27,42,0.78);
+      --white:       #F4EFE6;
+      --white-dim:   rgba(244,239,230,0.6);
+      --white-soft:  rgba(244,239,230,0.08);
+      --danger:      #E05A5A;
+      --success:     #4CAF7E;
+      --border:      rgba(201,168,76,0.25);
+      --radius:      18px;
+      --transition:  0.35s cubic-bezier(.4,0,.2,1);
+    }
+
+    html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--navy); color: var(--white); overflow-x: hidden; }
+
+    /* ── Arrière-plan ────────────────────────────────────── */
+    .bg-scene {
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 70% 70% at 75% 20%, #0e2240 0%, transparent 55%),
+        radial-gradient(ellipse 50% 50% at 15% 85%, #1a0e05 0%, transparent 55%),
+        linear-gradient(170deg, #07101F 0%, #0b1626 50%, #060b13 100%);
+    }
+
+    .orb { position:absolute; border-radius:50%; filter:blur(90px); animation:drift 14s ease-in-out infinite alternate; pointer-events:none; }
+    .orb-1 { width:600px; height:600px; background:rgba(201,168,76,.06); top:-200px; right:-200px; animation-delay:0s; }
+    .orb-2 { width:400px; height:400px; background:rgba(20,60,120,.10);  bottom:-100px; left:-100px; animation-delay:-5s; }
+    .orb-3 { width:150px; height:150px; background:rgba(201,168,76,.04); top:50%; left:30%;           animation-delay:-9s; }
+
+    @keyframes drift { from{transform:translate(0,0) scale(1)} to{transform:translate(50px,40px) scale(1.1)} }
+
+    #particles { position:fixed; inset:0; z-index:1; pointer-events:none; opacity:.4; }
+
+    /* ── Lignes verticales décoratives ───────────────────── */
+    .grid-line { position:fixed; pointer-events:none; z-index:1; background:linear-gradient(to bottom,transparent,rgba(201,168,76,.03),transparent); }
+    .grid-v { width:1px; height:100vh; top:0; }
+    .grid-v:nth-child(1){left:25%} .grid-v:nth-child(2){left:50%} .grid-v:nth-child(3){left:75%}
+
+    /* ── Layout ─────────────────────────────────────────── */
+    .page-wrapper {
+      position:relative; z-index:2;
+      min-height:100vh;
+      display:grid;
+      grid-template-columns: 1fr 480px 1fr;
+      align-items:center;
+    }
+
+    /* Panneau gauche décoratif */
+    .side-panel {
+      padding: 60px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 40px;
+      opacity: .75;
+    }
+    .stat-card {
+      border-left: 2px solid var(--gold);
+      padding-left: 20px;
+      animation: slideIn .8s cubic-bezier(.16,1,.3,1) both;
+    }
+    .stat-card:nth-child(2) { animation-delay: .12s; }
+    .stat-card:nth-child(3) { animation-delay: .24s; }
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .stat-label { font-size: 12px; color: var(--white-dim); letter-spacing: .1em; margin-top: 4px; }
+    @keyframes slideIn { from{opacity:0;transform:translateX(-20px)} to{opacity:1;transform:none} }
+
+    /* ── Carte centrale ──────────────────────────────────── */
+    .card-col { padding: 40px 20px; display:flex; align-items:center; justify-content:center; }
+
+    .card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--navy-card);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 48px 42px 44px;
+      box-shadow:
+        0 0 0 1px rgba(201,168,76,.07) inset,
+        0 50px 100px rgba(0,0,0,.6),
+        0 0 80px rgba(201,168,76,.04);
+      animation: cardIn .7s cubic-bezier(.16,1,.3,1) both;
+    }
+    @keyframes cardIn { from{opacity:0;transform:translateY(28px) scale(.97)} to{opacity:1;transform:none} }
+
+    /* ── Marque ──────────────────────────────────────────── */
+    .brand { text-align:center; margin-bottom:36px; }
+    .brand-logo { display:inline-flex; align-items:center; gap:10px; margin-bottom:14px; }
+    .brand-icon {
+      width:46px; height:46px;
+      background:linear-gradient(135deg,var(--gold),#8B5A00);
+      border-radius:13px; display:flex; align-items:center; justify-content:center;
+      font-size:22px;
+      box-shadow:0 6px 24px rgba(201,168,76,.4);
+      animation: pulse 3s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{box-shadow:0 6px 24px rgba(201,168,76,.4)} 50%{box-shadow:0 8px 32px rgba(201,168,76,.65)} }
+    .brand-name {
+      font-family:'Cormorant Garamond',serif;
+      font-size:28px; font-weight:700; letter-spacing:.12em;
+      background:linear-gradient(135deg,var(--gold-light),var(--gold));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    .brand-tagline { font-size:12.5px; color:var(--white-dim); letter-spacing:.06em; }
+
+    /* ── Titres ──────────────────────────────────────────── */
+    .section-title {
+      font-family:'Cormorant Garamond',serif;
+      font-size:30px; font-weight:600;
+      color:var(--white); text-align:center;
+      margin-bottom:6px; letter-spacing:.02em;
+    }
+    .section-subtitle { font-size:13.5px; color:var(--white-dim); text-align:center; margin-bottom:28px; }
+
+    /* ── Alertes ─────────────────────────────────────────── */
+    .alert {
+      border-radius:10px; padding:12px 16px;
+      font-size:13.5px; margin-bottom:20px;
+      display:flex; align-items:center; gap:10px;
+      animation:alertIn .3s ease both;
+    }
+    .alert-error   { background:rgba(224,90,90,.12);  border:1px solid rgba(224,90,90,.3);  color:#F08080; }
+    .alert-success { background:rgba(76,175,126,.12); border:1px solid rgba(76,175,126,.3); color:#7ECBA3; }
+    @keyframes alertIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:none} }
+
+    /* ── Formulaire ──────────────────────────────────────── */
+    .form-group { display:flex; flex-direction:column; gap:7px; margin-bottom:16px; }
+
+    label { font-size:11.5px; font-weight:500; color:var(--gold); letter-spacing:.09em; text-transform:uppercase; }
+
+    .input-wrap { position:relative; }
+    .input-wrap .ico { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--gold); opacity:.45; font-size:15px; pointer-events:none; transition:opacity var(--transition); }
+
+    input[type="email"], input[type="password"] {
+      width:100%;
+      background:var(--white-soft);
+      border:1px solid var(--border);
+      border-radius:10px;
+      padding:14px 14px 14px 42px;
+      font-family:'DM Sans',sans-serif;
+      font-size:14.5px; color:var(--white);
+      outline:none;
+      transition:border-color var(--transition), background var(--transition), box-shadow var(--transition);
+    }
+    input::placeholder { color:rgba(244,239,230,.22); }
+    input:focus {
+      border-color:var(--gold);
+      background:rgba(201,168,76,.07);
+      box-shadow:0 0 0 3px rgba(201,168,76,.13);
+    }
+
+    .eye-toggle {
+      position:absolute; right:12px; top:50%; transform:translateY(-50%);
+      background:none; border:none; cursor:pointer;
+      color:var(--white-dim); font-size:16px; padding:4px;
+      transition:color var(--transition);
+    }
+    .eye-toggle:hover { color:var(--gold); }
+
+    /* ── Mot de passe oublié ─────────────────────────────── */
+    .forgot-link {
+      display:block; text-align:right; font-size:12.5px;
+      color:var(--white-dim); text-decoration:none;
+      margin-top:-8px; margin-bottom:8px;
+      transition:color var(--transition);
+    }
+    .forgot-link:hover { color:var(--gold); }
+
+    /* ── Bouton ──────────────────────────────────────────── */
+    .btn-primary {
+      display:flex; align-items:center; justify-content:center; gap:10px;
+      width:100%; padding:15px; margin-top:10px;
+      background:linear-gradient(135deg,var(--gold) 0%,#A07020 100%);
+      color:var(--navy);
+      font-family:'DM Sans',sans-serif;
+      font-size:15px; font-weight:600; letter-spacing:.07em;
+      border:none; border-radius:12px; cursor:pointer;
+      transition:transform var(--transition), box-shadow var(--transition), opacity var(--transition);
+      box-shadow:0 4px 24px rgba(201,168,76,.35);
+      text-transform:uppercase;
+    }
+    .btn-primary:hover { transform:translateY(-2px); box-shadow:0 10px 36px rgba(201,168,76,.55); }
+    .btn-primary:active { transform:translateY(0); }
+    .btn-primary:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+
+    .spinner { display:none; width:18px; height:18px; border:2px solid rgba(7,16,31,.3); border-top-color:var(--navy); border-radius:50%; animation:spin .6s linear infinite; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+
+    /* ── Séparateur / Pied ───────────────────────────────── */
+    .form-footer { text-align:center; margin-top:24px; font-size:13.5px; color:var(--white-dim); }
+    .form-footer a { color:var(--gold); text-decoration:none; font-weight:500; transition:color var(--transition); }
+    .form-footer a:hover { color:var(--gold-light); }
+    .sep { display:flex; align-items:center; gap:12px; margin:14px 0 0; color:rgba(244,239,230,.2); font-size:12px; }
+    .sep::before,.sep::after { content:''; flex:1; height:1px; background:var(--border); }
+
+    /* ── Bouton langue ───────────────────────────────────── */
+    .lang-btn {
+      position:fixed; top:20px; right:20px; z-index:100;
+      background:var(--navy-card); border:1px solid var(--border);
+      backdrop-filter:blur(12px); border-radius:30px;
+      padding:8px 16px; display:flex; align-items:center; gap:8px;
+      cursor:pointer; font-family:'DM Sans',sans-serif;
+      font-size:13px; font-weight:500; color:var(--gold);
+      transition:all var(--transition); box-shadow:0 4px 16px rgba(0,0,0,.3);
+    }
+    .lang-btn:hover { background:var(--gold-dim); border-color:var(--gold); transform:translateY(-1px); }
+    .lang-flag { font-size:16px; }
+
+    /* ── Responsive ──────────────────────────────────────── */
+    @media(max-width:900px){
+      .page-wrapper { grid-template-columns:1fr; }
+      .side-panel { display:none; }
+      .card-col { padding:40px 16px; }
+    }
+    @media(max-width:480px){
+      .card { padding:36px 22px 32px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Arrière-plan -->
+<div class="bg-scene">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+<div class="grid-line grid-v"></div>
+<div class="grid-line grid-v"></div>
+<div class="grid-line grid-v"></div>
+<canvas id="particles"></canvas>
+
+<!-- Bouton langue -->
+<button class="lang-btn" onclick="toggleLang()" id="langBtn">
+  <span class="lang-flag">🇬🇧</span>
+  <span id="langLabel">English</span>
+</button>
+
+<!-- Layout principal -->
+<div class="page-wrapper">
+
+  <!-- Panneau gauche avec statistiques -->
+  <div class="side-panel">
+    <div class="stat-card">
+      <div class="stat-num">12 K+</div>
+      <div class="stat-label" data-fr="MEMBRES ACTIFS" data-en="ACTIVE MEMBERS">MEMBRES ACTIFS</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">$2.4M</div>
+      <div class="stat-label" data-fr="GAINS DISTRIBUÉS" data-en="EARNINGS DISTRIBUTED">GAINS DISTRIBUÉS</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">98%</div>
+      <div class="stat-label" data-fr="TAUX DE SATISFACTION" data-en="SATISFACTION RATE">TAUX DE SATISFACTION</div>
+    </div>
+  </div>
+
+  <!-- Carte connexion -->
+  <div class="card-col">
+    <div class="card">
+
+      <!-- Logo -->
+      <div class="brand">
+        <div class="brand-logo">
+          <div class="brand-icon">◈</div>
+          <span class="brand-name">WIN AFFINITY</span>
+        </div>
+        <p class="brand-tagline" data-fr="Plateforme d'affiliation premium" data-en="Premium affiliation platform">
+          Plateforme d'affiliation premium
+        </p>
+      </div>
+
+      <!-- Titres -->
+      <h1 class="section-title" data-fr="Bon retour" data-en="Welcome Back">Bon retour</h1>
+      <p class="section-subtitle" data-fr="Connectez-vous à votre espace" data-en="Sign in to your space">
+        Connectez-vous à votre espace
+      </p>
+
+      <!-- Succès après inscription -->
+      {% if success %}
+      <div class="alert alert-success">
+        <span>✓</span>
+        <span>{{ success }}</span>
+      </div>
+      {% endif %}
+
+      <!-- Erreur -->
+      {% if error %}
+      <div class="alert alert-error">
+        <span>⚠</span>
+        <span>{{ error }}</span>
+      </div>
+      {% endif %}
+
+      <!-- Formulaire -->
+      <form method="POST" action="/auth/login" id="loginForm" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+
+        <!-- Email -->
+        <div class="form-group">
+          <label data-fr="ADRESSE E-MAIL" data-en="EMAIL ADDRESS">ADRESSE E-MAIL</label>
+          <div class="input-wrap">
+            <input type="email" name="email" id="email"
+                   placeholder="vous@exemple.com"
+                   autocomplete="email" required />
+            <span class="ico">✉</span>
+          </div>
+        </div>
+
+        <!-- Mot de passe -->
+        <div class="form-group">
+          <label data-fr="MOT DE PASSE" data-en="PASSWORD">MOT DE PASSE</label>
+          <div class="input-wrap">
+            <input type="password" name="password" id="password"
+                   placeholder="••••••••"
+                   autocomplete="current-password" required />
+            <span class="ico">🔒</span>
+            <button type="button" class="eye-toggle" onclick="togglePw()" tabindex="-1">👁</button>
+          </div>
+        </div>
+
+        <!-- Mot de passe oublié -->
+        <a href="/auth/forgot-password" class="forgot-link"
+           data-fr="Mot de passe oublié ?" data-en="Forgot your password?">
+          Mot de passe oublié ?
+        </a>
+
+        <!-- Bouton -->
+        <button type="submit" class="btn-primary" id="submitBtn">
+          <div class="spinner" id="spinner"></div>
+          <span id="btnText" data-fr="SE CONNECTER" data-en="SIGN IN">SE CONNECTER</span>
+          <span>→</span>
+        </button>
+
+      </form>
+
+      <!-- Pied -->
+      <div class="sep">
+        <span data-fr="Nouveau sur WIN AFFINITY ?" data-en="New to WIN AFFINITY?">Nouveau sur WIN AFFINITY ?</span>
+      </div>
+      <div class="form-footer">
+        <a href="/auth/register" data-fr="Créer un compte gratuitement" data-en="Create a free account">
+          Créer un compte gratuitement
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Panneau droit vide (équilibre visuel) -->
+  <div></div>
+
+</div>
+
+<script>
+/* ─── PARTICULES ────────────────────────────────────── */
+(function(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let W, H, pts = [];
+  function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; }
+  resize(); window.addEventListener('resize',resize);
+  for(let i=0;i<60;i++) pts.push({
+    x:Math.random()*1920, y:Math.random()*1080,
+    r:Math.random()*1.5+.2,
+    vx:(Math.random()-.5)*.16, vy:(Math.random()-.5)*.16,
+    o:Math.random()*.45+.08
+  });
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0)p.x=W; if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(201,168,76,${p.o})`; ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ─── TRADUCTION ─────────────────────────────────────── */
+let currentLang = 'fr';
+function toggleLang(){
+  currentLang = currentLang==='fr' ? 'en' : 'fr';
+  const isEn = currentLang==='en';
+  document.getElementById('langLabel').textContent = isEn ? 'Français' : 'English';
+  document.querySelector('.lang-flag').textContent  = isEn ? '🇫🇷' : '🇬🇧';
+  document.documentElement.setAttribute('lang', currentLang);
+  document.querySelectorAll('[data-fr]').forEach(el=>{
+    el.textContent = isEn ? el.dataset.en : el.dataset.fr;
+  });
+  const emailInput = document.getElementById('email');
+  if(emailInput) emailInput.placeholder = isEn ? 'you@example.com' : 'vous@exemple.com';
+}
+
+/* ─── AFFICHER / MASQUER MOT DE PASSE ────────────────── */
+function togglePw(){
+  const input = document.getElementById('password');
+  const btn = document.querySelector('.eye-toggle');
+  const hide = input.type==='password';
+  input.type = hide ? 'text' : 'password';
+  btn.textContent = hide ? '🙈' : '👁';
+}
+
+/* ─── SPINNER ───────────────────────────────────────── */
+document.getElementById('loginForm').addEventListener('submit',function(){
+  document.getElementById('spinner').style.display = 'block';
+  document.getElementById('btnText').textContent = currentLang==='en' ? 'SIGNING IN...' : 'CONNEXION...';
+  document.getElementById('submitBtn').disabled = true;
+});
+
+/* ─── ANIMATION AU FOCUS (shake sur erreur) ──────────── */
+{% if error %}
+(function(){
+  const card = document.querySelector('.card');
+  card.style.animation = 'none';
+  card.offsetHeight; // reflow
+  card.style.animation = 'shake .4s ease';
+  const style = document.createElement('style');
+  style.textContent = `@keyframes shake {
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(-6px)}
+    40%{transform:translateX(6px)}
+    60%{transform:translateX(-4px)}
+    80%{transform:translateX(4px)}
+  }`;
+  document.head.appendChild(style);
+})();
+{% endif %}
+</script>
+</body>
+</html>
