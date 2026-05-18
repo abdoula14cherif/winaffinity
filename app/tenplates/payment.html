@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="fr" data-lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WIN AFFINITY — Activation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <!-- SDK LeekPay -->
+  <script src="https://leekpay.fr/js/leekpay.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold:       #C9A84C;
+      --gold-light: #E8C96A;
+      --gold-dim:   rgba(201,168,76,0.14);
+      --gold-glow:  rgba(201,168,76,0.35);
+      --navy:       #07101F;
+      --navy-card:  rgba(13,27,42,0.80);
+      --white:      #F4EFE6;
+      --white-dim:  rgba(244,239,230,0.55);
+      --soft:       rgba(244,239,230,0.08);
+      --success:    #4CAF7E;
+      --danger:     #E05A5A;
+      --border:     rgba(201,168,76,0.22);
+      --r:          20px;
+      --t:          0.38s cubic-bezier(.4,0,.2,1);
+    }
+
+    html, body {
+      min-height: 100%;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ── Fond ──────────────────────────────────────────── */
+    .bg {
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 90% 60% at 50% -10%, #132040 0%, transparent 55%),
+        radial-gradient(ellipse 60% 50% at 90% 90%, #1a0d04 0%, transparent 55%),
+        linear-gradient(175deg, #07101F 0%, #0a1628 60%, #060c14 100%);
+    }
+    .orb { position:absolute; border-radius:50%; filter:blur(100px); pointer-events:none; animation:drift 16s ease-in-out infinite alternate; }
+    .orb-1 { width:700px; height:700px; background:rgba(201,168,76,.055); top:-300px; left:50%; transform:translateX(-50%); }
+    .orb-2 { width:300px; height:300px; background:rgba(25,70,150,.09);   bottom:0;   right:-100px; animation-delay:-6s; }
+    .orb-3 { width:200px; height:200px; background:rgba(201,168,76,.04);  top:60%;    left:5%;      animation-delay:-11s; }
+    @keyframes drift { from{transform:translate(0,0)} to{transform:translate(30px,25px)} }
+    .orb-1 { animation: driftC 18s ease-in-out infinite alternate; }
+    @keyframes driftC { from{transform:translateX(-50%) scale(1)} to{transform:translateX(calc(-50% + 40px)) scale(1.06)} }
+
+    #cvs { position:fixed; inset:0; z-index:1; pointer-events:none; opacity:.35; }
+
+    /* ── Header ─────────────────────────────────────────── */
+    .header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px;
+      background: rgba(7,16,31,0.6);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(201,168,76,.1);
+    }
+    .header-brand {
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px; font-weight: 700; letter-spacing: .1em;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .header-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--gold), #8B5A00);
+      border-radius: 9px; display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+    }
+    .header-user {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13.5px; color: var(--white-dim);
+    }
+    .header-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold-dim), rgba(201,168,76,.25));
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 600; color: var(--gold);
+    }
+
+    /* ── Layout ─────────────────────────────────────────── */
+    .page {
+      position: relative; z-index: 2;
+      min-height: 100vh;
+      padding: 100px 20px 60px;
+      display: flex; flex-direction: column; align-items: center;
+    }
+
+    /* ── Héro ────────────────────────────────────────────── */
+    .hero {
+      text-align: center;
+      margin-bottom: 56px;
+      animation: fadeUp .8s cubic-bezier(.16,1,.3,1) both;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--gold-dim); border: 1px solid var(--border);
+      border-radius: 30px; padding: 6px 16px;
+      font-size: 11.5px; font-weight: 500; color: var(--gold);
+      letter-spacing: .1em; text-transform: uppercase;
+      margin-bottom: 22px;
+    }
+    .hero-badge::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--success); box-shadow:0 0 8px var(--success); }
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(34px,5vw,56px);
+      font-weight: 700; line-height: 1.1;
+      letter-spacing: .01em;
+      margin-bottom: 16px;
+    }
+    .hero-title span {
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-sub {
+      font-size: 15.5px; color: var(--white-dim);
+      max-width: 520px; margin: 0 auto; line-height: 1.6;
+    }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:none} }
+
+    /* ── Grille principale ──────────────────────────────── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+      width: 100%; max-width: 900px;
+      animation: fadeUp .8s .15s cubic-bezier(.16,1,.3,1) both;
+    }
+
+    /* ── Card générique ─────────────────────────────────── */
+    .card {
+      background: var(--navy-card);
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      box-shadow: 0 30px 70px rgba(0,0,0,.5), 0 0 0 1px rgba(201,168,76,.05) inset;
+    }
+
+    /* ── Card avantages ─────────────────────────────────── */
+    .card-benefits { padding: 36px 32px; }
+    .card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px; font-weight: 600;
+      color: var(--white); margin-bottom: 4px;
+    }
+    .card-subtitle { font-size: 13px; color: var(--white-dim); margin-bottom: 28px; }
+
+    .benefit-list { display: flex; flex-direction: column; gap: 14px; }
+    .benefit {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 14px 16px;
+      background: var(--soft);
+      border: 1px solid rgba(201,168,76,.1);
+      border-radius: 12px;
+      transition: background var(--t), border-color var(--t);
+    }
+    .benefit:hover { background: rgba(201,168,76,.07); border-color: var(--border); }
+    .benefit-ico {
+      flex-shrink: 0;
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--gold-dim); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+    }
+    .benefit-info { flex: 1; }
+    .benefit-name { font-size: 14px; font-weight: 500; color: var(--white); margin-bottom: 2px; }
+    .benefit-desc { font-size: 12.5px; color: var(--white-dim); line-height: 1.5; }
+
+    /* ── Card paiement ──────────────────────────────────── */
+    .card-payment { padding: 32px 28px; display: flex; flex-direction: column; gap: 0; }
+
+    /* Prix */
+    .price-block { text-align: center; margin-bottom: 24px; }
+    .price-label { font-size: 11.5px; color: var(--white-dim); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
+    .price-main {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 58px; font-weight: 700; line-height: 1;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .price-currency { font-size: 22px; vertical-align: super; }
+    .price-period { font-size: 13px; color: var(--white-dim); margin-top: 4px; }
+    .price-xof { font-size: 12px; color: rgba(201,168,76,.5); margin-top: 2px; }
+
+    /* Divider doré */
+    .gold-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 20px 0;
+      opacity: .3;
+    }
+
+    /* Mini-liste inclus */
+    .includes { display: flex; flex-direction: column; gap: 9px; margin-bottom: 24px; }
+    .inc-row { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--white-dim); }
+    .inc-row .chk { color: var(--success); font-size: 14px; }
+
+    /* ── Bouton paiement ─────────────────────────────────── */
+    .btn-pay {
+      position: relative;
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%;
+      padding: 17px;
+      background: linear-gradient(135deg, var(--gold) 0%, #A07020 100%);
+      color: var(--navy);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px; font-weight: 700;
+      letter-spacing: .07em; text-transform: uppercase;
+      border: none; border-radius: 13px; cursor: pointer;
+      transition: transform var(--t), box-shadow var(--t);
+      box-shadow: 0 6px 28px var(--gold-glow);
+    }
+    .btn-pay::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.15) 0%, transparent 60%);
+      opacity: 0; transition: opacity var(--t);
+    }
+    .btn-pay:hover { transform: translateY(-3px); box-shadow: 0 12px 40px var(--gold-glow); }
+    .btn-pay:hover::before { opacity: 1; }
+    .btn-pay:active { transform: translateY(0); }
+    .btn-pay:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+    /* Shimmer animation */
+    .btn-pay::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%; width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent);
+      animation: shimmer 2.5s ease infinite;
+    }
+    @keyframes shimmer { 0%{left:-100%} 100%{left:200%} }
+
+    .spinner-pay { display:none; width:18px; height:18px; border:2px solid rgba(7,16,31,.3); border-top-color:var(--navy); border-radius:50%; animation:spin .6s linear infinite; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+
+    /* Sécurité */
+    .secure-row {
+      display: flex; align-items: center; justify-content: center;
+      gap: 6px; margin-top: 14px;
+      font-size: 12px; color: rgba(244,239,230,.35);
+    }
+    .secure-row span { font-size: 14px; }
+
+    /* Méthodes de paiement */
+    .pay-methods {
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px; margin-top: 14px; flex-wrap: wrap;
+    }
+    .pay-tag {
+      background: var(--soft); border: 1px solid rgba(201,168,76,.1);
+      border-radius: 6px; padding: 4px 10px;
+      font-size: 11px; color: var(--white-dim);
+    }
+
+    /* ── Toast notification ─────────────────────────────── */
+    #toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
+      z-index: 999;
+      background: var(--navy-card); border: 1px solid var(--border);
+      backdrop-filter: blur(16px); border-radius: 12px;
+      padding: 14px 24px; font-size: 14px;
+      display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.5);
+      transition: transform .4s cubic-bezier(.16,1,.3,1), opacity .4s;
+      opacity: 0; pointer-events: none; white-space: nowrap;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    #toast.success { border-color: rgba(76,175,126,.4); }
+    #toast.error   { border-color: rgba(224,90,90,.4); color: #F08080; }
+
+    /* ── Overlay succès ──────────────────────────────────── */
+    #successOverlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(7,16,31,.97);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 20px;
+      opacity: 0; pointer-events: none;
+      transition: opacity .5s;
+    }
+    #successOverlay.show { opacity: 1; pointer-events: all; }
+    .success-ring {
+      width: 90px; height: 90px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold-dim), rgba(76,175,126,.15));
+      border: 2px solid var(--success);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px;
+      animation: scaleIn .5s .3s cubic-bezier(.16,1,.3,1) both;
+      box-shadow: 0 0 40px rgba(76,175,126,.3);
+    }
+    @keyframes scaleIn { from{transform:scale(0)} to{transform:scale(1)} }
+    .success-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 36px; font-weight: 700; color: var(--white);
+      animation: fadeUp .6s .5s both;
+    }
+    .success-sub { font-size: 15px; color: var(--white-dim); animation: fadeUp .6s .65s both; }
+    .success-loader {
+      width: 180px; height: 3px;
+      background: var(--soft); border-radius: 2px;
+      margin-top: 10px; overflow: hidden;
+      animation: fadeUp .6s .7s both;
+    }
+    .success-loader-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      border-radius: 2px;
+      animation: load 2.5s ease forwards;
+    }
+    @keyframes load { from{width:0} to{width:100%} }
+
+    /* ── Bouton langue ───────────────────────────────────── */
+    .lang-btn {
+      position: fixed; top: 76px; right: 20px; z-index: 50;
+      background: var(--navy-card); border: 1px solid var(--border);
+      backdrop-filter: blur(12px); border-radius: 30px;
+      padding: 7px 14px; display: flex; align-items: center; gap: 7px;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      font-size: 12.5px; font-weight: 500; color: var(--gold);
+      transition: all var(--t); box-shadow: 0 4px 16px rgba(0,0,0,.3);
+    }
+    .lang-btn:hover { background: var(--gold-dim); border-color: var(--gold); }
+
+    /* ── Responsive ─────────────────────────────────────── */
+    @media (max-width: 760px) {
+      .main-grid { grid-template-columns: 1fr; max-width: 460px; }
+      .header { padding: 0 16px; }
+      .header-user span { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Fond -->
+<div class="bg">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+<canvas id="cvs"></canvas>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-brand">
+    <div class="header-icon">◈</div>
+    WIN AFFINITY
+  </div>
+  <div class="header-user">
+    <span>{{ user.full_name }}</span>
+    <div class="header-avatar">{{ user.full_name[0].upper() }}</div>
+  </div>
+</header>
+
+<!-- Bouton langue -->
+<button class="lang-btn" onclick="toggleLang()">
+  <span id="langFlag">🇬🇧</span>
+  <span id="langLabel">English</span>
+</button>
+
+<!-- Overlay succès -->
+<div id="successOverlay">
+  <div class="success-ring">✓</div>
+  <div class="success-title" id="successTitle" data-fr="Compte activé !" data-en="Account Activated!">Compte activé !</div>
+  <div class="success-sub" id="successSub" data-fr="Redirection vers votre dashboard…" data-en="Redirecting to your dashboard…">Redirection vers votre dashboard…</div>
+  <div class="success-loader"><div class="success-loader-bar"></div></div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Contenu -->
+<div class="page">
+
+  <!-- Héro -->
+  <div class="hero">
+    <div class="hero-badge" data-fr="ACTIVATION REQUISE" data-en="ACTIVATION REQUIRED">ACTIVATION REQUISE</div>
+    <h1 class="hero-title">
+      <span data-fr="Débloquez votre" data-en="Unlock Your">Débloquez votre</span><br/>
+      <span data-fr="potentiel complet" data-en="full potential">potentiel complet</span>
+    </h1>
+    <p class="hero-sub" data-fr="Une seule activation pour accéder à tout l'écosystème WIN AFFINITY et commencer à générer des revenus."
+       data-en="One activation to access the full WIN AFFINITY ecosystem and start generating income.">
+      Une seule activation pour accéder à tout l'écosystème WIN AFFINITY et commencer à générer des revenus.
+    </p>
+  </div>
+
+  <!-- Grille -->
+  <div class="main-grid">
+
+    <!-- Avantages -->
+    <div class="card card-benefits">
+      <div class="card-title" data-fr="Ce qui vous attend" data-en="What Awaits You">Ce qui vous attend</div>
+      <div class="card-subtitle" data-fr="Accès complet dès l'activation" data-en="Full access upon activation">Accès complet dès l'activation</div>
+
+      <div class="benefit-list">
+        <div class="benefit">
+          <div class="benefit-ico">🌐</div>
+          <div class="benefit-info">
+            <div class="benefit-name" data-fr="Réseau d'affiliation illimité" data-en="Unlimited Affiliate Network">Réseau d'affiliation illimité</div>
+            <div class="benefit-desc" data-fr="Parrainez sans limite et construisez votre équipe dans le monde entier." data-en="Refer without limits and build your team worldwide.">Parrainez sans limite et construisez votre équipe dans le monde entier.</div>
+          </div>
+        </div>
+        <div class="benefit">
+          <div class="benefit-ico">💰</div>
+          <div class="benefit-info">
+            <div class="benefit-name" data-fr="Commissions instantanées" data-en="Instant Commissions">Commissions instantanées</div>
+            <div class="benefit-desc" data-fr="Recevez vos gains directement sur votre compte à chaque parrainage validé." data-en="Receive your earnings directly to your account with each validated referral.">Recevez vos gains directement sur votre compte à chaque parrainage validé.</div>
+          </div>
+        </div>
+        <div class="benefit">
+          <div class="benefit-ico">📊</div>
+          <div class="benefit-info">
+            <div class="benefit-name" data-fr="Dashboard analytique" data-en="Analytics Dashboard">Dashboard analytique</div>
+            <div class="benefit-desc" data-fr="Suivez vos performances, filleuls et revenus en temps réel." data-en="Track your performance, referrals and revenue in real time.">Suivez vos performances, filleuls et revenus en temps réel.</div>
+          </div>
+        </div>
+        <div class="benefit">
+          <div class="benefit-ico">🎯</div>
+          <div class="benefit-info">
+            <div class="benefit-name" data-fr="Lien de parrainage unique" data-en="Unique Referral Link">Lien de parrainage unique</div>
+            <div class="benefit-desc" data-fr="Votre code : {{ user.referral_code }} — partagez-le partout." data-en="Your code: {{ user.referral_code }} — share it everywhere.">Votre code : <strong>{{ user.referral_code }}</strong> — partagez-le partout.</div>
+          </div>
+        </div>
+        <div class="benefit">
+          <div class="benefit-ico">🏆</div>
+          <div class="benefit-info">
+            <div class="benefit-name" data-fr="Programme de bonus" data-en="Bonus Program">Programme de bonus</div>
+            <div class="benefit-desc" data-fr="Accédez aux niveaux VIP et débloquez des primes exclusives." data-en="Access VIP levels and unlock exclusive bonuses.">Accédez aux niveaux VIP et débloquez des primes exclusives.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paiement -->
+    <div class="card card-payment">
+
+      <div class="price-block">
+        <div class="price-label" data-fr="ACTIVATION UNIQUE" data-en="ONE-TIME ACTIVATION">ACTIVATION UNIQUE</div>
+        <div class="price-main">
+          <span class="price-currency">$</span>{{ "%.2f"|format(amount_usd) }}
+        </div>
+        <div class="price-period" data-fr="Paiement unique · Accès à vie" data-en="One-time payment · Lifetime access">Paiement unique · Accès à vie</div>
+        <div class="price-xof">≈ {{ amount_xof }} XOF</div>
+      </div>
+
+      <div class="gold-line"></div>
+
+      <div class="includes">
+        <div class="inc-row"><span class="chk">✓</span> <span data-fr="Accès immédiat au dashboard" data-en="Immediate dashboard access">Accès immédiat au dashboard</span></div>
+        <div class="inc-row"><span class="chk">✓</span> <span data-fr="Lien de parrainage activé" data-en="Referral link activated">Lien de parrainage activé</span></div>
+        <div class="inc-row"><span class="chk">✓</span> <span data-fr="Commissions sans limite" data-en="Unlimited commissions">Commissions sans limite</span></div>
+        <div class="inc-row"><span class="chk">✓</span> <span data-fr="Support prioritaire" data-en="Priority support">Support prioritaire</span></div>
+      </div>
+
+      <div class="gold-line"></div>
+
+      <!-- Bouton paiement -->
+      <button class="btn-pay" id="payBtn" onclick="startPayment()">
+        <div class="spinner-pay" id="paySpinner"></div>
+        <span>🔐</span>
+        <span id="payBtnText" data-fr="ACTIVER MON COMPTE" data-en="ACTIVATE MY ACCOUNT">ACTIVER MON COMPTE</span>
+      </button>
+
+      <div class="secure-row">
+        <span>🔒</span>
+        <span data-fr="Paiement 100% sécurisé via LeekPay" data-en="100% secure payment via LeekPay">Paiement 100% sécurisé via LeekPay</span>
+      </div>
+
+      <div class="pay-methods">
+        <div class="pay-tag">Orange Money</div>
+        <div class="pay-tag">Free Money</div>
+        <div class="pay-tag">Wave</div>
+        <div class="pay-tag">Visa / MC</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─── PARTICULES ──────────────────────────────────────── */
+(function(){
+  const c = document.getElementById('cvs'), x = c.getContext('2d');
+  let W,H,pts=[];
+  const resize=()=>{ W=c.width=innerWidth; H=c.height=innerHeight; };
+  resize(); addEventListener('resize',resize);
+  for(let i=0;i<65;i++) pts.push({
+    x:Math.random()*1920,y:Math.random()*1080,
+    r:Math.random()*1.5+.2,
+    vx:(Math.random()-.5)*.14,vy:(Math.random()-.5)*.14,
+    o:Math.random()*.4+.08
+  });
+  const draw=()=>{
+    x.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      x.beginPath();x.arc(p.x,p.y,p.r,0,Math.PI*2);
+      x.fillStyle=`rgba(201,168,76,${p.o})`;x.fill();
+    });
+    requestAnimationFrame(draw);
+  };
+  draw();
+})();
+
+/* ─── TRADUCTION ─────────────────────────────────────── */
+let lang = 'fr';
+function toggleLang(){
+  lang = lang==='fr'?'en':'fr';
+  const isEn = lang==='en';
+  document.getElementById('langFlag').textContent = isEn?'🇫🇷':'🇬🇧';
+  document.getElementById('langLabel').textContent = isEn?'Français':'English';
+  document.documentElement.setAttribute('lang', lang);
+  document.querySelectorAll('[data-fr]').forEach(el=>{
+    el.textContent = isEn ? el.dataset.en : el.dataset.fr;
+  });
+}
+
+/* ─── LEEKPAY PAIEMENT ───────────────────────────────── */
+function startPayment() {
+  const btn = document.getElementById('payBtn');
+  const spinner = document.getElementById('paySpinner');
+  const txt = document.getElementById('payBtnText');
+
+  // Désactiver le bouton
+  btn.disabled = true;
+  spinner.style.display = 'block';
+  txt.textContent = lang==='en' ? 'PROCESSING...' : 'TRAITEMENT...';
+
+  LeekPay.checkout({
+    amount:      {{ amount_xof }},
+    currency:    'XOF',
+    apiKey:      '{{ leekpay_public_key }}',
+    description: lang==='en'
+      ? 'WIN AFFINITY Account Activation'
+      : 'Activation compte WIN AFFINITY',
+    customerEmail: '{{ user.email }}',
+
+    onSuccess: async function(data) {
+      /* ── Confirmation côté serveur ──────────────────────
+         Double-vérification : on envoie le payment_id au
+         backend qui re-vérifie via l'API LeekPay avant
+         d'activer le compte (ne jamais faire confiance
+         uniquement au JS client).
+      ─────────────────────────────────────────────────── */
+      try {
+        const res = await fetch('/payment/confirm', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            payment_id: data.payment_id,
+            amount:     data.amount,
+            currency:   data.currency,
+            status:     data.status,
+          })
+        });
+        const result = await res.json();
+
+        if (result.success) {
+          showSuccess();
+        } else {
+          // Paiement reçu mais activation échouée → on affiche une erreur
+          showToast('⚠ ' + (result.error || (lang==='en'?'Activation failed.':'Activation impossible.')), 'error');
+          resetBtn();
+        }
+      } catch(err) {
+        // Erreur réseau → on affiche un toast mais ne bloque pas l'utilisateur
+        showToast(lang==='en'?'Network error. Please refresh.':'Erreur réseau. Veuillez actualiser.', 'error');
+        resetBtn();
+      }
+    },
+
+    onCancel: function() {
+      showToast(lang==='en'?'Payment cancelled.':'Paiement annulé.', 'error');
+      resetBtn();
+    }
+  });
+}
+
+/* ─── RÉINITIALISER LE BOUTON ────────────────────────── */
+function resetBtn(){
+  const btn = document.getElementById('payBtn');
+  btn.disabled = false;
+  document.getElementById('paySpinner').style.display = 'none';
+  document.getElementById('payBtnText').textContent = lang==='en'?'ACTIVATE MY ACCOUNT':'ACTIVER MON COMPTE';
+}
+
+/* ─── OVERLAY SUCCÈS + REDIRECT ─────────────────────── */
+function showSuccess(){
+  const o = document.getElementById('successOverlay');
+  o.classList.add('show');
+  // Redirection vers le dashboard après 3s (durée de l'animation loader)
+  setTimeout(()=>{ window.location.href = '/dashboard'; }, 3000);
+}
+
+/* ─── TOAST ──────────────────────────────────────────── */
+function showToast(msg, type='success'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `show ${type}`;
+  clearTimeout(t._tid);
+  t._tid = setTimeout(()=>{ t.className=''; }, 4000);
+}
+</script>
+</body>
+</html>
