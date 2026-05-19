@@ -42,7 +42,7 @@
     #cvs { position:fixed; inset:0; z-index:1; pointer-events:none; opacity:.25; }
 
     /* ── Sidebar ─────────────────────────────────────── */
-    .sidebar {
+    .sidebar { overflow-y: auto;
       position: fixed; left:0; top:0; bottom:0;
       width: var(--sidebar-w); z-index: 30;
       background: rgba(7,16,31,.95);
@@ -366,7 +366,7 @@
     @media(max-width:1100px) { .stats-grid{grid-template-columns:1fr 1fr} }
     @media(max-width:820px)  { .two-col{grid-template-columns:1fr} }
     @media(max-width:700px) {
-      .sidebar { transform:translateX(-100%); }
+      .sidebar { overflow-y: auto; transform:translateX(-100%); }
       .sidebar.open { transform:translateX(0); }
       .overlay-sidebar.open { display:block; }
       .main { margin-left:0; padding:20px 14px 50px; }
@@ -441,7 +441,7 @@
       <span class="ni">👤</span>
       <span data-fr="Mon profil" data-en="My Profile">Mon profil</span>
     </a>
-    <a href="/faq" class="nav-item">
+    <a href="/profile" class="nav-item">
       <span class="ni">⚙️</span>
       <span data-fr="Paramètres" data-en="Settings">Paramètres</span>
     </a>
