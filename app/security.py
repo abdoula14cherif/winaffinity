@@ -38,7 +38,7 @@ def hash_password(plain: str) -> str:
     Hache le mot de passe avec bcrypt + pepper.
     Le pepper est concaténé AVANT le hachage.
     """
-    peppered = plain + _PEPPER
+    peppered = (plain + _PEPPER)[:72]
     return _pwd_context.hash(peppered)
 
 
@@ -48,7 +48,7 @@ def verify_password(plain: str, hashed: str) -> bool:
     Retourne False silencieusement en cas d'échec (pas d'exception).
     """
     try:
-        peppered = plain + _PEPPER
+        peppered = (plain + _PEPPER)[:72]
         return _pwd_context.verify(peppered, hashed)
     except Exception:
         # Ne jamais faire fuiter d'informations sur la raison de l'échec
