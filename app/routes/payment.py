@@ -73,7 +73,7 @@ async def get_payment(request: Request):
     # Montant en dollars (converti depuis XOF pour l'affichage)
     # 1 USD ≈ 600 XOF (taux approximatif)
     amount_xof = settings.activation_amount
-    amount_usd = round(amount_xof / 600, 2)
+    
 
     return templates.TemplateResponse(
         "payment.html",
@@ -81,7 +81,7 @@ async def get_payment(request: Request):
             "request": request,
             "user": user,
             "amount_xof": amount_xof,
-            "amount_usd": amount_usd,
+            
             "leekpay_public_key": settings.leekpay_public_key,
             "base_url": settings.base_url,
         },
@@ -130,6 +130,8 @@ async def confirm_payment(request: Request, body: PaymentConfirmRequest):
     # 3. Activation du compte si statut = completed
     if real_status == "completed":
         activated = await activate_user_account(db, user["id"])
+        from app.services.commission_service import process_commissions
+        await process_commissions(db, user["id"])
         if activated:
             return JSONResponse({"success": True, "redirect": "/dashboard"})
         return JSONResponse({"success": False, "error": "Activation impossible."}, status_code=500)
