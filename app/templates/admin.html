@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WIN AFFINITY — Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--gold:#C9A84C;--gold-light:#E8C96A;--gold-dim:rgba(201,168,76,.13);--navy:#07101F;--navy-2:#0D1B2A;--navy-card:rgba(13,27,42,.9);--white:#F4EFE6;--white-dim:rgba(244,239,230,.55);--soft:rgba(244,239,230,.06);--border:rgba(201,168,76,.2);--success:#4CAF7E;--danger:#E05A5A;--warning:#E09050;--r:14px;--t:.3s cubic-bezier(.4,0,.2,1)}
+    html,body{min-height:100%;font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--white)}
+    .bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 60% 50% at 0% 0%,#0e2240 0%,transparent 55%),linear-gradient(165deg,#07101F 0%,#091525 100%)}
+    /* Header */
+    .header{position:fixed;top:0;left:0;right:0;z-index:20;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:rgba(7,16,31,.97);border-bottom:1px solid rgba(224,90,90,.3);backdrop-filter:blur(16px)}
+    .brand{display:flex;align-items:center;gap:10px;font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;letter-spacing:.1em;background:linear-gradient(135deg,var(--gold-light),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .brand-icon{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#8B5A00);display:flex;align-items:center;justify-content:center;font-size:16px}
+    .admin-badge{background:rgba(224,90,90,.15);border:1px solid rgba(224,90,90,.4);color:#F08080;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;letter-spacing:.1em}
+    .header-right{display:flex;align-items:center;gap:10px}
+    .back-btn{color:var(--gold);text-decoration:none;font-size:13px;padding:6px 12px;border:1px solid var(--border);border-radius:8px}
+    /* Layout */
+    .page{position:relative;z-index:2;padding:76px 16px 60px;max-width:1100px;margin:0 auto}
+    /* Tabs */
+    .tabs{display:flex;gap:6px;margin-bottom:24px;flex-wrap:wrap}
+    .tab{padding:9px 18px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--soft);color:var(--white-dim);transition:all var(--t)}
+    .tab.active{background:var(--gold-dim);color:var(--gold);border-color:var(--gold)}
+    .tab-content{display:none}
+    .tab-content.active{display:block}
+    /* Stats */
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+    .stat{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--r);padding:18px;backdrop-filter:blur(16px)}
+    .stat-num{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:var(--gold);line-height:1}
+    .stat-lbl{font-size:11px;color:var(--white-dim);margin-top:4px;text-transform:uppercase;letter-spacing:.07em}
+    /* Card */
+    .card{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--r);padding:20px;backdrop-filter:blur(16px);margin-bottom:16px}
+    .card-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+    /* Table */
+    .tbl-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    thead th{text-align:left;padding:9px 12px;font-size:10.5px;color:rgba(201,168,76,.7);letter-spacing:.09em;text-transform:uppercase;border-bottom:1px solid rgba(201,168,76,.12);white-space:nowrap}
+    tbody tr{transition:background var(--t)}
+    tbody tr:hover{background:rgba(244,239,230,.03)}
+    tbody td{padding:11px 12px;color:var(--white-dim);border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+    .td-name{font-weight:500;color:var(--white)}
+    /* Badges */
+    .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500}
+    .badge::before{content:'';width:5px;height:5px;border-radius:50%}
+    .b-active{background:rgba(76,175,126,.12);color:var(--success);border:1px solid rgba(76,175,126,.25)}
+    .b-active::before{background:var(--success)}
+    .b-pending{background:rgba(224,144,80,.12);color:var(--warning);border:1px solid rgba(224,144,80,.25)}
+    .b-pending::before{background:var(--warning)}
+    .b-rejected{background:rgba(224,90,90,.12);color:var(--danger);border:1px solid rgba(224,90,90,.25)}
+    .b-rejected::before{background:var(--danger)}
+    .b-approved{background:rgba(76,175,126,.12);color:var(--success);border:1px solid rgba(76,175,126,.25)}
+    .b-approved::before{background:var(--success)}
+    /* Boutons action */
+    .btn-xs{padding:5px 10px;border-radius:7px;font-size:11.5px;font-weight:500;cursor:pointer;border:none;transition:all var(--t)}
+    .btn-activate{background:rgba(76,175,126,.15);color:var(--success);border:1px solid rgba(76,175,126,.3)}
+    .btn-deactivate{background:rgba(224,90,90,.15);color:var(--danger);border:1px solid rgba(224,90,90,.3)}
+    .btn-approve{background:rgba(76,175,126,.15);color:var(--success);border:1px solid rgba(76,175,126,.3)}
+    .btn-reject{background:rgba(224,90,90,.15);color:var(--danger);border:1px solid rgba(224,90,90,.3)}
+    .btn-delete{background:rgba(224,90,90,.15);color:var(--danger);border:1px solid rgba(224,90,90,.3)}
+    .btn-xs:hover{transform:translateY(-1px);opacity:.85}
+    /* Formulaire tâche */
+    .form-inline{display:grid;grid-template-columns:1fr 1fr 80px 1fr auto;gap:10px;align-items:end}
+    .fg{display:flex;flex-direction:column;gap:5px}
+    .fg label{font-size:10.5px;color:var(--gold);letter-spacing:.08em;text-transform:uppercase}
+    .fg input,.fg select,.fg textarea{background:var(--soft);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--white);outline:none}
+    .fg input:focus,.fg select:focus{border-color:var(--gold)}
+    .fg select option{background:#0D1B2A}
+    .btn-add{padding:10px 18px;background:linear-gradient(135deg,var(--gold),#A07020);color:var(--navy);border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+    /* Search */
+    .search-bar{display:flex;gap:10px;margin-bottom:14px}
+    .search-bar input{flex:1;background:var(--soft);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:13px;color:var(--white);outline:none}
+    .search-bar input:focus{border-color:var(--gold)}
+    /* Toast */
+    #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--navy-card);border:1px solid var(--border);border-radius:10px;padding:12px 22px;font-size:13.5px;transition:transform .4s,opacity .4s;opacity:0;z-index:999;pointer-events:none}
+    #toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+    #toast.ok{border-color:rgba(76,175,126,.4);color:#7ECBA3}
+    #toast.err{border-color:rgba(224,90,90,.4);color:#F08080}
+    @media(max-width:800px){.stats-grid{grid-template-columns:1fr 1fr}.form-inline{grid-template-columns:1fr}}
+    @media(max-width:500px){.stats-grid{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+<div class="bg"></div>
+<header class="header">
+  <div class="brand"><div class="brand-icon">◈</div>WIN AFFINITY</div>
+  <div class="header-right">
+    <span class="admin-badge">⚡ ADMIN</span>
+    <a href="/dashboard" class="back-btn">← Site</a>
+  </div>
+</header>
+
+<div class="page">
+  <!-- Stats globales -->
+  <div class="stats-grid">
+    <div class="stat"><div class="stat-num">{{ stats.total_users or 0 }}</div><div class="stat-lbl">Total membres</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--success)">{{ stats.active_users or 0 }}</div><div class="stat-lbl">Comptes actifs</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--warning)">{{ stats.pending_withdrawals or 0 }}</div><div class="stat-lbl">Retraits en attente</div></div>
+    <div class="stat"><div class="stat-num">{{ stats.total_commissions or 0 }} <span style="font-size:14px">F</span></div><div class="stat-lbl">Commissions versées</div></div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('users',this)">👥 Utilisateurs</div>
+    <div class="tab" onclick="showTab('withdrawals',this)">💸 Retraits</div>
+    <div class="tab" onclick="showTab('tasks',this)">📋 Tâches</div>
+  </div>
+
+  <!-- TAB UTILISATEURS -->
+  <div class="tab-content active" id="tab-users">
+    <div class="card">
+      <div class="card-title">Tous les utilisateurs <span style="font-size:13px;color:var(--white-dim)">{{ users|length }} membres</span></div>
+      <div class="search-bar">
+        <input type="text" id="searchUser" placeholder="🔍 Rechercher par nom ou email..." oninput="filterUsers()"/>
+      </div>
+      <div class="tbl-wrap">
+        <table id="usersTable">
+          <thead><tr>
+            <th>NOM</th><th>EMAIL</th><th>TÉLÉPHONE</th>
+            <th>CODE</th><th>FILLEULS</th><th>STATUT</th><th>DATE</th><th>ACTION</th>
+          </tr></thead>
+          <tbody>
+            {% for u in users %}
+            <tr id="row-{{ u.id }}">
+              <td class="td-name">{{ u.full_name }}</td>
+              <td>{{ u.email }}</td>
+              <td>{{ u.phone }}</td>
+              <td style="color:var(--gold);font-weight:600;letter-spacing:.08em">{{ u.referral_code }}</td>
+              <td style="text-align:center">{{ u.referral_count or 0 }}</td>
+              <td>
+                <span class="badge {% if u.is_active %}b-active{% else %}b-pending{% endif %}" id="badge-{{ u.id }}">
+                  {% if u.is_active %}Actif{% else %}En attente{% endif %}
+                </span>
+              </td>
+              <td>{{ u.created_at[:10] if u.created_at else '—' }}</td>
+              <td>
+                <button class="btn-xs {% if u.is_active %}btn-deactivate{% else %}btn-activate{% endif %}"
+                  id="btn-{{ u.id }}"
+                  onclick="toggleUser('{{ u.id }}', {{ 'true' if u.is_active else 'false' }})">
+                  {% if u.is_active %}Désactiver{% else %}Activer{% endif %}
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB RETRAITS -->
+  <div class="tab-content" id="tab-withdrawals">
+    <div class="card">
+      <div class="card-title">Demandes de retrait</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>DATE</th><th>UTILISATEUR</th><th>MONTANT</th><th>FRAIS</th><th>NET</th><th>OPÉRATEUR</th><th>TÉLÉPHONE</th><th>STATUT</th><th>ACTION</th>
+          </tr></thead>
+          <tbody>
+            {% for w in withdrawals %}
+            <tr id="wd-{{ w.id }}">
+              <td>{{ w.created_at[:10] if w.created_at else '—' }}</td>
+              <td class="td-name">{{ w.user_id[:8] }}...</td>
+              <td style="color:var(--white)">{{ w.amount }} FCFA</td>
+              <td style="color:var(--danger)">-{{ w.fee }} FCFA</td>
+              <td style="color:var(--success);font-weight:600">{{ w.net_amount }} FCFA</td>
+              <td>{{ w.operator.replace('_',' ').title() }}</td>
+              <td>{{ w.phone }}</td>
+              <td>
+                <span class="badge b-{{ w.status }}" id="wbadge-{{ w.id }}">
+                  {% if w.status == 'pending' %}⏳ En attente
+                  {% elif w.status == 'approved' %}✓ Approuvé
+                  {% else %}✗ Rejeté{% endif %}
+                </span>
+              </td>
+              <td style="display:flex;gap:6px">
+                {% if w.status == 'pending' %}
+                <button class="btn-xs btn-approve" onclick="approveWd('{{ w.id }}')">✓ Approuver</button>
+                <button class="btn-xs btn-reject" onclick="rejectWd('{{ w.id }}')">✗ Rejeter</button>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+            {% if not withdrawals %}
+            <tr><td colspan="9" style="text-align:center;padding:30px;color:var(--white-dim)">Aucun retrait</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB TÂCHES -->
+  <div class="tab-content" id="tab-tasks">
+    <div class="card">
+      <div class="card-title">Ajouter une tâche</div>
+      <div class="form-inline">
+        <div class="fg"><label>TITRE</label><input type="text" id="tTitle" placeholder="ex: Suivre sur Instagram"/></div>
+        <div class="fg"><label>DESCRIPTION</label><input type="text" id="tDesc" placeholder="Description courte"/></div>
+        <div class="fg"><label>GAIN</label>
+          <select id="tReward">
+            <option value="300">300 FCFA</option>
+            <option value="100">100 FCFA</option>
+            <option value="55">55 FCFA</option>
+          </select>
+        </div>
+        <div class="fg"><label>LIEN (optionnel)</label><input type="text" id="tLink" placeholder="https://..."/></div>
+        <button class="btn-add" onclick="addTask()">+ Ajouter</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Tâches actives</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>TITRE</th><th>DESCRIPTION</th><th>GAIN</th><th>LIEN</th><th>STATUT</th><th>ACTIONS</th></tr></thead>
+          <tbody id="tasksTbody">
+            {% for t in tasks %}
+            <tr id="task-{{ t.id }}">
+              <td class="td-name">{{ t.title }}</td>
+              <td>{{ t.description or '—' }}</td>
+              <td style="color:var(--gold);font-weight:600">{{ t.reward }} FCFA</td>
+              <td>{% if t.link %}<a href="{{ t.link }}" target="_blank" style="color:var(--gold);font-size:12px">🔗 Lien</a>{% else %}—{% endif %}</td>
+              <td><span class="badge {% if t.is_active %}b-active{% else %}b-pending{% endif %}">{% if t.is_active %}Active{% else %}Inactive{% endif %}</span></td>
+              <td style="display:flex;gap:6px">
+                <button class="btn-xs {% if t.is_active %}btn-deactivate{% else %}btn-activate{% endif %}" onclick="toggleTask('{{ t.id }}')">{% if t.is_active %}Désactiver{% else %}Activer{% endif %}</button>
+                <button class="btn-xs btn-delete" onclick="deleteTask('{{ t.id }}')">🗑 Supprimer</button>
+              </td>
+            </tr>
+            {% endfor %}
+            {% if not tasks %}
+            <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--white-dim)">Aucune tâche</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+function showTab(name, el){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+function toast(msg, type='ok'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='show '+type;
+  clearTimeout(t._t); t._t=setTimeout(()=>t.className='',3000);
+}
+
+async function post(url, data){
+  const f=new FormData();
+  Object.entries(data).forEach(([k,v])=>f.append(k,v));
+  const r=await fetch(url,{method:'POST',body:f});
+  return r.json();
+}
+
+async function toggleUser(id, isActive){
+  const r=await post('/admin/user/toggle-active',{user_id:id});
+  if(r.success){
+    const active=r.is_active;
+    document.getElementById('badge-'+id).className='badge '+(active?'b-active':'b-pending');
+    document.getElementById('badge-'+id).textContent=active?'Actif':'En attente';
+    const btn=document.getElementById('btn-'+id);
+    btn.className='btn-xs '+(active?'btn-deactivate':'btn-activate');
+    btn.textContent=active?'Désactiver':'Activer';
+    btn.onclick=()=>toggleUser(id,active);
+    toast(active?'✓ Compte activé':'✓ Compte désactivé');
+  } else toast('Erreur','err');
+}
+
+async function approveWd(id){
+  const r=await post('/admin/withdrawal/approve',{withdrawal_id:id});
+  if(r.success){
+    document.getElementById('wbadge-'+id).className='badge b-approved';
+    document.getElementById('wbadge-'+id).textContent='✓ Approuvé';
+    const row=document.getElementById('wd-'+id);
+    row.querySelector('td:last-child').innerHTML='';
+    toast('✓ Retrait approuvé');
+  } else toast('Erreur','err');
+}
+
+async function rejectWd(id){
+  const r=await post('/admin/withdrawal/reject',{withdrawal_id:id});
+  if(r.success){
+    document.getElementById('wbadge-'+id).className='badge b-rejected';
+    document.getElementById('wbadge-'+id).textContent='✗ Rejeté';
+    const row=document.getElementById('wd-'+id);
+    row.querySelector('td:last-child').innerHTML='';
+    toast('Retrait rejeté');
+  } else toast('Erreur','err');
+}
+
+async function addTask(){
+  const title=document.getElementById('tTitle').value.trim();
+  const desc=document.getElementById('tDesc').value.trim();
+  const reward=document.getElementById('tReward').value;
+  const link=document.getElementById('tLink').value.trim();
+  if(!title){toast('Titre requis','err');return;}
+  const r=await post('/admin/task/add',{title,description:desc,reward,link});
+  if(r.success){toast('✓ Tâche ajoutée');setTimeout(()=>location.reload(),1000);}
+  else toast('Erreur','err');
+}
+
+async function toggleTask(id){
+  const r=await post('/admin/task/toggle',{task_id:id});
+  if(r.success){toast('✓ Tâche mise à jour');setTimeout(()=>location.reload(),800);}
+  else toast('Erreur','err');
+}
+
+async function deleteTask(id){
+  if(!confirm('Supprimer cette tâche ?'))return;
+  const r=await post('/admin/task/delete',{task_id:id});
+  if(r.success){document.getElementById('task-'+id).remove();toast('✓ Tâche supprimée');}
+  else toast('Erreur','err');
+}
+
+function filterUsers(){
+  const q=document.getElementById('searchUser').value.toLowerCase();
+  document.querySelectorAll('#usersTable tbody tr').forEach(row=>{
+    row.style.display=row.textContent.toLowerCase().includes(q)?'':'none';
+  });
+}
+</script>
+</body>
+</html>

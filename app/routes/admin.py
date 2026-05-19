@@ -1,0 +1,126 @@
+"""
+Panel Admin WIN AFFINITY
+Accès réservé aux comptes role='admin'
+"""
+import logging
+from fastapi import APIRouter, Request, Form
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
+from fastapi.templating import Jinja2Templates
+from typing import Annotated
+from app.database import get_supabase
+from app.security import decode_access_token
+from app.services.auth_service import get_user_by_id
+
+router = APIRouter(prefix="/admin", tags=["Admin"])
+templates = Jinja2Templates(directory="app/templates")
+logger = logging.getLogger(__name__)
+
+async def _get_admin(request: Request):
+    token = request.cookies.get("access_token")
+    if not token: return None
+    payload = decode_access_token(token)
+    if not payload: return None
+    user = await get_user_by_id(get_supabase(), payload["sub"])
+    if not user or user.get("role") != "admin": return None
+    return user
+
+@router.get("", response_class=HTMLResponse)
+async def admin_dashboard(request: Request):
+    admin = await _get_admin(request)
+    if not admin: return RedirectResponse("/auth/login", status_code=302)
+    db = get_supabase()
+    try:
+        users = db.table("users").select("*").order("created_at", desc=True).execute().data or []
+        payments = db.table("payments").select("*").order("created_at", desc=True).limit(50).execute().data or []
+        withdrawals = db.table("withdrawals").select("*").order("created_at", desc=True).limit(50).execute().data or []
+        commissions = db.table("commissions").select("*").order("created_at", desc=True).limit(50).execute().data or []
+        tasks = db.table("tasks").select("*").order("created_at", desc=True).execute().data or []
+        total_balance = sum(w.get("balance",0) for w in (db.table("wallets").select("balance").execute().data or []))
+        stats = {
+            "total_users": len(users),
+            "active_users": len([u for u in users if u.get("is_active")]),
+            "pending_users": len([u for u in users if not u.get("is_active")]),
+            "total_withdrawals": len(withdrawals),
+            "pending_withdrawals": len([w for w in withdrawals if w.get("status")=="pending"]),
+            "total_commissions": sum(c.get("amount",0) for c in commissions),
+            "total_balance": total_balance,
+            "total_payments": len([p for p in payments if p.get("status")=="completed"]),
+        }
+    except Exception as e:
+        logger.error("[ADMIN] Erreur chargement : %s", e)
+        users, payments, withdrawals, commissions, tasks = [], [], [], [], []
+        stats = {}
+    return templates.TemplateResponse("admin.html", {
+        "request": request, "admin": admin,
+        "users": users, "payments": payments,
+        "withdrawals": withdrawals, "tasks": tasks,
+        "stats": stats,
+    })
+
+@router.post("/user/toggle-active")
+async def toggle_active(request: Request, user_id: Annotated[str, Form()]):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    user = db.table("users").select("is_active").eq("id", user_id).execute().data
+    if not user: return JSONResponse({"error": "Utilisateur introuvable"}, status_code=404)
+    new_status = not user[0]["is_active"]
+    db.table("users").update({"is_active": new_status}).eq("id", user_id).execute()
+    if new_status:
+        wallet = db.table("wallets").select("id").eq("user_id", user_id).execute().data
+        if not wallet:
+            db.table("wallets").insert({"user_id": user_id, "balance": 0, "total_earned": 0}).execute()
+        from app.services.commission_service import process_commissions
+        await process_commissions(db, user_id)
+    logger.info("[ADMIN] Compte %s → is_active=%s", user_id, new_status)
+    return JSONResponse({"success": True, "is_active": new_status})
+
+@router.post("/withdrawal/approve")
+async def approve_withdrawal(request: Request, withdrawal_id: Annotated[str, Form()]):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    db.table("withdrawals").update({"status": "approved"}).eq("id", withdrawal_id).execute()
+    logger.info("[ADMIN] Retrait approuvé : %s", withdrawal_id)
+    return JSONResponse({"success": True})
+
+@router.post("/withdrawal/reject")
+async def reject_withdrawal(request: Request, withdrawal_id: Annotated[str, Form()]):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    wd = db.table("withdrawals").select("*").eq("id", withdrawal_id).execute().data
+    if wd:
+        w = wd[0]
+        if w["status"] == "pending":
+            wallet = db.table("wallets").select("balance").eq("user_id", w["user_id"]).execute().data
+            if wallet:
+                db.table("wallets").update({"balance": wallet[0]["balance"] + w["amount"]}).eq("user_id", w["user_id"]).execute()
+    db.table("withdrawals").update({"status": "rejected"}).eq("id", withdrawal_id).execute()
+    return JSONResponse({"success": True})
+
+@router.post("/task/add")
+async def add_task(request: Request, title: Annotated[str, Form()], description: Annotated[str, Form()], reward: Annotated[int, Form()], link: Annotated[str, Form()] = ""):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    db.table("tasks").insert({"title": title, "description": description, "reward": reward, "link": link or None}).execute()
+    return JSONResponse({"success": True})
+
+@router.post("/task/toggle")
+async def toggle_task(request: Request, task_id: Annotated[str, Form()]):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    task = db.table("tasks").select("is_active").eq("id", task_id).execute().data
+    if task:
+        db.table("tasks").update({"is_active": not task[0]["is_active"]}).eq("id", task_id).execute()
+    return JSONResponse({"success": True})
+
+@router.post("/task/delete")
+async def delete_task(request: Request, task_id: Annotated[str, Form()]):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    db.table("tasks").delete().eq("id", task_id).execute()
+    return JSONResponse({"success": True})
