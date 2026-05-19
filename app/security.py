@@ -26,7 +26,7 @@ settings = get_settings()
 # ── Hachage ──────────────────────────────────────────────────────────────────
 
 # bcrypt avec un coût de 12 (bon équilibre sécurité / performance)
-_pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=12)
+_pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Pepper statique : ajoute une couche de sécurité côté application
 # (même si la DB est compromise, les hashes restent inutilisables sans le pepper)
