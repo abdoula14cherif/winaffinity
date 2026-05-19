@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WIN AFFINITY — FAQ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--gold:#C9A84C;--gold-light:#E8C96A;--gold-dim:rgba(201,168,76,.13);--navy:#07101F;--navy-card:rgba(13,27,42,.85);--white:#F4EFE6;--white-dim:rgba(244,239,230,.55);--soft:rgba(244,239,230,.06);--border:rgba(201,168,76,.2);--r:16px;--t:.35s cubic-bezier(.4,0,.2,1)}
+    html,body{min-height:100%;font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--white)}
+    .bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 60% 50% at 0% 0%,#0e2240 0%,transparent 55%),linear-gradient(165deg,#07101F 0%,#091525 100%)}
+    .header{position:fixed;top:0;left:0;right:0;z-index:20;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:rgba(7,16,31,.95);border-bottom:1px solid var(--border);backdrop-filter:blur(16px)}
+    .brand{display:flex;align-items:center;gap:10px;font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;letter-spacing:.1em;background:linear-gradient(135deg,var(--gold-light),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .brand-icon{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--gold),#8B5A00);display:flex;align-items:center;justify-content:center;font-size:17px}
+    .back-btn{display:flex;align-items:center;gap:6px;color:var(--gold);text-decoration:none;font-size:13.5px;font-weight:500;padding:8px 14px;border:1px solid var(--border);border-radius:8px}
+    .page{position:relative;z-index:2;min-height:100vh;padding:90px 20px 60px;max-width:700px;margin:0 auto}
+    .hero{text-align:center;margin-bottom:36px}
+    .hero h1{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;margin-bottom:8px}
+    .hero h1 span{color:var(--gold)}
+    .hero p{font-size:14px;color:var(--white-dim)}
+    .faq-item{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden;backdrop-filter:blur(20px)}
+    .faq-q{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;cursor:pointer;transition:background var(--t)}
+    .faq-q:hover{background:var(--gold-dim)}
+    .faq-q-text{font-size:15px;font-weight:500;color:var(--white)}
+    .faq-icon{color:var(--gold);font-size:18px;transition:transform var(--t)}
+    .faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease}
+    .faq-a.open{max-height:300px}
+    .faq-a-inner{padding:0 20px 18px;font-size:13.5px;color:var(--white-dim);line-height:1.7}
+    .faq-icon.open{transform:rotate(45deg)}
+  </style>
+</head>
+<body>
+<div class="bg"></div>
+<header class="header">
+  <div class="brand"><div class="brand-icon">◈</div>WIN AFFINITY</div>
+  <a href="/dashboard" class="back-btn">← Dashboard</a>
+</header>
+<div class="page">
+  <div class="hero">
+    <h1>Questions <span>fréquentes</span></h1>
+    <p>Tout ce que vous devez savoir sur WIN AFFINITY</p>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggle(this)">
+      <span class="faq-q-text">Comment fonctionne le parrainage ?</span>
+      <span class="faq-icon">+</span>
+    </div>
+    <div class="faq-a"><div class="faq-a-inner">Partagez votre lien unique. Quand quelqu'un s'inscrit et active son compte via votre lien, vous recevez automatiquement 1 250 FCFA. Si ce filleul parraine quelqu'un qui active, vous recevez 600 FCFA. Au 3ème niveau : 300 FCFA.</div></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggle(this)">
+      <span class="faq-q-text">Combien coûte l'activation ?</span>
+      <span class="faq-icon">+</span>
+    </div>
+    <div class="faq-a"><div class="faq-a-inner">L'activation du compte coûte 2 500 FCFA une seule fois. C'est un paiement unique qui vous donne accès à vie à toutes les fonctionnalités de WIN AFFINITY.</div></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggle(this)">
+      <span class="faq-q-text">Comment retirer mes gains ?</span>
+      <span class="faq-icon">+</span>
+    </div>
+    <div class="faq-a"><div class="faq-a-inner">Allez dans la section Retrait. Le minimum est de 1 000 FCFA. Des frais de 10% sont appliqués. Le paiement se fait via Mobile Money (Orange Money, Free Money, Wave, MTN).</div></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggle(this)">
+      <span class="faq-q-text">Quand est-ce que je reçois mes commissions ?</span>
+      <span class="faq-icon">+</span>
+    </div>
+    <div class="faq-a"><div class="faq-a-inner">Les commissions sont créditées automatiquement sur votre solde dès que votre filleul active son compte avec le paiement de 2 500 FCFA.</div></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggle(this)">
+      <span class="faq-q-text">Comment gagner avec les tâches quotidiennes ?</span>
+      <span class="faq-icon">+</span>
+    </div>
+    <div class="faq-a"><div class="faq-a-inner">Chaque jour, des tâches sont disponibles dans la section Mes Gains. Complétez-les pour gagner entre 55, 100 et 300 FCFA par tâche. Les tâches se renouvellent chaque jour.</div></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggle(this)">
+      <span class="faq-q-text">Mon lien de parrainage expire-t-il ?</span>
+      <span class="faq-icon">+</span>
+    </div>
+    <div class="faq-a"><div class="faq-a-inner">Non, votre lien de parrainage est permanent et unique. Il ne expire jamais et vous pouvez le partager partout : WhatsApp, Facebook, TikTok, etc.</div></div>
+  </div>
+</div>
+<script>
+function toggle(el){
+  const ans = el.nextElementSibling;
+  const ico = el.querySelector('.faq-icon');
+  ans.classList.toggle('open');
+  ico.classList.toggle('open');
+}
+</script>
+</body>
+</html>

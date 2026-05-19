@@ -8,7 +8,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 from app.config import get_settings
-from app.routes import auth, payment, dashboard, withdrawal, gains
+from app.routes import auth, payment, dashboard, withdrawal, gains, pages
 
 settings = get_settings()
 logging.basicConfig(level=logging.INFO)
@@ -35,6 +35,7 @@ app.include_router(payment.router)
 app.include_router(dashboard.router)
 app.include_router(withdrawal.router)
 app.include_router(gains.router)
+app.include_router(pages.router)
 
 @app.get("/", include_in_schema=False)
 async def root():

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WIN AFFINITY — Support</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--gold:#C9A84C;--gold-light:#E8C96A;--gold-dim:rgba(201,168,76,.13);--navy:#07101F;--navy-card:rgba(13,27,42,.85);--white:#F4EFE6;--white-dim:rgba(244,239,230,.55);--soft:rgba(244,239,230,.06);--border:rgba(201,168,76,.2);--success:#4CAF7E;--r:16px;--t:.35s cubic-bezier(.4,0,.2,1)}
+    html,body{min-height:100%;font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--white)}
+    .bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 60% 50% at 0% 0%,#0e2240 0%,transparent 55%),linear-gradient(165deg,#07101F 0%,#091525 100%)}
+    .header{position:fixed;top:0;left:0;right:0;z-index:20;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:rgba(7,16,31,.95);border-bottom:1px solid var(--border);backdrop-filter:blur(16px)}
+    .brand{display:flex;align-items:center;gap:10px;font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;letter-spacing:.1em;background:linear-gradient(135deg,var(--gold-light),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .brand-icon{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--gold),#8B5A00);display:flex;align-items:center;justify-content:center;font-size:17px}
+    .back-btn{display:flex;align-items:center;gap:6px;color:var(--gold);text-decoration:none;font-size:13.5px;font-weight:500;padding:8px 14px;border:1px solid var(--border);border-radius:8px}
+    .page{position:relative;z-index:2;min-height:100vh;padding:90px 20px 60px;max-width:640px;margin:0 auto}
+    .hero{text-align:center;margin-bottom:36px}
+    .hero h1{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;margin-bottom:8px}
+    .hero h1 span{color:var(--gold)}
+    .hero p{font-size:14px;color:var(--white-dim)}
+    .support-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+    .support-card{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--r);padding:24px;text-align:center;text-decoration:none;transition:all var(--t);backdrop-filter:blur(20px)}
+    .support-card:hover{border-color:var(--gold);background:var(--gold-dim);transform:translateY(-2px)}
+    .support-ico{font-size:36px;margin-bottom:12px}
+    .support-name{font-size:15px;font-weight:600;color:var(--white);margin-bottom:4px}
+    .support-desc{font-size:12.5px;color:var(--white-dim)}
+    .support-badge{display:inline-block;background:var(--gold-dim);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--gold);margin-top:8px}
+    .hours-card{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--r);padding:24px;backdrop-filter:blur(20px)}
+    .hours-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold);margin-bottom:16px}
+    .hours-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13.5px}
+    .hours-row:last-child{border-bottom:none}
+    .hours-row span:first-child{color:var(--white-dim)}
+    .hours-row span:last-child{color:var(--white);font-weight:500}
+    .online{color:var(--success) !important}
+    @media(max-width:500px){.support-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="bg"></div>
+<header class="header">
+  <div class="brand"><div class="brand-icon">◈</div>WIN AFFINITY</div>
+  <a href="/dashboard" class="back-btn">← Dashboard</a>
+</header>
+<div class="page">
+  <div class="hero">
+    <h1>Centre de <span>support</span></h1>
+    <p>Notre équipe est là pour vous aider</p>
+  </div>
+  <div class="support-grid">
+    <a href="https://wa.me/221770000000" target="_blank" class="support-card">
+      <div class="support-ico">📱</div>
+      <div class="support-name">WhatsApp</div>
+      <div class="support-desc">Discutez avec notre équipe</div>
+      <div class="support-badge">Réponse rapide</div>
+    </a>
+    <a href="https://t.me/winaffinity" target="_blank" class="support-card">
+      <div class="support-ico">✈️</div>
+      <div class="support-name">Telegram</div>
+      <div class="support-desc">Rejoignez notre groupe</div>
+      <div class="support-badge">Communauté</div>
+    </a>
+    <a href="mailto:support@winaffinity.com" class="support-card">
+      <div class="support-ico">📧</div>
+      <div class="support-name">Email</div>
+      <div class="support-desc">support@winaffinity.com</div>
+      <div class="support-badge">24-48h</div>
+    </a>
+    <a href="/faq" class="support-card">
+      <div class="support-ico">❓</div>
+      <div class="support-name">FAQ</div>
+      <div class="support-desc">Questions fréquentes</div>
+      <div class="support-badge">Instantané</div>
+    </a>
+  </div>
+  <div class="hours-card">
+    <div class="hours-title">Heures de disponibilité</div>
+    <div class="hours-row"><span>Lundi — Vendredi</span><span class="online">08h00 — 20h00</span></div>
+    <div class="hours-row"><span>Samedi</span><span>09h00 — 17h00</span></div>
+    <div class="hours-row"><span>Dimanche</span><span style="color:var(--white-dim)">Fermé</span></div>
+    <div class="hours-row"><span>Urgences</span><span class="online">WhatsApp 24h/7j</span></div>
+  </div>
+</div>
+</body>
+</html>
