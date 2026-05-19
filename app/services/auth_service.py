@@ -173,7 +173,7 @@ async def authenticate_user(db: Client, data: LoginRequest) -> Optional[dict]:
     if not result.data:
         # Utilisateur introuvable : on fait quand même un hash pour éviter
         # les timing attacks (un attaquant ne doit pas savoir si l'email existe)
-        verify_password("dummy_password_timing_protection", "$2b$12$" + "x" * 53)
+        verify_password("Dummy@1234", "$2b$12$" + "x" * 53)
         return None
 
     user = result.data[0]
