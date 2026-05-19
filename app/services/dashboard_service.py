@@ -3,7 +3,7 @@ Dashboard service - soldes en FCFA
 """
 import logging
 from supabase import Client
-from app.services.commission_service import get_wallet, get_commissions
+from app.services.commission_service import get_wallet, get_commissions  # noqa
 
 logger = logging.getLogger(__name__)
 
@@ -58,3 +58,18 @@ async def get_dashboard_stats(db: Client, user_id: str) -> dict:
         "referrals"   : referrals,
         "transactions": commissions,
     }
+
+
+async def get_user_referral_tree(db, user_id: str, depth: int = 2) -> list:
+    tree = []
+    try:
+        lvl1 = db.table("users").select("id,full_name,is_active,created_at").eq("sponsor_id", user_id).execute().data or []
+        for m in lvl1:
+            node = {**m, "level": 1, "children": []}
+            if depth >= 2:
+                lvl2 = db.table("users").select("id,full_name,is_active,created_at").eq("sponsor_id", m["id"]).execute().data or []
+                node["children"] = [{**x, "level": 2} for x in lvl2]
+            tree.append(node)
+    except Exception as e:
+        pass
+    return tree
