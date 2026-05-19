@@ -134,6 +134,8 @@
     .topbar-right { display:flex; align-items:center; gap:12px; }
 
     /* Bouton langue */
+    .notif-btn{display:flex;align-items:center;gap:4px;color:var(--gold);text-decoration:none;font-size:20px;padding:8px;border-radius:10px;border:1px solid var(--border);background:var(--soft);transition:all var(--t)}
+    .notif-btn:hover{background:var(--gold-dim)}
     .lang-btn {
       background:var(--navy-card); border:1px solid var(--border);
       backdrop-filter:blur(12px); border-radius:30px;
@@ -481,6 +483,9 @@
       </div>
     </div>
     <div class="topbar-right">
+      <a href="/notifications" class="notif-btn" id="notifBtn">
+        🔔 <span id="notifCount" style="display:none;background:var(--danger);color:#fff;border-radius:50%;padding:2px 6px;font-size:11px;margin-left:2px">0</span>
+      </a>
       <button class="lang-btn" onclick="toggleLang()">
         <span id="langFlag">🇬🇧</span><span id="langLabel">English</span>
       </button>
@@ -771,6 +776,18 @@ function showToast(msg, type='ok'){
   t.textContent = msg; t.className = `show ${type}`;
   clearTimeout(t._t); t._t = setTimeout(()=>t.className='', 3500);
 }
+
+/* ─── NOTIFICATIONS COUNT */
+(async function(){
+  try{
+    const r = await fetch('/notifications/count');
+    const d = await r.json();
+    if(d.count > 0){
+      const el = document.getElementById('notifCount');
+      if(el){ el.textContent = d.count; el.style.display='inline'; }
+    }
+  }catch(e){}
+})();
 
 /* ─── SIDEBAR MOBILE ─────────────────────────────────── */
 function openSidebar(){
