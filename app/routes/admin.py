@@ -118,6 +118,21 @@ async def toggle_task(request: Request, task_id: Annotated[str, Form()]):
     return JSONResponse({"success": True})
 
 @router.post("/task/delete")
+@router.post("/notification/send")
+async def send_notif_all(request: Request, title: Annotated[str, Form()], message: Annotated[str, Form()], type: Annotated[str, Form()], target: Annotated[str, Form()]):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    from app.services.notification_service import send_notification, send_to_all
+    if target == "all":
+        await send_to_all(db, title, message, type)
+    else:
+        users = db.table("users").select("id").eq("is_active", True).execute().data or []
+        for u in users:
+            await send_notification(db, u["id"], title, message, type)
+    return JSONResponse({"success": True})
+
+@router.post("/task/delete")
 async def delete_task(request: Request, task_id: Annotated[str, Form()]):
     admin = await _get_admin(request)
     if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)

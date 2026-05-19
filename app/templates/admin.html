@@ -105,6 +105,7 @@
     <div class="tab active" onclick="showTab('users',this)">👥 Utilisateurs</div>
     <div class="tab" onclick="showTab('withdrawals',this)">💸 Retraits</div>
     <div class="tab" onclick="showTab('tasks',this)">📋 Tâches</div>
+    <div class="tab" onclick="showTab('notifs',this)">🔔 Notifications</div>
   </div>
 
   <!-- TAB UTILISATEURS -->
@@ -239,6 +240,30 @@
   </div>
 </div>
 
+<div class="tab-content" id="tab-notifs">
+    <div class="card">
+      <div class="card-title">Envoyer une notification</div>
+      <div class="form-inline" style="grid-template-columns:1fr 2fr 120px auto">
+        <div class="fg"><label>TITRE</label><input type="text" id="nTitle" placeholder="ex: Nouvelle tâche disponible !"/></div>
+        <div class="fg"><label>MESSAGE</label><input type="text" id="nMsg" placeholder="Votre message..."/></div>
+        <div class="fg"><label>TYPE</label>
+          <select id="nType">
+            <option value="info">💬 Info</option>
+            <option value="success">✅ Succès</option>
+            <option value="warning">⚠️ Avertissement</option>
+          </select>
+        </div>
+        <div class="fg"><label>DESTINATAIRE</label>
+          <select id="nTarget">
+            <option value="all">Tous les membres</option>
+            <option value="active">Membres actifs</option>
+          </select>
+        </div>
+        <button class="btn-add" onclick="sendNotif()">📤 Envoyer</button>
+      </div>
+    </div>
+  </div>
+
 <div id="toast"></div>
 
 <script>
@@ -319,6 +344,17 @@ async function deleteTask(id){
   if(!confirm('Supprimer cette tâche ?'))return;
   const r=await post('/admin/task/delete',{task_id:id});
   if(r.success){document.getElementById('task-'+id).remove();toast('✓ Tâche supprimée');}
+  else toast('Erreur','err');
+}
+
+async function sendNotif(){
+  const title=document.getElementById('nTitle').value.trim();
+  const msg=document.getElementById('nMsg').value.trim();
+  const type=document.getElementById('nType').value;
+  const target=document.getElementById('nTarget').value;
+  if(!title||!msg){toast('Titre et message requis','err');return;}
+  const r=await post('/admin/notification/send',{title,message:msg,type,target});
+  if(r.success){toast('✓ Notification envoyée !');document.getElementById('nTitle').value='';document.getElementById('nMsg').value='';}
   else toast('Erreur','err');
 }
 
