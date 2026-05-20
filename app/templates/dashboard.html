@@ -377,6 +377,12 @@
     }
     @media(max-width:480px) { .stats-grid{grid-template-columns:1fr} }
   </style>
+  <link rel="manifest" href="/static/manifest.json"/>
+  <meta name="theme-color" content="#C9A84C"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="WIN AFFINITY"/>
+  <link rel="apple-touch-icon" href="/static/icon-192.png"/>
 </head>
 <body>
 
@@ -797,6 +803,13 @@ function openSidebar(){
 function closeSidebar(){
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sidebarOverlay').classList.remove('open');
+}
+</script>
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/static/sw.js')
+    .then(()=>console.log('SW registered'))
+    .catch(e=>console.log('SW error',e));
 }
 </script>
 </body>

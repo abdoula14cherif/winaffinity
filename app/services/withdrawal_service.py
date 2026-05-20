@@ -55,7 +55,18 @@ async def request_withdrawal(db: Client, user_id: str, amount: int, phone: str, 
         "status": "pending"
     }).execute()
 
-    logger.info("[WITHDRAWAL] Demande créée : %s FCFA pour user %s", amount, user_id)
+        logger.info("[WITHDRAWAL] Demande créée : %s FCFA pour user %s", amount, user_id)
+
+    # Email confirmation retrait
+    try:
+        user_res = db.table("users").select("email,full_name").eq("id", user_id).execute()
+        if user_res.data:
+            u = user_res.data[0]
+            from app.services.email_service import send_withdrawal_requested
+            await send_withdrawal_requested(u["email"], u["full_name"], amount, net_amount, operator)
+    except Exception as e:
+        pass
+
     return result.data[0]
 
 

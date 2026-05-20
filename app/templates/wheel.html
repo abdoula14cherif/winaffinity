@@ -65,6 +65,12 @@
     .ov-sub{font-size:16px;color:var(--white-dim);animation:popIn .5s .3s both}
     .ov-btn{margin-top:8px;padding:14px 32px;background:linear-gradient(135deg,var(--gold),#A07020);color:var(--navy);font-size:15px;font-weight:700;border:none;border-radius:12px;cursor:pointer;animation:popIn .5s .4s both}
   </style>
+  <link rel="manifest" href="/static/manifest.json"/>
+  <meta name="theme-color" content="#C9A84C"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="WIN AFFINITY"/>
+  <link rel="apple-touch-icon" href="/static/icon-192.png"/>
 </head>
 <body>
 <div class="bg"></div>
@@ -245,6 +251,13 @@ function showResult(data){
 function closeOverlay(){
   document.getElementById('overlay').classList.remove('show');
   location.reload();
+}
+</script>
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/static/sw.js')
+    .then(()=>console.log('SW registered'))
+    .catch(e=>console.log('SW error',e));
 }
 </script>
 </body>

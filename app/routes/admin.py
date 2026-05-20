@@ -80,8 +80,18 @@ async def approve_withdrawal(request: Request, withdrawal_id: Annotated[str, For
     admin = await _get_admin(request)
     if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
     db = get_supabase()
+    wd = db.table("withdrawals").select("*").eq("id", withdrawal_id).execute().data
     db.table("withdrawals").update({"status": "approved"}).eq("id", withdrawal_id).execute()
     logger.info("[ADMIN] Retrait approuvé : %s", withdrawal_id)
+    if wd:
+        try:
+            w = wd[0]
+            user = db.table("users").select("email,full_name").eq("id", w["user_id"]).execute().data
+            if user:
+                from app.services.email_service import send_withdrawal_approved
+                await send_withdrawal_approved(user[0]["email"], user[0]["full_name"], w["net_amount"], w["operator"], w["phone"])
+        except Exception as e:
+            pass
     return JSONResponse({"success": True})
 
 @router.post("/withdrawal/reject")
@@ -97,6 +107,15 @@ async def reject_withdrawal(request: Request, withdrawal_id: Annotated[str, Form
             if wallet:
                 db.table("wallets").update({"balance": wallet[0]["balance"] + w["amount"]}).eq("user_id", w["user_id"]).execute()
     db.table("withdrawals").update({"status": "rejected"}).eq("id", withdrawal_id).execute()
+    if wd:
+        try:
+            w = wd[0]
+            user = db.table("users").select("email,full_name").eq("id", w["user_id"]).execute().data
+            if user:
+                from app.services.email_service import send_withdrawal_rejected
+                await send_withdrawal_rejected(user[0]["email"], user[0]["full_name"], w["amount"])
+        except Exception as e:
+            pass
     return JSONResponse({"success": True})
 
 @router.post("/task/add")

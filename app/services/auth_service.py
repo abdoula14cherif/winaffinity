@@ -145,6 +145,18 @@ async def register_user(db: Client, data: RegisterRequest) -> dict:
             logger.warning("[AUTH] Impossible d'incrémenter le compteur parrain : %s", e)
 
     logger.info("[AUTH] Nouveau compte créé : %s", new_user["id"])
+
+    # Email de bienvenue
+    try:
+        from app.services.email_service import send_welcome
+        await send_welcome(
+            data.email,
+            full_name,
+            new_user["referral_code"]
+        )
+    except Exception as e:
+        logger.warning("[AUTH] Email bienvenue échoué : %s", e)
+
     return new_user
 
 
