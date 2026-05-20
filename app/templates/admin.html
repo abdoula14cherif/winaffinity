@@ -106,6 +106,7 @@
     <div class="tab" onclick="showTab('withdrawals',this)">💸 Retraits</div>
     <div class="tab" onclick="showTab('tasks',this)">📋 Tâches</div>
     <div class="tab" onclick="showTab('notifs',this)">🔔 Notifications</div>
+    <div class="tab" onclick="showTab('stats',this)">📊 Statistiques</div>
   </div>
 
   <!-- TAB UTILISATEURS -->
@@ -260,6 +261,48 @@
           </select>
         </div>
         <button class="btn-add" onclick="sendNotif()">📤 Envoyer</button>
+      </div>
+    </div>
+  </div>
+
+<div class="tab-content" id="tab-stats">
+    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat"><div class="stat-num">{{ stats.total_users or 0 }}</div><div class="stat-lbl">Total membres</div></div>
+      <div class="stat"><div class="stat-num" style="color:var(--success)">{{ stats.active_users or 0 }}</div><div class="stat-lbl">Comptes actifs</div></div>
+      <div class="stat"><div class="stat-num" style="color:var(--warning)">{{ stats.pending_users or 0 }}</div><div class="stat-lbl">En attente</div></div>
+      <div class="stat"><div class="stat-num">{{ stats.total_payments or 0 }}</div><div class="stat-lbl">Paiements reçus</div></div>
+      <div class="stat"><div class="stat-num" style="color:var(--danger)">{{ stats.pending_withdrawals or 0 }}</div><div class="stat-lbl">Retraits en attente</div></div>
+      <div class="stat"><div class="stat-num">{{ stats.total_commissions or 0 }} <span style="font-size:14px">F</span></div><div class="stat-lbl">Commissions versées</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Revenus de la plateforme</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div style="background:var(--soft);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center">
+          <div style="font-family:Cormorant Garamond,serif;font-size:36px;font-weight:700;color:var(--gold)">{{ (stats.active_users or 0) * 2500 }} <span style="font-size:16px">FCFA</span></div>
+          <div style="font-size:12px;color:var(--white-dim);margin-top:4px;text-transform:uppercase;letter-spacing:.07em">Total activations</div>
+        </div>
+        <div style="background:var(--soft);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center">
+          <div style="font-family:Cormorant Garamond,serif;font-size:36px;font-weight:700;color:var(--success)">{{ ((stats.active_users or 0) * 2500) - (stats.total_commissions or 0) }} <span style="font-size:16px">FCFA</span></div>
+          <div style="font-size:12px;color:var(--white-dim);margin-top:4px;text-transform:uppercase;letter-spacing:.07em">Bénéfice net</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Derniers membres inscrits</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>NOM</th><th>EMAIL</th><th>STATUT</th><th>DATE</th></tr></thead>
+          <tbody>
+            {% for u in users[:10] %}
+            <tr>
+              <td class="td-name">{{ u.full_name }}</td>
+              <td>{{ u.email }}</td>
+              <td><span class="badge {% if u.is_active %}b-active{% else %}b-pending{% endif %}">{% if u.is_active %}Actif{% else %}En attente{% endif %}</span></td>
+              <td>{{ u.created_at[:10] if u.created_at else '—' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
