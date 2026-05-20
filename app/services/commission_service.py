@@ -78,23 +78,14 @@ async def _add_commission(db: Client, beneficiary_id: str, from_user_id: str, le
             }).execute()
 
                 logger.info("[COMMISSION] Niveau %d : %s FCFA → %s", level, amount, beneficiary_id)
-
-        # Email commission reçue
         try:
             user_res = db.table("users").select("email,full_name").eq("id", beneficiary_id).execute()
             from_res = db.table("users").select("full_name").eq("id", from_user_id).execute()
             if user_res.data and from_res.data:
                 from app.services.email_service import send_commission_received
-                await send_commission_received(
-                    user_res.data[0]["email"],
-                    user_res.data[0]["full_name"],
-                    amount,
-                    level,
-                    from_res.data[0]["full_name"]
-                )
-        except Exception as e:
+                await send_commission_received(user_res.data[0]["email"], user_res.data[0]["full_name"], amount, level, from_res.data[0]["full_name"])
+        except Exception:
             pass
-
     except Exception as e:
         logger.error("[COMMISSION] Erreur niveau %d : %s", level, e)
 
