@@ -1,205 +1,145 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>WIN AFFINITY — Mes Gains</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--gold:#C9A84C;--gold-light:#E8C96A;--gold-dim:rgba(201,168,76,.13);--navy:#07101F;--navy-card:rgba(13,27,42,.85);--white:#F4EFE6;--white-dim:rgba(244,239,230,.55);--soft:rgba(244,239,230,.06);--border:rgba(201,168,76,.2);--success:#4CAF7E;--danger:#E05A5A;--r:16px;--t:.35s cubic-bezier(.4,0,.2,1)}
-    html,body{min-height:100%;font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--white)}
-    .bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 60% 50% at 0% 0%,#0e2240 0%,transparent 55%),radial-gradient(ellipse 50% 40% at 100% 80%,#150a00 0%,transparent 55%),linear-gradient(165deg,#07101F 0%,#091525 100%)}
-    .header{position:fixed;top:0;left:0;right:0;z-index:20;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:rgba(7,16,31,.95);border-bottom:1px solid var(--border);backdrop-filter:blur(16px)}
-    .brand{display:flex;align-items:center;gap:10px;font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;letter-spacing:.1em;background:linear-gradient(135deg,var(--gold-light),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .brand-icon{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--gold),#8B5A00);display:flex;align-items:center;justify-content:center;font-size:17px}
-    .back-btn{display:flex;align-items:center;gap:6px;color:var(--gold);text-decoration:none;font-size:13.5px;font-weight:500;padding:8px 14px;border:1px solid var(--border);border-radius:8px;transition:all var(--t)}
-    .back-btn:hover{background:var(--gold-dim)}
-    .page{position:relative;z-index:2;min-height:100vh;padding:90px 20px 60px;max-width:860px;margin:0 auto}
-    /* Stats solde */
-    .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px}
-    .stat-card{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;backdrop-filter:blur(20px)}
-    .stat-num{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;color:var(--gold);line-height:1}
-    .stat-lbl{font-size:11px;color:var(--white-dim);letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
-    /* Bouton retrait */
-    .btn-withdraw{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;background:linear-gradient(135deg,var(--gold),#A07020);color:var(--navy);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:none;border-radius:12px;cursor:pointer;text-decoration:none;margin-bottom:28px;transition:transform var(--t),box-shadow var(--t);box-shadow:0 4px 20px rgba(201,168,76,.35)}
-    .btn-withdraw:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(201,168,76,.5)}
-    /* Section tâches */
-    .section-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;margin-bottom:6px}
-    .section-sub{font-size:13px;color:var(--white-dim);margin-bottom:20px}
-    .tasks-grid{display:flex;flex-direction:column;gap:14px}
-    .task-card{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--r);padding:20px;display:flex;align-items:center;gap:16px;backdrop-filter:blur(20px);transition:border-color var(--t),background var(--t)}
-    .task-card:hover{border-color:rgba(201,168,76,.4);background:rgba(13,27,42,.95)}
-    .task-card.done{opacity:.6;border-color:rgba(76,175,126,.3)}
-    .task-reward{flex-shrink:0;width:70px;height:70px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-weight:700}
-    .reward-300{background:linear-gradient(135deg,rgba(201,168,76,.2),rgba(201,168,76,.05));border:2px solid var(--gold)}
-    .reward-100{background:linear-gradient(135deg,rgba(76,175,126,.2),rgba(76,175,126,.05));border:2px solid var(--success)}
-    .reward-55{background:linear-gradient(135deg,rgba(100,149,237,.2),rgba(100,149,237,.05));border:2px solid #6495ED}
-    .reward-num{font-size:22px;line-height:1}
-    .reward-num.r300{color:var(--gold)}
-    .reward-num.r100{color:var(--success)}
-    .reward-num.r55{color:#6495ED}
-    .reward-fcfa{font-size:9px;letter-spacing:.08em;color:var(--white-dim)}
-    .task-info{flex:1;min-width:0}
-    .task-title{font-size:15px;font-weight:500;color:var(--white);margin-bottom:4px}
-    .task-desc{font-size:12.5px;color:var(--white-dim);line-height:1.5}
-    .task-action{flex-shrink:0}
-    .btn-task{padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all var(--t)}
-    .btn-start{background:var(--gold-dim);border:1px solid var(--border);color:var(--gold)}
-    .btn-start:hover{background:rgba(201,168,76,.2)}
-    .btn-done{background:rgba(76,175,126,.12);border:1px solid rgba(76,175,126,.3);color:var(--success);cursor:default}
-    /* Niveaux commissions */
-    .levels-card{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-top:28px;backdrop-filter:blur(20px)}
-    .level-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)}
-    .level-row:last-child{border-bottom:none}
-    .level-info{display:flex;align-items:center;gap:12px}
-    .level-badge{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700}
-    .lv1{background:rgba(201,168,76,.15);color:var(--gold);border:1px solid var(--border)}
-    .lv2{background:rgba(76,175,126,.15);color:var(--success);border:1px solid rgba(76,175,126,.3)}
-    .lv3{background:rgba(100,149,237,.15);color:#6495ED;border:1px solid rgba(100,149,237,.3)}
-    .level-name{font-size:14px;color:var(--white)}
-    .level-desc{font-size:12px;color:var(--white-dim)}
-    .level-amount{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:var(--gold)}
-    /* Toast */
-    #toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(60px);z-index:999;background:var(--navy-card);border:1px solid var(--border);backdrop-filter:blur(16px);border-radius:10px;padding:12px 22px;font-size:13.5px;display:flex;align-items:center;gap:8px;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:transform .4s cubic-bezier(.16,1,.3,1),opacity .4s;opacity:0;pointer-events:none}
-    #toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-    #toast.ok{border-color:rgba(76,175,126,.4);color:#7ECBA3}
-    #toast.err{border-color:rgba(224,90,90,.4);color:#F08080}
-    .lang-btn{position:fixed;top:76px;right:16px;z-index:50;background:var(--navy-card);border:1px solid var(--border);backdrop-filter:blur(12px);border-radius:30px;padding:7px 14px;display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12.5px;font-weight:500;color:var(--gold);transition:all var(--t)}
-    @media(max-width:600px){.stats-row{grid-template-columns:1fr 1fr}.task-card{flex-wrap:wrap}}
-  </style>
-  <link rel="manifest" href="/static/manifest.json"/>
-  <meta name="theme-color" content="#C9A84C"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="apple-mobile-web-app-title" content="WIN AFFINITY"/>
-  <link rel="apple-touch-icon" href="/static/icon-192.png"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WIN AFFINITY — Mes Gains</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--or:#FF6B35;--orl:#FF8C5A;--ord:rgba(255,107,53,.1);--bl:#1A3A5C;--bg:#F0F4F8;--wh:#FFFFFF;--tx:#1A2B3C;--txd:#6B7A8D;--bd:#D1DCE8;--ok:#00B894;--warn:#F39C12;--t:.3s;--sh:0 4px 20px rgba(26,58,92,.08)}
+html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);color:var(--tx)}
+.header{position:fixed;top:0;left:0;right:0;z-index:20;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:var(--bl);box-shadow:0 2px 12px rgba(26,58,92,.2)}
+.brand-row{display:flex;align-items:center;gap:8px}
+.bico{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#FF6B35,#FF8C5A);display:flex;align-items:center;justify-content:center;font-size:16px}
+.bname{font-size:18px;font-weight:800;color:#fff}.bname span{color:#FF6B35}
+.back-btn{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.8);text-decoration:none;font-size:13px;font-weight:500;padding:7px 14px;border:1px solid rgba(255,255,255,.2);border-radius:8px;transition:all var(--t)}
+.back-btn:hover{background:rgba(255,255,255,.1)}
+.page{min-height:100vh;padding:76px 16px 50px;max-width:860px;margin:0 auto}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
+.stat{background:var(--wh);border-radius:14px;padding:18px;text-align:center;box-shadow:var(--sh);border:1.5px solid var(--bd)}
+.sn{font-size:26px;font-weight:800;color:var(--bl);line-height:1}
+.sn.or{color:var(--or)}.sn.ok{color:var(--ok)}
+.sl{font-size:11px;color:var(--txd);margin-top:4px;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.btn-withdraw{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;font-family:"Poppins",sans-serif;font-size:14px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:none;border-radius:12px;cursor:pointer;text-decoration:none;margin-bottom:22px;transition:transform var(--t),box-shadow var(--t);box-shadow:0 4px 16px rgba(255,107,53,.4)}
+.btn-withdraw:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,107,53,.5)}
+.card{background:var(--wh);border-radius:16px;padding:22px;box-shadow:var(--sh);border:1.5px solid var(--bd);margin-bottom:18px}
+.card-title{font-size:16px;font-weight:700;color:var(--bl);margin-bottom:4px}
+.card-sub{font-size:12.5px;color:var(--txd);margin-bottom:18px}
+.tasks-list{display:flex;flex-direction:column;gap:12px}
+.task{display:flex;align-items:center;gap:14px;padding:16px;background:var(--bg);border:1.5px solid var(--bd);border-radius:12px;transition:all var(--t)}
+.task:hover{border-color:rgba(255,107,53,.3);background:rgba(255,107,53,.02)}
+.task.done{opacity:.65}
+.reward-box{flex-shrink:0;width:64px;height:64px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800}
+.r300{background:rgba(255,107,53,.12);border:2px solid rgba(255,107,53,.3)}
+.r100{background:rgba(0,184,148,.12);border:2px solid rgba(0,184,148,.3)}
+.r55{background:rgba(100,149,237,.12);border:2px solid rgba(100,149,237,.3)}
+.r-num{font-size:20px;line-height:1}
+.rn300{color:var(--or)}.rn100{color:var(--ok)}.rn55{color:#6495ED}
+.r-lbl{font-size:9px;letter-spacing:.08em;color:var(--txd);text-transform:uppercase;font-weight:600}
+.task-info{flex:1;min-width:0}
+.task-title{font-size:14px;font-weight:600;color:var(--tx);margin-bottom:3px}
+.task-desc{font-size:12px;color:var(--txd)}
+.btn-task{padding:9px 18px;border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer;border:none;font-family:"Poppins",sans-serif;transition:all var(--t);white-space:nowrap}
+.bt-go{background:var(--or);color:#fff;box-shadow:0 3px 12px rgba(255,107,53,.35)}
+.bt-go:hover{background:var(--orl);transform:translateY(-1px)}
+.bt-done{background:rgba(0,184,148,.1);border:1.5px solid rgba(0,184,148,.2);color:var(--ok);cursor:default}
+.levels-card{background:var(--wh);border-radius:16px;padding:22px;box-shadow:var(--sh);border:1.5px solid var(--bd)}
+.lv-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1.5px solid var(--bg)}
+.lv-row:last-child{border-bottom:none}
+.lv-left{display:flex;align-items:center;gap:12px}
+.lv-badge{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.lv1{background:var(--ord);color:var(--or);border:1.5px solid rgba(255,107,53,.2)}
+.lv2{background:rgba(0,184,148,.1);color:var(--ok);border:1.5px solid rgba(0,184,148,.2)}
+.lv3{background:rgba(100,149,237,.1);color:#6495ED;border:1.5px solid rgba(100,149,237,.2)}
+.lv-name{font-size:13.5px;font-weight:600;color:var(--tx)}
+.lv-desc{font-size:11.5px;color:var(--txd)}
+.lv-amount{font-size:20px;font-weight:800;color:var(--or)}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);z-index:999;background:var(--ok);color:#fff;border-radius:10px;padding:12px 22px;font-size:13.5px;box-shadow:0 6px 20px rgba(0,184,148,.4);transition:transform .4s cubic-bezier(.16,1,.3,1),opacity .4s;opacity:0;pointer-events:none;display:flex;align-items:center;gap:8px}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.lb{position:fixed;top:68px;right:14px;z-index:50;background:rgba(255,255,255,.9);border:1.5px solid var(--bd);border-radius:30px;padding:6px 14px;display:flex;align-items:center;gap:6px;cursor:pointer;font-family:"Poppins",sans-serif;font-size:12px;font-weight:500;color:var(--bl)}
+@media(max-width:600px){.stats-grid{grid-template-columns:1fr 1fr}.task{flex-wrap:wrap}}
+</style>
 </head>
 <body>
-<div class="bg"></div>
-<button class="lang-btn" onclick="toggleLang()"><span id="lf">🇬🇧</span><span id="ll">English</span></button>
+<button class="lb" onclick="tl()"><span id="lf">🇬🇧</span><span id="ll">English</span></button>
 <header class="header">
-  <div class="brand"><div class="brand-icon">◈</div>WIN AFFINITY</div>
-  <a href="/dashboard" class="back-btn">← <span data-fr="Dashboard" data-en="Dashboard">Dashboard</span></a>
+  <div class="brand-row"><div class="bico">◈</div><div class="bname">WIN <span>AFFINITY</span></div></div>
+  <a href="/dashboard" class="back-btn">← Dashboard</a>
 </header>
 <div class="page">
-  <!-- Stats -->
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-num">{{ wallet.balance }} <span style="font-size:14px">FCFA</span></div>
-      <div class="stat-lbl" data-fr="Solde disponible" data-en="Available balance">Solde disponible</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num">{{ wallet.total_earned }} <span style="font-size:14px">FCFA</span></div>
-      <div class="stat-lbl" data-fr="Total gagné" data-en="Total earned">Total gagné</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num">{{ tasks|selectattr('completed_today')|list|length }}/{{ tasks|length }}</div>
-      <div class="stat-lbl" data-fr="Tâches du jour" data-en="Today's tasks">Tâches du jour</div>
+  <div class="stats-grid">
+    <div class="stat"><div class="sn or">{{ wallet.balance }} <span style="font-size:13px">F</span></div><div class="sl" data-fr="Solde disponible" data-en="Balance">Solde disponible</div></div>
+    <div class="stat"><div class="sn ok">{{ wallet.total_earned }} <span style="font-size:13px">F</span></div><div class="sl" data-fr="Total gagné" data-en="Total earned">Total gagné</div></div>
+    <div class="stat"><div class="sn">{{ tasks|selectattr("completed_today")|list|length }}/{{ tasks|length }}</div><div class="sl" data-fr="Tâches du jour" data-en="Daily tasks">Tâches du jour</div></div>
+  </div>
+  <a href="/withdrawal" class="btn-withdraw">💸 <span data-fr="RETIRER MES GAINS" data-en="WITHDRAW MY EARNINGS">RETIRER MES GAINS</span></a>
+  <div class="card">
+    <div class="card-title" data-fr="Tâches du jour" data-en="Daily Tasks">Tâches du jour</div>
+    <div class="card-sub" data-fr="Complétez ces tâches chaque jour pour gagner des FCFA" data-en="Complete daily tasks to earn FCFA">Complétez ces tâches chaque jour pour gagner des FCFA</div>
+    <div class="tasks-list">
+      {% for task in tasks %}
+      <div class="task {% if task.completed_today %}done{% endif %}" id="t-{{ task.id }}">
+        <div class="reward-box r{{ task.reward }}">
+          <div class="r-num rn{{ task.reward }}">{{ task.reward }}</div>
+          <div class="r-lbl">FCFA</div>
+        </div>
+        <div class="task-info">
+          <div class="task-title">{{ task.title }}</div>
+          <div class="task-desc">{{ task.description or "" }}</div>
+        </div>
+        <div>
+          {% if task.completed_today %}
+          <button class="btn-task bt-done" data-fr="✓ Fait" data-en="✓ Done">✓ Fait</button>
+          {% else %}
+          <button class="btn-task bt-go" onclick="doTask('{{ task.id }}',{{ task.reward }},'{{ task.link or "" }}')">
+            <span data-fr="Faire" data-en="Do it">Faire</span>
+          </button>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+      {% if not tasks %}
+      <div style="text-align:center;padding:30px;color:var(--txd)" data-fr="Aucune tâche disponible." data-en="No tasks available.">Aucune tâche disponible.</div>
+      {% endif %}
     </div>
   </div>
-
-  <!-- Bouton retrait -->
-  <a href="/withdrawal" class="btn-withdraw">
-    <span>💸</span>
-    <span data-fr="RETIRER MES GAINS" data-en="WITHDRAW MY EARNINGS">RETIRER MES GAINS</span>
-  </a>
-
-  <!-- Tâches -->
-  <div class="section-title" data-fr="Tâches du jour" data-en="Daily Tasks">Tâches du jour</div>
-  <div class="section-sub" data-fr="Complétez ces tâches chaque jour pour gagner des FCFA" data-en="Complete these tasks every day to earn FCFA">Complétez ces tâches chaque jour pour gagner des FCFA</div>
-
-  <div class="tasks-grid">
-    {% for task in tasks %}
-    <div class="task-card {% if task.completed_today %}done{% endif %}" id="task-{{ task.id }}">
-      <div class="task-reward reward-{{ task.reward }}">
-        <div class="reward-num r{{ task.reward }}">{{ task.reward }}</div>
-        <div class="reward-fcfa">FCFA</div>
-      </div>
-      <div class="task-info">
-        <div class="task-title">{{ task.title }}</div>
-        <div class="task-desc">{{ task.description or '' }}</div>
-      </div>
-      <div class="task-action">
-        {% if task.completed_today %}
-          <button class="btn-task btn-done" data-fr="✓ Fait" data-en="✓ Done">✓ Fait</button>
-        {% else %}
-          <button class="btn-task btn-start" onclick="doTask('{{ task.id }}', {{ task.reward }}, '{{ task.link or '' }}')" data-fr="Faire" data-en="Do it">Faire</button>
-        {% endif %}
-      </div>
+  <div class="levels-card">
+    <div class="card-title" style="margin-bottom:16px" data-fr="Commissions parrainage" data-en="Referral Commissions">Commissions parrainage</div>
+    <div class="lv-row">
+      <div class="lv-left"><div class="lv-badge lv1">N1</div><div><div class="lv-name" data-fr="Filleul direct" data-en="Direct referral">Filleul direct</div><div class="lv-desc" data-fr="Activation de votre filleul" data-en="Your referral activates">Activation de votre filleul</div></div></div>
+      <div class="lv-amount">1 250 F</div>
     </div>
-    {% endfor %}
-    {% if not tasks %}
-    <div style="text-align:center;padding:40px;color:var(--white-dim)" data-fr="Aucune tâche disponible pour l'instant." data-en="No tasks available yet.">Aucune tâche disponible pour l'instant.</div>
-    {% endif %}
-  </div>
-
-  <!-- Commissions parrainage -->
-  <div class="levels-card" style="margin-top:28px">
-    <div class="section-title" style="margin-bottom:16px" data-fr="Commissions parrainage" data-en="Referral Commissions">Commissions parrainage</div>
-    <div class="level-row">
-      <div class="level-info">
-        <div class="level-badge lv1">N1</div>
-        <div><div class="level-name" data-fr="Filleul direct" data-en="Direct referral">Filleul direct</div><div class="level-desc" data-fr="Quand votre filleul active son compte" data-en="When your referral activates">Quand votre filleul active son compte</div></div>
-      </div>
-      <div class="level-amount">1 250 FCFA</div>
+    <div class="lv-row">
+      <div class="lv-left"><div class="lv-badge lv2">N2</div><div><div class="lv-name" data-fr="Niveau 2" data-en="Level 2">Niveau 2</div><div class="lv-desc" data-fr="Filleul de votre filleul" data-en="Your referral s referral">Filleul de votre filleul</div></div></div>
+      <div class="lv-amount" style="color:var(--ok)">600 F</div>
     </div>
-    <div class="level-row">
-      <div class="level-info">
-        <div class="level-badge lv2">N2</div>
-        <div><div class="level-name" data-fr="Filleul de filleul" data-en="2nd level referral">Filleul de filleul</div><div class="level-desc" data-fr="Quand le filleul de votre filleul active" data-en="When 2nd level referral activates">Quand le filleul de votre filleul active</div></div>
-      </div>
-      <div class="level-amount" style="color:var(--success)">600 FCFA</div>
-    </div>
-    <div class="level-row">
-      <div class="level-info">
-        <div class="level-badge lv3">N3</div>
-        <div><div class="level-name" data-fr="Niveau 3" data-en="Level 3">Niveau 3</div><div class="level-desc" data-fr="3ème niveau de parrainage" data-en="3rd level referral">3ème niveau de parrainage</div></div>
-      </div>
-      <div class="level-amount" style="color:#6495ED">300 FCFA</div>
+    <div class="lv-row">
+      <div class="lv-left"><div class="lv-badge lv3">N3</div><div><div class="lv-name" data-fr="Niveau 3" data-en="Level 3">Niveau 3</div><div class="lv-desc" data-fr="3ème niveau" data-en="3rd level">3ème niveau</div></div></div>
+      <div class="lv-amount" style="color:#6495ED">300 F</div>
     </div>
   </div>
 </div>
 <div id="toast"></div>
 <script>
-async function doTask(taskId, reward, link){
-  if(link) window.open(link, '_blank');
-  const form = new FormData();
-  form.append('task_id', taskId);
-  const res = await fetch('/gains/complete', {method:'POST', body:form});
-  const data = await res.json();
-  if(data.success){
-    const card = document.getElementById('task-'+taskId);
-    card.classList.add('done');
-    const btn = card.querySelector('.btn-task');
-    btn.className = 'btn-task btn-done';
-    btn.textContent = '✓ Fait';
-    btn.onclick = null;
-    showToast('🎉 +'+reward+' FCFA crédités !', 'ok');
-    setTimeout(()=>location.reload(), 2000);
-  } else {
-    showToast('⚠ '+(data.error||'Erreur'), 'err');
-  }
+async function doTask(id,reward,link){
+  if(link)window.open(link,"_blank");
+  const f=new FormData();f.append("task_id",id);
+  const res=await fetch("/gains/complete",{method:"POST",body:f});
+  const d=await res.json();
+  if(d.success){
+    const card=document.getElementById("t-"+id);
+    card.classList.add("done");
+    const btn=card.querySelector(".btn-task");
+    btn.className="btn-task bt-done";
+    btn.textContent="✓ Fait";
+    btn.onclick=null;
+    showToast("🎉 +"+reward+" FCFA crédités !");
+    setTimeout(()=>location.reload(),2000);
+  }else{showToast("⚠ "+(d.error||"Erreur"));}
 }
-function showToast(msg, type){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className='show '+type;
-  clearTimeout(t._t); t._t=setTimeout(()=>t.className='',3500);
-}
-let lang='fr';
-function toggleLang(){
-  lang=lang==='fr'?'en':'fr';
-  document.getElementById('lf').textContent=lang==='en'?'🇫🇷':'🇬🇧';
-  document.getElementById('ll').textContent=lang==='en'?'Français':'English';
-  document.querySelectorAll('[data-fr]').forEach(el=>el.innerHTML=lang==='en'?el.dataset.en:el.dataset.fr);
-}
+function showToast(msg){const t=document.getElementById("toast");t.innerHTML=msg;t.className="show";clearTimeout(t._t);t._t=setTimeout(()=>t.className="",3500);}
+let lg="fr";
+function tl(){lg=lg==="fr"?"en":"fr";const e=lg==="en";document.getElementById("lf").textContent=e?"🇫🇷":"🇬🇧";document.getElementById("ll").textContent=e?"Français":"English";document.querySelectorAll("[data-fr]").forEach(el=>el.innerHTML=e?el.dataset.en:el.dataset.fr);}
 </script>
-<script>
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/static/sw.js')
-    .then(()=>console.log('SW registered'))
-    .catch(e=>console.log('SW error',e));
-}
-</script>
-</body>
-</html>
+</body></html>

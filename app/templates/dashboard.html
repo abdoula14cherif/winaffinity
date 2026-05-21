@@ -230,7 +230,7 @@ tbody td{padding:11px 16px;font-size:13px;color:var(--txd);border-bottom:1px sol
               <td><div class="td-name"><div class="mini-avatar">{{ r.full_name[0].upper() }}</div>{{ r.full_name }}</div></td>
               <td>{% if r.is_active %}<span class="badge b-ok" data-fr="Actif" data-en="Active">Actif</span>{% else %}<span class="badge b-warn" data-fr="En attente" data-en="Pending">En attente</span>{% endif %}</td>
               <td>{{ r.created_at[:10] if r.created_at else "—" }}</td>
-              <td class="gain-cell">{% if r.is_active %}750 FCFA{% else %}—{% endif %}</td>
+              <td class="gain-cell">{% if r.is_active %}1 250 FCFA{% else %}—{% endif %}</td>
             </tr>
             {% endfor %}
           </tbody>
