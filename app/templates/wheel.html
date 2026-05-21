@@ -1,264 +1,171 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>WIN AFFINITY — Roue de la chance</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--gold:#C9A84C;--gold-light:#E8C96A;--gold-dim:rgba(201,168,76,.13);--navy:#07101F;--navy-card:rgba(13,27,42,.85);--white:#F4EFE6;--white-dim:rgba(244,239,230,.55);--soft:rgba(244,239,230,.06);--border:rgba(201,168,76,.2);--success:#4CAF7E;--danger:#E05A5A;--r:16px;--t:.35s cubic-bezier(.4,0,.2,1)}
-    html,body{min-height:100%;font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--white);overflow-x:hidden}
-    .bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 70% 60% at 50% 0%,#0e2240 0%,transparent 60%),linear-gradient(165deg,#07101F 0%,#091525 100%)}
-    .header{position:fixed;top:0;left:0;right:0;z-index:20;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:rgba(7,16,31,.95);border-bottom:1px solid var(--border);backdrop-filter:blur(16px)}
-    .brand{display:flex;align-items:center;gap:10px;font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;letter-spacing:.1em;background:linear-gradient(135deg,var(--gold-light),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .brand-icon{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--gold),#8B5A00);display:flex;align-items:center;justify-content:center;font-size:17px}
-    .back-btn{display:flex;align-items:center;gap:6px;color:var(--gold);text-decoration:none;font-size:13.5px;font-weight:500;padding:8px 14px;border:1px solid var(--border);border-radius:8px}
-    .page{position:relative;z-index:2;min-height:100vh;padding:90px 16px 60px;display:flex;flex-direction:column;align-items:center}
-    /* Hero */
-    .hero{text-align:center;margin-bottom:32px}
-    .hero h1{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;margin-bottom:8px}
-    .hero h1 span{color:var(--gold)}
-    .hero p{font-size:13.5px;color:var(--white-dim)}
-    /* Roue */
-    .wheel-container{position:relative;display:flex;flex-direction:column;align-items:center;margin-bottom:28px}
-    .wheel-pointer{font-size:36px;margin-bottom:-18px;z-index:10;filter:drop-shadow(0 4px 8px rgba(201,168,76,.5));animation:bounce 1.5s ease-in-out infinite}
-    @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-    .wheel-wrap{position:relative;width:300px;height:300px}
-    #wheelCanvas{border-radius:50%;box-shadow:0 0 40px rgba(201,168,76,.25),0 0 80px rgba(201,168,76,.1);border:4px solid var(--gold)}
-    .wheel-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#8B5A00);border:3px solid var(--navy);display:flex;align-items:center;justify-content:center;font-size:18px;z-index:5;box-shadow:0 4px 16px rgba(201,168,76,.5)}
-    /* Bouton */
-    .btn-spin{display:flex;align-items:center;justify-content:center;gap:10px;padding:16px 40px;margin-top:24px;background:linear-gradient(135deg,var(--gold),#A07020);color:var(--navy);font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;border:none;border-radius:14px;cursor:pointer;transition:transform var(--t),box-shadow var(--t);box-shadow:0 6px 28px rgba(201,168,76,.4)}
-    .btn-spin:hover{transform:translateY(-3px);box-shadow:0 10px 36px rgba(201,168,76,.6)}
-    .btn-spin:disabled{opacity:.5;cursor:not-allowed;transform:none}
-    .btn-tomorrow{padding:14px 32px;background:var(--soft);border:1px solid var(--border);color:var(--white-dim);font-size:14px;font-weight:500;border-radius:14px;cursor:default}
-    /* Résultat */
-    #resultBox{margin-top:20px;text-align:center;min-height:60px}
-    .result-win{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:700;color:var(--gold);animation:popIn .5s cubic-bezier(.16,1,.3,1)}
-    .result-lose{font-size:24px;color:var(--white-dim);animation:popIn .5s cubic-bezier(.16,1,.3,1)}
-    @keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
-    .result-sub{font-size:14px;color:var(--white-dim);margin-top:6px}
-    /* Probabilités */
-    .odds-card{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--r);padding:20px;width:100%;max-width:400px;backdrop-filter:blur(20px);margin-bottom:20px}
-    .odds-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold);margin-bottom:14px;text-align:center}
-    .odds-list{display:flex;flex-direction:column;gap:8px}
-    .odds-row{display:flex;align-items:center;gap:10px}
-    .odds-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
-    .odds-label{flex:1;font-size:13px;color:var(--white-dim)}
-    .odds-bar-bg{width:100px;height:6px;border-radius:3px;background:rgba(255,255,255,.06);overflow:hidden}
-    .odds-bar{height:100%;border-radius:3px}
-    .odds-pct{font-size:12px;color:var(--white-dim);width:35px;text-align:right}
-    /* Historique */
-    .history-card{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--r);padding:20px;width:100%;max-width:400px;backdrop-filter:blur(20px)}
-    .history-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold);margin-bottom:14px}
-    .hist-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px}
-    .hist-row:last-child{border-bottom:none}
-    .hist-date{color:var(--white-dim)}
-    .hist-amount{font-weight:600}
-    .hist-win{color:var(--success)}
-    .hist-lose{color:var(--danger)}
-    /* Overlay résultat */
-    #overlay{position:fixed;inset:0;z-index:100;background:rgba(7,16,31,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;opacity:0;pointer-events:none;transition:opacity .4s}
-    #overlay.show{opacity:1;pointer-events:all}
-    .ov-emoji{font-size:72px;animation:popIn .5s .1s both}
-    .ov-title{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:700;animation:popIn .5s .2s both}
-    .ov-sub{font-size:16px;color:var(--white-dim);animation:popIn .5s .3s both}
-    .ov-btn{margin-top:8px;padding:14px 32px;background:linear-gradient(135deg,var(--gold),#A07020);color:var(--navy);font-size:15px;font-weight:700;border:none;border-radius:12px;cursor:pointer;animation:popIn .5s .4s both}
-  </style>
-  <link rel="manifest" href="/static/manifest.json"/>
-  <meta name="theme-color" content="#C9A84C"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="apple-mobile-web-app-title" content="WIN AFFINITY"/>
-  <link rel="apple-touch-icon" href="/static/icon-192.png"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WIN AFFINITY — Roue de la chance</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--or:#FF6B35;--orl:#FF8C5A;--ord:rgba(255,107,53,.1);--bl:#1A3A5C;--bg:#F0F4F8;--wh:#FFFFFF;--tx:#1A2B3C;--txd:#6B7A8D;--bd:#D1DCE8;--ok:#00B894;--er:#E74C3C;--t:.3s;--sh:0 4px 20px rgba(26,58,92,.08)}
+html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);color:var(--tx)}
+.header{position:fixed;top:0;left:0;right:0;z-index:20;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:var(--bl);box-shadow:0 2px 12px rgba(26,58,92,.2)}
+.brand-row{display:flex;align-items:center;gap:8px}
+.bico{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#FF6B35,#FF8C5A);display:flex;align-items:center;justify-content:center;font-size:16px}
+.bname{font-size:18px;font-weight:800;color:#fff}.bname span{color:#FF6B35}
+.back-btn{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.8);text-decoration:none;font-size:13px;font-weight:500;padding:7px 14px;border:1px solid rgba(255,255,255,.2);border-radius:8px}
+.page{min-height:100vh;padding:76px 16px 50px;max-width:500px;margin:0 auto;display:flex;flex-direction:column;align-items:center}
+.page-hero{text-align:center;margin-bottom:24px}
+.page-hero h1{font-size:24px;font-weight:800;color:var(--bl);margin-bottom:4px}
+.page-hero h1 span{color:var(--or)}
+.page-hero p{font-size:13px;color:var(--txd)}
+.wheel-wrap{position:relative;width:300px;height:300px;margin-bottom:8px}
+#wc{border-radius:50%;box-shadow:0 8px 32px rgba(26,58,92,.2);border:4px solid var(--bl)}
+.wheel-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#FF6B35,#FF8C5A);border:3px solid var(--wh);display:flex;align-items:center;justify-content:center;font-size:17px;z-index:5;box-shadow:0 4px 12px rgba(255,107,53,.4)}
+.pointer{font-size:32px;margin-bottom:-12px;z-index:10;animation:bounce 1.5s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.btn-spin{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 36px;margin-top:20px;background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;font-family:"Poppins",sans-serif;font-size:14px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:none;border-radius:14px;cursor:pointer;transition:transform var(--t),box-shadow var(--t);box-shadow:0 6px 20px rgba(255,107,53,.4)}
+.btn-spin:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(255,107,53,.55)}
+.btn-spin:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-tomorrow{padding:13px 32px;background:var(--bg);border:1.5px solid var(--bd);color:var(--txd);font-size:13px;font-weight:500;border-radius:14px;margin-top:20px;cursor:default}
+.sp{display:none;width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.odds-card{width:100%;background:var(--wh);border-radius:16px;padding:20px;box-shadow:var(--sh);border:1.5px solid var(--bd);margin-top:22px}
+.odds-title{font-size:15px;font-weight:700;color:var(--bl);margin-bottom:14px;text-align:center}
+.odds-list{display:flex;flex-direction:column;gap:8px}
+.odds-row{display:flex;align-items:center;gap:10px}
+.odds-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+.odds-lbl{flex:1;font-size:13px;color:var(--txd)}
+.odds-bar-bg{width:90px;height:5px;border-radius:3px;background:var(--bg);overflow:hidden}
+.odds-bar{height:100%;border-radius:3px}
+.odds-pct{font-size:12px;color:var(--txd);width:32px;text-align:right;font-weight:600}
+.hist-card{width:100%;background:var(--wh);border-radius:16px;padding:20px;box-shadow:var(--sh);border:1.5px solid var(--bd);margin-top:16px}
+.hist-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1.5px solid var(--bg);font-size:13px}
+.hist-row:last-child{border-bottom:none}
+.hist-date{color:var(--txd)}
+.hist-win{color:var(--ok);font-weight:700}
+.hist-lose{color:var(--er)}
+#ov{position:fixed;inset:0;z-index:200;background:rgba(26,58,92,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;opacity:0;pointer-events:none;transition:opacity .4s}
+#ov.show{opacity:1;pointer-events:all}
+.ov-ico{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:38px;animation:pop .5s .2s both}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.ov-win{background:rgba(0,184,148,.15);border:3px solid var(--ok)}
+.ov-lose{background:rgba(231,76,60,.15);border:3px solid var(--er)}
+.ov-title{font-size:32px;font-weight:800;color:#fff;animation:fu .5s .3s both}
+.ov-sub{font-size:14px;color:rgba(255,255,255,.6);animation:fu .5s .4s both}
+.ov-btn{padding:13px 32px;background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;font-size:14px;font-weight:700;border:none;border-radius:12px;cursor:pointer;animation:fu .5s .5s both}
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.lb{position:fixed;top:68px;right:14px;z-index:50;background:rgba(255,255,255,.9);border:1.5px solid var(--bd);border-radius:30px;padding:6px 14px;display:flex;align-items:center;gap:6px;cursor:pointer;font-family:"Poppins",sans-serif;font-size:12px;font-weight:500;color:var(--bl)}
+</style>
 </head>
 <body>
-<div class="bg"></div>
-
-<!-- Overlay résultat -->
-<div id="overlay">
-  <div class="ov-emoji" id="ovEmoji">🎉</div>
+<button class="lb" onclick="tl()"><span id="lf">🇬🇧</span><span id="ll">English</span></button>
+<div id="ov">
+  <div class="ov-ico" id="ovIco">🎉</div>
   <div class="ov-title" id="ovTitle">+100 FCFA !</div>
-  <div class="ov-sub" id="ovSub">Crédité sur votre compte</div>
-  <button class="ov-btn" onclick="closeOverlay()">Continuer</button>
+  <div class="ov-sub" id="ovSub" data-fr="Crédité sur votre compte !" data-en="Credited to your account!">Crédité sur votre compte !</div>
+  <button class="ov-btn" onclick="closeOv()">Continuer</button>
 </div>
-
 <header class="header">
-  <div class="brand"><div class="brand-icon">◈</div>WIN AFFINITY</div>
+  <div class="brand-row"><div class="bico">◈</div><div class="bname">WIN <span>AFFINITY</span></div></div>
   <a href="/dashboard" class="back-btn">← Dashboard</a>
 </header>
-
 <div class="page">
-  <div class="hero">
+  <div class="page-hero">
     <h1>Roue de la <span>chance</span> 🎡</h1>
-    <p>1 tour gratuit par jour — Tentez votre chance !</p>
+    <p data-fr="1 tour gratuit par jour" data-en="1 free spin per day">1 tour gratuit par jour</p>
   </div>
-
-  <div class="wheel-container">
-    <div class="wheel-pointer">▼</div>
-    <div class="wheel-wrap">
-      <canvas id="wheelCanvas" width="300" height="300"></canvas>
-      <div class="wheel-center">◈</div>
-    </div>
+  <div class="pointer">▼</div>
+  <div class="wheel-wrap">
+    <canvas id="wc" width="300" height="300"></canvas>
+    <div class="wheel-center">◈</div>
   </div>
-
-  <div id="resultBox"></div>
-
   {% if can_spin %}
-  <button class="btn-spin" id="spinBtn" onclick="startSpin()">
-    🎡 TOURNER LA ROUE
+  <button class="btn-spin" id="sb" onclick="startSpin()">
+    <div class="sp" id="sp"></div>
+    <span>🎡</span>
+    <span id="bt" data-fr="TOURNER LA ROUE" data-en="SPIN THE WHEEL">TOURNER LA ROUE</span>
   </button>
   {% else %}
-  <button class="btn-tomorrow" disabled>
-    ⏰ Revenez demain pour un nouveau tour
-  </button>
+  <button class="btn-tomorrow" disabled>⏰ <span data-fr="Revenez demain !" data-en="Come back tomorrow!">Revenez demain !</span></button>
   {% endif %}
-
-  <!-- Probabilités -->
-  <div class="odds-card" style="margin-top:28px">
-    <div class="odds-title">Probabilités</div>
+  <div class="odds-card">
+    <div class="odds-title" data-fr="Probabilités" data-en="Odds">Probabilités</div>
     <div class="odds-list">
-      <div class="odds-row"><div class="odds-dot" style="background:#4CAF7E"></div><div class="odds-label">+200 FCFA</div><div class="odds-bar-bg"><div class="odds-bar" style="width:1%;background:#4CAF7E"></div></div><div class="odds-pct">1%</div></div>
-      <div class="odds-row"><div class="odds-dot" style="background:#E8C96A"></div><div class="odds-label">+100 FCFA</div><div class="odds-bar-bg"><div class="odds-bar" style="width:7%;background:#E8C96A"></div></div><div class="odds-pct">7%</div></div>
-      <div class="odds-row"><div class="odds-dot" style="background:#C9A84C"></div><div class="odds-label">+50 FCFA</div><div class="odds-bar-bg"><div class="odds-bar" style="width:15%;background:#C9A84C"></div></div><div class="odds-pct">15%</div></div>
-      <div class="odds-row"><div class="odds-dot" style="background:#E09050"></div><div class="odds-label">+25 FCFA</div><div class="odds-bar-bg"><div class="odds-bar" style="width:5%;background:#E09050"></div></div><div class="odds-pct">5%</div></div>
-      <div class="odds-row"><div class="odds-dot" style="background:#E05A5A"></div><div class="odds-label">Perdu</div><div class="odds-bar-bg"><div class="odds-bar" style="width:72%;background:#E05A5A"></div></div><div class="odds-pct">72%</div></div>
+      <div class="odds-row"><div class="odds-dot" style="background:#00B894"></div><div class="odds-lbl">+200 FCFA</div><div class="odds-bar-bg"><div class="odds-bar" style="width:1%;background:#00B894"></div></div><div class="odds-pct">1%</div></div>
+      <div class="odds-row"><div class="odds-dot" style="background:#FF6B35"></div><div class="odds-lbl">+100 FCFA</div><div class="odds-bar-bg"><div class="odds-bar" style="width:7%;background:#FF6B35"></div></div><div class="odds-pct">7%</div></div>
+      <div class="odds-row"><div class="odds-dot" style="background:#F39C12"></div><div class="odds-lbl">+50 FCFA</div><div class="odds-bar-bg"><div class="odds-bar" style="width:15%;background:#F39C12"></div></div><div class="odds-pct">15%</div></div>
+      <div class="odds-row"><div class="odds-dot" style="background:#6495ED"></div><div class="odds-lbl">+25 FCFA</div><div class="odds-bar-bg"><div class="odds-bar" style="width:5%;background:#6495ED"></div></div><div class="odds-pct">5%</div></div>
+      <div class="odds-row"><div class="odds-dot" style="background:#E74C3C"></div><div class="odds-lbl" data-fr="Perdu" data-en="Lost">Perdu</div><div class="odds-bar-bg"><div class="odds-bar" style="width:72%;background:#E74C3C"></div></div><div class="odds-pct">72%</div></div>
     </div>
   </div>
-
-  <!-- Historique -->
   {% if history %}
-  <div class="history-card">
-    <div class="history-title">Mes derniers tours</div>
+  <div class="hist-card">
+    <div class="odds-title" data-fr="Mes derniers tours" data-en="My last spins">Mes derniers tours</div>
     {% for h in history %}
     <div class="hist-row">
-      <span class="hist-date">{{ h.spun_at[:10] if h.spun_at else '—' }}</span>
-      <span class="hist-amount {% if h.reward > 0 %}hist-win{% else %}hist-lose{% endif %}">
-        {% if h.reward > 0 %}+{{ h.reward }} FCFA{% else %}Perdu{% endif %}
-      </span>
+      <span class="hist-date">{{ h.spun_at[:10] if h.spun_at else "—" }}</span>
+      <span class="{% if h.reward > 0 %}hist-win{% else %}hist-lose{% endif %}">{% if h.reward > 0 %}+{{ h.reward }} FCFA{% else %}Perdu{% endif %}</span>
     </div>
     {% endfor %}
   </div>
   {% endif %}
 </div>
-
 <script>
-// ── Dessiner la roue ─────────────────────────────
-const segments = {{ segments | tojson }};
-const canvas = document.getElementById('wheelCanvas');
-const ctx = canvas.getContext('2d');
-const cx = 150, cy = 150, radius = 145;
-let currentAngle = 0;
-
-function drawWheel(angle){
+const segs = {{ segments | tojson }};
+const cvs = document.getElementById("wc");
+const ctx = cvs.getContext("2d");
+const cx=150,cy=150,r=145;
+let angle=0,spinning=false;
+function draw(a){
   ctx.clearRect(0,0,300,300);
-  const segAngle = (2 * Math.PI) / segments.length;
-  segments.forEach((seg, i) => {
-    const start = angle + i * segAngle;
-    const end = start + segAngle;
-    // Segment
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.arc(cx, cy, radius, start, end);
-    ctx.closePath();
-    ctx.fillStyle = seg.color;
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(7,16,31,0.6)';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    // Texte
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(start + segAngle/2);
-    ctx.textAlign = 'right';
-    ctx.fillStyle = '#F4EFE6';
-    ctx.font = 'bold 12px DM Sans';
-    ctx.fillText(seg.label, radius - 10, 4);
-    ctx.restore();
+  const sa=(2*Math.PI)/segs.length;
+  segs.forEach((s,i)=>{
+    const st=a+i*sa,en=st+sa;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,st,en);ctx.closePath();
+    ctx.fillStyle=s.color;ctx.fill();
+    ctx.strokeStyle="rgba(255,255,255,0.5)";ctx.lineWidth=2;ctx.stroke();
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(st+sa/2);
+    ctx.textAlign="right";ctx.fillStyle="#fff";
+    ctx.font="bold 12px Poppins,sans-serif";
+    ctx.fillText(s.label,r-10,4);ctx.restore();
   });
 }
-
-drawWheel(currentAngle);
-
-// ── Animation rotation ───────────────────────────
-let spinning = false;
-let targetSegment = 0;
-
+draw(angle);
 async function startSpin(){
-  if(spinning) return;
-  spinning = true;
-  const btn = document.getElementById('spinBtn');
-  if(btn){ btn.disabled=true; btn.textContent='🎡 En cours...'; }
-
-  // Appel API
-  const res = await fetch('/wheel/spin', {method:'POST'});
-  const data = await res.json();
-
-  if(!data.success){
-    alert(data.error || 'Erreur');
-    if(btn){ btn.disabled=false; btn.textContent='🎡 TOURNER LA ROUE'; }
-    spinning = false;
-    return;
+  if(spinning)return;
+  spinning=true;
+  const btn=document.getElementById("sb");
+  btn.disabled=true;
+  document.getElementById("sp").style.display="block";
+  document.getElementById("bt").textContent="...";
+  const res=await fetch("/wheel/spin",{method:"POST"});
+  const data=await res.json();
+  if(!data.success){alert(data.error||"Erreur");btn.disabled=false;document.getElementById("sp").style.display="none";document.getElementById("bt").textContent="TOURNER LA ROUE";spinning=false;return;}
+  const sa=(2*Math.PI)/segs.length;
+  const target=-(data.segment*sa+sa/2);
+  const total=(5+Math.random()*3)*2*Math.PI+target-angle;
+  let start=null;const dur=4000;
+  function anim(ts){
+    if(!start)start=ts;
+    const p=Math.min((ts-start)/dur,1);
+    const ease=1-Math.pow(1-p,4);
+    draw(angle+total*ease);
+    if(p<1){requestAnimationFrame(anim);}
+    else{angle+=total;spinning=false;showResult(data);}
   }
-
-  targetSegment = data.segment;
-  const segAngle = (2 * Math.PI) / segments.length;
-  const targetAngle = -(targetSegment * segAngle + segAngle/2);
-  const fullRotations = (5 + Math.random()*3) * 2 * Math.PI;
-  const finalAngle = fullRotations + targetAngle - currentAngle;
-
-  let start = null;
-  const duration = 4000;
-
-  function animate(ts){
-    if(!start) start = ts;
-    const elapsed = ts - start;
-    const progress = Math.min(elapsed/duration, 1);
-    // Easing
-    const ease = 1 - Math.pow(1-progress, 4);
-    const angle = currentAngle + finalAngle * ease;
-    drawWheel(angle);
-    if(progress < 1){
-      requestAnimationFrame(animate);
-    } else {
-      currentAngle = angle;
-      spinning = false;
-      showResult(data);
-    }
-  }
-  requestAnimationFrame(animate);
+  requestAnimationFrame(anim);
 }
-
 function showResult(data){
-  const overlay = document.getElementById('overlay');
-  const emoji = document.getElementById('ovEmoji');
-  const title = document.getElementById('ovTitle');
-  const sub = document.getElementById('ovSub');
-  if(data.amount > 0){
-    emoji.textContent = '🎉';
-    title.textContent = '+' + data.amount + ' FCFA !';
-    title.style.color = '#4CAF7E';
-    sub.textContent = 'Crédité sur votre compte !';
-  } else {
-    emoji.textContent = '😔';
-    title.textContent = 'Pas de chance !';
-    title.style.color = '#E05A5A';
-    sub.textContent = 'Revenez demain pour un nouveau tour';
-  }
-  overlay.classList.add('show');
+  const ov=document.getElementById("ov");
+  const ico=document.getElementById("ovIco");
+  const title=document.getElementById("ovTitle");
+  if(data.amount>0){ico.className="ov-ico ov-win";ico.textContent="🎉";title.textContent="+"+data.amount+" FCFA !";}
+  else{ico.className="ov-ico ov-lose";ico.textContent="😔";title.textContent="Pas de chance !";}
+  ov.classList.add("show");
 }
-
-function closeOverlay(){
-  document.getElementById('overlay').classList.remove('show');
-  location.reload();
-}
+function closeOv(){document.getElementById("ov").classList.remove("show");location.reload();}
+let lg="fr";
+function tl(){lg=lg==="fr"?"en":"fr";const e=lg==="en";document.getElementById("lf").textContent=e?"🇫🇷":"🇬🇧";document.getElementById("ll").textContent=e?"Français":"English";document.querySelectorAll("[data-fr]").forEach(el=>el.textContent=e?el.dataset.en:el.dataset.fr);}
 </script>
-<script>
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/static/sw.js')
-    .then(()=>console.log('SW registered'))
-    .catch(e=>console.log('SW error',e));
-}
-</script>
-</body>
-</html>
+</body></html>
