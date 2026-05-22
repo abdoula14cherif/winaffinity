@@ -1,147 +1,132 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>WIN AFFINITY — Admin</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--gold:#C9A84C;--gold-light:#E8C96A;--gold-dim:rgba(201,168,76,.13);--navy:#07101F;--navy-2:#0D1B2A;--navy-card:rgba(13,27,42,.9);--white:#F4EFE6;--white-dim:rgba(244,239,230,.55);--soft:rgba(244,239,230,.06);--border:rgba(201,168,76,.2);--success:#4CAF7E;--danger:#E05A5A;--warning:#E09050;--r:14px;--t:.3s cubic-bezier(.4,0,.2,1)}
-    html,body{min-height:100%;font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--white)}
-    .bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 60% 50% at 0% 0%,#0e2240 0%,transparent 55%),linear-gradient(165deg,#07101F 0%,#091525 100%)}
-    /* Header */
-    .header{position:fixed;top:0;left:0;right:0;z-index:20;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:rgba(7,16,31,.97);border-bottom:1px solid rgba(224,90,90,.3);backdrop-filter:blur(16px)}
-    .brand{display:flex;align-items:center;gap:10px;font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;letter-spacing:.1em;background:linear-gradient(135deg,var(--gold-light),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .brand-icon{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#8B5A00);display:flex;align-items:center;justify-content:center;font-size:16px}
-    .admin-badge{background:rgba(224,90,90,.15);border:1px solid rgba(224,90,90,.4);color:#F08080;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;letter-spacing:.1em}
-    .header-right{display:flex;align-items:center;gap:10px}
-    .back-btn{color:var(--gold);text-decoration:none;font-size:13px;padding:6px 12px;border:1px solid var(--border);border-radius:8px}
-    /* Layout */
-    .page{position:relative;z-index:2;padding:76px 16px 60px;max-width:1100px;margin:0 auto}
-    /* Tabs */
-    .tabs{display:flex;gap:6px;margin-bottom:24px;flex-wrap:wrap}
-    .tab{padding:9px 18px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--soft);color:var(--white-dim);transition:all var(--t)}
-    .tab.active{background:var(--gold-dim);color:var(--gold);border-color:var(--gold)}
-    .tab-content{display:none}
-    .tab-content.active{display:block}
-    /* Stats */
-    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
-    .stat{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--r);padding:18px;backdrop-filter:blur(16px)}
-    .stat-num{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:var(--gold);line-height:1}
-    .stat-lbl{font-size:11px;color:var(--white-dim);margin-top:4px;text-transform:uppercase;letter-spacing:.07em}
-    /* Card */
-    .card{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--r);padding:20px;backdrop-filter:blur(16px);margin-bottom:16px}
-    .card-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
-    /* Table */
-    .tbl-wrap{overflow-x:auto}
-    table{width:100%;border-collapse:collapse;font-size:13px}
-    thead th{text-align:left;padding:9px 12px;font-size:10.5px;color:rgba(201,168,76,.7);letter-spacing:.09em;text-transform:uppercase;border-bottom:1px solid rgba(201,168,76,.12);white-space:nowrap}
-    tbody tr{transition:background var(--t)}
-    tbody tr:hover{background:rgba(244,239,230,.03)}
-    tbody td{padding:11px 12px;color:var(--white-dim);border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
-    .td-name{font-weight:500;color:var(--white)}
-    /* Badges */
-    .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500}
-    .badge::before{content:'';width:5px;height:5px;border-radius:50%}
-    .b-active{background:rgba(76,175,126,.12);color:var(--success);border:1px solid rgba(76,175,126,.25)}
-    .b-active::before{background:var(--success)}
-    .b-pending{background:rgba(224,144,80,.12);color:var(--warning);border:1px solid rgba(224,144,80,.25)}
-    .b-pending::before{background:var(--warning)}
-    .b-rejected{background:rgba(224,90,90,.12);color:var(--danger);border:1px solid rgba(224,90,90,.25)}
-    .b-rejected::before{background:var(--danger)}
-    .b-approved{background:rgba(76,175,126,.12);color:var(--success);border:1px solid rgba(76,175,126,.25)}
-    .b-approved::before{background:var(--success)}
-    /* Boutons action */
-    .btn-xs{padding:5px 10px;border-radius:7px;font-size:11.5px;font-weight:500;cursor:pointer;border:none;transition:all var(--t)}
-    .btn-activate{background:rgba(76,175,126,.15);color:var(--success);border:1px solid rgba(76,175,126,.3)}
-    .btn-deactivate{background:rgba(224,90,90,.15);color:var(--danger);border:1px solid rgba(224,90,90,.3)}
-    .btn-approve{background:rgba(76,175,126,.15);color:var(--success);border:1px solid rgba(76,175,126,.3)}
-    .btn-reject{background:rgba(224,90,90,.15);color:var(--danger);border:1px solid rgba(224,90,90,.3)}
-    .btn-delete{background:rgba(224,90,90,.15);color:var(--danger);border:1px solid rgba(224,90,90,.3)}
-    .btn-xs:hover{transform:translateY(-1px);opacity:.85}
-    /* Formulaire tâche */
-    .form-inline{display:grid;grid-template-columns:1fr 1fr 80px 1fr auto;gap:10px;align-items:end}
-    .fg{display:flex;flex-direction:column;gap:5px}
-    .fg label{font-size:10.5px;color:var(--gold);letter-spacing:.08em;text-transform:uppercase}
-    .fg input,.fg select,.fg textarea{background:var(--soft);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--white);outline:none}
-    .fg input:focus,.fg select:focus{border-color:var(--gold)}
-    .fg select option{background:#0D1B2A}
-    .btn-add{padding:10px 18px;background:linear-gradient(135deg,var(--gold),#A07020);color:var(--navy);border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
-    /* Search */
-    .search-bar{display:flex;gap:10px;margin-bottom:14px}
-    .search-bar input{flex:1;background:var(--soft);border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:13px;color:var(--white);outline:none}
-    .search-bar input:focus{border-color:var(--gold)}
-    /* Toast */
-    #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--navy-card);border:1px solid var(--border);border-radius:10px;padding:12px 22px;font-size:13.5px;transition:transform .4s,opacity .4s;opacity:0;z-index:999;pointer-events:none}
-    #toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-    #toast.ok{border-color:rgba(76,175,126,.4);color:#7ECBA3}
-    #toast.err{border-color:rgba(224,90,90,.4);color:#F08080}
-    @media(max-width:800px){.stats-grid{grid-template-columns:1fr 1fr}.form-inline{grid-template-columns:1fr}}
-    @media(max-width:500px){.stats-grid{grid-template-columns:1fr 1fr}}
-  </style>
-</head>
-<body>
-<div class="bg"></div>
-<header class="header">
-  <div class="brand"><div class="brand-icon">◈</div>WIN AFFINITY</div>
-  <div class="header-right">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WIN AFFINITY — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--or:#FF6B35;--orl:#FF8C5A;--ord:rgba(255,107,53,.1);--bl:#1A3A5C;--bg:#F0F4F8;--wh:#FFFFFF;--tx:#1A2B3C;--txd:#6B7A8D;--bd:#D1DCE8;--ok:#00B894;--er:#E74C3C;--warn:#F39C12;--t:.3s;--sh:0 4px 20px rgba(26,58,92,.08)}
+html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);color:var(--tx)}
+.header{position:fixed;top:0;left:0;right:0;z-index:20;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:var(--bl)}
+.brand-row{display:flex;align-items:center;gap:8px}
+.bico{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#FF6B35,#FF8C5A);display:flex;align-items:center;justify-content:center;font-size:16px}
+.bname{font-size:18px;font-weight:800;color:#fff}.bname span{color:#FF6B35}
+.admin-badge{background:rgba(255,107,53,.2);border:1px solid rgba(255,107,53,.4);color:#FF8C5A;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700}
+.back-btn{color:rgba(255,255,255,.8);text-decoration:none;font-size:13px;padding:7px 14px;border:1px solid rgba(255,255,255,.2);border-radius:8px}
+.page{padding:76px 16px 50px;max-width:1100px;margin:0 auto}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.stat{background:var(--wh);border-radius:14px;padding:18px;box-shadow:var(--sh);border:1.5px solid var(--bd)}
+.sn{font-size:28px;font-weight:800;color:var(--bl);line-height:1}
+.sn.or{color:var(--or)}.sn.ok{color:var(--ok)}.sn.er{color:var(--er)}.sn.warn{color:var(--warn)}
+.sl{font-size:11px;color:var(--txd);margin-top:4px;text-transform:uppercase;letter-spacing:.07em;font-weight:600}
+.tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.tab{padding:9px 18px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid var(--bd);background:var(--wh);color:var(--txd);transition:all var(--t)}
+.tab.active{background:var(--or);color:#fff;border-color:var(--or);box-shadow:0 4px 12px rgba(255,107,53,.3)}
+.tab-content{display:none}.tab-content.active{display:block}
+.card{background:var(--wh);border-radius:16px;padding:20px;box-shadow:var(--sh);border:1.5px solid var(--bd);margin-bottom:16px}
+.card-title{font-size:16px;font-weight:700;color:var(--bl);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.search-bar{display:flex;gap:10px;margin-bottom:14px}
+.search-bar input{flex:1;background:var(--bg);border:1.5px solid var(--bd);border-radius:9px;padding:9px 14px;font-size:13px;color:var(--tx);outline:none;font-family:"Poppins",sans-serif}
+.search-bar input:focus{border-color:var(--or)}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{text-align:left;padding:9px 12px;font-size:10.5px;font-weight:600;color:var(--txd);letter-spacing:.07em;text-transform:uppercase;border-bottom:1.5px solid var(--bd);white-space:nowrap}
+tbody tr{transition:background var(--t)}
+tbody tr:hover{background:rgba(255,107,53,.03)}
+tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);vertical-align:middle}
+.td-name{font-weight:600;color:var(--tx)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.badge::before{content:"";width:5px;height:5px;border-radius:50%}
+.b-ok{background:rgba(0,184,148,.1);color:var(--ok);border:1px solid rgba(0,184,148,.2)}.b-ok::before{background:var(--ok)}
+.b-warn{background:rgba(243,156,18,.1);color:var(--warn);border:1px solid rgba(243,156,18,.2)}.b-warn::before{background:var(--warn)}
+.b-er{background:rgba(231,76,60,.1);color:var(--er);border:1px solid rgba(231,76,60,.2)}.b-er::before{background:var(--er)}
+.b-or{background:var(--ord);color:var(--or);border:1px solid rgba(255,107,53,.2)}.b-or::before{background:var(--or)}
+.btn-xs{padding:5px 11px;border-radius:7px;font-size:11.5px;font-weight:600;cursor:pointer;border:none;font-family:"Poppins",sans-serif;transition:all var(--t)}
+.btn-act{background:rgba(0,184,148,.12);color:var(--ok);border:1px solid rgba(0,184,148,.25)}
+.btn-dea{background:rgba(231,76,60,.12);color:var(--er);border:1px solid rgba(231,76,60,.25)}
+.btn-xs:hover{transform:translateY(-1px);opacity:.85}
+.form-inline{display:grid;grid-template-columns:1fr 1fr 90px 1fr auto;gap:10px;align-items:end}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg label{font-size:10.5px;color:var(--bl);letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.fg input,.fg select{background:var(--bg);border:1.5px solid var(--bd);border-radius:8px;padding:9px 11px;font-family:"Poppins",sans-serif;font-size:13px;color:var(--tx);outline:none}
+.fg input:focus,.fg select:focus{border-color:var(--or)}
+.btn-add{padding:10px 18px;background:linear-gradient(135deg,var(--or),var(--orl));color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:"Poppins",sans-serif;white-space:nowrap}
+#modal{position:fixed;inset:0;z-index:100;background:rgba(26,58,92,.5);display:none;align-items:center;justify-content:center;padding:20px}
+#modal.show{display:flex}
+.modal-card{background:var(--wh);border-radius:20px;padding:28px;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(26,58,92,.3)}
+.modal-title{font-size:18px;font-weight:700;color:var(--bl);margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}
+.modal-close{background:none;border:none;cursor:pointer;font-size:20px;color:var(--txd)}
+.mfg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.mfg label{font-size:11px;font-weight:600;color:var(--bl);letter-spacing:.05em;text-transform:uppercase}
+.mfg input,.mfg select{background:var(--bg);border:1.5px solid var(--bd);border-radius:9px;padding:10px 12px;font-family:"Poppins",sans-serif;font-size:13px;color:var(--tx);outline:none;width:100%}
+.mfg input:focus,.mfg select:focus{border-color:var(--or)}
+.modal-btns{display:flex;gap:10px;margin-top:8px}
+.btn-save{flex:1;padding:12px;background:linear-gradient(135deg,var(--or),var(--orl));color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:"Poppins",sans-serif}
+.btn-cancel{padding:12px 20px;background:var(--bg);border:1.5px solid var(--bd);color:var(--txd);border-radius:10px;font-size:14px;cursor:pointer;font-family:"Poppins",sans-serif}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);z-index:999;color:#fff;border-radius:10px;padding:12px 22px;font-size:13.5px;transition:transform .4s cubic-bezier(.16,1,.3,1),opacity .4s;opacity:0;pointer-events:none}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+#toast.ok{background:var(--ok)}#toast.er{background:var(--er)}
+@media(max-width:900px){.stats-grid{grid-template-columns:1fr 1fr}.form-inline{grid-template-columns:1fr}}
+</style></head><body><header class="header">
+  <div class="brand-row"><div class="bico">◈</div><div class="bname">WIN <span>AFFINITY</span></div></div>
+  <div style="display:flex;align-items:center;gap:10px">
     <span class="admin-badge">⚡ ADMIN</span>
     <a href="/dashboard" class="back-btn">← Site</a>
   </div>
 </header>
-
-<div class="page">
-  <!-- Stats globales -->
-  <div class="stats-grid">
-    <div class="stat"><div class="stat-num">{{ stats.total_users or 0 }}</div><div class="stat-lbl">Total membres</div></div>
-    <div class="stat"><div class="stat-num" style="color:var(--success)">{{ stats.active_users or 0 }}</div><div class="stat-lbl">Comptes actifs</div></div>
-    <div class="stat"><div class="stat-num" style="color:var(--warning)">{{ stats.pending_withdrawals or 0 }}</div><div class="stat-lbl">Retraits en attente</div></div>
-    <div class="stat"><div class="stat-num">{{ stats.total_commissions or 0 }} <span style="font-size:14px">F</span></div><div class="stat-lbl">Commissions versées</div></div>
+<div id="modal">
+  <div class="modal-card">
+    <div class="modal-title"><span>✏️ Modifier</span><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <input type="hidden" id="m-id"/>
+    <div class="mfg"><label>NOM</label><input type="text" id="m-name"/></div>
+    <div class="mfg"><label>EMAIL</label><input type="email" id="m-email"/></div>
+    <div class="mfg"><label>TÉLÉPHONE</label><input type="tel" id="m-phone"/></div>
+    <div class="mfg"><label>RÔLE</label><select id="m-role"><option value="user">Utilisateur</option><option value="admin">Admin</option></select></div>
+    <div class="mfg"><label>STATUT</label><select id="m-active"><option value="true">Actif</option><option value="false">En attente</option></select></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">Annuler</button>
+      <button class="btn-save" onclick="saveUser()">💾 Sauvegarder</button>
+    </div>
   </div>
-
-  <!-- Tabs -->
+</div>
+<div class="page">
+  <div class="stats-grid">
+    <div class="stat"><div class="sn">{{ stats.total_users or 0 }}</div><div class="sl">Total membres</div></div>
+    <div class="stat"><div class="sn ok">{{ stats.active_users or 0 }}</div><div class="sl">Comptes actifs</div></div>
+    <div class="stat"><div class="sn warn">{{ stats.pending_withdrawals or 0 }}</div><div class="sl">Retraits attente</div></div>
+    <div class="stat"><div class="sn or">{{ ((stats.active_users or 0)*2500)-(stats.total_commissions or 0) }} <span style="font-size:14px">F</span></div><div class="sl">Bénéfice net</div></div>
+  </div>
   <div class="tabs">
     <div class="tab active" onclick="showTab('users',this)">👥 Utilisateurs</div>
     <div class="tab" onclick="showTab('withdrawals',this)">💸 Retraits</div>
     <div class="tab" onclick="showTab('tasks',this)">📋 Tâches</div>
     <div class="tab" onclick="showTab('notifs',this)">🔔 Notifications</div>
-    <div class="tab" onclick="showTab('stats',this)">📊 Statistiques</div>
+    <div class="tab" onclick="showTab('stats',this)">📊 Stats</div>
   </div>
-
-  <!-- TAB UTILISATEURS -->
   <div class="tab-content active" id="tab-users">
     <div class="card">
-      <div class="card-title">Tous les utilisateurs <span style="font-size:13px;color:var(--white-dim)">{{ users|length }} membres</span></div>
-      <div class="search-bar">
-        <input type="text" id="searchUser" placeholder="🔍 Rechercher par nom ou email..." oninput="filterUsers()"/>
-      </div>
+      <div class="card-title">Tous les utilisateurs <span style="font-size:13px;color:var(--txd)">{{ users|length }} membres</span></div>
+      <div class="search-bar"><input type="text" id="searchUser" placeholder="🔍 Rechercher nom, email, code..." oninput="filterUsers()"/></div>
       <div class="tbl-wrap">
         <table id="usersTable">
-          <thead><tr>
-            <th>NOM</th><th>EMAIL</th><th>TÉLÉPHONE</th>
-            <th>CODE</th><th>FILLEULS</th><th>STATUT</th><th>DATE</th><th>ACTION</th>
-          </tr></thead>
+          <thead><tr><th>NOM</th><th>EMAIL</th><th>TÉL</th><th>CODE</th><th>PARRAIN</th><th>FILLEULS</th><th>STATUT</th><th>RÔLE</th><th>DATE</th><th>ACTIONS</th></tr></thead>
           <tbody>
             {% for u in users %}
             <tr id="row-{{ u.id }}">
               <td class="td-name">{{ u.full_name }}</td>
-              <td>{{ u.email }}</td>
+              <td style="font-size:12px">{{ u.email }}</td>
               <td>{{ u.phone }}</td>
-              <td style="color:var(--gold);font-weight:600;letter-spacing:.08em">{{ u.referral_code }}</td>
-              <td style="text-align:center">{{ u.referral_count or 0 }}</td>
-              <td>
-                <span class="badge {% if u.is_active %}b-active{% else %}b-pending{% endif %}" id="badge-{{ u.id }}">
-                  {% if u.is_active %}Actif{% else %}En attente{% endif %}
-                </span>
-              </td>
-              <td>{{ u.created_at[:10] if u.created_at else '—' }}</td>
-              <td>
-                <button class="btn-xs {% if u.is_active %}btn-deactivate{% else %}btn-activate{% endif %}"
-                  id="btn-{{ u.id }}"
-                  onclick="toggleUser('{{ u.id }}', {{ 'true' if u.is_active else 'false' }})">
-                  {% if u.is_active %}Désactiver{% else %}Activer{% endif %}
-                </button>
+              <td style="color:var(--or);font-weight:700;letter-spacing:.08em">{{ u.referral_code }}</td>
+              <td style="font-size:11px;color:var(--txd)">{{ u.sponsor_id[:8] if u.sponsor_id else "—" }}</td>
+              <td style="text-align:center;font-weight:700;color:var(--bl)">{{ u.referral_count or 0 }}</td>
+              <td><span class="badge {% if u.is_active %}b-ok{% else %}b-warn{% endif %}" id="badge-{{ u.id }}">{% if u.is_active %}Actif{% else %}Attente{% endif %}</span></td>
+              <td><span class="badge {% if u.role == "admin" %}b-or{% else %}b-warn{% endif %}">{{ u.role }}</span></td>
+              <td style="font-size:12px">{{ u.created_at[:10] if u.created_at else "—" }}</td>
+              <td style="display:flex;gap:5px;flex-wrap:wrap">
+                <button class="btn-xs {% if u.is_active %}btn-dea{% else %}btn-act{% endif %}" id="btn-{{ u.id }}" onclick="toggleUser('{{ u.id }}',{{ 'true' if u.is_active else 'false' }})">{% if u.is_active %}Désact.{% else %}Activer{% endif %}</button>
+                <button class="btn-xs" style="background:rgba(45,95,143,.1);color:#2D5F8F;border:1px solid rgba(45,95,143,.2)" onclick="openModal('{{ u.id }}','{{ u.full_name }}','{{ u.email }}','{{ u.phone }}','{{ u.role }}',{{ 'true' if u.is_active else 'false' }})">✏️</button>
               </td>
             </tr>
             {% endfor %}
@@ -151,144 +136,109 @@
     </div>
   </div>
 
-  <!-- TAB RETRAITS -->
   <div class="tab-content" id="tab-withdrawals">
     <div class="card">
       <div class="card-title">Demandes de retrait</div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr>
-            <th>DATE</th><th>UTILISATEUR</th><th>MONTANT</th><th>FRAIS</th><th>NET</th><th>OPÉRATEUR</th><th>TÉLÉPHONE</th><th>STATUT</th><th>ACTION</th>
-          </tr></thead>
+          <thead><tr><th>DATE</th><th>MONTANT</th><th>NET</th><th>OPÉRATEUR</th><th>TÉLÉPHONE</th><th>STATUT</th><th>ACTIONS</th></tr></thead>
           <tbody>
             {% for w in withdrawals %}
             <tr id="wd-{{ w.id }}">
-              <td>{{ w.created_at[:10] if w.created_at else '—' }}</td>
-              <td class="td-name">{{ w.user_id[:8] }}...</td>
-              <td style="color:var(--white)">{{ w.amount }} FCFA</td>
-              <td style="color:var(--danger)">-{{ w.fee }} FCFA</td>
-              <td style="color:var(--success);font-weight:600">{{ w.net_amount }} FCFA</td>
-              <td>{{ w.operator.replace('_',' ').title() }}</td>
+              <td>{{ w.created_at[:10] if w.created_at else "—" }}</td>
+              <td style="font-weight:600;color:var(--tx)">{{ w.amount }} F</td>
+              <td style="color:var(--ok);font-weight:700">{{ w.net_amount }} F</td>
+              <td>{{ w.operator.replace("_"," ").title() }}</td>
               <td>{{ w.phone }}</td>
-              <td>
-                <span class="badge b-{{ w.status }}" id="wbadge-{{ w.id }}">
-                  {% if w.status == 'pending' %}⏳ En attente
-                  {% elif w.status == 'approved' %}✓ Approuvé
-                  {% else %}✗ Rejeté{% endif %}
-                </span>
-              </td>
-              <td style="display:flex;gap:6px">
+              <td><span class="badge b-{{ 'ok' if w.status=='approved' else 'er' if w.status=='rejected' else 'warn' }}" id="wbadge-{{ w.id }}">{% if w.status=='pending' %}⏳ Attente{% elif w.status=='approved' %}✓ Approuvé{% else %}✗ Rejeté{% endif %}</span></td>
+              <td style="display:flex;gap:5px">
                 {% if w.status == 'pending' %}
-                <button class="btn-xs btn-approve" onclick="approveWd('{{ w.id }}')">✓ Approuver</button>
-                <button class="btn-xs btn-reject" onclick="rejectWd('{{ w.id }}')">✗ Rejeter</button>
+                <button class="btn-xs btn-act" onclick="aprWd('{{ w.id }}')">✓</button>
+                <button class="btn-xs btn-dea" onclick="rejWd('{{ w.id }}')">✗</button>
                 {% endif %}
               </td>
             </tr>
             {% endfor %}
-            {% if not withdrawals %}
-            <tr><td colspan="9" style="text-align:center;padding:30px;color:var(--white-dim)">Aucun retrait</td></tr>
-            {% endif %}
+            {% if not withdrawals %}<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--txd)">Aucun retrait</td></tr>{% endif %}
           </tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- TAB TÂCHES -->
   <div class="tab-content" id="tab-tasks">
     <div class="card">
       <div class="card-title">Ajouter une tâche</div>
       <div class="form-inline">
-        <div class="fg"><label>TITRE</label><input type="text" id="tTitle" placeholder="ex: Suivre sur Instagram"/></div>
-        <div class="fg"><label>DESCRIPTION</label><input type="text" id="tDesc" placeholder="Description courte"/></div>
-        <div class="fg"><label>GAIN</label>
-          <select id="tReward">
-            <option value="300">300 FCFA</option>
-            <option value="100">100 FCFA</option>
-            <option value="55">55 FCFA</option>
-          </select>
-        </div>
-        <div class="fg"><label>LIEN (optionnel)</label><input type="text" id="tLink" placeholder="https://..."/></div>
+        <div class="fg"><label>TITRE</label><input type="text" id="tT" placeholder="ex: Suivre sur Instagram"/></div>
+        <div class="fg"><label>DESCRIPTION</label><input type="text" id="tD" placeholder="Description"/></div>
+        <div class="fg"><label>GAIN</label><select id="tR"><option value="300">300 F</option><option value="100">100 F</option><option value="55">55 F</option></select></div>
+        <div class="fg"><label>LIEN</label><input type="text" id="tL" placeholder="https://..."/></div>
         <button class="btn-add" onclick="addTask()">+ Ajouter</button>
       </div>
     </div>
     <div class="card">
-      <div class="card-title">Tâches actives</div>
+      <div class="card-title">Tâches</div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>TITRE</th><th>DESCRIPTION</th><th>GAIN</th><th>LIEN</th><th>STATUT</th><th>ACTIONS</th></tr></thead>
+          <thead><tr><th>TITRE</th><th>DESC</th><th>GAIN</th><th>STATUT</th><th>ACTIONS</th></tr></thead>
           <tbody id="tasksTbody">
             {% for t in tasks %}
             <tr id="task-{{ t.id }}">
               <td class="td-name">{{ t.title }}</td>
-              <td>{{ t.description or '—' }}</td>
-              <td style="color:var(--gold);font-weight:600">{{ t.reward }} FCFA</td>
-              <td>{% if t.link %}<a href="{{ t.link }}" target="_blank" style="color:var(--gold);font-size:12px">🔗 Lien</a>{% else %}—{% endif %}</td>
-              <td><span class="badge {% if t.is_active %}b-active{% else %}b-pending{% endif %}">{% if t.is_active %}Active{% else %}Inactive{% endif %}</span></td>
-              <td style="display:flex;gap:6px">
-                <button class="btn-xs {% if t.is_active %}btn-deactivate{% else %}btn-activate{% endif %}" onclick="toggleTask('{{ t.id }}')">{% if t.is_active %}Désactiver{% else %}Activer{% endif %}</button>
-                <button class="btn-xs btn-delete" onclick="deleteTask('{{ t.id }}')">🗑 Supprimer</button>
+              <td>{{ t.description or "—" }}</td>
+              <td style="color:var(--or);font-weight:700">{{ t.reward }} F</td>
+              <td><span class="badge {% if t.is_active %}b-ok{% else %}b-warn{% endif %}">{% if t.is_active %}Active{% else %}Inactive{% endif %}</span></td>
+              <td style="display:flex;gap:5px">
+                <button class="btn-xs {% if t.is_active %}btn-dea{% else %}btn-act{% endif %}" onclick="togTask('{{ t.id }}')">{% if t.is_active %}Off{% else %}On{% endif %}</button>
+                <button class="btn-xs btn-dea" onclick="delTask('{{ t.id }}')">🗑</button>
               </td>
             </tr>
             {% endfor %}
-            {% if not tasks %}
-            <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--white-dim)">Aucune tâche</td></tr>
-            {% endif %}
+            {% if not tasks %}<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--txd)">Aucune tâche</td></tr>{% endif %}
           </tbody>
         </table>
       </div>
     </div>
   </div>
-</div>
 
-<div class="tab-content" id="tab-notifs">
+  <div class="tab-content" id="tab-notifs">
     <div class="card">
       <div class="card-title">Envoyer une notification</div>
-      <div class="form-inline" style="grid-template-columns:1fr 2fr 120px auto">
-        <div class="fg"><label>TITRE</label><input type="text" id="nTitle" placeholder="ex: Nouvelle tâche disponible !"/></div>
-        <div class="fg"><label>MESSAGE</label><input type="text" id="nMsg" placeholder="Votre message..."/></div>
-        <div class="fg"><label>TYPE</label>
-          <select id="nType">
-            <option value="info">💬 Info</option>
-            <option value="success">✅ Succès</option>
-            <option value="warning">⚠️ Avertissement</option>
-          </select>
-        </div>
-        <div class="fg"><label>DESTINATAIRE</label>
-          <select id="nTarget">
-            <option value="all">Tous les membres</option>
-            <option value="active">Membres actifs</option>
-          </select>
-        </div>
+      <div class="form-inline" style="grid-template-columns:1fr 2fr 120px 120px auto">
+        <div class="fg"><label>TITRE</label><input type="text" id="nT" placeholder="Titre"/></div>
+        <div class="fg"><label>MESSAGE</label><input type="text" id="nM" placeholder="Votre message..."/></div>
+        <div class="fg"><label>TYPE</label><select id="nTy"><option value="info">💬 Info</option><option value="success">✅ Succès</option><option value="warning">⚠️ Alerte</option></select></div>
+        <div class="fg"><label>DESTINATAIRE</label><select id="nTg"><option value="all">Tous</option><option value="active">Actifs</option></select></div>
         <button class="btn-add" onclick="sendNotif()">📤 Envoyer</button>
       </div>
     </div>
   </div>
 
-<div class="tab-content" id="tab-stats">
+  <div class="tab-content" id="tab-stats">
     <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
-      <div class="stat"><div class="stat-num">{{ stats.total_users or 0 }}</div><div class="stat-lbl">Total membres</div></div>
-      <div class="stat"><div class="stat-num" style="color:var(--success)">{{ stats.active_users or 0 }}</div><div class="stat-lbl">Comptes actifs</div></div>
-      <div class="stat"><div class="stat-num" style="color:var(--warning)">{{ stats.pending_users or 0 }}</div><div class="stat-lbl">En attente</div></div>
-      <div class="stat"><div class="stat-num">{{ stats.total_payments or 0 }}</div><div class="stat-lbl">Paiements reçus</div></div>
-      <div class="stat"><div class="stat-num" style="color:var(--danger)">{{ stats.pending_withdrawals or 0 }}</div><div class="stat-lbl">Retraits en attente</div></div>
-      <div class="stat"><div class="stat-num">{{ stats.total_commissions or 0 }} <span style="font-size:14px">F</span></div><div class="stat-lbl">Commissions versées</div></div>
+      <div class="stat"><div class="sn">{{ stats.total_users or 0 }}</div><div class="sl">Total membres</div></div>
+      <div class="stat"><div class="sn ok">{{ stats.active_users or 0 }}</div><div class="sl">Comptes actifs</div></div>
+      <div class="stat"><div class="sn warn">{{ stats.pending_users or 0 }}</div><div class="sl">En attente</div></div>
+      <div class="stat"><div class="sn">{{ stats.total_payments or 0 }}</div><div class="sl">Paiements</div></div>
+      <div class="stat"><div class="sn er">{{ stats.pending_withdrawals or 0 }}</div><div class="sl">Retraits attente</div></div>
+      <div class="stat"><div class="sn or">{{ stats.total_commissions or 0 }} <span style="font-size:14px">F</span></div><div class="sl">Commissions</div></div>
     </div>
     <div class="card">
-      <div class="card-title">Revenus de la plateforme</div>
+      <div class="card-title">Revenus plateforme</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div style="background:var(--soft);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center">
-          <div style="font-family:Cormorant Garamond,serif;font-size:36px;font-weight:700;color:var(--gold)">{{ (stats.active_users or 0) * 2500 }} <span style="font-size:16px">FCFA</span></div>
-          <div style="font-size:12px;color:var(--white-dim);margin-top:4px;text-transform:uppercase;letter-spacing:.07em">Total activations</div>
+        <div style="background:var(--ord);border:1.5px solid rgba(255,107,53,.2);border-radius:12px;padding:20px;text-align:center">
+          <div style="font-size:32px;font-weight:800;color:var(--bl)">{{ (stats.active_users or 0)*2500 }} <span style="font-size:15px;color:var(--or)">F</span></div>
+          <div style="font-size:12px;color:var(--txd);margin-top:4px;text-transform:uppercase;font-weight:600">Total activations</div>
         </div>
-        <div style="background:var(--soft);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center">
-          <div style="font-family:Cormorant Garamond,serif;font-size:36px;font-weight:700;color:var(--success)">{{ ((stats.active_users or 0) * 2500) - (stats.total_commissions or 0) }} <span style="font-size:16px">FCFA</span></div>
-          <div style="font-size:12px;color:var(--white-dim);margin-top:4px;text-transform:uppercase;letter-spacing:.07em">Bénéfice net</div>
+        <div style="background:rgba(0,184,148,.08);border:1.5px solid rgba(0,184,148,.2);border-radius:12px;padding:20px;text-align:center">
+          <div style="font-size:32px;font-weight:800;color:var(--bl)">{{ ((stats.active_users or 0)*2500)-(stats.total_commissions or 0) }} <span style="font-size:15px;color:var(--ok)">F</span></div>
+          <div style="font-size:12px;color:var(--txd);margin-top:4px;text-transform:uppercase;font-weight:600">Bénéfice net</div>
         </div>
       </div>
     </div>
     <div class="card">
-      <div class="card-title">Derniers membres inscrits</div>
+      <div class="card-title">Derniers membres</div>
       <div class="tbl-wrap">
         <table>
           <thead><tr><th>NOM</th><th>EMAIL</th><th>STATUT</th><th>DATE</th></tr></thead>
@@ -297,8 +247,8 @@
             <tr>
               <td class="td-name">{{ u.full_name }}</td>
               <td>{{ u.email }}</td>
-              <td><span class="badge {% if u.is_active %}b-active{% else %}b-pending{% endif %}">{% if u.is_active %}Actif{% else %}En attente{% endif %}</span></td>
-              <td>{{ u.created_at[:10] if u.created_at else '—' }}</td>
+              <td><span class="badge {% if u.is_active %}b-ok{% else %}b-warn{% endif %}">{% if u.is_active %}Actif{% else %}Attente{% endif %}</span></td>
+              <td>{{ u.created_at[:10] if u.created_at else "—" }}</td>
             </tr>
             {% endfor %}
           </tbody>
@@ -306,107 +256,22 @@
       </div>
     </div>
   </div>
-
+</div>
 <div id="toast"></div>
-
 <script>
-function showTab(name, el){
-  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
-  el.classList.add('active');
-}
-
-function toast(msg, type='ok'){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className='show '+type;
-  clearTimeout(t._t); t._t=setTimeout(()=>t.className='',3000);
-}
-
-async function post(url, data){
-  const f=new FormData();
-  Object.entries(data).forEach(([k,v])=>f.append(k,v));
-  const r=await fetch(url,{method:'POST',body:f});
-  return r.json();
-}
-
-async function toggleUser(id, isActive){
-  const r=await post('/admin/user/toggle-active',{user_id:id});
-  if(r.success){
-    const active=r.is_active;
-    document.getElementById('badge-'+id).className='badge '+(active?'b-active':'b-pending');
-    document.getElementById('badge-'+id).textContent=active?'Actif':'En attente';
-    const btn=document.getElementById('btn-'+id);
-    btn.className='btn-xs '+(active?'btn-deactivate':'btn-activate');
-    btn.textContent=active?'Désactiver':'Activer';
-    btn.onclick=()=>toggleUser(id,active);
-    toast(active?'✓ Compte activé':'✓ Compte désactivé');
-  } else toast('Erreur','err');
-}
-
-async function approveWd(id){
-  const r=await post('/admin/withdrawal/approve',{withdrawal_id:id});
-  if(r.success){
-    document.getElementById('wbadge-'+id).className='badge b-approved';
-    document.getElementById('wbadge-'+id).textContent='✓ Approuvé';
-    const row=document.getElementById('wd-'+id);
-    row.querySelector('td:last-child').innerHTML='';
-    toast('✓ Retrait approuvé');
-  } else toast('Erreur','err');
-}
-
-async function rejectWd(id){
-  const r=await post('/admin/withdrawal/reject',{withdrawal_id:id});
-  if(r.success){
-    document.getElementById('wbadge-'+id).className='badge b-rejected';
-    document.getElementById('wbadge-'+id).textContent='✗ Rejeté';
-    const row=document.getElementById('wd-'+id);
-    row.querySelector('td:last-child').innerHTML='';
-    toast('Retrait rejeté');
-  } else toast('Erreur','err');
-}
-
-async function addTask(){
-  const title=document.getElementById('tTitle').value.trim();
-  const desc=document.getElementById('tDesc').value.trim();
-  const reward=document.getElementById('tReward').value;
-  const link=document.getElementById('tLink').value.trim();
-  if(!title){toast('Titre requis','err');return;}
-  const r=await post('/admin/task/add',{title,description:desc,reward,link});
-  if(r.success){toast('✓ Tâche ajoutée');setTimeout(()=>location.reload(),1000);}
-  else toast('Erreur','err');
-}
-
-async function toggleTask(id){
-  const r=await post('/admin/task/toggle',{task_id:id});
-  if(r.success){toast('✓ Tâche mise à jour');setTimeout(()=>location.reload(),800);}
-  else toast('Erreur','err');
-}
-
-async function deleteTask(id){
-  if(!confirm('Supprimer cette tâche ?'))return;
-  const r=await post('/admin/task/delete',{task_id:id});
-  if(r.success){document.getElementById('task-'+id).remove();toast('✓ Tâche supprimée');}
-  else toast('Erreur','err');
-}
-
-async function sendNotif(){
-  const title=document.getElementById('nTitle').value.trim();
-  const msg=document.getElementById('nMsg').value.trim();
-  const type=document.getElementById('nType').value;
-  const target=document.getElementById('nTarget').value;
-  if(!title||!msg){toast('Titre et message requis','err');return;}
-  const r=await post('/admin/notification/send',{title,message:msg,type,target});
-  if(r.success){toast('✓ Notification envoyée !');document.getElementById('nTitle').value='';document.getElementById('nMsg').value='';}
-  else toast('Erreur','err');
-}
-
-function filterUsers(){
-  const q=document.getElementById('searchUser').value.toLowerCase();
-  document.querySelectorAll('#usersTable tbody tr').forEach(row=>{
-    row.style.display=row.textContent.toLowerCase().includes(q)?'':'none';
-  });
-}
+function showTab(n,el){document.querySelectorAll(".tab-content").forEach(t=>t.classList.remove("active"));document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));document.getElementById("tab-"+n).classList.add("active");el.classList.add("active");}
+function toast(msg,type="ok"){const t=document.getElementById("toast");t.textContent=msg;t.className="show "+type;clearTimeout(t._t);t._t=setTimeout(()=>t.className="",3000);}
+async function post(url,data){const f=new FormData();Object.entries(data).forEach(([k,v])=>f.append(k,v));const r=await fetch(url,{method:"POST",body:f});return r.json();}
+async function toggleUser(id,isActive){const r=await post("/admin/user/toggle-active",{user_id:id});if(r.success){const a=r.is_active;document.getElementById("badge-"+id).className="badge "+(a?"b-ok":"b-warn");document.getElementById("badge-"+id).textContent=a?"Actif":"Attente";const btn=document.getElementById("btn-"+id);btn.className="btn-xs "+(a?"btn-dea":"btn-act");btn.textContent=a?"Désact.":"Activer";btn.onclick=()=>toggleUser(id,a);toast(a?"✓ Activé":"✓ Désactivé");}else toast("Erreur","er");}
+async function aprWd(id){const r=await post("/admin/withdrawal/approve",{withdrawal_id:id});if(r.success){document.getElementById("wbadge-"+id).className="badge b-ok";document.getElementById("wbadge-"+id).textContent="✓ Approuvé";document.getElementById("wd-"+id).querySelector("td:last-child").innerHTML="";toast("✓ Approuvé");}else toast("Erreur","er");}
+async function rejWd(id){const r=await post("/admin/withdrawal/reject",{withdrawal_id:id});if(r.success){document.getElementById("wbadge-"+id).className="badge b-er";document.getElementById("wbadge-"+id).textContent="✗ Rejeté";document.getElementById("wd-"+id).querySelector("td:last-child").innerHTML="";toast("Rejeté");}else toast("Erreur","er");}
+async function addTask(){const t=document.getElementById("tT").value.trim(),d=document.getElementById("tD").value.trim(),r=document.getElementById("tR").value,l=document.getElementById("tL").value.trim();if(!t){toast("Titre requis","er");return;}const res=await post("/admin/task/add",{title:t,description:d,reward:r,link:l});if(res.success){toast("✓ Tâche ajoutée");setTimeout(()=>location.reload(),800);}else toast("Erreur","er");}
+async function togTask(id){const r=await post("/admin/task/toggle",{task_id:id});if(r.success){toast("✓ Mis à jour");setTimeout(()=>location.reload(),600);}else toast("Erreur","er");}
+async function delTask(id){if(!confirm("Supprimer ?"))return;const r=await post("/admin/task/delete",{task_id:id});if(r.success){document.getElementById("task-"+id).remove();toast("✓ Supprimée");}else toast("Erreur","er");}
+async function sendNotif(){const t=document.getElementById("nT").value.trim(),m=document.getElementById("nM").value.trim(),ty=document.getElementById("nTy").value,tg=document.getElementById("nTg").value;if(!t||!m){toast("Requis","er");return;}const r=await post("/admin/notification/send",{title:t,message:m,type:ty,target:tg});if(r.success){toast("✓ Envoyé !");document.getElementById("nT").value="";document.getElementById("nM").value="";}else toast("Erreur","er");}
+function filterUsers(){const q=document.getElementById("searchUser").value.toLowerCase();document.querySelectorAll("#usersTable tbody tr").forEach(row=>{row.style.display=row.textContent.toLowerCase().includes(q)?"":"none";});}
+function openModal(id,name,email,phone,role,active){document.getElementById("m-id").value=id;document.getElementById("m-name").value=name;document.getElementById("m-email").value=email;document.getElementById("m-phone").value=phone;document.getElementById("m-role").value=role;document.getElementById("m-active").value=active.toString();document.getElementById("modal").classList.add("show");}
+function closeModal(){document.getElementById("modal").classList.remove("show");}
+async function saveUser(){const id=document.getElementById("m-id").value;const r=await post("/admin/user/update",{user_id:id,full_name:document.getElementById("m-name").value,email:document.getElementById("m-email").value,phone:document.getElementById("m-phone").value,role:document.getElementById("m-role").value,is_active:document.getElementById("m-active").value});if(r.success){closeModal();toast("✓ Mis à jour");setTimeout(()=>location.reload(),800);}else toast(r.error||"Erreur","er");}
 </script>
-</body>
-</html>
+</body></html>

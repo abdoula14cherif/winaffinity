@@ -155,6 +155,25 @@ async def update_user(request: Request, user_id: Annotated[str, Form()], full_na
         logger.error("[ADMIN] Erreur update user : %s", e)
         return JSONResponse({"error": str(e)}, status_code=500)
 
+@router.post("/user/update")
+async def update_user(request: Request, user_id: Annotated[str, Form()], full_name: Annotated[str, Form()], email: Annotated[str, Form()], phone: Annotated[str, Form()], role: Annotated[str, Form()], is_active: Annotated[str, Form()]):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    try:
+        db.table("users").update({
+            "full_name": full_name,
+            "email": email.lower(),
+            "phone": phone,
+            "role": role,
+            "is_active": is_active == "true"
+        }).eq("id", user_id).execute()
+        logger.info("[ADMIN] User mis à jour : %s", user_id)
+        return JSONResponse({"success": True})
+    except Exception as e:
+        logger.error("[ADMIN] Erreur update user : %s", e)
+        return JSONResponse({"error": str(e)}, status_code=500)
+
 @router.post("/task/delete")
 @router.post("/notification/send")
 async def send_notif_all(request: Request, title: Annotated[str, Form()], message: Annotated[str, Form()], type: Annotated[str, Form()], target: Annotated[str, Form()]):
@@ -169,6 +188,25 @@ async def send_notif_all(request: Request, title: Annotated[str, Form()], messag
         for u in users:
             await send_notification(db, u["id"], title, message, type)
     return JSONResponse({"success": True})
+
+@router.post("/user/update")
+async def update_user(request: Request, user_id: Annotated[str, Form()], full_name: Annotated[str, Form()], email: Annotated[str, Form()], phone: Annotated[str, Form()], role: Annotated[str, Form()], is_active: Annotated[str, Form()]):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    try:
+        db.table("users").update({
+            "full_name": full_name,
+            "email": email.lower(),
+            "phone": phone,
+            "role": role,
+            "is_active": is_active == "true"
+        }).eq("id", user_id).execute()
+        logger.info("[ADMIN] User mis à jour : %s", user_id)
+        return JSONResponse({"success": True})
+    except Exception as e:
+        logger.error("[ADMIN] Erreur update user : %s", e)
+        return JSONResponse({"error": str(e)}, status_code=500)
 
 @router.post("/user/update")
 async def update_user(request: Request, user_id: Annotated[str, Form()], full_name: Annotated[str, Form()], email: Annotated[str, Form()], phone: Annotated[str, Form()], role: Annotated[str, Form()], is_active: Annotated[str, Form()]):
