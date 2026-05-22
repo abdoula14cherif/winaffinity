@@ -42,7 +42,7 @@ async def admin_dashboard(request: Request):
             "pending_users": len([u for u in users if not u.get("is_active")]),
             "total_withdrawals": len(withdrawals),
             "pending_withdrawals": len([w for w in withdrawals if w.get("status")=="pending"]),
-            "total_commissions": sum(c.get("amount",0) for c in commissions),
+            "total_commissions": sum(com.get("amount",0) for com in commissions),
             "total_balance": total_balance,
             "total_payments": len([p for p in payments if p.get("status")=="completed"]),
         }
