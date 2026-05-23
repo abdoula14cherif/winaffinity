@@ -121,12 +121,27 @@ async def reject_withdrawal(request: Request, withdrawal_id: Annotated[str, Form
     return JSONResponse({"success": True})
 
 @router.post("/task/add")
-async def add_task(request: Request, title: Annotated[str, Form()], description: Annotated[str, Form()], reward: Annotated[int, Form()], link: Annotated[str, Form()] = ""):
+async def add_task(request: Request, title: Annotated[str, Form()], description: Annotated[str, Form()], reward: Annotated[int, Form()], link: Annotated[str, Form()] = "", task_type: Annotated[str, Form()] = "link", video_url: Annotated[str, Form()] = ""):
     admin = await _get_admin(request)
     if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
     db = get_supabase()
-    db.table("tasks").insert({"title": title, "description": description, "reward": reward, "link": link or None}).execute()
+    db.table("tasks").insert({"title": title, "description": description, "reward": reward, "link": link or None, "type": task_type, "video_url": video_url or None}).execute()
     return JSONResponse({"success": True})
+
+@router.post("/wallet/update")
+async def update_wallet(request: Request, user_id: Annotated[str, Form()], balance: Annotated[int, Form()]):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    try:
+        wallet = db.table("wallets").select("*").eq("user_id", user_id).execute().data
+        if wallet:
+            db.table("wallets").update({"balance": balance}).eq("user_id", user_id).execute()
+        else:
+            db.table("wallets").insert({"user_id": user_id, "balance": balance, "total_earned": balance}).execute()
+        return JSONResponse({"success": True})
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
 
 @router.post("/task/toggle")
 async def toggle_task(request: Request, task_id: Annotated[str, Form()]):

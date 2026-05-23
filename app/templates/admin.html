@@ -113,7 +113,7 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
       <div class="search-bar"><input type="text" id="searchUser" placeholder="🔍 Rechercher nom, email, code..." oninput="filterUsers()"/></div>
       <div class="tbl-wrap">
         <table id="usersTable">
-          <thead><tr><th>NOM</th><th>EMAIL</th><th>TÉL</th><th>CODE</th><th>PARRAIN</th><th>FILLEULS</th><th>STATUT</th><th>RÔLE</th><th>DATE</th><th>ACTIONS</th></tr></thead>
+          <thead><tr><th>NOM</th><th>EMAIL</th><th>TÉL</th><th>CODE</th><th>PARRAIN</th><th>FILLEULS</th><th>STATUT</th><th>RÔLE</th><th>SOLDE</th><th>DATE</th><th>ACTIONS</th></tr></thead>
           <tbody>
             {% for u in users %}
             <tr id="row-{{ u.id }}">
@@ -129,6 +129,7 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
               <td style="display:flex;gap:5px;flex-wrap:wrap">
                 <button class="btn-xs {% if u.is_active %}btn-dea{% else %}btn-act{% endif %}" id="btn-{{ u.id }}" onclick="toggleUser('{{ u.id }}',{{ 'true' if u.is_active else 'false' }})">{% if u.is_active %}Désact.{% else %}Activer{% endif %}</button>
                 <button class="btn-xs" style="background:rgba(45,95,143,.1);color:#2D5F8F;border:1px solid rgba(45,95,143,.2)" onclick="openModal('{{ u.id }}','{{ u.full_name }}','{{ u.email }}','{{ u.phone }}','{{ u.role }}',{{ 'true' if u.is_active else 'false' }})">✏️</button>
+                <button class="btn-xs" style="background:rgba(0,184,148,.1);color:#00B894;border:1px solid rgba(0,184,148,.2)" onclick="openWallet('{{ u.id }}','{{ u.full_name }}')">💰</button>
               </td>
             </tr>
             {% endfor %}
