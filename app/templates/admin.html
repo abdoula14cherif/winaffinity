@@ -117,7 +117,7 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
           <tbody>
             {% for u in users %}
             <tr id="row-{{ u.id }}">
-              <td class="td-name">{{ u.full_name }}</td>
+              <td class="td-name"><a href="/admin/user/{{ u.id }}" style="color:var(--bl);text-decoration:none;font-weight:600">{{ u.full_name }} →</a></td>
               <td style="font-size:12px">{{ u.email }}</td>
               <td>{{ u.phone }}</td>
               <td style="color:var(--or);font-weight:700;letter-spacing:.08em">{{ u.referral_code }}</td>
@@ -248,7 +248,7 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
           <tbody>
             {% for u in users[:10] %}
             <tr>
-              <td class="td-name">{{ u.full_name }}</td>
+              <td class="td-name"><a href="/admin/user/{{ u.id }}" style="color:var(--bl);text-decoration:none;font-weight:600">{{ u.full_name }} →</a></td>
               <td>{{ u.email }}</td>
               <td><span class="badge {% if u.is_active %}b-ok{% else %}b-warn{% endif %}">{% if u.is_active %}Actif{% else %}Attente{% endif %}</span></td>
               <td>{{ u.created_at[:10] if u.created_at else "—" }}</td>
