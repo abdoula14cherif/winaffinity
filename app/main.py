@@ -8,7 +8,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 from app.config import get_settings
-from app.routes import auth, payment, dashboard, withdrawal, gains, pages, admin, notifications, wheel, network
+from app.routes import auth, payment, dashboard, withdrawal, gains, pages, admin, notifications, wheel, network, learning
 
 settings = get_settings()
 logging.basicConfig(level=logging.INFO)
