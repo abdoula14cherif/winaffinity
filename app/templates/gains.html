@@ -92,9 +92,15 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
           {% if task.completed_today %}
           <button class="btn-task bt-done" data-fr="✓ Fait" data-en="✓ Done">✓ Fait</button>
           {% else %}
+          {% if task.type == "video" %}
+          <button class="btn-task bt-go" onclick="openVideo('{{ task.id }}',{{ task.reward }},'{{ task.video_url or "" }}','{{ task.title }}')">
+            <span>▶ Voir</span>
+          </button>
+          {% else %}
           <button class="btn-task bt-go" onclick="doTask('{{ task.id }}',{{ task.reward }},'{{ task.link or "" }}')">
             <span data-fr="Faire" data-en="Do it">Faire</span>
           </button>
+          {% endif %}
           {% endif %}
         </div>
       </div>
@@ -141,5 +147,67 @@ async function doTask(id,reward,link){
 function showToast(msg){const t=document.getElementById("toast");t.innerHTML=msg;t.className="show";clearTimeout(t._t);t._t=setTimeout(()=>t.className="",3500);}
 let lg="fr";
 function tl(){lg=lg==="fr"?"en":"fr";const e=lg==="en";document.getElementById("lf").textContent=e?"🇫🇷":"🇬🇧";document.getElementById("ll").textContent=e?"Français":"English";document.querySelectorAll("[data-fr]").forEach(el=>el.innerHTML=e?el.dataset.en:el.dataset.fr);}
+</script>
+<!-- Modal vidéo -->
+<div id="videoModal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(26,58,92,.95);align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:20px">
+  <div style="width:100%;max-width:600px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--bl)">
+      <span id="videoTitle" style="color:#fff;font-weight:700;font-size:15px"></span>
+      <button onclick="closeVideo()" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px">✕</button>
+    </div>
+    <div id="videoContainer" style="position:relative;padding-bottom:56.25%;height:0;background:#000">
+      <iframe id="videoFrame" style="position:absolute;top:0;left:0;width:100%;height:100%" frameborder="0" allowfullscreen allow="autoplay"></iframe>
+    </div>
+    <div style="padding:16px 18px;display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:13px;color:var(--txd)" id="videoInstr">Regardez la vidéo entièrement pour valider</span>
+      <button id="validateBtn" onclick="validateVideo()" style="background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:Poppins,sans-serif" disabled>⏳ Visionnage...</button>
+    </div>
+  </div>
+</div>
+<script>
+let currentVideoTaskId = null;
+let currentVideoReward = 0;
+let videoTimer = null;
+
+function openVideo(taskId, reward, url, title){
+  currentVideoTaskId = taskId;
+  currentVideoReward = reward;
+  document.getElementById("videoTitle").textContent = title;
+  document.getElementById("validateBtn").disabled = true;
+  document.getElementById("validateBtn").textContent = "⏳ Visionnage...";
+  
+  // Convertir URL YouTube en embed
+  let embedUrl = url;
+  if(url.includes("youtube.com/watch")){
+    const vid = new URL(url).searchParams.get("v");
+    embedUrl = "https://www.youtube.com/embed/"+vid+"?autoplay=1";
+  } else if(url.includes("youtu.be/")){
+    const vid = url.split("youtu.be/")[1].split("?")[0];
+    embedUrl = "https://www.youtube.com/embed/"+vid+"?autoplay=1";
+  }
+  
+  document.getElementById("videoFrame").src = embedUrl;
+  document.getElementById("videoModal").style.display = "flex";
+  
+  // Activer le bouton après 30 secondes
+  videoTimer = setTimeout(()=>{
+    const btn = document.getElementById("validateBtn");
+    btn.disabled = false;
+    btn.textContent = "✓ Valider et gagner +"+reward+" FCFA";
+  }, 30000);
+}
+
+function closeVideo(){
+  document.getElementById("videoModal").style.display = "none";
+  document.getElementById("videoFrame").src = "";
+  if(videoTimer) clearTimeout(videoTimer);
+  currentVideoTaskId = null;
+}
+
+async function validateVideo(){
+  if(!currentVideoTaskId) return;
+  await doTask(currentVideoTaskId, currentVideoReward, "");
+  closeVideo();
+}
 </script>
 </body></html>

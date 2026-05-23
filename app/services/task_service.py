@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 async def get_tasks_with_status(db: Client, user_id: str) -> list:
     """Retourne toutes les tâches avec statut complété ou non pour aujourd'hui."""
     try:
-        tasks_res = db.table("tasks").select("*").eq("is_active", True).execute()
+        tasks_res = db.table("tasks").select("*").eq("is_active", True).order("created_at").execute()
         tasks = tasks_res.data or []
 
         today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
