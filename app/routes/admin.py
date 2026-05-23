@@ -35,6 +35,8 @@ async def admin_dashboard(request: Request):
         withdrawals = db.table("withdrawals").select("*").order("created_at", desc=True).limit(50).execute().data or []
         commissions = db.table("commissions").select("*").order("created_at", desc=True).limit(50).execute().data or []
         tasks = db.table("tasks").select("*").order("created_at", desc=True).execute().data or []
+        formations = db.table("formations").select("*").order("created_at", desc=True).execute().data or []
+        groups = db.table("groups").select("*").order("created_at", desc=True).execute().data or []
         total_balance = sum(w.get("balance",0) for w in (db.table("wallets").select("balance").execute().data or []))
         stats = {
             "total_users": len(users),
@@ -48,12 +50,12 @@ async def admin_dashboard(request: Request):
         }
     except Exception as e:
         logger.error("[ADMIN] Erreur chargement : %s", e)
-        users, payments, withdrawals, commissions, tasks = [], [], [], [], []
+        users, payments, withdrawals, commissions, tasks, formations, groups = [], [], [], [], [], [], []
         stats = {}
     return templates.TemplateResponse("admin.html", {
         "request": request, "admin": admin,
         "users": users, "payments": payments,
-        "withdrawals": withdrawals, "tasks": tasks,
+        "withdrawals": withdrawals, "tasks": tasks, "formations": formations, "groups": groups,
         "stats": stats,
     })
 
@@ -226,6 +228,48 @@ async def update_user(request: Request, user_id: Annotated[str, Form()], full_na
     except Exception as e:
         logger.error("[ADMIN] Erreur update user : %s", e)
         return JSONResponse({"error": str(e)}, status_code=500)
+
+@router.post("/task/delete")
+@router.post("/formation/add")
+async def add_formation(request: Request, title: Annotated[str, Form()], description: Annotated[str, Form()], category: Annotated[str, Form()], link: Annotated[str, Form()] = ""):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    db.table("formations").insert({"title": title, "description": description, "category": category, "link": link or None}).execute()
+    return JSONResponse({"success": True})
+
+@router.post("/formation/toggle")
+async def toggle_formation(request: Request, formation_id: Annotated[str, Form()]):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    f = db.table("formations").select("is_active").eq("id", formation_id).execute().data
+    if f: db.table("formations").update({"is_active": not f[0]["is_active"]}).eq("id", formation_id).execute()
+    return JSONResponse({"success": True})
+
+@router.post("/formation/delete")
+async def delete_formation(request: Request, formation_id: Annotated[str, Form()]):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    db.table("formations").delete().eq("id", formation_id).execute()
+    return JSONResponse({"success": True})
+
+@router.post("/group/add")
+async def add_group(request: Request, name: Annotated[str, Form()], description: Annotated[str, Form()], category: Annotated[str, Form()], link: Annotated[str, Form()], members: Annotated[str, Form()] = "0"):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    db.table("groups").insert({"name": name, "description": description, "category": category, "link": link, "members": int(members or 0)}).execute()
+    return JSONResponse({"success": True})
+
+@router.post("/group/delete")
+async def delete_group(request: Request, group_id: Annotated[str, Form()]):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    db.table("groups").delete().eq("id", group_id).execute()
+    return JSONResponse({"success": True})
 
 @router.post("/task/delete")
 async def delete_task(request: Request, task_id: Annotated[str, Form()]):
