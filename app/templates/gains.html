@@ -77,7 +77,12 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
   <div class="card">
     <div class="card-title" data-fr="Tâches du jour" data-en="Daily Tasks">Tâches du jour</div>
     <div class="card-sub" data-fr="Complétez ces tâches chaque jour pour gagner des FCFA" data-en="Complete daily tasks to earn FCFA">Complétez ces tâches chaque jour pour gagner des FCFA</div>
-    <div class="tasks-list">
+    <!-- Publicité Adsterra -->
+<div style="margin-bottom:18px;text-align:center">
+  <script async="async" data-cfasync="false" src="https://pl29592706.effectivecpmnetwork.com/179a5376f150e801f0986ea8b0a95ab9/invoke.js"></script>
+  <div id="container-179a5376f150e801f0986ea8b0a95ab9"></div>
+</div>
+<div class="tasks-list">
       {% for task in tasks %}
       <div class="task {% if task.completed_today %}done{% endif %}" id="t-{{ task.id }}">
         <div class="reward-box r{{ task.reward }}">
