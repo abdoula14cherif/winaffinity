@@ -55,3 +55,25 @@ async def post_complete_task(request: Request, task_id: Annotated[str, Form()]):
         return JSONResponse({"success": True, "reward": result["reward"]})
     except ValueError as e:
         return JSONResponse({"success": False, "error": str(e)}, status_code=400)
+
+@router.post("/ad/view")
+async def ad_view(request: Request, ad_id: Annotated[str, Form()]):
+    user = await _get_user(request)
+    if not user: return JSONResponse({"error": "Non authentifie"}, status_code=401)
+    db = get_supabase()
+    from datetime import datetime, timezone
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    try:
+        already = db.table("ad_views").select("id").eq("user_id", user["id"]).eq("ad_id", ad_id).gte("viewed_at", today).execute().data
+        if already:
+            return JSONResponse({"success": False, "error": "Pub deja vue.", "reward": 0})
+        db.table("ad_views").insert({"user_id": user["id"], "ad_id": ad_id, "reward": 25}).execute()
+        wallet = db.table("wallets").select("*").eq("user_id", user["id"]).execute().data
+        if wallet:
+            w = wallet[0]
+            db.table("wallets").update({"balance": w["balance"]+25, "total_earned": w["total_earned"]+25}).eq("user_id", user["id"]).execute()
+        else:
+            db.table("wallets").insert({"user_id": user["id"], "balance": 25, "total_earned": 25}).execute()
+        return JSONResponse({"success": True, "reward": 25})
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
