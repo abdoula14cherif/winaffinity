@@ -100,3 +100,31 @@ async def get_commissions(db: Client, user_id: str) -> list:
     except Exception as e:
         logger.error("[COMMISSION] Erreur historique : %s", e)
         return []
+
+COMMISSION_BY_LEVEL = {
+    "starter":  {1: 500,  2: 240, 3: 120},
+    "standard": {1: 1250, 2: 600, 3: 300},
+    "premium":  {1: 2500, 2: 1200, 3: 600},
+}
+
+async def process_commissions_v2(db, new_user_id: str, level: str = "standard"):
+    try:
+        user_res = db.table("users").select("id,sponsor_id").eq("id", new_user_id).execute()
+        if not user_res.data: return
+        sponsor1_id = user_res.data[0].get("sponsor_id")
+        if not sponsor1_id: return
+        rates = COMMISSION_BY_LEVEL.get(level, COMMISSION_BY_LEVEL["standard"])
+        await _add_commission(db, sponsor1_id, new_user_id, 1, rates[1])
+        s1 = db.table("users").select("sponsor_id").eq("id", sponsor1_id).execute().data
+        if not s1: return
+        sponsor2_id = s1[0].get("sponsor_id")
+        if not sponsor2_id: return
+        await _add_commission(db, sponsor2_id, new_user_id, 2, rates[2])
+        s2 = db.table("users").select("sponsor_id").eq("id", sponsor2_id).execute().data
+        if not s2: return
+        sponsor3_id = s2[0].get("sponsor_id")
+        if not sponsor3_id: return
+        await _add_commission(db, sponsor3_id, new_user_id, 3, rates[3])
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error("[COMMISSION V2] Erreur : %s", e)

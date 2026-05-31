@@ -5,10 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>WIN AFFINITY — Activation</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-<script src="https://leekpay.fr/js/leekpay.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--or:#FF6B35;--bl:#1A3A5C;--bg:#F0F4F8;--wh:#FFFFFF;--tx:#1A2B3C;--txd:#6B7A8D;--bd:#D1DCE8;--ok:#00B894;--t:.3s}
+:root{--or:#FF6B35;--orl:#FF8C5A;--ord:rgba(255,107,53,.1);--bl:#1A3A5C;--bg:#F0F4F8;--wh:#FFFFFF;--tx:#1A2B3C;--txd:#6B7A8D;--bd:#D1DCE8;--ok:#00B894;--t:.3s}
 html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);color:var(--tx)}
 .bg{position:fixed;inset:0;z-index:0;background:linear-gradient(135deg,#1A3A5C,#2D5F8F)}
 .blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.2;animation:blob 8s ease-in-out infinite alternate}
@@ -18,51 +17,59 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
 .header{position:fixed;top:0;left:0;right:0;z-index:20;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:rgba(26,58,92,.95);backdrop-filter:blur(16px)}
 .brand-row{display:flex;align-items:center;gap:8px}
 .bico{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#FF6B35,#FF8C5A);display:flex;align-items:center;justify-content:center;font-size:16px}
-.bname{font-size:18px;font-weight:800;color:#fff}
-.bname span{color:#FF6B35}
+.bname{font-size:18px;font-weight:800;color:#fff}.bname span{color:#FF6B35}
 .user-info{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.7);font-size:13px}
 .avatar{width:32px;height:32px;border-radius:50%;background:rgba(255,107,53,.2);border:2px solid rgba(255,107,53,.5);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#FF6B35}
-.page{position:relative;z-index:2;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:80px 16px 40px}
-.card{width:100%;max-width:400px;background:var(--wh);border-radius:24px;padding:36px 28px;box-shadow:0 16px 48px rgba(26,58,92,.25);text-align:center;animation:in .6s cubic-bezier(.16,1,.3,1) both}
-@keyframes in{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-.top-icon{width:68px;height:68px;border-radius:20px;background:rgba(255,107,53,.1);border:2px solid rgba(255,107,53,.25);display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 18px}
-h1{font-size:21px;font-weight:800;color:var(--bl);margin-bottom:8px}
-.desc{font-size:13px;color:var(--txd);line-height:1.6;margin-bottom:24px}
-.price-box{background:rgba(255,107,53,.06);border:2px solid rgba(255,107,53,.2);border-radius:16px;padding:18px;margin-bottom:20px}
-.price-label{font-size:10px;font-weight:700;color:var(--or);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
-.price-num{font-size:44px;font-weight:800;color:var(--bl);line-height:1}
-.price-cur{font-size:18px;font-weight:600;color:var(--or)}
-.price-note{font-size:11px;color:var(--txd);margin-top:4px}
-.includes{display:flex;flex-direction:column;gap:7px;margin-bottom:22px;text-align:left}
-.inc{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--tx)}
-.inc-ico{width:22px;height:22px;border-radius:6px;background:rgba(0,184,148,.12);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;color:var(--ok)}
-.btn-pay{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;font-family:"Poppins",sans-serif;font-size:14px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:none;border-radius:14px;cursor:pointer;transition:transform var(--t),box-shadow var(--t);box-shadow:0 6px 22px rgba(255,107,53,.45);margin-bottom:14px}
+.page{position:relative;z-index:2;min-height:100vh;padding:80px 16px 40px}
+.hero{text-align:center;margin-bottom:28px}
+.hero h1{font-size:22px;font-weight:800;color:#fff;margin-bottom:6px}
+.hero p{font-size:13px;color:rgba(255,255,255,.7)}
+/* Niveaux */
+.levels-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:800px;margin:0 auto 24px}
+.level-card{background:var(--wh);border-radius:16px;padding:22px 18px;border:2.5px solid var(--bd);cursor:pointer;transition:all var(--t);position:relative;text-align:center}
+.level-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(26,58,92,.2)}
+.level-card.selected{border-color:var(--or);box-shadow:0 8px 28px rgba(255,107,53,.3)}
+.level-card.popular{border-color:var(--or)}
+.popular-badge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;border-radius:20px;padding:3px 14px;font-size:11px;font-weight:700;white-space:nowrap}
+.level-icon{font-size:32px;margin-bottom:10px}
+.level-name{font-size:16px;font-weight:800;color:var(--bl);margin-bottom:4px}
+.level-price{font-size:28px;font-weight:800;color:var(--or);line-height:1;margin-bottom:4px}
+.level-price span{font-size:14px;color:var(--txd);font-weight:500}
+.level-features{display:flex;flex-direction:column;gap:6px;margin:14px 0;text-align:left}
+.lf-row{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--tx)}
+.lf-ico{width:18px;height:18px;border-radius:50%;background:rgba(0,184,148,.15);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;color:#00B894}
+.select-btn{width:100%;padding:10px;border-radius:10px;border:2px solid var(--bd);background:transparent;font-family:"Poppins",sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all var(--t);color:var(--txd)}
+.level-card.selected .select-btn{background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;border-color:var(--or)}
+/* Bouton paiement */
+.pay-section{max-width:400px;margin:0 auto;text-align:center}
+.btn-pay{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;font-family:"Poppins",sans-serif;font-size:14px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:none;border-radius:14px;cursor:pointer;transition:transform var(--t),box-shadow var(--t);box-shadow:0 6px 22px rgba(255,107,53,.45);margin-bottom:10px;text-decoration:none}
 .btn-pay:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(255,107,53,.6)}
-.btn-pay:disabled{opacity:.6;cursor:not-allowed;transform:none}
-.sp{display:none;width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.secure{display:flex;align-items:center;justify-content:center;gap:5px;font-size:12px;color:var(--txd)}
+.secure{display:flex;align-items:center;justify-content:center;gap:5px;font-size:12px;color:rgba(255,255,255,.6)}
 .methods{display:flex;justify-content:center;gap:6px;margin-top:10px;flex-wrap:wrap}
-.method{background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:3px 9px;font-size:11px;color:var(--txd)}
+.method{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:3px 9px;font-size:11px;color:rgba(255,255,255,.8)}
+/* Upgrade */
+.upgrade-banner{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.2);border-radius:14px;padding:16px;max-width:600px;margin:0 auto 24px;text-align:center}
+.upgrade-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:6px}
+.upgrade-sub{font-size:12.5px;color:rgba(255,255,255,.65)}
 #ov{position:fixed;inset:0;z-index:200;background:rgba(26,58,92,.96);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;opacity:0;pointer-events:none;transition:opacity .4s}
 #ov.show{opacity:1;pointer-events:all}
 .ov-ico{width:76px;height:76px;border-radius:50%;background:rgba(0,184,148,.15);border:2px solid #00B894;display:flex;align-items:center;justify-content:center;font-size:34px;animation:pop .5s .2s both}
 @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
-.ov-t{font-size:26px;font-weight:800;color:#fff;animation:fu .5s .3s both}
-.ov-s{font-size:13px;color:rgba(255,255,255,.6);animation:fu .5s .4s both}
-.ov-bar{width:180px;height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;animation:fu .5s .5s both}
+.ov-t{font-size:26px;font-weight:800;color:#fff}
+.ov-s{font-size:13px;color:rgba(255,255,255,.6)}
+.ov-bar{width:180px;height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
 .ov-fill{height:100%;background:linear-gradient(90deg,#FF6B35,#FF8C5A);animation:fill 2.8s ease forwards}
-@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes fill{from{width:0}to{width:100%}}
 .lb{position:fixed;top:68px;right:14px;z-index:50;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);backdrop-filter:blur(10px);border-radius:30px;padding:6px 14px;display:flex;align-items:center;gap:6px;cursor:pointer;font-family:"Poppins",sans-serif;font-size:12px;color:#fff}
+@media(max-width:600px){.levels-grid{grid-template-columns:1fr;max-width:360px}}
 </style>
 </head>
 <body>
 <div class="bg"><div class="blob b1"></div><div class="blob b2"></div></div>
 <div id="ov">
   <div class="ov-ico">✓</div>
-  <div class="ov-t" data-fr="Compte activé !" data-en="Account Activated!">Compte activé !</div>
-  <div class="ov-s" data-fr="Redirection..." data-en="Redirecting...">Redirection...</div>
+  <div class="ov-t">Compte activé !</div>
+  <div class="ov-s">Redirection vers votre dashboard...</div>
   <div class="ov-bar"><div class="ov-fill"></div></div>
 </div>
 <button class="lb" onclick="tl()"><span id="lf">🇬🇧</span><span id="ll">English</span></button>
@@ -70,55 +77,102 @@ h1{font-size:21px;font-weight:800;color:var(--bl);margin-bottom:8px}
   <div class="brand-row"><div class="bico">◈</div><div class="bname">WIN <span>AFFINITY</span></div></div>
   <div class="user-info"><span>{{ user.full_name }}</span><div class="avatar">{{ user.full_name[0].upper() }}</div></div>
 </header>
-<div class="page"><div class="card">
-  <div class="top-icon">🔓</div>
-  <h1 data-fr="Activez votre compte" data-en="Activate Your Account">Activez votre compte</h1>
-  <p class="desc" data-fr="Une activation unique pour commencer à gagner des commissions." data-en="One-time activation to start earning commissions.">Une activation unique pour commencer à gagner des commissions.</p>
-  <div class="price-box">
-    <div class="price-label" data-fr="ACTIVATION UNIQUE" data-en="ONE-TIME ACTIVATION">ACTIVATION UNIQUE</div>
-    <div class="price-num">{{ amount_xof }} <span class="price-cur">FCFA</span></div>
-    <div class="price-note" data-fr="Paiement unique · Accès à vie" data-en="One-time · Lifetime access">Paiement unique · Accès à vie</div>
+<div class="page">
+  <div class="hero">
+    <h1 data-fr="Choisissez votre niveau" data-en="Choose Your Level">Choisissez votre niveau</h1>
+    <p data-fr="Plus votre niveau est élevé, plus vous gagnez" data-en="Higher level = higher earnings">Plus votre niveau est élevé, plus vous gagnez</p>
   </div>
-  <div class="includes">
-    <div class="inc"><div class="inc-ico">✓</div><span data-fr="Lien de parrainage actif" data-en="Active referral link">Lien de parrainage actif</span></div>
-    <div class="inc"><div class="inc-ico">✓</div><span data-fr="Commissions 3 niveaux" data-en="3-level commissions">Commissions 3 niveaux</span></div>
-    <div class="inc"><div class="inc-ico">✓</div><span data-fr="Tâches quotidiennes" data-en="Daily tasks">Tâches quotidiennes</span></div>
-    <div class="inc"><div class="inc-ico">✓</div><span data-fr="Roue de la chance" data-en="Lucky wheel">Roue de la chance</span></div>
+
+  {% if user.is_active %}
+  <div class="upgrade-banner">
+    <div class="upgrade-title">⭐ Niveau actuel : {{ user.level|upper if user.level else "STANDARD" }}</div>
+    <div class="upgrade-sub" data-fr="Montez de niveau pour augmenter vos commissions !" data-en="Upgrade to increase your commissions!">Montez de niveau pour augmenter vos commissions !</div>
   </div>
-  <a href="https://soinapay.com/pay/2e4xj81f" target="_blank" class="btn-pay" style="text-decoration:none">
-    <span>🔐</span>
-    <span data-fr="ACTIVER MON COMPTE — 2 500 FCFA" data-en="ACTIVATE MY ACCOUNT — 2,500 FCFA">ACTIVER MON COMPTE — 2 500 FCFA</span>
-  </a>
-  <p style="font-size:12px;color:var(--txd);text-align:center;margin-top:8px" data-fr="Après le paiement, revenez ici et actualisez la page" data-en="After payment, come back here and refresh the page">Après le paiement, revenez ici et actualisez la page</p>
-  <div class="secure"><span>🔒</span><span data-fr="Paiement sécurisé via LeekPay" data-en="Secure payment via LeekPay">Paiement sécurisé via LeekPay</span></div>
-  <div class="methods">
-    <div class="method">Orange Money</div>
-    <div class="method">Wave</div>
-    <div class="method">Free Money</div>
-    <div class="method">Visa/MC</div>
+  {% endif %}
+
+  <div class="levels-grid">
+    <!-- Starter -->
+    <div class="level-card" id="card-starter" onclick="selectLevel('starter', 1000, 'https://soinapay.com/pay/2e4xj81f')">
+      <div class="level-icon">🥉</div>
+      <div class="level-name">Starter</div>
+      <div class="level-price">1 000 <span>FCFA</span></div>
+      <div class="level-features">
+        <div class="lf-row"><div class="lf-ico">✓</div><span>N1 : <strong>500 FCFA</strong></span></div>
+        <div class="lf-row"><div class="lf-ico">✓</div><span>N2 : <strong>240 FCFA</strong></span></div>
+        <div class="lf-row"><div class="lf-ico">✓</div><span>N3 : <strong>120 FCFA</strong></span></div>
+        <div class="lf-row"><div class="lf-ico">✓</div><span data-fr="Tâches quotidiennes" data-en="Daily tasks">Tâches quotidiennes</span></div>
+        <div class="lf-row"><div class="lf-ico">✓</div><span data-fr="Roue de la chance" data-en="Lucky wheel">Roue de la chance</span></div>
+      </div>
+      <button class="select-btn" data-fr="Choisir" data-en="Select">Choisir</button>
+    </div>
+
+    <!-- Standard -->
+    <div class="level-card popular selected" id="card-standard" onclick="selectLevel('standard', 2500, 'https://soinapay.com/pay/2e4xj81f')">
+      <div class="popular-badge">⭐ POPULAIRE</div>
+      <div class="level-icon">🥈</div>
+      <div class="level-name">Standard</div>
+      <div class="level-price">2 500 <span>FCFA</span></div>
+      <div class="level-features">
+        <div class="lf-row"><div class="lf-ico">✓</div><span>N1 : <strong>1 250 FCFA</strong></span></div>
+        <div class="lf-row"><div class="lf-ico">✓</div><span>N2 : <strong>600 FCFA</strong></span></div>
+        <div class="lf-row"><div class="lf-ico">✓</div><span>N3 : <strong>300 FCFA</strong></span></div>
+        <div class="lf-row"><div class="lf-ico">✓</div><span data-fr="Formations incluses" data-en="Courses included">Formations incluses</span></div>
+        <div class="lf-row"><div class="lf-ico">✓</div><span data-fr="2 000 groupes WA" data-en="2,000 WA groups">2 000 groupes WA</span></div>
+      </div>
+      <button class="select-btn" data-fr="✓ Sélectionné" data-en="✓ Selected">✓ Sélectionné</button>
+    </div>
+
+    <!-- Premium -->
+    <div class="level-card" id="card-premium" onclick="selectLevel('premium', 5000, 'https://soinapay.com/pay/2e4xj81f')">
+      <div class="level-icon">🥇</div>
+      <div class="level-name">Premium</div>
+      <div class="level-price">5 000 <span>FCFA</span></div>
+      <div class="level-features">
+        <div class="lf-row"><div class="lf-ico">✓</div><span>N1 : <strong>2 500 FCFA</strong></span></div>
+        <div class="lf-row"><div class="lf-ico">✓</div><span>N2 : <strong>1 200 FCFA</strong></span></div>
+        <div class="lf-row"><div class="lf-ico">✓</div><span>N3 : <strong>600 FCFA</strong></span></div>
+        <div class="lf-row"><div class="lf-ico">✓</div><span data-fr="Support prioritaire" data-en="Priority support">Support prioritaire</span></div>
+        <div class="lf-row"><div class="lf-ico">✓</div><span data-fr="Badge VIP" data-en="VIP Badge">Badge VIP</span></div>
+      </div>
+      <button class="select-btn" data-fr="Choisir" data-en="Select">Choisir</button>
+    </div>
   </div>
-</div></div>
+
+  <div class="pay-section">
+    <a id="payBtn" href="https://soinapay.com/pay/2e4xj81f" target="_blank" class="btn-pay">
+      🔐 <span id="payTxt">ACTIVER — 2 500 FCFA</span>
+    </a>
+    <div class="secure">🔒 <span data-fr="Paiement sécurisé SoinaPay" data-en="Secure payment SoinaPay">Paiement sécurisé SoinaPay</span></div>
+    <div class="methods">
+      <div class="method">Orange Money</div>
+      <div class="method">Wave</div>
+      <div class="method">Free Money</div>
+    </div>
+    <p style="font-size:12px;color:rgba(255,255,255,.5);margin-top:12px;text-align:center" data-fr="Après le paiement, revenez et actualisez la page" data-en="After payment, come back and refresh">Après le paiement, revenez et actualisez la page</p>
+  </div>
+</div>
 <script>
+let selected = "standard";
+let selectedAmount = 2500;
+let selectedLink = "https://soinapay.com/pay/2e4xj81f";
+
+function selectLevel(level, amount, link){
+  selected = level;
+  selectedAmount = amount;
+  selectedLink = link;
+  ["starter","standard","premium"].forEach(l=>{
+    const card = document.getElementById("card-"+l);
+    card.classList.remove("selected");
+    card.querySelector(".select-btn").textContent = "Choisir";
+  });
+  const card = document.getElementById("card-"+level);
+  card.classList.add("selected");
+  card.querySelector(".select-btn").textContent = "✓ Sélectionné";
+  document.getElementById("payBtn").href = link;
+  document.getElementById("payTxt").textContent = "ACTIVER — "+amount.toLocaleString()+" FCFA";
+}
+
 let lg="fr";
 function tl(){lg=lg==="fr"?"en":"fr";const e=lg==="en";document.getElementById("lf").textContent=e?"🇫🇷":"🇬🇧";document.getElementById("ll").textContent=e?"Français":"English";document.querySelectorAll("[data-fr]").forEach(el=>el.textContent=e?el.dataset.en:el.dataset.fr);}
-function pay(){
-  const btn=document.getElementById("pb");
-  btn.disabled=true;
-  document.getElementById("sp").style.display="block";
-  document.getElementById("bt").textContent=lg==="en"?"PROCESSING...":"TRAITEMENT...";
-  LeekPay.checkout({
-    amount:{{ amount_xof }},currency:"XOF",
-    apiKey:"{{ leekpay_public_key }}",
-    description:"Activation WIN AFFINITY",
-    customerEmail:"{{ user.email }}",
-    onSuccess:async function(data){
-      const res=await fetch("/payment/confirm",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({payment_id:data.payment_id,amount:data.amount,currency:data.currency,status:data.status})});
-      const r=await res.json();
-      if(r.success){document.getElementById("ov").classList.add("show");setTimeout(()=>window.location.href="/dashboard",3000);}
-      else{btn.disabled=false;document.getElementById("sp").style.display="none";document.getElementById("bt").textContent="ACTIVER MON COMPTE";alert(r.error||"Erreur");}
-    },
-    onCancel:function(){btn.disabled=false;document.getElementById("sp").style.display="none";document.getElementById("bt").textContent="ACTIVER MON COMPTE";}
-  });
-}
 </script>
 </body></html>
