@@ -63,6 +63,7 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
 .lb{position:fixed;top:68px;right:14px;z-index:50;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);backdrop-filter:blur(10px);border-radius:30px;padding:6px 14px;display:flex;align-items:center;gap:6px;cursor:pointer;font-family:"Poppins",sans-serif;font-size:12px;color:#fff}
 @media(max-width:600px){.levels-grid{grid-template-columns:1fr;max-width:360px}}
 </style>
+<script src="https://leekpay.fr/js/leekpay.js"></script>
 </head>
 <body>
 <div class="bg"><div class="blob b1"></div><div class="blob b2"></div></div>
@@ -92,7 +93,7 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
 
   <div class="levels-grid">
     <!-- Starter -->
-    <div class="level-card" id="card-starter" onclick="selectLevel('starter', 1000, 'https://soinapay.com/pay/2e4xj81f')">
+    <div class="level-card" id="card-starter" onclick="selectLevel('starter', 1000, '#leekpay')">
       <div class="level-icon">🥉</div>
       <div class="level-name">Starter</div>
       <div class="level-price">1 000 <span>FCFA</span></div>
@@ -107,7 +108,7 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
     </div>
 
     <!-- Standard -->
-    <div class="level-card popular selected" id="card-standard" onclick="selectLevel('standard', 2500, 'https://soinapay.com/pay/2e4xj81f')">
+    <div class="level-card popular selected" id="card-standard" onclick="selectLevel('standard', 2500, '#leekpay')">
       <div class="popular-badge">⭐ POPULAIRE</div>
       <div class="level-icon">🥈</div>
       <div class="level-name">Standard</div>
@@ -123,7 +124,7 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
     </div>
 
     <!-- Premium -->
-    <div class="level-card" id="card-premium" onclick="selectLevel('premium', 5000, 'https://soinapay.com/pay/2e4xj81f')">
+    <div class="level-card" id="card-premium" onclick="selectLevel('premium', 5000, '#leekpay')">
       <div class="level-icon">🥇</div>
       <div class="level-name">Premium</div>
       <div class="level-price">5 000 <span>FCFA</span></div>
@@ -139,7 +140,7 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
   </div>
 
   <div class="pay-section">
-    <a id="payBtn" href="https://soinapay.com/pay/2e4xj81f" target="_blank" class="btn-pay">
+    <a id="payBtn" href="#leekpay" target="_blank" class="btn-pay">
       🔐 <span id="payTxt">ACTIVER — 2 500 FCFA</span>
     </a>
     <div class="secure">🔒 <span data-fr="Paiement sécurisé SoinaPay" data-en="Secure payment SoinaPay">Paiement sécurisé SoinaPay</span></div>
@@ -152,9 +153,31 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
   </div>
 </div>
 <script>
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+<script>
+function pay(){
+  const btn=document.getElementById("payBtn");
+  btn.disabled=true;
+  document.getElementById("sp").style.display="inline-block";
+  LeekPay.checkout({
+    amount: selectedAmount,
+    currency: "XOF",
+    apiKey: "pk_live_h0RQu365IhnhdXkW2YeWZiDmKQGo7Pn1",
+    description: "Activation WIN AFFINITY " + selected,
+    customerEmail: "{{ user.email }}",
+    onSuccess: async function(data){
+      const res = await fetch("/payment/confirm", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({payment_id:data.payment_id, amount:data.amount, currency:data.currency, status:data.status})});
+      const r = await res.json();
+      if(r.success){document.getElementById("ov").classList.add("show");setTimeout(()=>window.location.href="/dashboard",3000);}
+      else{btn.disabled=false;document.getElementById("sp").style.display="none";alert(r.error||"Erreur");}
+    },
+    onCancel: function(){btn.disabled=false;document.getElementById("sp").style.display="none";}
+  });
+}
 let selected = "standard";
 let selectedAmount = 2500;
-let selectedLink = "https://soinapay.com/pay/2e4xj81f";
+let selectedLink = "#leekpay";
 
 function selectLevel(level, amount, link){
   selected = level;
