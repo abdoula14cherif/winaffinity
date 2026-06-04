@@ -11,32 +11,44 @@ COMMISSIONS = {1: 1250, 2: 600, 3: 300}
 
 
 async def process_commissions(db: Client, new_user_id: str):
+    """
+    Commission basée sur le niveau DU PARRAIN.
+    Starter=1000F -> 500/240/120
+    Standard=2500F -> 1250/600/300
+    Premium=5000F -> 2500/1200/600
+    """
     try:
-        user_res = db.table("users").select("id,sponsor_id,full_name").eq("id", new_user_id).execute()
-        if not user_res.data:
-            return
-        user = user_res.data[0]
-        sponsor1_id = user.get("sponsor_id")
-        if not sponsor1_id:
-            return
+        user_res = db.table("users").select("id,sponsor_id").eq("id", new_user_id).execute()
+        if not user_res.data: return
+        sponsor1_id = user_res.data[0].get("sponsor_id")
+        if not sponsor1_id: return
 
-        await _add_commission(db, sponsor1_id, new_user_id, 1)
+        # Niveau 1 - commission selon niveau du parrain N1
+        s1_res = db.table("users").select("sponsor_id,level").eq("id", sponsor1_id).execute()
+        if not s1_res.data: return
+        s1 = s1_res.data[0]
+        rates1 = COMMISSION_BY_LEVEL.get(s1.get("level") or "standard", COMMISSION_BY_LEVEL["standard"])
+        await _add_commission(db, sponsor1_id, new_user_id, 1, rates1[1])
 
-        s1_res = db.table("users").select("sponsor_id").eq("id", sponsor1_id).execute()
-        if not s1_res.data:
-            return
-        sponsor2_id = s1_res.data[0].get("sponsor_id")
-        if not sponsor2_id:
-            return
-        await _add_commission(db, sponsor2_id, new_user_id, 2)
+        sponsor2_id = s1.get("sponsor_id")
+        if not sponsor2_id: return
 
-        s2_res = db.table("users").select("sponsor_id").eq("id", sponsor2_id).execute()
-        if not s2_res.data:
-            return
-        sponsor3_id = s2_res.data[0].get("sponsor_id")
-        if not sponsor3_id:
-            return
-        await _add_commission(db, sponsor3_id, new_user_id, 3)
+        # Niveau 2 - commission selon niveau du parrain N2
+        s2_res = db.table("users").select("sponsor_id,level").eq("id", sponsor2_id).execute()
+        if not s2_res.data: return
+        s2 = s2_res.data[0]
+        rates2 = COMMISSION_BY_LEVEL.get(s2.get("level") or "standard", COMMISSION_BY_LEVEL["standard"])
+        await _add_commission(db, sponsor2_id, new_user_id, 2, rates2[2])
+
+        sponsor3_id = s2.get("sponsor_id")
+        if not sponsor3_id: return
+
+        # Niveau 3 - commission selon niveau du parrain N3
+        s3_res = db.table("users").select("level").eq("id", sponsor3_id).execute()
+        if not s3_res.data: return
+        s3 = s3_res.data[0]
+        rates3 = COMMISSION_BY_LEVEL.get(s3.get("level") or "standard", COMMISSION_BY_LEVEL["standard"])
+        await _add_commission(db, sponsor3_id, new_user_id, 3, rates3[3])
 
     except Exception as e:
         logger.error("[COMMISSION] Erreur : %s", e)
