@@ -187,6 +187,9 @@ tbody td{padding:11px 16px;font-size:13px;color:var(--txd);border-bottom:1px sol
       <button class="btn-share" onclick="copyLink()">🔗 <span data-fr="Partager" data-en="Share">Partager</span></button>
     </div>
   </div>
+  <!-- Bannière annonces -->
+  <div id="bannerZone" style="margin-bottom:16px"></div>
+
   <!-- Stats -->
   <div class="stats-grid">
     <div class="stat-card">
@@ -302,6 +305,25 @@ let lg="fr";
 function tl(){lg=lg==="fr"?"en":"fr";const e=lg==="en";document.getElementById("lf").textContent=e?"🇫🇷":"🇬🇧";document.getElementById("ll").textContent=e?"Français":"English";document.documentElement.setAttribute("lang",lg);document.querySelectorAll("[data-fr]").forEach(el=>el.innerHTML=e?el.dataset.en:el.dataset.fr);}
 function copyLink(){const link=document.getElementById("refLink").textContent;navigator.clipboard.writeText(link).then(()=>{const btn=document.getElementById("copyBtn");if(btn){btn.textContent=lg==="en"?"Copied!":"Copié!";btn.classList.add("copied");}showToast(lg==="en"?"✓ Link copied!":"✓ Lien copié !","ok");setTimeout(()=>{if(btn){btn.textContent=lg==="en"?"Copy":"Copier";btn.classList.remove("copied");}},2000);});}
 function showToast(msg,type=""){const t=document.getElementById("toast");t.textContent=msg;t.className="show "+type;clearTimeout(t._t);t._t=setTimeout(()=>t.className="",3000);}
+// Charger annonces
+(async function(){
+  try{
+    const r=await fetch("/dashboard/announcements");
+    const d=await r.json();
+    const zone=document.getElementById("bannerZone");
+    if(!zone||!d.announcements||!d.announcements.length)return;
+    const colors={success:"rgba(0,184,148,.1)",info:"rgba(45,95,143,.1)",warning:"rgba(243,156,18,.1)",error:"rgba(231,76,60,.1)"};
+    const borders={success:"rgba(0,184,148,.3)",info:"rgba(45,95,143,.3)",warning:"rgba(243,156,18,.3)",error:"rgba(231,76,60,.3)"};
+    const textColors={success:"#00B894",info:"#2D5F8F",warning:"#F39C12",error:"#E74C3C"};
+    zone.innerHTML=d.announcements.map(a=>`
+      <div style="background:${colors[a.type]||colors.info};border:1.5px solid ${borders[a.type]||borders.info};border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;animation:fadeUp .5s ease both">
+        <span style="font-size:13px;font-weight:500;color:${textColors[a.type]||textColors.info};flex:1">${a.message}</span>
+        ${a.link?`<a href="${a.link}" style="color:${textColors[a.type]};font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap">Voir →</a>`:""}
+        <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:${textColors[a.type]};font-size:16px;padding:2px 6px">✕</button>
+      </div>`).join("");
+  }catch(e){}
+})();
+
 function openSb(){document.getElementById("sidebar").classList.add("open");document.getElementById("sbOverlay").classList.add("open");}
 function closeSb(){document.getElementById("sidebar").classList.remove("open");document.getElementById("sbOverlay").classList.remove("open");}
 </script>

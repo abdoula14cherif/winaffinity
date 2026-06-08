@@ -89,3 +89,21 @@ async def get_network(request: Request):
     db = get_supabase()
     tree = await get_user_referral_tree(db, user["id"], depth=2)
     return JSONResponse({"tree": tree, "total": len(tree)})
+
+@router.get("/announcements")
+async def get_announcements(request: Request):
+    db = get_supabase()
+    try:
+        res = db.table("announcements").select("*").eq("is_active", True).order("created_at", desc=True).execute()
+        return JSONResponse({"announcements": res.data or []})
+    except Exception as e:
+        return JSONResponse({"announcements": []})
+
+@router.get("/announcements")
+async def get_announcements(request: Request):
+    db = get_supabase()
+    try:
+        res = db.table("announcements").select("*").eq("is_active", True).order("created_at", desc=True).execute()
+        return JSONResponse({"announcements": res.data or []})
+    except Exception as e:
+        return JSONResponse({"announcements": []})

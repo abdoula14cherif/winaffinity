@@ -104,6 +104,7 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
     <div class="tab" onclick="showTab('tasks',this)">📋 Tâches</div>
     <div class="tab" onclick="showTab('notifs',this)">🔔 Notifications</div>
     <div class="tab" onclick="showTab('stats',this)">📊 Stats</div>
+    <div class="tab" onclick="showTab('annonces',this)">📢 Annonces</div>
     <div class="tab" onclick="showTab('formations',this)">🎓 Formations</div>
     <div class="tab" onclick="showTab('groups',this)">👥 Groupes</div>
   </div>
@@ -333,6 +334,31 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
     </div>
   </div>
 
+
+  <div class="tab-content" id="tab-annonces">
+    <div class="card">
+      <div class="card-title">Ajouter une annonce</div>
+      <div style="display:grid;grid-template-columns:2fr 100px 1fr auto;gap:10px;align-items:end">
+        <div class="fg"><label>MESSAGE</label><input type="text" id="anMsg" placeholder="Votre annonce..."/></div>
+        <div class="fg"><label>TYPE</label>
+          <select id="anType">
+            <option value="success">✅ Succès</option>
+            <option value="info">💬 Info</option>
+            <option value="warning">⚠️ Alerte</option>
+            <option value="error">❌ Urgent</option>
+          </select>
+        </div>
+        <div class="fg"><label>LIEN (optionnel)</label><input type="text" id="anLink" placeholder="https://..."/></div>
+        <button class="btn-add" onclick="addAnnounce()">+ Publier</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Annonces actives</div>
+      <div id="announceList" style="display:flex;flex-direction:column;gap:10px">
+        <div style="text-align:center;padding:20px;color:var(--txd)">Chargement...</div>
+      </div>
+    </div>
+  </div>
 </div>
 <div id="toast"></div>
 <script>
@@ -356,5 +382,48 @@ async function togForm(id){const r=await post("/admin/formation/toggle",{formati
 async function delForm(id){if(!confirm("Supprimer ?"))return;const r=await post("/admin/formation/delete",{formation_id:id});if(r.success){document.getElementById("form-"+id).remove();toast("✓ Supprimée");}else toast("Erreur","er");}
 async function addGroup(){const n=document.getElementById("gN").value.trim(),d=document.getElementById("gD").value.trim(),cat=document.getElementById("gC").value.trim(),l=document.getElementById("gL").value.trim(),m=document.getElementById("gM").value;if(!n||!l){toast("Nom et lien requis","er");return;}const r=await post("/admin/group/add",{name:n,description:d,category:cat,link:l,members:m});if(r.success){toast("✓ Groupe ajouté");setTimeout(()=>location.reload(),800);}else toast("Erreur","er");}
 async function delGroup(id){if(!confirm("Supprimer ?"))return;const r=await post("/admin/group/delete",{group_id:id});if(r.success){document.getElementById("grp-"+id).remove();toast("✓ Supprimé");}else toast("Erreur","er");}
+
+async function addAnnounce(){
+  const msg=document.getElementById("anMsg").value.trim();
+  const type=document.getElementById("anType").value;
+  const link=document.getElementById("anLink").value.trim();
+  if(!msg){toast("Message requis","er");return;}
+  const r=await post("/admin/announcement/add",{message:msg,type:type,link:link});
+  if(r.success){toast("✓ Annonce publiée");loadAnnounces();document.getElementById("anMsg").value="";}
+  else toast("Erreur","er");
+}
+async function delAnnounce(id){
+  const r=await post("/admin/announcement/delete",{announcement_id:id});
+  if(r.success){toast("✓ Supprimée");loadAnnounces();}
+  else toast("Erreur","er");
+}
+async function togAnnounce(id){
+  const r=await post("/admin/announcement/toggle",{announcement_id:id});
+  if(r.success){toast("✓ Mis à jour");loadAnnounces();}
+  else toast("Erreur","er");
+}
+async function loadAnnounces(){
+  try{
+    const r=await fetch("/dashboard/announcements");
+    const d=await r.json();
+    const list=document.getElementById("announceList");
+    if(!list)return;
+    if(!d.announcements||!d.announcements.length){list.innerHTML="<div style=text-align:center;padding:20px;color:var(--txd)>Aucune annonce</div>";return;}
+    list.innerHTML=d.announcements.map(a=>`
+      <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg);border:1.5px solid var(--bd);border-radius:10px">
+        <div style="flex:1;font-size:13px;color:var(--tx)">${a.message}</div>
+        <span class="badge b-${a.type==="success"?"ok":a.type==="warning"?"warn":"er"}">${a.type}</span>
+        <span class="badge ${a.is_active?"b-ok":"b-warn"}">${a.is_active?"Active":"Inactive"}</span>
+        <button class="btn-xs btn-act" onclick="togAnnounce('${a.id}')">${a.is_active?"Off":"On"}</button>
+        <button class="btn-xs btn-dea" onclick="delAnnounce('${a.id}')">🗑</button>
+      </div>`).join("");
+  }catch(e){}
+}
+// Charger annonces quand on clique sur l onglet
+document.querySelectorAll(".tab").forEach(t=>{
+  t.addEventListener("click",function(){
+    if(this.textContent.includes("Annonces"))loadAnnounces();
+  });
+});
 </script>
 </body></html>

@@ -293,3 +293,28 @@ async def delete_task(request: Request, task_id: Annotated[str, Form()]):
     db = get_supabase()
     db.table("tasks").delete().eq("id", task_id).execute()
     return JSONResponse({"success": True})
+
+@router.post("/announcement/add")
+async def add_announcement(request: Request, message: Annotated[str, Form()], type: Annotated[str, Form()] = "info", link: Annotated[str, Form()] = ""):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    db.table("announcements").insert({"message": message, "type": type, "link": link or None}).execute()
+    return JSONResponse({"success": True})
+
+@router.post("/announcement/delete")
+async def delete_announcement(request: Request, announcement_id: Annotated[str, Form()]):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    db.table("announcements").delete().eq("id", announcement_id).execute()
+    return JSONResponse({"success": True})
+
+@router.post("/announcement/toggle")
+async def toggle_announcement(request: Request, announcement_id: Annotated[str, Form()]):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    a = db.table("announcements").select("is_active").eq("id", announcement_id).execute().data
+    if a: db.table("announcements").update({"is_active": not a[0]["is_active"]}).eq("id", announcement_id).execute()
+    return JSONResponse({"success": True})
