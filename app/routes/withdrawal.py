@@ -60,23 +60,59 @@ async def post_withdrawal(
     user = await _get_user(request)
     if not user:
         return RedirectResponse("/auth/login", status_code=302)
+    
     db = get_supabase()
-    wallet = await get_wallet(db, user["id"])
-    withdrawals = await get_withdrawals(db, user["id"])
-
+    
     try:
+        # 1. Vérifier le solde avant la demande
+        current_wallet = await get_wallet(db, user["id"])
+        if current_wallet["balance"] < amount:
+            # Récupérer les données pour rafraîchir la page
+            wallet = await get_wallet(db, user["id"])
+            withdrawals = await get_withdrawals(db, user["id"])
+            return templates.TemplateResponse("withdrawal.html", {
+                "request": request, "user": user,
+                "wallet": wallet, "withdrawals": withdrawals,
+                "min_amount": 1000, "fee_rate": 10,
+                "error": f"Solde insuffisant. Votre solde est de {current_wallet['balance']} FCFA",
+                "success": None,
+            })
+        
+        # 2. Exécuter la demande de retrait
         await request_withdrawal(db, user["id"], amount, phone, operator, country, account_name)
+        
+        # 3. Récupérer le NOUVEAU solde après retrait
+        new_wallet = await get_wallet(db, user["id"])
+        new_withdrawals = await get_withdrawals(db, user["id"])
+        
         return templates.TemplateResponse("withdrawal.html", {
             "request": request, "user": user,
-            "wallet": wallet, "withdrawals": withdrawals,
+            "wallet": new_wallet,  # ← Correction: nouveau solde
+            "withdrawals": new_withdrawals,  # ← Correction: historique mis à jour
             "min_amount": 1000, "fee_rate": 10,
             "error": None,
             "success": f"Demande de {amount} FCFA envoyée ! Vous recevrez {int(amount*0.9)} FCFA.",
         })
+        
     except ValueError as e:
+        # En cas d'erreur, rafraîchir les données
+        wallet = await get_wallet(db, user["id"])
+        withdrawals = await get_withdrawals(db, user["id"])
         return templates.TemplateResponse("withdrawal.html", {
             "request": request, "user": user,
             "wallet": wallet, "withdrawals": withdrawals,
             "min_amount": 1000, "fee_rate": 10,
             "error": str(e), "success": None,
+        })
+        
+    except Exception as e:
+        logger.error(f"Erreur inattendue lors du retrait: {str(e)}")
+        wallet = await get_wallet(db, user["id"])
+        withdrawals = await get_withdrawals(db, user["id"])
+        return templates.TemplateResponse("withdrawal.html", {
+            "request": request, "user": user,
+            "wallet": wallet, "withdrawals": withdrawals,
+            "min_amount": 1000, "fee_rate": 10,
+            "error": "Erreur interne. Veuillez réessayer plus tard.",
+            "success": None,
         })
