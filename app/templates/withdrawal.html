@@ -148,7 +148,9 @@ tbody td{padding:10px;font-size:12.5px;color:var(--txd);border-bottom:1px solid 
       {% if withdrawals %}
       <div style="overflow-x:auto">
         <table>
-          <thead><tr><th>DATE</th><th>PAYS</th><th>MONTANT</th><th>REÇU</th><th>STATUT</th></tr></thead>
+          <thead>
+            <tr><th>DATE</th><th>PAYS</th><th>MONTANT</th><th>REÇU</th><th>STATUT</th></tr>
+          </thead>
           <tbody>
             {% for w in withdrawals %}
             <tr>
@@ -192,7 +194,7 @@ var currentCountry = "SN";
 var currentOp = "";
 
 function selCountry(el, code){
-  document.querySelectorAll(".country-btn").forEach(b=>b.classList.remove("sel"));
+  document.querySelectorAll(".country-btn").forEach(function(b){ b.classList.remove("sel"); });
   el.classList.add("sel");
   currentCountry = code;
   document.getElementById("countryInput").value = code;
@@ -203,21 +205,25 @@ function selCountry(el, code){
 function renderOps(code){
   var ops = OPERATORS[code] || [];
   var grid = document.getElementById("opsGrid");
-  grid.innerHTML = ops.map(function(op){
-    return "<div class="op-btn" onclick="selOp(this,'"+op.v+"')">"+op.n+"</div>";
-  }).join("");
-  currentOp = "";
-  document.getElementById("operatorInput").value = "";
-  if(ops.length > 0){
-    var first = grid.querySelector(".op-btn");
-    first.classList.add("sel");
-    currentOp = ops[0].v;
-    document.getElementById("operatorInput").value = ops[0].v;
+  if(ops.length === 0){
+    grid.innerHTML = "<div style='grid-column:span 2;text-align:center;padding:12px;background:#f8f9fa;border-radius:10px;font-size:12px;color:#999'>Aucun opérateur disponible</div>";
+    document.getElementById("operatorInput").value = "";
+    currentOp = "";
+    return;
   }
+  var html = "";
+  for(var i = 0; i < ops.length; i++){
+    html += "<div class='op-btn' onclick=\"selOp(this,'" + ops[i].v + "')\">" + ops[i].n + "</div>";
+  }
+  grid.innerHTML = html;
+  currentOp = ops[0].v;
+  document.getElementById("operatorInput").value = ops[0].v;
+  var firstBtn = grid.querySelector(".op-btn");
+  if(firstBtn) firstBtn.classList.add("sel");
 }
 
 function selOp(el, val){
-  document.querySelectorAll(".op-btn").forEach(b=>b.classList.remove("sel"));
+  document.querySelectorAll(".op-btn").forEach(function(b){ b.classList.remove("sel"); });
   el.classList.add("sel");
   currentOp = val;
   document.getElementById("operatorInput").value = val;
@@ -246,7 +252,7 @@ function chk(){
 var lg = "fr";
 function tl(){
   lg = lg==="fr"?"en":"fr";
-  var e = lg==="en";
+  var e = (lg==="en");
   document.getElementById("lf").textContent = e?"🇫🇷":"🇬🇧";
   document.getElementById("ll").textContent = e?"Français":"English";
 }
@@ -254,4 +260,5 @@ function tl(){
 // Initialiser
 renderOps("SN");
 </script>
-</body></html>
+</body>
+</html>
