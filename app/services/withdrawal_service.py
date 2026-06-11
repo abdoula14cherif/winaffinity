@@ -12,7 +12,7 @@ MINIMUM_WITHDRAWAL = 1000
 FEE_RATE = 0.10
 
 
-async def request_withdrawal(db: Client, user_id: str, amount: int, phone: str, operator: str) -> dict:
+async def request_withdrawal(db: Client, user_id: str, amount: int, phone: str, operator: str, country: str = "", account_name: str = "") -> dict:
     if amount < MINIMUM_WITHDRAWAL:
         raise ValueError(f"Montant minimum de retrait : {MINIMUM_WITHDRAWAL} FCFA.")
 
@@ -35,6 +35,7 @@ async def request_withdrawal(db: Client, user_id: str, amount: int, phone: str, 
         "balance": wallet["balance"] - amount
     }).eq("user_id", user_id).execute()
 
+    # Insertion avec les nouveaux champs
     result = db.table("withdrawals").insert({
         "user_id": user_id,
         "amount": amount,
@@ -42,10 +43,12 @@ async def request_withdrawal(db: Client, user_id: str, amount: int, phone: str, 
         "net_amount": net_amount,
         "phone": phone,
         "operator": operator,
+        "country": country,  # ← Ajouté
+        "account_name": account_name,  # ← Ajouté
         "status": "pending"
     }).execute()
 
-    logger.info("[WITHDRAWAL] Demande créée : %s FCFA pour user %s", amount, user_id)
+    logger.info("[WITHDRAWAL] Demande créée : %s FCFA pour user %s (pays: %s)", amount, user_id, country)
 
     try:
         user_res = db.table("users").select("email,full_name").eq("id", user_id).execute()
