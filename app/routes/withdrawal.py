@@ -54,6 +54,8 @@ async def post_withdrawal(
     amount: Annotated[int, Form()],
     phone: Annotated[str, Form()],
     operator: Annotated[str, Form()],
+    country: Annotated[str, Form()] = "SN",
+    account_name: Annotated[str, Form()] = "",
 ):
     user = await _get_user(request)
     if not user:
@@ -63,7 +65,7 @@ async def post_withdrawal(
     withdrawals = await get_withdrawals(db, user["id"])
 
     try:
-        await request_withdrawal(db, user["id"], amount, phone, operator)
+        await request_withdrawal(db, user["id"], amount, phone, operator, country, account_name)
         return templates.TemplateResponse("withdrawal.html", {
             "request": request, "user": user,
             "wallet": wallet, "withdrawals": withdrawals,
