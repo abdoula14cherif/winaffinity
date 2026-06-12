@@ -27,6 +27,11 @@ async def request_withdrawal(db: Client, user_id: str, amount: int, phone: str, 
     if wallet["balance"] < amount:
         raise ValueError(f"Solde insuffisant. Votre solde : {wallet['balance']} FCFA.")
 
+    # Vérifier qu'il a au moins 1 filleul actif
+    referrals = db.table("users").select("id").eq("sponsor_id", user_id).eq("is_active", True).execute().data or []
+    if len(referrals) < 1:
+        raise ValueError("Vous devez avoir au moins 1 filleul actif pour effectuer un retrait.")
+
     pending = db.table("withdrawals").select("id").eq("user_id", user_id).eq("status", "pending").execute()
     if pending.data:
         raise ValueError("Vous avez déjà une demande de retrait en cours.")
