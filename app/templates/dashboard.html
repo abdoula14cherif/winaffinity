@@ -136,6 +136,10 @@ tbody td{padding:11px 16px;font-size:13px;color:var(--txd);border-bottom:1px sol
   .topbar-left h1{font-size:18px}
 }
 @media(max-width:480px){.stats-grid{grid-template-columns:1fr 1fr}}
+.level-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 16px;border-radius:20px;font-size:12px;font-weight:800;letter-spacing:.05em;margin-top:6px;margin-bottom:4px}
+.level-starter{background:rgba(255,107,53,.1);color:#FF6B35;border:1.5px solid rgba(255,107,53,.25)}
+.level-standard{background:rgba(45,95,143,.1);color:#2D5F8F;border:1.5px solid rgba(45,95,143,.25)}
+.level-premium{background:linear-gradient(135deg,rgba(255,215,0,.15),rgba(255,107,53,.1));color:#B8860B;border:1.5px solid rgba(255,215,0,.35)}
 </style>
 <link rel="manifest" href="/static/manifest.json"/>
 <link rel="icon" type="image/png" href="/static/icon-192-v2.png"/>
@@ -182,6 +186,13 @@ tbody td{padding:11px 16px;font-size:13px;color:var(--txd);border-bottom:1px sol
       <button class="hamburger" onclick="openSb()">☰</button>
       <div class="topbar-left">
         <h1 data-fr="Bonjour, <span style=color:var(--or)>{{ user.full_name.split()[0] }}</span> 👋" data-en="Hello, <span style=color:var(--or)>{{ user.full_name.split()[0] }}</span> 👋">Bonjour, <span>{{ user.full_name.split()[0] }}</span> 👋</h1>
+    {% if user.is_active %}
+    <div class="level-badge level-{{ user.level or 'standard' }}">
+      {% if user.level == 'starter' %}🥉 STARTER
+      {% elif user.level == 'premium' %}🥇 PREMIUM
+      {% else %}🥈 STANDARD{% endif %}
+    </div>
+    {% endif %}
         <p id="dateLabel"></p>
       </div>
     </div>
