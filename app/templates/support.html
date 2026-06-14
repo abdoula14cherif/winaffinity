@@ -1,98 +1,144 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>WIN AFFINITY — Support</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--gold:#C9A84C;--gold-light:#E8C96A;--gold-dim:rgba(201,168,76,.13);--navy:#07101F;--navy-card:rgba(13,27,42,.85);--white:#F4EFE6;--white-dim:rgba(244,239,230,.55);--soft:rgba(244,239,230,.06);--border:rgba(201,168,76,.2);--success:#4CAF7E;--r:16px;--t:.35s cubic-bezier(.4,0,.2,1)}
-    html,body{min-height:100%;font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--white)}
-    .bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 60% 50% at 0% 0%,#0e2240 0%,transparent 55%),linear-gradient(165deg,#07101F 0%,#091525 100%)}
-    .header{position:fixed;top:0;left:0;right:0;z-index:20;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:rgba(7,16,31,.95);border-bottom:1px solid var(--border);backdrop-filter:blur(16px)}
-    .brand{display:flex;align-items:center;gap:10px;font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;letter-spacing:.1em;background:linear-gradient(135deg,var(--gold-light),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .brand-icon{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--gold),#8B5A00);display:flex;align-items:center;justify-content:center;font-size:17px}
-    .back-btn{display:flex;align-items:center;gap:6px;color:var(--gold);text-decoration:none;font-size:13.5px;font-weight:500;padding:8px 14px;border:1px solid var(--border);border-radius:8px}
-    .page{position:relative;z-index:2;min-height:100vh;padding:90px 20px 60px;max-width:640px;margin:0 auto}
-    .hero{text-align:center;margin-bottom:36px}
-    .hero h1{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;margin-bottom:8px}
-    .hero h1 span{color:var(--gold)}
-    .hero p{font-size:14px;color:var(--white-dim)}
-    .support-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
-    .support-card{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--r);padding:24px;text-align:center;text-decoration:none;transition:all var(--t);backdrop-filter:blur(20px)}
-    .support-card:hover{border-color:var(--gold);background:var(--gold-dim);transform:translateY(-2px)}
-    .support-ico{font-size:36px;margin-bottom:12px}
-    .support-name{font-size:15px;font-weight:600;color:var(--white);margin-bottom:4px}
-    .support-desc{font-size:12.5px;color:var(--white-dim)}
-    .support-badge{display:inline-block;background:var(--gold-dim);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--gold);margin-top:8px}
-    .hours-card{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--r);padding:24px;backdrop-filter:blur(20px)}
-    .hours-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold);margin-bottom:16px}
-    .hours-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13.5px}
-    .hours-row:last-child{border-bottom:none}
-    .hours-row span:first-child{color:var(--white-dim)}
-    .hours-row span:last-child{color:var(--white);font-weight:500}
-    .online{color:var(--success) !important}
-    @media(max-width:500px){.support-grid{grid-template-columns:1fr}}
-  </style>
-  <link rel="manifest" href="/static/manifest.json"/>
-  <meta name="theme-color" content="#C9A84C"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="apple-mobile-web-app-title" content="WIN AFFINITY"/>
-  <link rel="apple-touch-icon" href="/static/icon-192.png"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WIN AFFINITY — Support</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--or:#FF6B35;--orl:#FF8C5A;--ord:rgba(255,107,53,.1);--bl:#1A3A5C;--bg:#F0F4F8;--wh:#FFFFFF;--tx:#1A2B3C;--txd:#6B7A8D;--bd:#D1DCE8;--ok:#00B894;--t:.3s}
+html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);color:var(--tx)}
+.header{position:fixed;top:0;left:0;right:0;z-index:20;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:var(--bl);box-shadow:0 2px 12px rgba(26,58,92,.2)}
+.brow{display:flex;align-items:center;gap:8px}
+.bico{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#FF6B35,#FF8C5A);display:flex;align-items:center;justify-content:center;font-size:16px}
+.bname{font-size:18px;font-weight:800;color:#fff}.bname span{color:#FF6B35}
+.back-btn{color:rgba(255,255,255,.8);text-decoration:none;font-size:13px;padding:7px 14px;border:1px solid rgba(255,255,255,.2);border-radius:8px}
+.page{min-height:100vh;padding:76px 16px 16px;max-width:680px;margin:0 auto;display:flex;flex-direction:column;height:100vh}
+.hero{text-align:center;margin-bottom:16px}
+.hero h1{font-size:20px;font-weight:800;color:var(--bl)}
+.hero h1 span{color:var(--or)}
+.hero p{font-size:12.5px;color:var(--txd)}
+.chat-box{flex:1;background:var(--wh);border-radius:16px;border:1.5px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 4px 20px rgba(26,58,92,.08)}
+.chat-header{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1.5px solid var(--bd);background:var(--bg)}
+.chat-avatar{width:38px;height:38px;border-radius:50%;background:var(--ord);border:2px solid var(--or);display:flex;align-items:center;justify-content:center;font-size:17px}
+.chat-title{font-size:14px;font-weight:700;color:var(--bl)}
+.chat-status{font-size:11px;color:var(--ok);display:flex;align-items:center;gap:4px}
+.chat-status::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:75%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.4;animation:msgIn .3s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.msg-admin{align-self:flex-start;background:var(--bg);color:var(--tx);border-bottom-left-radius:4px}
+.msg-user{align-self:flex-end;background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;border-bottom-right-radius:4px}
+.msg-time{font-size:10px;color:var(--txd);margin-top:3px;text-align:right}
+.msg-user .msg-time{color:rgba(255,255,255,.7)}
+.empty-chat{text-align:center;padding:40px;color:var(--txd)}
+.empty-chat-ico{font-size:40px;margin-bottom:10px;opacity:.4}
+.chat-input{display:flex;gap:8px;padding:12px;border-top:1.5px solid var(--bd);background:var(--bg)}
+.chat-input input{flex:1;background:var(--wh);border:1.5px solid var(--bd);border-radius:24px;padding:11px 16px;font-family:"Poppins",sans-serif;font-size:13px;color:var(--tx);outline:none}
+.chat-input input:focus{border-color:var(--or)}
+.send-btn{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:transform var(--t)}
+.send-btn:hover{transform:scale(1.05)}
+.send-btn:disabled{opacity:.5;cursor:not-allowed}
+.quick-replies{display:flex;gap:6px;padding:10px 12px 0;flex-wrap:wrap}
+.qr-btn{background:var(--ord);border:1px solid rgba(255,107,53,.2);color:var(--or);border-radius:16px;padding:6px 12px;font-size:11.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+</style>
 </head>
 <body>
-<div class="bg"></div>
 <header class="header">
-  <div class="brand"><div class="brand-icon">◈</div>WIN AFFINITY</div>
+  <div class="brow"><div class="bico">◈</div><div class="bname">WIN <span>AFFINITY</span></div></div>
   <a href="/dashboard" class="back-btn">← Dashboard</a>
 </header>
 <div class="page">
   <div class="hero">
-    <h1>Centre de <span>support</span></h1>
-    <p>Notre équipe est là pour vous aider</p>
+    <h1>Support <span>WIN AFFINITY</span> 🎧</h1>
+    <p>Notre équipe vous répond rapidement</p>
   </div>
-  <div class="support-grid">
-    <a href="https://wa.me/221770000000" target="_blank" class="support-card">
-      <div class="support-ico">📱</div>
-      <div class="support-name">WhatsApp</div>
-      <div class="support-desc">Discutez avec notre équipe</div>
-      <div class="support-badge">Réponse rapide</div>
-    </a>
-    <a href="https://t.me/winaffinity" target="_blank" class="support-card">
-      <div class="support-ico">✈️</div>
-      <div class="support-name">Telegram</div>
-      <div class="support-desc">Rejoignez notre groupe</div>
-      <div class="support-badge">Communauté</div>
-    </a>
-    <a href="mailto:support@winaffinity.com" class="support-card">
-      <div class="support-ico">📧</div>
-      <div class="support-name">Email</div>
-      <div class="support-desc">support@winaffinity.com</div>
-      <div class="support-badge">24-48h</div>
-    </a>
-    <a href="/faq" class="support-card">
-      <div class="support-ico">❓</div>
-      <div class="support-name">FAQ</div>
-      <div class="support-desc">Questions fréquentes</div>
-      <div class="support-badge">Instantané</div>
-    </a>
-  </div>
-  <div class="hours-card">
-    <div class="hours-title">Heures de disponibilité</div>
-    <div class="hours-row"><span>Lundi — Vendredi</span><span class="online">08h00 — 20h00</span></div>
-    <div class="hours-row"><span>Samedi</span><span>09h00 — 17h00</span></div>
-    <div class="hours-row"><span>Dimanche</span><span style="color:var(--white-dim)">Fermé</span></div>
-    <div class="hours-row"><span>Urgences</span><span class="online">WhatsApp 24h/7j</span></div>
+  <div class="chat-box">
+    <div class="chat-header">
+      <div class="chat-avatar">🎧</div>
+      <div>
+        <div class="chat-title">Équipe WIN AFFINITY</div>
+        <div class="chat-status">En ligne</div>
+      </div>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      {% if messages %}
+        {% for m in messages %}
+        <div class="msg msg-{{ m.sender }}">
+          {{ m.message }}
+          <div class="msg-time">{{ m.created_at[11:16] if m.created_at else "" }}</div>
+        </div>
+        {% endfor %}
+      {% else %}
+      <div class="empty-chat">
+        <div class="empty-chat-ico">💬</div>
+        <div>Bonjour ! Comment pouvons-nous vous aider ?</div>
+      </div>
+      {% endif %}
+    </div>
+    <div class="quick-replies">
+      <div class="qr-btn" onclick="quickMsg('Comment activer mon compte ?')">Activation</div>
+      <div class="qr-btn" onclick="quickMsg('Mon retrait n\'a pas été traité')">Problème retrait</div>
+      <div class="qr-btn" onclick="quickMsg('Je n\'ai pas reçu ma commission')">Commission manquante</div>
+    </div>
+    <form class="chat-input" id="chatForm">
+      <input type="text" id="msgInput" placeholder="Écrivez votre message..." autocomplete="off"/>
+      <button type="submit" class="send-btn">➤</button>
+    </form>
   </div>
 </div>
 <script>
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/static/sw.js')
-    .then(()=>console.log('SW registered'))
-    .catch(e=>console.log('SW error',e));
+const chatBox = document.getElementById("chatMessages");
+chatBox.scrollTop = chatBox.scrollHeight;
+
+function quickMsg(text){
+  document.getElementById("msgInput").value = text;
+  document.getElementById("chatForm").dispatchEvent(new Event("submit"));
 }
+
+document.getElementById("chatForm").addEventListener("submit", async function(e){
+  e.preventDefault();
+  const input = document.getElementById("msgInput");
+  const text = input.value.trim();
+  if(!text) return;
+
+  // Afficher immédiatement
+  const empty = chatBox.querySelector(".empty-chat");
+  if(empty) empty.remove();
+  const now = new Date();
+  const time = now.getHours().toString().padStart(2,"0")+":"+now.getMinutes().toString().padStart(2,"0");
+  const div = document.createElement("div");
+  div.className = "msg msg-user";
+  div.innerHTML = text.replace(/</g,"&lt;") + '<div class="msg-time">'+time+'</div>';
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+  input.value = "";
+
+  const f = new FormData();
+  f.append("message", text);
+  await fetch("/support/send", {method:"POST", body:f});
+});
+
+// Polling pour nouveaux messages (toutes les 8 secondes)
+let lastCount = {{ messages|length }};
+setInterval(async function(){
+  try{
+    const r = await fetch("/support/messages");
+    const d = await r.json();
+    if(d.messages && d.messages.length > lastCount){
+      chatBox.innerHTML = "";
+      d.messages.forEach(m=>{
+        const div = document.createElement("div");
+        div.className = "msg msg-"+m.sender;
+        const time = m.created_at ? m.created_at.substring(11,16) : "";
+        div.innerHTML = m.message.replace(/</g,"&lt;") + '<div class="msg-time">'+time+'</div>';
+        chatBox.appendChild(div);
+      });
+      chatBox.scrollTop = chatBox.scrollHeight;
+      lastCount = d.messages.length;
+    }
+  }catch(e){}
+}, 8000);
 </script>
-</body>
-</html>
+</body></html>
