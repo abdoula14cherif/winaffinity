@@ -210,12 +210,19 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
   <div class="tab-content" id="tab-notifs">
     <div class="card">
       <div class="card-title">📧 Envoyer un email à un utilisateur</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 2fr auto;gap:10px;align-items:end">
-        <div class="fg"><label>EMAIL DESTINATAIRE</label><input type="email" id="emEmail" placeholder="email@exemple.com"/></div>
-        <div class="fg"><label>NOM</label><input type="text" id="emName" placeholder="Nom du destinataire"/></div>
-        <div class="fg"><label>MESSAGE</label><input type="text" id="emMsg" placeholder="Contenu du message..."/></div>
-        <button class="btn-add" onclick="sendEmail()">📧 Envoyer Email</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="fg"><label>DESTINATAIRE</label>
+          <select id="emUser" onchange="onUserSelect()">
+            <option value="">-- Choisir un utilisateur --</option>
+            {% for u in users %}
+            <option value="{{ u.email }}" data-name="{{ u.full_name }}">{{ u.full_name }} ({{ u.email }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="fg"><label>OBJET</label><input type="text" id="emSubject" placeholder="Objet du message"/></div>
       </div>
+      <div class="fg" style="margin-bottom:10px"><label>MESSAGE</label><input type="text" id="emMsg" placeholder="Contenu du message..."/></div>
+      <button class="btn-add" onclick="sendEmail()">📧 Envoyer Email</button>
       <div id="emStatus" style="margin-top:10px;font-size:12px;color:var(--txd)"></div>
     </div>
     <div class="card">
@@ -387,23 +394,28 @@ async function delTask(id){if(!confirm("Supprimer ?"))return;const r=await post(
     emailjs.init("fNyhiux6zn4u2CtRj");
   }
 })();
+function onUserSelect(){
+  // rien de special, juste garder pour future utilisation
+}
 async function sendEmail(){
-  const email=document.getElementById("emEmail").value.trim();
-  const name=document.getElementById("emName").value.trim();
+  const sel=document.getElementById("emUser");
+  const email=sel.value;
+  const name=sel.selectedOptions[0] ? sel.selectedOptions[0].dataset.name : "";
+  const subject=document.getElementById("emSubject").value.trim();
   const msg=document.getElementById("emMsg").value.trim();
   const status=document.getElementById("emStatus");
-  if(!email||!msg){toast("Email et message requis","er");return;}
+  if(!email||!msg){toast("Destinataire et message requis","er");return;}
   status.textContent="Envoi en cours...";
   try{
-    await emailjs.send("servive_ps61bla","template_aks186b",{
+    await emailjs.send("service_ps61bla","template_aks186b",{
       to_email: email,
       to_name: name || "Membre",
+      subject: subject || "Message de WIN AFFINITY",
       message: msg,
     });
     status.textContent="✓ Email envoyé à "+email;
     toast("✓ Email envoyé !");
-    document.getElementById("emEmail").value="";
-    document.getElementById("emName").value="";
+    document.getElementById("emSubject").value="";
     document.getElementById("emMsg").value="";
   }catch(e){
     status.textContent="✗ Erreur : "+(e.text||e.message||"inconnue");
