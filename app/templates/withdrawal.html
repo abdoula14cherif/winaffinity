@@ -34,18 +34,15 @@ label{font-size:11px;font-weight:600;color:var(--bl);letter-spacing:.05em;text-t
 input,select{width:100%;background:var(--bg);border:1.5px solid var(--bd);border-radius:10px;padding:11px 12px;font-family:"Poppins",sans-serif;font-size:13px;color:var(--tx);outline:none;transition:border-color var(--t)}
 input:focus,select:focus{border-color:var(--or);background:var(--wh)}
 select option{background:var(--wh)}
-/* Pays selector */
 .country-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
 .country-btn{background:var(--bg);border:1.5px solid var(--bd);border-radius:10px;padding:8px 6px;text-align:center;cursor:pointer;transition:all var(--t);font-size:12px;font-weight:600;color:var(--txd)}
 .country-btn:hover{border-color:rgba(255,107,53,.3);background:var(--ord)}
 .country-btn.sel{border-color:var(--or);background:var(--ord);color:var(--or)}
 .country-flag{font-size:20px;display:block;margin-bottom:3px}
-/* Opérateurs */
 .ops-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
 .op-btn{background:var(--bg);border:1.5px solid var(--bd);border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer;transition:all var(--t);font-size:12px;font-weight:600;color:var(--txd)}
 .op-btn.sel{border-color:var(--or);background:var(--ord);color:var(--or)}
 .op-btn:hover{border-color:rgba(255,107,53,.3)}
-/* Calcul */
 .calc-box{background:rgba(0,184,148,.06);border:1.5px solid rgba(0,184,148,.2);border-radius:10px;padding:12px 14px;margin-bottom:14px;display:none;flex-direction:column;gap:6px}
 .calc-row{display:flex;justify-content:space-between;font-size:13px}
 .calc-total span{font-weight:700;font-size:15px;color:var(--ok)}
@@ -79,7 +76,6 @@ tbody td{padding:10px;font-size:12.5px;color:var(--txd);border-bottom:1px solid 
     <p>Minimum 1 000 FCFA · Frais 10% · Paiement Mobile Money</p>
   </div>
   <div class="grid">
-    <!-- FORMULAIRE -->
     <div class="card">
       <div class="card-title">Nouvelle demande</div>
       {% if error %}<div class="alert ae"><span>⚠</span><span>{{ error }}</span></div>{% endif %}
@@ -93,7 +89,6 @@ tbody td{padding:10px;font-size:12.5px;color:var(--txd);border-bottom:1px solid 
         <div class="fee-row"><span>Frais</span><span>10%</span></div>
       </div>
       <form method="POST" action="/withdrawal" onsubmit="return chk()">
-        <!-- Sélection pays -->
         <div class="fg">
           <label>VOTRE PAYS</label>
           <div class="country-grid">
@@ -112,29 +107,24 @@ tbody td{padding:10px;font-size:12.5px;color:var(--txd);border-bottom:1px solid 
           </div>
           <input type="hidden" name="country" id="countryInput" value="SN"/>
         </div>
-        <!-- Opérateurs dynamiques -->
         <div class="fg" id="opsSection">
           <label>OPÉRATEUR</label>
           <div class="ops-grid" id="opsGrid"></div>
           <input type="hidden" name="operator" id="operatorInput"/>
         </div>
-        <!-- Montant -->
         <div class="fg">
           <label>MONTANT (FCFA)</label>
           <input type="number" name="amount" id="amt" placeholder="1000" min="1000" required oninput="calcFee(this.value)"/>
         </div>
-        <!-- Calcul frais -->
         <div class="calc-box" id="cb">
           <div class="calc-row"><span>Demandé</span><span id="cAmt">0 FCFA</span></div>
           <div class="calc-row"><span>Frais (10%)</span><span id="cFee" style="color:var(--er)">-0 FCFA</span></div>
           <div class="calc-row calc-total"><span>Vous recevrez</span><span id="cNet">0 FCFA</span></div>
         </div>
-        <!-- Nom du compte -->
         <div class="fg">
           <label>NOM DU COMPTE</label>
           <input type="text" name="account_name" placeholder="Nom sur le compte Mobile Money" required/>
         </div>
-        <!-- Numéro -->
         <div class="fg">
           <label>NUMÉRO MOBILE MONEY</label>
           <input type="tel" name="phone" id="phoneInput" placeholder="+221 77 000 0000" required/>
@@ -142,13 +132,14 @@ tbody td{padding:10px;font-size:12.5px;color:var(--txd);border-bottom:1px solid 
         <button type="submit" class="btn">💸 DEMANDER LE RETRAIT</button>
       </form>
     </div>
-    <!-- HISTORIQUE -->
     <div class="card">
       <div class="card-title">Historique des retraits</div>
       {% if withdrawals %}
       <div style="overflow-x:auto">
         <table>
-          <thead><tr><th>DATE</th><th>PAYS</th><th>MONTANT</th><th>REÇU</th><th>STATUT</th></tr></thead>
+          <thead>
+            <tr><th>DATE</th><th>PAYS</th><th>MONTANT</th><th>REÇU</th><th>STATUT</th></tr>
+          </thead>
           <tbody>
             {% for w in withdrawals %}
             <tr>
@@ -191,67 +182,85 @@ var PHONES = {SN:"+221",CI:"+225",CM:"+237",ML:"+223",TG:"+228",BF:"+226",BJ:"+2
 var currentCountry = "SN";
 var currentOp = "";
 
-function selCountry(el, code){
-  document.querySelectorAll(".country-btn").forEach(b=>b.classList.remove("sel"));
+function selCountry(el, code) {
+  var btns = document.querySelectorAll(".country-btn");
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.remove("sel");
+  }
   el.classList.add("sel");
   currentCountry = code;
   document.getElementById("countryInput").value = code;
-  document.getElementById("phoneInput").placeholder = PHONES[code]+" ...";
+  document.getElementById("phoneInput").placeholder = PHONES[code] + " ...";
   renderOps(code);
 }
 
-function renderOps(code){
+function renderOps(code) {
   var ops = OPERATORS[code] || [];
   var grid = document.getElementById("opsGrid");
-  grid.innerHTML = ops.map(function(op){
-    return "<div class="op-btn" onclick="selOp(this,'"+op.v+"')">"+op.n+"</div>";
-  }).join("");
-  currentOp = "";
-  document.getElementById("operatorInput").value = "";
-  if(ops.length > 0){
-    var first = grid.querySelector(".op-btn");
-    first.classList.add("sel");
+  var html = "";
+  for (var i = 0; i < ops.length; i++) {
+    html += '<div class="op-btn" onclick="selOp(this, \'' + ops[i].v + '\')">' + ops[i].n + '</div>';
+  }
+  grid.innerHTML = html;
+  if (ops.length > 0) {
     currentOp = ops[0].v;
     document.getElementById("operatorInput").value = ops[0].v;
+    var firstBtn = document.querySelector("#opsGrid .op-btn");
+    if (firstBtn) firstBtn.classList.add("sel");
+  } else {
+    currentOp = "";
+    document.getElementById("operatorInput").value = "";
+    grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:12px;background:#f8f9fa;border-radius:10px;font-size:12px;color:#999">Aucun opérateur disponible</div>';
   }
 }
 
-function selOp(el, val){
-  document.querySelectorAll(".op-btn").forEach(b=>b.classList.remove("sel"));
+function selOp(el, val) {
+  var btns = document.querySelectorAll(".op-btn");
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.remove("sel");
+  }
   el.classList.add("sel");
   currentOp = val;
   document.getElementById("operatorInput").value = val;
 }
 
-function calcFee(v){
+function calcFee(v) {
   var cb = document.getElementById("cb");
-  var val = parseInt(v)||0;
-  if(val >= 1000){
-    var fee = Math.round(val*0.1);
-    var net = val-fee;
-    document.getElementById("cAmt").textContent = val+" FCFA";
-    document.getElementById("cFee").textContent = "-"+fee+" FCFA";
-    document.getElementById("cNet").textContent = net+" FCFA";
+  var val = parseInt(v) || 0;
+  if (val >= 1000) {
+    var fee = Math.round(val * 0.1);
+    var net = val - fee;
+    document.getElementById("cAmt").innerHTML = val + " FCFA";
+    document.getElementById("cFee").innerHTML = "-" + fee + " FCFA";
+    document.getElementById("cNet").innerHTML = net + " FCFA";
     cb.style.display = "flex";
-  } else { cb.style.display = "none"; }
+  } else {
+    cb.style.display = "none";
+  }
 }
 
-function chk(){
-  if(!currentOp){alert("Veuillez choisir un opérateur");return false;}
-  var v = parseInt(document.getElementById("amt").value)||0;
-  if(v < 1000){alert("Minimum 1 000 FCFA");return false;}
+function chk() {
+  if (!currentOp) {
+    alert("Veuillez choisir un opérateur");
+    return false;
+  }
+  var v = parseInt(document.getElementById("amt").value) || 0;
+  if (v < 1000) {
+    alert("Minimum 1 000 FCFA");
+    return false;
+  }
   return true;
 }
 
 var lg = "fr";
-function tl(){
-  lg = lg==="fr"?"en":"fr";
-  var e = lg==="en";
-  document.getElementById("lf").textContent = e?"🇫🇷":"🇬🇧";
-  document.getElementById("ll").textContent = e?"Français":"English";
+function tl() {
+  lg = lg === "fr" ? "en" : "fr";
+  var e = lg === "en";
+  document.getElementById("lf").innerHTML = e ? "🇫🇷" : "🇬🇧";
+  document.getElementById("ll").innerHTML = e ? "Français" : "English";
 }
 
-// Initialiser
 renderOps("SN");
 </script>
-</body></html>
+</body>
+</html>
