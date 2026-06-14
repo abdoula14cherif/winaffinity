@@ -49,6 +49,9 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
   <div class="brow"><div class="bico">◈</div><div class="bname">WIN <span>AFFINITY</span></div></div>
   <a href="/dashboard" class="back-btn">← Dashboard</a>
 </header>
+<audio id="notifSound" preload="auto">
+  <source src="https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3" type="audio/mpeg">
+</audio>
 <div class="page">
   <div class="hero">
     <h1>Support <span>WIN AFFINITY</span> 🎧</h1>
@@ -127,6 +130,8 @@ setInterval(async function(){
     const r = await fetch("/support/messages");
     const d = await r.json();
     if(d.messages && d.messages.length > lastCount){
+      const newMessages = d.messages.slice(lastCount);
+      const hasNewAdminMsg = newMessages.some(m => m.sender === "admin");
       chatBox.innerHTML = "";
       d.messages.forEach(m=>{
         const div = document.createElement("div");
@@ -137,6 +142,11 @@ setInterval(async function(){
       });
       chatBox.scrollTop = chatBox.scrollHeight;
       lastCount = d.messages.length;
+      if(hasNewAdminMsg){
+        const sound = document.getElementById("notifSound");
+        if(sound) sound.play().catch(()=>{});
+        if("vibrate" in navigator) navigator.vibrate(200);
+      }
     }
   }catch(e){}
 }, 8000);
