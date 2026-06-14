@@ -209,17 +209,32 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
 
   <div class="tab-content" id="tab-notifs">
     <div class="card">
-      <div class="card-title">📧 Envoyer un email à un utilisateur</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-        <div class="fg"><label>DESTINATAIRE</label>
-          <select id="emUser" onchange="onUserSelect()">
-            <option value="">-- Choisir un utilisateur --</option>
-            {% for u in users %}
-            <option value="{{ u.email }}" data-name="{{ u.full_name }}">{{ u.full_name }} ({{ u.email }})</option>
-            {% endfor %}
+      <div class="card-title">📧 Envoyer un email</div>
+      <div style="display:grid;grid-template-columns:140px 1fr;gap:10px;margin-bottom:10px">
+        <div class="fg"><label>FILTRE</label>
+          <select id="emFilter" onchange="filterEmailUsers()">
+            <option value="all">Tous</option>
+            <option value="active">Actifs seulement</option>
+            <option value="inactive">Inactifs seulement</option>
           </select>
         </div>
         <div class="fg"><label>OBJET</label><input type="text" id="emSubject" placeholder="Objet du message"/></div>
+      </div>
+      <div class="fg" style="margin-bottom:10px">
+        <label>DESTINATAIRES <span style="color:var(--or)" id="emCount"></span></label>
+        <div style="display:flex;gap:8px;margin-bottom:6px">
+          <button type="button" class="btn-xs btn-act" onclick="selectAllEmails(true)">Tout sélectionner</button>
+          <button type="button" class="btn-xs btn-dea" onclick="selectAllEmails(false)">Tout désélectionner</button>
+        </div>
+        <div id="emUsersList" style="max-height:220px;overflow-y:auto;border:1.5px solid var(--bd);border-radius:9px;background:var(--bg)">
+          {% for u in users %}
+          <label class="em-user-row" data-active="{{ 'true' if u.is_active else 'false' }}" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--bd);cursor:pointer;font-size:12.5px">
+            <input type="checkbox" class="em-check" value="{{ u.email }}" data-name="{{ u.full_name }}" onchange="updateEmCount()"/>
+            <span style="flex:1">{{ u.full_name }} <span style="color:var(--txd)">({{ u.email }})</span></span>
+            <span class="badge {% if u.is_active %}b-ok{% else %}b-warn{% endif %}">{% if u.is_active %}Actif{% else %}Attente{% endif %}</span>
+          </label>
+          {% endfor %}
+        </div>
       </div>
       <div class="fg" style="margin-bottom:10px"><label>MESSAGE</label><input type="text" id="emMsg" placeholder="Contenu du message..."/></div>
       <button class="btn-add" onclick="sendEmail()">📧 Envoyer Email</button>
@@ -394,32 +409,57 @@ async function delTask(id){if(!confirm("Supprimer ?"))return;const r=await post(
     emailjs.init("fNyhiux6zn4u2CtRj");
   }
 })();
-function onUserSelect(){
-  // rien de special, juste garder pour future utilisation
+function filterEmailUsers(){
+  const f=document.getElementById("emFilter").value;
+  document.querySelectorAll(".em-user-row").forEach(row=>{
+    const isActive=row.dataset.active==="true";
+    let show=true;
+    if(f==="active")show=isActive;
+    if(f==="inactive")show=!isActive;
+    row.style.display=show?"flex":"none";
+  });
+}
+function selectAllEmails(state){
+  document.querySelectorAll(".em-user-row").forEach(row=>{
+    if(row.style.display!=="none"){
+      row.querySelector(".em-check").checked=state;
+    }
+  });
+  updateEmCount();
+}
+function updateEmCount(){
+  const n=document.querySelectorAll(".em-check:checked").length;
+  document.getElementById("emCount").textContent=n>0?"("+n+" sélectionné"+(n>1?"s":"")+")":"";
 }
 async function sendEmail(){
-  const sel=document.getElementById("emUser");
-  const email=sel.value;
-  const name=sel.selectedOptions[0] ? sel.selectedOptions[0].dataset.name : "";
+  const checks=document.querySelectorAll(".em-check:checked");
   const subject=document.getElementById("emSubject").value.trim();
   const msg=document.getElementById("emMsg").value.trim();
   const status=document.getElementById("emStatus");
-  if(!email||!msg){toast("Destinataire et message requis","er");return;}
-  status.textContent="Envoi en cours...";
-  try{
-    await emailjs.send("service_ps61bla","template_aks186b",{
-      to_email: email,
-      to_name: name || "Membre",
-      subject: subject || "Message de WIN AFFINITY",
-      message: msg,
-    });
-    status.textContent="✓ Email envoyé à "+email;
-    toast("✓ Email envoyé !");
+  if(checks.length===0||!msg){toast("Destinataires et message requis","er");return;}
+  status.textContent="Envoi en cours... (0/"+checks.length+")";
+  let sent=0, failed=0;
+  for(const chk of checks){
+    const email=chk.value;
+    const name=chk.dataset.name;
+    try{
+      await emailjs.send("service_ps61bla","template_aks186b",{
+        to_email: email,
+        to_name: name || "Membre",
+        subject: subject || "Message de WIN AFFINITY",
+        message: msg,
+      });
+      sent++;
+    }catch(e){
+      failed++;
+    }
+    status.textContent="Envoi en cours... ("+(sent+failed)+"/"+checks.length+")";
+  }
+  status.textContent="✓ "+sent+" envoyé(s)"+(failed>0?", ✗ "+failed+" échec(s)":"");
+  toast(sent>0?"✓ "+sent+" email(s) envoyé(s) !":"Erreur envoi", failed>0&&sent===0?"er":"ok");
+  if(sent>0){
     document.getElementById("emSubject").value="";
     document.getElementById("emMsg").value="";
-  }catch(e){
-    status.textContent="✗ Erreur : "+(e.text||e.message||"inconnue");
-    toast("Erreur envoi email","er");
   }
 }
 async function sendNotif(){const t=document.getElementById("nT").value.trim(),m=document.getElementById("nM").value.trim(),ty=document.getElementById("nTy").value,tg=document.getElementById("nTg").value;if(!t||!m){toast("Requis","er");return;}const r=await post("/admin/notification/send",{title:t,message:m,type:ty,target:tg});if(r.success){toast("✓ Envoyé !");document.getElementById("nT").value="";document.getElementById("nM").value="";}else toast("Erreur","er");}
