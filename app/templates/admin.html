@@ -69,7 +69,8 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
 #toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 #toast.ok{background:var(--ok)}#toast.er{background:var(--er)}
 @media(max-width:900px){.stats-grid{grid-template-columns:1fr 1fr}.form-inline{grid-template-columns:1fr}}
-</style></head><body><header class="header">
+</style><script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head><body><header class="header">
   <div class="brand-row"><div class="bico">◈</div><div class="bname">WIN <span>AFFINITY</span></div></div>
   <div style="display:flex;align-items:center;gap:10px">
     <span class="admin-badge">⚡ ADMIN</span>
@@ -207,6 +208,16 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
   </div>
 
   <div class="tab-content" id="tab-notifs">
+    <div class="card">
+      <div class="card-title">📧 Envoyer un email à un utilisateur</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 2fr auto;gap:10px;align-items:end">
+        <div class="fg"><label>EMAIL DESTINATAIRE</label><input type="email" id="emEmail" placeholder="email@exemple.com"/></div>
+        <div class="fg"><label>NOM</label><input type="text" id="emName" placeholder="Nom du destinataire"/></div>
+        <div class="fg"><label>MESSAGE</label><input type="text" id="emMsg" placeholder="Contenu du message..."/></div>
+        <button class="btn-add" onclick="sendEmail()">📧 Envoyer Email</button>
+      </div>
+      <div id="emStatus" style="margin-top:10px;font-size:12px;color:var(--txd)"></div>
+    </div>
     <div class="card">
       <div class="card-title">Envoyer une notification</div>
       <div class="form-inline" style="grid-template-columns:1fr 2fr 120px 120px auto">
@@ -371,6 +382,34 @@ async function rejWd(id){const r=await post("/admin/withdrawal/reject",{withdraw
 async function addTask(){const t=document.getElementById("tT").value.trim(),d=document.getElementById("tD").value.trim(),r=document.getElementById("tR").value,l=document.getElementById("tL").value.trim();if(!t){toast("Titre requis","er");return;}const res=await post("/admin/task/add",{title:t,description:d,reward:r,link:l});if(res.success){toast("✓ Tâche ajoutée");setTimeout(()=>location.reload(),800);}else toast("Erreur","er");}
 async function togTask(id){const r=await post("/admin/task/toggle",{task_id:id});if(r.success){toast("✓ Mis à jour");setTimeout(()=>location.reload(),600);}else toast("Erreur","er");}
 async function delTask(id){if(!confirm("Supprimer ?"))return;const r=await post("/admin/task/delete",{task_id:id});if(r.success){document.getElementById("task-"+id).remove();toast("✓ Supprimée");}else toast("Erreur","er");}
+(function(){
+  if(typeof emailjs !== "undefined"){
+    emailjs.init("fNyhiux6zn4u2CtRj");
+  }
+})();
+async function sendEmail(){
+  const email=document.getElementById("emEmail").value.trim();
+  const name=document.getElementById("emName").value.trim();
+  const msg=document.getElementById("emMsg").value.trim();
+  const status=document.getElementById("emStatus");
+  if(!email||!msg){toast("Email et message requis","er");return;}
+  status.textContent="Envoi en cours...";
+  try{
+    await emailjs.send("servive_ps61bla","template_aks186b",{
+      to_email: email,
+      to_name: name || "Membre",
+      message: msg,
+    });
+    status.textContent="✓ Email envoyé à "+email;
+    toast("✓ Email envoyé !");
+    document.getElementById("emEmail").value="";
+    document.getElementById("emName").value="";
+    document.getElementById("emMsg").value="";
+  }catch(e){
+    status.textContent="✗ Erreur : "+(e.text||e.message||"inconnue");
+    toast("Erreur envoi email","er");
+  }
+}
 async function sendNotif(){const t=document.getElementById("nT").value.trim(),m=document.getElementById("nM").value.trim(),ty=document.getElementById("nTy").value,tg=document.getElementById("nTg").value;if(!t||!m){toast("Requis","er");return;}const r=await post("/admin/notification/send",{title:t,message:m,type:ty,target:tg});if(r.success){toast("✓ Envoyé !");document.getElementById("nT").value="";document.getElementById("nM").value="";}else toast("Erreur","er");}
 function filterUsers(){const q=document.getElementById("searchUser").value.toLowerCase();document.querySelectorAll("#usersTable tbody tr").forEach(row=>{row.style.display=row.textContent.toLowerCase().includes(q)?"":"none";});}
 function openModal(id,name,email,phone,role,active){document.getElementById("m-id").value=id;document.getElementById("m-name").value=name;document.getElementById("m-email").value=email;document.getElementById("m-phone").value=phone;document.getElementById("m-role").value=role;document.getElementById("m-active").value=active.toString();document.getElementById("modal").classList.add("show");}
