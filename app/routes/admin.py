@@ -318,3 +318,31 @@ async def toggle_announcement(request: Request, announcement_id: Annotated[str, 
     a = db.table("announcements").select("is_active").eq("id", announcement_id).execute().data
     if a: db.table("announcements").update({"is_active": not a[0]["is_active"]}).eq("id", announcement_id).execute()
     return JSONResponse({"success": True})
+
+@router.get("/support/conversations")
+async def get_conversations(request: Request):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    from app.services.support_service import get_all_conversations
+    convs = await get_all_conversations(db)
+    return JSONResponse({"conversations": convs})
+
+@router.get("/support/messages/{user_id}")
+async def get_user_messages(request: Request, user_id: str):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    from app.services.support_service import get_messages, mark_read
+    messages = await get_messages(db, user_id)
+    await mark_read(db, user_id, "user")
+    return JSONResponse({"messages": messages})
+
+@router.post("/support/reply")
+async def admin_reply(request: Request, user_id: Annotated[str, Form()], message: Annotated[str, Form()]):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    from app.services.support_service import send_message
+    ok = await send_message(db, user_id, "admin", message)
+    return JSONResponse({"success": ok})

@@ -33,11 +33,6 @@ async def get_faq(request: Request):
     if not user: return RedirectResponse("/auth/login", status_code=302)
     return templates.TemplateResponse("faq.html", {"request": request, "user": user})
 
-@router.get("/support", response_class=HTMLResponse)
-async def get_support(request: Request):
-    user = await _get_user(request)
-    if not user: return RedirectResponse("/auth/login", status_code=302)
-    return templates.TemplateResponse("support.html", {"request": request, "user": user})
 
 @router.get("/contact", response_class=HTMLResponse)
 async def get_contact(request: Request):

@@ -108,6 +108,7 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
     <div class="tab" onclick="showTab('annonces',this)">📢 Annonces</div>
     <div class="tab" onclick="showTab('formations',this)">🎓 Formations</div>
     <div class="tab" onclick="showTab('groups',this)">👥 Groupes</div>
+    <div class="tab" onclick="showTab('support',this)">💬 Support</div>
   </div>
   <div class="tab-content active" id="tab-users">
     <div class="card">
@@ -392,6 +393,25 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
       </div>
     </div>
   </div>
+
+  <div class="tab-content" id="tab-support">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="display:grid;grid-template-columns:280px 1fr;min-height:500px">
+        <div style="border-right:1.5px solid var(--bd);overflow-y:auto;max-height:600px">
+          <div style="padding:14px 16px;border-bottom:1.5px solid var(--bd);font-weight:700;color:var(--bl);font-size:14px">Conversations</div>
+          <div id="convList"></div>
+        </div>
+        <div style="display:flex;flex-direction:column">
+          <div id="chatHeader" style="padding:14px 16px;border-bottom:1.5px solid var(--bd);font-weight:700;color:var(--bl);font-size:14px">Sélectionnez une conversation</div>
+          <div id="adminChatMessages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;max-height:440px"></div>
+          <div style="display:flex;gap:8px;padding:12px;border-top:1.5px solid var(--bd)" id="adminChatInput" style="display:none">
+            <input type="text" id="adminMsgInput" placeholder="Répondre..." style="flex:1;background:var(--bg);border:1.5px solid var(--bd);border-radius:20px;padding:10px 14px;font-family:Poppins,sans-serif;font-size:13px;outline:none"/>
+            <button onclick="sendAdminReply()" style="background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;border:none;border-radius:50%;width:42px;height:42px;cursor:pointer;font-size:15px">➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 <div id="toast"></div>
 <script>
@@ -514,6 +534,57 @@ async function loadAnnounces(){
 document.querySelectorAll(".tab").forEach(t=>{
   t.addEventListener("click",function(){
     if(this.textContent.includes("Annonces"))loadAnnounces();
+  });
+});
+
+let currentChatUser = null;
+async function loadConversations(){
+  const r=await fetch("/admin/support/conversations");
+  const d=await r.json();
+  const list=document.getElementById("convList");
+  if(!d.conversations||!d.conversations.length){list.innerHTML="<div style=padding:16px;color:var(--txd);font-size:12px>Aucune conversation</div>";return;}
+  list.innerHTML=d.conversations.map(c=>`
+    <div onclick="openChat('${c.user_id}','${c.full_name}')" style="padding:12px 16px;border-bottom:1px solid var(--bg);cursor:pointer;display:flex;align-items:center;gap:10px">
+      <div style="width:36px;height:36px;border-radius:50%;background:var(--ord);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--or);flex-shrink:0">${c.full_name[0].toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:var(--tx)">${c.full_name}</div>
+        <div style="font-size:11px;color:var(--txd);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px">${c.last_sender==="user"?"":"Vous: "}${c.last_message}</div>
+      </div>
+      ${c.unread>0?`<span style="background:#FF6B35;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">${c.unread}</span>`:""}
+    </div>`).join("");
+}
+async function openChat(userId, name){
+  currentChatUser=userId;
+  document.getElementById("chatHeader").textContent=name;
+  document.querySelector("#adminChatInput").style.display="flex";
+  const r=await fetch("/admin/support/messages/"+userId);
+  const d=await r.json();
+  const box=document.getElementById("adminChatMessages");
+  if(!d.messages||!d.messages.length){box.innerHTML="<div style=text-align:center;color:var(--txd);padding:20px>Aucun message</div>";return;}
+  box.innerHTML=d.messages.map(m=>`
+    <div style="max-width:75%;padding:9px 13px;border-radius:12px;font-size:13px;${m.sender==="admin"?"align-self:flex-end;background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff":"align-self:flex-start;background:var(--bg);color:var(--tx)"}">
+      ${m.message}
+      <div style="font-size:10px;opacity:.7;margin-top:3px;text-align:right">${m.created_at?m.created_at.substring(11,16):""}</div>
+    </div>`).join("");
+  box.scrollTop=box.scrollHeight;
+  loadConversations();
+}
+async function sendAdminReply(){
+  const input=document.getElementById("adminMsgInput");
+  const msg=input.value.trim();
+  if(!msg||!currentChatUser)return;
+  const f=new FormData();
+  f.append("user_id",currentChatUser);
+  f.append("message",msg);
+  await fetch("/admin/support/reply",{method:"POST",body:f});
+  input.value="";
+  openChat(currentChatUser, document.getElementById("chatHeader").textContent);
+}
+document.getElementById("adminMsgInput") && document.getElementById("adminMsgInput").addEventListener("keypress",function(e){if(e.key==="Enter")sendAdminReply();});
+// Charger conversations quand on clique sur l onglet support
+document.querySelectorAll(".tab").forEach(t=>{
+  t.addEventListener("click",function(){
+    if(this.textContent.includes("Support"))loadConversations();
   });
 });
 </script>
