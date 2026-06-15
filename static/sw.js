@@ -1,4 +1,4 @@
-const CACHE = 'winaffinity-v2';
+const CACHE = 'winaffinity-v3';
 const ASSETS = [
   '/',
   '/dashboard',
@@ -38,8 +38,8 @@ self.addEventListener('push', e => {
 
   const options = {
     body: data.body,
-    icon: '/static/icon-192-v2.png',
-    badge: '/static/icon-192-v2.png',
+    icon: '/static/icon-192-v3.png',
+    badge: '/static/icon-192-v3.png',
     vibrate: [200, 100, 200],
     data: { url: data.url || '/dashboard' },
   };
