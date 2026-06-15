@@ -46,6 +46,11 @@ app.include_router(contest.router)
 app.include_router(support.router)
 app.include_router(push.router)
 
+@app.get("/sw.js", include_in_schema=False)
+async def service_worker():
+    from fastapi.responses import FileResponse
+    return FileResponse("assets/sw.js", media_type="application/javascript")
+
 @app.get("/", include_in_schema=False)
 async def root():
     return RedirectResponse(url="/auth/register")

@@ -324,7 +324,7 @@ function showToast(msg,type=""){const t=document.getElementById("toast");t.textC
 async function initPush(){
   if(!("serviceWorker" in navigator) || !("PushManager" in window)) return;
   try{
-    const reg = await navigator.serviceWorker.register("/assets/sw.js");
+    const reg = await navigator.serviceWorker.register("/sw.js", {scope: "/"});
     let perm = Notification.permission;
     if(perm === "default"){
       perm = await Notification.requestPermission();
