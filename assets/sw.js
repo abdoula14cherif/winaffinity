@@ -38,8 +38,8 @@ self.addEventListener('push', e => {
 
   const options = {
     body: data.body,
-    icon: '/assets/icon-192-v3.png',
-    badge: '/assets/icon-192-v3.png',
+    icon: '/assets/app-icon-192.png',
+    badge: '/assets/app-icon-192.png',
     vibrate: [200, 100, 200],
     data: { url: data.url || '/dashboard' },
   };
