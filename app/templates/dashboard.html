@@ -320,6 +320,45 @@ let lg="fr";
 function tl(){lg=lg==="fr"?"en":"fr";const e=lg==="en";document.getElementById("lf").textContent=e?"🇫🇷":"🇬🇧";document.getElementById("ll").textContent=e?"Français":"English";document.documentElement.setAttribute("lang",lg);document.querySelectorAll("[data-fr]").forEach(el=>el.innerHTML=e?el.dataset.en:el.dataset.fr);}
 function copyLink(){const link=document.getElementById("refLink").textContent;navigator.clipboard.writeText(link).then(()=>{const btn=document.getElementById("copyBtn");if(btn){btn.textContent=lg==="en"?"Copied!":"Copié!";btn.classList.add("copied");}showToast(lg==="en"?"✓ Link copied!":"✓ Lien copié !","ok");setTimeout(()=>{if(btn){btn.textContent=lg==="en"?"Copy":"Copier";btn.classList.remove("copied");}},2000);});}
 function showToast(msg,type=""){const t=document.getElementById("toast");t.textContent=msg;t.className="show "+type;clearTimeout(t._t);t._t=setTimeout(()=>t.className="",3000);}
+// Notifications Push
+async function initPush(){
+  if(!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+  try{
+    const reg = await navigator.serviceWorker.register("/static/sw.js");
+    let perm = Notification.permission;
+    if(perm === "default"){
+      perm = await Notification.requestPermission();
+    }
+    if(perm !== "granted") return;
+
+    let sub = await reg.pushManager.getSubscription();
+    if(!sub){
+      const r = await fetch("/push/vapid-key");
+      const d = await r.json();
+      if(!d.key) return;
+      const vapidKey = urlBase64ToUint8Array(d.key);
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: vapidKey,
+      });
+    }
+    await fetch("/push/subscribe", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(sub.toJSON()),
+    });
+  }catch(e){console.log("Push error:", e);}
+}
+function urlBase64ToUint8Array(base64String){
+  const padding = "=".repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for(let i=0;i<rawData.length;i++){ outputArray[i] = rawData.charCodeAt(i); }
+  return outputArray;
+}
+initPush();
+
 // Charger annonces
 (async function(){
   try{

@@ -29,6 +29,11 @@ async def mark_all_read(db: Client, user_id: str):
 
 async def send_notification(db: Client, user_id: str, title: str, message: str, type: str = "info"):
     try:
+        from app.services.push_service import send_push_to_user
+        await send_push_to_user(db, user_id, title, message)
+    except Exception:
+        pass
+    try:
         db.table("notifications").insert({
             "user_id": user_id,
             "title": title,

@@ -344,5 +344,10 @@ async def admin_reply(request: Request, user_id: Annotated[str, Form()], message
     if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
     db = get_supabase()
     from app.services.support_service import send_message
+    from app.services.push_service import send_push_to_user
     ok = await send_message(db, user_id, "admin", message)
+    try:
+        await send_push_to_user(db, user_id, "💬 Nouveau message du support", message, "/support")
+    except Exception:
+        pass
     return JSONResponse({"success": ok})
