@@ -141,9 +141,9 @@ tbody td{padding:11px 16px;font-size:13px;color:var(--txd);border-bottom:1px sol
 .level-standard{background:rgba(45,95,143,.1);color:#2D5F8F;border:1.5px solid rgba(45,95,143,.25)}
 .level-premium{background:linear-gradient(135deg,rgba(255,215,0,.15),rgba(255,107,53,.1));color:#B8860B;border:1.5px solid rgba(255,215,0,.35)}
 </style>
-<link rel="manifest" href="/static/manifest.json"/>
-<link rel="icon" type="image/png" href="/static/icon-192-v3.png"/>
-<link rel="apple-touch-icon" href="/static/icon-192-v3.png"/>
+<link rel="manifest" href="/assets/manifest.json"/>
+<link rel="icon" type="image/png" href="/assets/icon-192-v3.png"/>
+<link rel="apple-touch-icon" href="/assets/icon-192-v3.png"/>
 </head>
 <body>
 <div class="sb-overlay" id="sbOverlay" onclick="closeSb()"></div>
@@ -324,7 +324,7 @@ function showToast(msg,type=""){const t=document.getElementById("toast");t.textC
 async function initPush(){
   if(!("serviceWorker" in navigator) || !("PushManager" in window)) return;
   try{
-    const reg = await navigator.serviceWorker.register("/static/sw.js");
+    const reg = await navigator.serviceWorker.register("/assets/sw.js");
     let perm = Notification.permission;
     if(perm === "default"){
       perm = await Notification.requestPermission();

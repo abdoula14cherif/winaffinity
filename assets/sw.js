@@ -5,7 +5,7 @@ const ASSETS = [
   '/gains',
   '/auth/login',
   '/auth/register',
-  '/static/manifest.json',
+  '/assets/manifest.json',
 ];
 
 self.addEventListener('install', e => {
@@ -38,8 +38,8 @@ self.addEventListener('push', e => {
 
   const options = {
     body: data.body,
-    icon: '/static/icon-192-v3.png',
-    badge: '/static/icon-192-v3.png',
+    icon: '/assets/icon-192-v3.png',
+    badge: '/assets/icon-192-v3.png',
     vibrate: [200, 100, 200],
     data: { url: data.url || '/dashboard' },
   };
