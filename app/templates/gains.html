@@ -257,6 +257,7 @@ async function watchAd(){
     try{
       const r = await fetch("/ad/view", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({zone:"monetag"})});
       const d = await r.json();
+      alert(JSON.stringify(d));
       if(d.success){
         adViews++;
         document.getElementById("adCount").textContent = adViews+"/"+maxAdViews+" aujourd hui";
