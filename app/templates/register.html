@@ -90,4 +90,10 @@ function tp(id,btn){const i=document.getElementById(id);i.type=i.type==='passwor
 document.getElementById('rf').addEventListener('submit',function(e){const p=document.getElementById('pw').value,p2=document.getElementById('pw2').value;if(p!==p2){e.preventDefault();alert('Les mots de passe ne correspondent pas');return;}document.getElementById('sp').style.display='block';document.getElementById('bt').textContent='CRÉATION...';document.getElementById('sb').disabled=true;});
 document.getElementById('ref').addEventListener('input',function(){this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'');});
 </script>
+<div style="text-align:center;margin-top:16px;font-size:12px;color:var(--txd)">
+  En utilisant WIN AFFINITY, vous acceptez nos
+  <a href="/legal" style="color:var(--or);font-weight:600;text-decoration:none">Conditions d'utilisation</a>
+  et notre
+  <a href="/legal" style="color:var(--or);font-weight:600;text-decoration:none">Politique de confidentialité</a>
+</div>
 </body></html>
