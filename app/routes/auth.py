@@ -246,10 +246,22 @@ async def post_login(
             status_code=422,
         )
 
+    # ── Vérification tentatives ───────────────────────────────────
+    ip = request.client.host or "unknown"
+    check = await _check_login_attempts(db, email, ip)
+    if check["blocked"]:
+        return templates.TemplateResponse("login.html", {
+            "request": request,
+            "csrf_token": generate_csrf_token(session_id),
+            "error": check["reason"],
+            "success": None,
+        }, status_code=429)
+
     # ── Authentification ───────────────────────────────────────────
     user = await authenticate_user(db, data)
 
     if not user:
+        await _log_attempt(db, email, ip, False)
         # Message générique intentionnel (ne révèle pas si l'email existe)
         return templates.TemplateResponse(
             "login.html",
