@@ -181,6 +181,27 @@ async def get_login(
     return response
 
 
+async def _check_login_attempts(db, email: str, ip: str) -> dict:
+    """Vérifie si l'email ou l'IP n'est pas bloqué."""
+    from datetime import datetime, timezone, timedelta
+    window = (datetime.now(timezone.utc) - timedelta(minutes=15)).isoformat()
+    # Vérifier tentatives par email
+    by_email = db.table("login_attempts").select("id").eq("email", email).eq("success", False).gte("created_at", window).execute().data or []
+    if len(by_email) >= 5:
+        return {"blocked": True, "reason": "Trop de tentatives échouées. Réessayez dans 15 minutes."}
+    # Vérifier tentatives par IP
+    by_ip = db.table("login_attempts").select("id").eq("ip", ip).eq("success", False).gte("created_at", window).execute().data or []
+    if len(by_ip) >= 10:
+        return {"blocked": True, "reason": "Trop de tentatives depuis votre réseau. Réessayez dans 15 minutes."}
+    return {"blocked": False}
+
+async def _log_attempt(db, email: str, ip: str, success: bool):
+    """Enregistre une tentative de connexion."""
+    try:
+        db.table("login_attempts").insert({"email": email, "ip": ip, "success": success}).execute()
+    except Exception:
+        pass
+
 @router.post("/login", name="login_submit")
 async def post_login(
     request: Request,
