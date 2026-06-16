@@ -75,7 +75,22 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
   </div>
   <a href="/withdrawal" class="btn-withdraw">💸 <span data-fr="RETIRER MES GAINS" data-en="WITHDRAW MY EARNINGS">RETIRER MES GAINS</span></a>
   <div class="card">
-    <div class="card-title" data-fr="Tâches du jour" data-en="Daily Tasks">Tâches du jour</div>
+    <div style="background:linear-gradient(135deg,rgba(255,107,53,.08),rgba(255,140,90,.04));border:1.5px solid rgba(255,107,53,.25);border-radius:14px;padding:16px;margin-bottom:16px">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">
+    <div style="width:46px;height:46px;border-radius:12px;background:var(--ord);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📺</div>
+    <div style="flex:1">
+      <div style="font-size:14px;font-weight:700;color:var(--bl)">Regarder une publicité</div>
+      <div style="font-size:12px;color:var(--txd);margin-top:2px">Regardez une pub et gagnez 25 FCFA (max 10/jour)</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:16px;font-weight:800;color:var(--or)">+25 F</div>
+      <div style="font-size:10px;color:var(--txd)" id="adCount">0/10 aujourd hui</div>
+    </div>
+  </div>
+  <button id="adBtn" onclick="watchAd()" style="width:100%;padding:11px;background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;border:none;border-radius:10px;font-family:Poppins,sans-serif;font-size:13px;font-weight:700;cursor:pointer">▶ VOIR LA PUB (+25 FCFA)</button>
+</div>
+
+<div class="card-title" data-fr="Tâches du jour" data-en="Daily Tasks">Tâches du jour</div>
     <div class="card-sub" data-fr="Complétez ces tâches chaque jour pour gagner des FCFA" data-en="Complete daily tasks to earn FCFA">Complétez ces tâches chaque jour pour gagner des FCFA</div>
     <!-- Publicité Adsterra -->
 <div style="margin-bottom:18px;text-align:center">
