@@ -1,109 +1,157 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>WIN AFFINITY — FAQ</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--gold:#C9A84C;--gold-light:#E8C96A;--gold-dim:rgba(201,168,76,.13);--navy:#07101F;--navy-card:rgba(13,27,42,.85);--white:#F4EFE6;--white-dim:rgba(244,239,230,.55);--soft:rgba(244,239,230,.06);--border:rgba(201,168,76,.2);--r:16px;--t:.35s cubic-bezier(.4,0,.2,1)}
-    html,body{min-height:100%;font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--white)}
-    .bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 60% 50% at 0% 0%,#0e2240 0%,transparent 55%),linear-gradient(165deg,#07101F 0%,#091525 100%)}
-    .header{position:fixed;top:0;left:0;right:0;z-index:20;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:rgba(7,16,31,.95);border-bottom:1px solid var(--border);backdrop-filter:blur(16px)}
-    .brand{display:flex;align-items:center;gap:10px;font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;letter-spacing:.1em;background:linear-gradient(135deg,var(--gold-light),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .brand-icon{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--gold),#8B5A00);display:flex;align-items:center;justify-content:center;font-size:17px}
-    .back-btn{display:flex;align-items:center;gap:6px;color:var(--gold);text-decoration:none;font-size:13.5px;font-weight:500;padding:8px 14px;border:1px solid var(--border);border-radius:8px}
-    .page{position:relative;z-index:2;min-height:100vh;padding:90px 20px 60px;max-width:700px;margin:0 auto}
-    .hero{text-align:center;margin-bottom:36px}
-    .hero h1{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;margin-bottom:8px}
-    .hero h1 span{color:var(--gold)}
-    .hero p{font-size:14px;color:var(--white-dim)}
-    .faq-item{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden;backdrop-filter:blur(20px)}
-    .faq-q{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;cursor:pointer;transition:background var(--t)}
-    .faq-q:hover{background:var(--gold-dim)}
-    .faq-q-text{font-size:15px;font-weight:500;color:var(--white)}
-    .faq-icon{color:var(--gold);font-size:18px;transition:transform var(--t)}
-    .faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease}
-    .faq-a.open{max-height:300px}
-    .faq-a-inner{padding:0 20px 18px;font-size:13.5px;color:var(--white-dim);line-height:1.7}
-    .faq-icon.open{transform:rotate(45deg)}
-  </style>
-  <link rel="manifest" href="/assets/manifest.json"/>
-  <meta name="theme-color" content="#C9A84C"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="apple-mobile-web-app-title" content="WIN AFFINITY"/>
-  <link rel="apple-touch-icon" href="/assets/icon-192.png"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WIN AFFINITY — FAQ</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="manifest" href="/assets/manifest.json"/>
+<link rel="icon" type="image/png" href="/assets/app-icon-192.png"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--or:#FF6B35;--orl:#FF8C5A;--ord:rgba(255,107,53,.1);--bl:#1A3A5C;--bg:#F0F4F8;--wh:#FFFFFF;--tx:#1A2B3C;--txd:#6B7A8D;--bd:#D1DCE8;--ok:#00B894;--t:.3s;--sh:0 4px 20px rgba(26,58,92,.08)}
+html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);color:var(--tx)}
+.header{position:fixed;top:0;left:0;right:0;z-index:20;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:var(--bl);box-shadow:0 2px 12px rgba(26,58,92,.2)}
+.brow{display:flex;align-items:center;gap:8px}
+.bico{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#FF6B35,#FF8C5A);display:flex;align-items:center;justify-content:center;font-size:16px}
+.bname{font-size:18px;font-weight:800;color:#fff}.bname span{color:#FF6B35}
+.back-btn{color:rgba(255,255,255,.8);text-decoration:none;font-size:13px;padding:7px 14px;border:1px solid rgba(255,255,255,.2);border-radius:8px}
+.page{min-height:100vh;padding:76px 16px 50px;max-width:700px;margin:0 auto}
+.hero{text-align:center;margin-bottom:28px}
+.hero h1{font-size:24px;font-weight:800;color:var(--bl);margin-bottom:6px}
+.hero h1 span{color:var(--or)}
+.hero p{font-size:13px;color:var(--txd)}
+.faq-item{background:var(--wh);border-radius:14px;box-shadow:var(--sh);border:1.5px solid var(--bd);margin-bottom:10px;overflow:hidden}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;cursor:pointer;gap:12px}
+.faq-q-txt{font-size:13.5px;font-weight:600;color:var(--bl)}
+.faq-ico{width:28px;height:28px;border-radius:50%;background:var(--ord);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;transition:transform var(--t);color:var(--or)}
+.faq-item.open .faq-ico{transform:rotate(45deg)}
+.faq-a{display:none;padding:0 18px 16px;font-size:13px;color:var(--txd);line-height:1.6;border-top:1px solid var(--bg)}
+.faq-item.open .faq-a{display:block}
+.category{font-size:11px;font-weight:700;color:var(--or);text-transform:uppercase;letter-spacing:.08em;margin:20px 0 10px;padding-left:4px}
+.cta{background:linear-gradient(135deg,var(--bl),#2D5F8F);border-radius:16px;padding:22px;text-align:center;margin-top:24px;color:#fff}
+.cta h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.cta p{font-size:12.5px;color:rgba(255,255,255,.7);margin-bottom:14px}
+.cta a{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;border-radius:10px;padding:10px 20px;font-size:13px;font-weight:700;text-decoration:none}
+</style>
 </head>
 <body>
-<div class="bg"></div>
 <header class="header">
-  <div class="brand"><div class="brand-icon">◈</div>WIN AFFINITY</div>
+  <div class="brow"><div class="bico">◈</div><div class="bname">WIN <span>AFFINITY</span></div></div>
   <a href="/dashboard" class="back-btn">← Dashboard</a>
 </header>
 <div class="page">
   <div class="hero">
-    <h1>Questions <span>fréquentes</span></h1>
-    <p>Tout ce que vous devez savoir sur WIN AFFINITY</p>
+    <h1>Questions <span>Fréquentes</span></h1>
+    <p>Trouvez rapidement les réponses à vos questions</p>
   </div>
+
+  <div class="category">🚀 DÉMARRAGE</div>
+
   <div class="faq-item">
-    <div class="faq-q" onclick="toggle(this)">
-      <span class="faq-q-text">Comment fonctionne le parrainage ?</span>
-      <span class="faq-icon">+</span>
+    <div class="faq-q" onclick="tog(this)">
+      <span class="faq-q-txt">Comment activer mon compte ?</span>
+      <div class="faq-ico">+</div>
     </div>
-    <div class="faq-a"><div class="faq-a-inner">Partagez votre lien unique. Quand quelqu'un s'inscrit et active son compte via votre lien, vous recevez automatiquement 1 250 FCFA. Si ce filleul parraine quelqu'un qui active, vous recevez 600 FCFA. Au 3ème niveau : 300 FCFA.</div></div>
+    <div class="faq-a">Choisissez votre niveau (Starter 1 000 F, Standard 2 500 F ou Premium 5 000 F) sur la page d'activation, puis effectuez le paiement via LeekPay. Votre compte est activé automatiquement dès confirmation.</div>
   </div>
+
   <div class="faq-item">
-    <div class="faq-q" onclick="toggle(this)">
-      <span class="faq-q-text">Combien coûte l'activation ?</span>
-      <span class="faq-icon">+</span>
+    <div class="faq-q" onclick="tog(this)">
+      <span class="faq-q-txt">Quelle est la différence entre les niveaux ?</span>
+      <div class="faq-ico">+</div>
     </div>
-    <div class="faq-a"><div class="faq-a-inner">L'activation du compte coûte 2 500 FCFA une seule fois. C'est un paiement unique qui vous donne accès à vie à toutes les fonctionnalités de WIN AFFINITY.</div></div>
+    <div class="faq-a">Le niveau détermine les commissions que VOUS recevez quand vos filleuls activent leur compte. Starter = 500/240/120 FCFA. Standard = 1250/600/300 FCFA. Premium = 2500/1200/600 FCFA aux niveaux N1/N2/N3.</div>
   </div>
+
   <div class="faq-item">
-    <div class="faq-q" onclick="toggle(this)">
-      <span class="faq-q-text">Comment retirer mes gains ?</span>
-      <span class="faq-icon">+</span>
+    <div class="faq-q" onclick="tog(this)">
+      <span class="faq-q-txt">Comment obtenir mon lien de parrainage ?</span>
+      <div class="faq-ico">+</div>
     </div>
-    <div class="faq-a"><div class="faq-a-inner">Allez dans la section Retrait. Le minimum est de 1 000 FCFA. Des frais de 10% sont appliqués. Le paiement se fait via Mobile Money (Orange Money, Free Money, Wave, MTN).</div></div>
+    <div class="faq-a">Votre lien est disponible sur le Dashboard (bouton "Partager") et sur votre page Profil. Format : winaffinity.vercel.app/auth/register?ref=VOTRE_CODE</div>
   </div>
+
+  <div class="category">💰 GAINS ET COMMISSIONS</div>
+
   <div class="faq-item">
-    <div class="faq-q" onclick="toggle(this)">
-      <span class="faq-q-text">Quand est-ce que je reçois mes commissions ?</span>
-      <span class="faq-icon">+</span>
+    <div class="faq-q" onclick="tog(this)">
+      <span class="faq-q-txt">Comment fonctionnent les commissions de parrainage ?</span>
+      <div class="faq-ico">+</div>
     </div>
-    <div class="faq-a"><div class="faq-a-inner">Les commissions sont créditées automatiquement sur votre solde dès que votre filleul active son compte avec le paiement de 2 500 FCFA.</div></div>
+    <div class="faq-a">Quand un filleul active son compte, vous recevez automatiquement une commission selon VOTRE niveau (pas le sien). Le système compte 3 niveaux : vos filleuls directs (N1), leurs filleuls (N2), et leurs filleuls (N3).</div>
   </div>
+
   <div class="faq-item">
-    <div class="faq-q" onclick="toggle(this)">
-      <span class="faq-q-text">Comment gagner avec les tâches quotidiennes ?</span>
-      <span class="faq-icon">+</span>
+    <div class="faq-q" onclick="tog(this)">
+      <span class="faq-q-txt">Comment gagner sans inviter des gens ?</span>
+      <div class="faq-ico">+</div>
     </div>
-    <div class="faq-a"><div class="faq-a-inner">Chaque jour, des tâches sont disponibles dans la section Mes Gains. Complétez-les pour gagner entre 55, 100 et 300 FCFA par tâche. Les tâches se renouvellent chaque jour.</div></div>
+    <div class="faq-a">Chaque jour, complétez les tâches disponibles (regarder des vidéos, suivre des pages) pour gagner jusqu'à 300 FCFA/jour. Tournez aussi la roue de la chance (1 tour gratuit/jour) pour gagner jusqu'à 200 FCFA.</div>
   </div>
+
   <div class="faq-item">
-    <div class="faq-q" onclick="toggle(this)">
-      <span class="faq-q-text">Mon lien de parrainage expire-t-il ?</span>
-      <span class="faq-icon">+</span>
+    <div class="faq-q" onclick="tog(this)">
+      <span class="faq-q-txt">C'est quoi le Grand Concours ?</span>
+      <div class="faq-ico">+</div>
     </div>
-    <div class="faq-a"><div class="faq-a-inner">Non, votre lien de parrainage est permanent et unique. Il ne expire jamais et vous pouvez le partager partout : WhatsApp, Facebook, TikTok, etc.</div></div>
+    <div class="faq-a">Un concours permanent basé sur vos filleuls actifs. 20 filleuls = 5 000 FCFA. 50 filleuls = 15 000 FCFA + T-shirt WIN AFFINITY. 100 filleuls = 30 000 FCFA + T-shirt + iPhone 15 !</div>
+  </div>
+
+  <div class="category">💸 RETRAITS</div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="tog(this)">
+      <span class="faq-q-txt">Quand puis-je retirer mes gains ?</span>
+      <div class="faq-ico">+</div>
+    </div>
+    <div class="faq-a">Dès que vous avez au moins 1 filleul actif et un solde minimum de 1 000 FCFA. Les frais sont de 10% sur le montant retiré.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="tog(this)">
+      <span class="faq-q-txt">Quels pays et opérateurs sont acceptés ?</span>
+      <div class="faq-ico">+</div>
+    </div>
+    <div class="faq-a">12 pays africains : Sénégal, Côte d Ivoire, Cameroun, Mali, Togo, Burkina Faso, Bénin, Guinée, RDC, Congo, Gabon, Niger. Opérateurs : Orange Money, Wave, MTN MoMo, Moov Money, Airtel Money, M-Pesa et plus.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="tog(this)">
+      <span class="faq-q-txt">Combien de temps prend un retrait ?</span>
+      <div class="faq-ico">+</div>
+    </div>
+    <div class="faq-a">Les retraits sont traités manuellement dans un délai de 24 à 72h ouvrables. Vous serez notifié dès que votre retrait est approuvé.</div>
+  </div>
+
+  <div class="category">🔧 TECHNIQUE</div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="tog(this)">
+      <span class="faq-q-txt">Comment installer l'application ?</span>
+      <div class="faq-ico">+</div>
+    </div>
+    <div class="faq-a">Sur Android Chrome : menu ⋮ → "Ajouter à l'écran d'accueil" ou "Installer l'application". L'app s'installe sans passer par le Play Store et fonctionne comme une vraie application.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="tog(this)">
+      <span class="faq-q-txt">Comment activer les notifications ?</span>
+      <div class="faq-ico">+</div>
+    </div>
+    <div class="faq-a">Connectez-vous sur le dashboard et acceptez la permission de notification quand Chrome la demande. Vous recevrez des notifications pour les réponses du support, les annonces et les nouvelles commissions.</div>
+  </div>
+
+  <div class="cta">
+    <h3>Vous n avez pas trouvé votre réponse ?</h3>
+    <p>Notre équipe support est disponible pour vous aider</p>
+    <a href="/support">💬 Contacter le support</a>
   </div>
 </div>
 <script>
-function toggle(el){
-  const ans = el.nextElementSibling;
-  const ico = el.querySelector('.faq-icon');
-  ans.classList.toggle('open');
-  ico.classList.toggle('open');
+function tog(el){
+  const item = el.parentElement;
+  item.classList.toggle("open");
 }
 </script>
-<script>
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/assets/sw.js')
-    .then(()=>console.log('SW registered'))
-    .catch(e=>console.log('SW error',e));
-}
-</script>
-</body>
-</html>
+</body></html>

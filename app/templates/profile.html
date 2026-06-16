@@ -1,98 +1,149 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>WIN AFFINITY — Profil</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--gold:#C9A84C;--gold-light:#E8C96A;--gold-dim:rgba(201,168,76,.13);--navy:#07101F;--navy-card:rgba(13,27,42,.85);--white:#F4EFE6;--white-dim:rgba(244,239,230,.55);--soft:rgba(244,239,230,.06);--border:rgba(201,168,76,.2);--success:#4CAF7E;--r:16px;--t:.35s cubic-bezier(.4,0,.2,1)}
-    html,body{min-height:100%;font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--white)}
-    .bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 60% 50% at 0% 0%,#0e2240 0%,transparent 55%),linear-gradient(165deg,#07101F 0%,#091525 100%)}
-    .header{position:fixed;top:0;left:0;right:0;z-index:20;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:rgba(7,16,31,.95);border-bottom:1px solid var(--border);backdrop-filter:blur(16px)}
-    .brand{display:flex;align-items:center;gap:10px;font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;letter-spacing:.1em;background:linear-gradient(135deg,var(--gold-light),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .brand-icon{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--gold),#8B5A00);display:flex;align-items:center;justify-content:center;font-size:17px}
-    .back-btn{display:flex;align-items:center;gap:6px;color:var(--gold);text-decoration:none;font-size:13.5px;font-weight:500;padding:8px 14px;border:1px solid var(--border);border-radius:8px;transition:all var(--t)}
-    .page{position:relative;z-index:2;min-height:100vh;padding:90px 20px 60px;max-width:600px;margin:0 auto}
-    .avatar-block{text-align:center;margin-bottom:32px}
-    .avatar{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--gold-dim),rgba(201,168,76,.2));border:3px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:var(--gold);margin:0 auto 12px}
-    .avatar-name{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600}
-    .avatar-status{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--success);margin-top:4px}
-    .avatar-status::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success)}
-    .card{background:var(--navy-card);border:1px solid var(--border);border-radius:var(--r);padding:24px;backdrop-filter:blur(20px);margin-bottom:16px}
-    .card-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;margin-bottom:16px;color:var(--gold)}
-    .info-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)}
-    .info-row:last-child{border-bottom:none}
-    .info-label{font-size:12px;color:var(--white-dim);letter-spacing:.08em;text-transform:uppercase}
-    .info-value{font-size:14px;color:var(--white);font-weight:500}
-    .ref-box{display:flex;align-items:center;gap:10px;background:var(--soft);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:12px}
-    .ref-code{flex:1;font-size:18px;font-weight:700;color:var(--gold);letter-spacing:.1em;font-family:'Cormorant Garamond',serif}
-    .copy-btn{background:var(--gold-dim);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:12px;color:var(--gold);cursor:pointer;transition:all var(--t)}
-    .copy-btn:hover{background:rgba(201,168,76,.2)}
-    .wallet-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .wallet-box{background:var(--soft);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
-    .wallet-num{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--gold)}
-    .wallet-lbl{font-size:11px;color:var(--white-dim);margin-top:3px;text-transform:uppercase;letter-spacing:.07em}
-    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--navy-card);border:1px solid rgba(76,175,126,.4);border-radius:10px;padding:12px 22px;color:#7ECBA3;font-size:13.5px;transition:transform .4s,opacity .4s;opacity:0;z-index:999}
-    .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-  </style>
-  <link rel="manifest" href="/assets/manifest.json"/>
-  <meta name="theme-color" content="#C9A84C"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="apple-mobile-web-app-title" content="WIN AFFINITY"/>
-  <link rel="apple-touch-icon" href="/assets/icon-192.png"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WIN AFFINITY — Mon Profil</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="manifest" href="/assets/manifest.json"/>
+<link rel="icon" type="image/png" href="/assets/app-icon-192.png"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--or:#FF6B35;--orl:#FF8C5A;--ord:rgba(255,107,53,.1);--bl:#1A3A5C;--bg:#F0F4F8;--wh:#FFFFFF;--tx:#1A2B3C;--txd:#6B7A8D;--bd:#D1DCE8;--ok:#00B894;--er:#E74C3C;--warn:#F39C12;--t:.3s;--sh:0 4px 20px rgba(26,58,92,.08)}
+html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);color:var(--tx)}
+.header{position:fixed;top:0;left:0;right:0;z-index:20;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:var(--bl);box-shadow:0 2px 12px rgba(26,58,92,.2)}
+.brow{display:flex;align-items:center;gap:8px}
+.bico{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#FF6B35,#FF8C5A);display:flex;align-items:center;justify-content:center;font-size:16px}
+.bname{font-size:18px;font-weight:800;color:#fff}.bname span{color:#FF6B35}
+.back-btn{color:rgba(255,255,255,.8);text-decoration:none;font-size:13px;padding:7px 14px;border:1px solid rgba(255,255,255,.2);border-radius:8px}
+.page{min-height:100vh;padding:76px 16px 50px;max-width:680px;margin:0 auto}
+.profile-hero{background:linear-gradient(135deg,var(--bl),#2D5F8F);border-radius:20px;padding:28px;text-align:center;margin-bottom:20px;position:relative;overflow:hidden}
+.profile-hero::before{content:"";position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,107,53,.15)}
+.avatar-big{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#FF6B35,#FF8C5A);border:3px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;color:#fff;margin:0 auto 12px}
+.profile-name{font-size:20px;font-weight:800;color:#fff;margin-bottom:4px}
+.profile-email{font-size:12.5px;color:rgba(255,255,255,.6);margin-bottom:12px}
+.level-badge-big{display:inline-flex;align-items:center;gap:6px;padding:7px 18px;border-radius:20px;font-size:13px;font-weight:800}
+.lb-starter{background:rgba(255,107,53,.2);color:#FF8C5A;border:1.5px solid rgba(255,107,53,.3)}
+.lb-standard{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.25)}
+.lb-premium{background:rgba(255,215,0,.15);color:#FFD700;border:1.5px solid rgba(255,215,0,.3)}
+.card{background:var(--wh);border-radius:16px;padding:20px;box-shadow:var(--sh);border:1.5px solid var(--bd);margin-bottom:16px}
+.card-title{font-size:15px;font-weight:700;color:var(--bl);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.info-rows{display:flex;flex-direction:column;gap:10px}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg);border-radius:10px;font-size:13px}
+.info-lbl{color:var(--txd);font-weight:500}
+.info-val{color:var(--tx);font-weight:600}
+.ref-box{background:var(--ord);border:1.5px solid rgba(255,107,53,.2);border-radius:12px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.ref-code{font-size:20px;font-weight:800;color:var(--or);letter-spacing:.08em}
+.copy-btn{background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer}
+.ref-link{font-size:11.5px;color:var(--txd);word-break:break-all;margin-top:8px}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+label{font-size:11px;font-weight:600;color:var(--bl);letter-spacing:.05em;text-transform:uppercase}
+input{width:100%;background:var(--bg);border:1.5px solid var(--bd);border-radius:10px;padding:11px 12px;font-family:"Poppins",sans-serif;font-size:13px;color:var(--tx);outline:none;transition:border-color var(--t)}
+input:focus{border-color:var(--or)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;font-family:"Poppins",sans-serif;font-size:13.5px;font-weight:700;text-transform:uppercase;border:none;border-radius:12px;cursor:pointer;box-shadow:0 4px 16px rgba(255,107,53,.4)}
+.btn-logout{background:rgba(231,76,60,.08);color:var(--er);border:1.5px solid rgba(231,76,60,.2);border-radius:12px;padding:12px;font-family:"Poppins",sans-serif;font-size:13px;font-weight:700;cursor:pointer;width:100%;margin-top:8px}
+.alert{border-radius:10px;padding:11px 14px;font-size:13px;margin-bottom:14px}
+.as{background:rgba(0,184,148,.08);border:1px solid rgba(0,184,148,.2);color:var(--ok)}
+.ae{background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);color:var(--er)}
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.stat-card{background:var(--bg);border-radius:12px;padding:14px;text-align:center;border:1.5px solid var(--bd)}
+.stat-num{font-size:22px;font-weight:800;color:var(--bl)}
+.stat-lbl{font-size:11px;color:var(--txd);font-weight:500;margin-top:2px}
+.upgrade-btn{display:block;text-align:center;background:linear-gradient(135deg,rgba(255,215,0,.15),rgba(255,107,53,.1));border:1.5px solid rgba(255,107,53,.3);border-radius:12px;padding:14px;text-decoration:none;color:var(--or);font-weight:700;font-size:13px;margin-bottom:16px}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);z-index:999;color:#fff;border-radius:10px;padding:12px 22px;font-size:13.5px;transition:transform .4s,opacity .4s;opacity:0}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+#toast.ok{background:var(--ok)}#toast.er{background:var(--er)}
+</style>
 </head>
 <body>
-<div class="bg"></div>
 <header class="header">
-  <div class="brand"><div class="brand-icon">◈</div>WIN AFFINITY</div>
+  <div class="brow"><div class="bico">◈</div><div class="bname">WIN <span>AFFINITY</span></div></div>
   <a href="/dashboard" class="back-btn">← Dashboard</a>
 </header>
 <div class="page">
-  <div class="avatar-block">
-    <div class="avatar">{{ user.full_name[0].upper() }}</div>
-    <div class="avatar-name">{{ user.full_name }}</div>
-    <div class="avatar-status">Compte actif</div>
+  <!-- Hero profil -->
+  <div class="profile-hero">
+    <div class="avatar-big">{{ user.full_name[0].upper() }}</div>
+    <div class="profile-name">{{ user.full_name }}</div>
+    <div class="profile-email">{{ user.email }}</div>
+    {% if user.is_active %}
+    <div class="level-badge-big lb-{{ user.level or 'standard' }}">
+      {% if user.level == 'starter' %}🥉 STARTER
+      {% elif user.level == 'premium' %}🥇 PREMIUM
+      {% else %}🥈 STANDARD{% endif %}
+    </div>
+    {% else %}
+    <div class="level-badge-big lb-starter">⏳ EN ATTENTE D ACTIVATION</div>
+    {% endif %}
   </div>
-  <div class="card">
-    <div class="card-title">Informations personnelles</div>
-    <div class="info-row"><span class="info-label">Nom complet</span><span class="info-value">{{ user.full_name }}</span></div>
-    <div class="info-row"><span class="info-label">Email</span><span class="info-value">{{ user.email }}</span></div>
-    <div class="info-row"><span class="info-label">Téléphone</span><span class="info-value">{{ user.phone }}</span></div>
-    <div class="info-row"><span class="info-label">Membre depuis</span><span class="info-value">{{ user.created_at[:10] }}</span></div>
-  </div>
-  <div class="card">
-    <div class="card-title">Mon portefeuille</div>
-    <div class="wallet-grid">
-      <div class="wallet-box"><div class="wallet-num">{{ wallet.balance }} <span style="font-size:13px">FCFA</span></div><div class="wallet-lbl">Solde disponible</div></div>
-      <div class="wallet-box"><div class="wallet-num">{{ wallet.total_earned }} <span style="font-size:13px">FCFA</span></div><div class="wallet-lbl">Total gagné</div></div>
+
+  <!-- Stats rapides -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-num">{{ wallet.balance }}</div>
+      <div class="stat-lbl">FCFA Disponible</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{{ referrals_count }}</div>
+      <div class="stat-lbl">Filleuls actifs</div>
     </div>
   </div>
+
+  <!-- Code parrainage -->
+  {% if user.is_active %}
   <div class="card">
-    <div class="card-title">Mon code de parrainage</div>
+    <div class="card-title">🔗 Mon code parrainage</div>
     <div class="ref-box">
       <div class="ref-code">{{ user.referral_code }}</div>
-      <button class="copy-btn" onclick="copyRef()">Copier</button>
+      <button class="copy-btn" onclick="copyCode()">📋 Copier</button>
+    </div>
+    <div class="ref-link">https://winaffinity.vercel.app/auth/register?ref={{ user.referral_code }}</div>
+  </div>
+
+  {% if user.level != 'premium' %}
+  <a href="/payment" class="upgrade-btn">⭐ Passer au niveau supérieur pour plus de commissions →</a>
+  {% endif %}
+  {% endif %}
+
+  <!-- Infos compte -->
+  <div class="card">
+    <div class="card-title">👤 Informations du compte</div>
+    <div class="info-rows">
+      <div class="info-row"><span class="info-lbl">Nom complet</span><span class="info-val">{{ user.full_name }}</span></div>
+      <div class="info-row"><span class="info-lbl">Email</span><span class="info-val">{{ user.email }}</span></div>
+      <div class="info-row"><span class="info-lbl">Téléphone</span><span class="info-val">{{ user.phone or "—" }}</span></div>
+      <div class="info-row"><span class="info-lbl">Membre depuis</span><span class="info-val">{{ user.created_at[:10] if user.created_at else "—" }}</span></div>
+      <div class="info-row"><span class="info-lbl">Statut</span><span class="info-val" style="color:{% if user.is_active %}var(--ok){% else %}var(--warn){% endif %}">{% if user.is_active %}✓ Actif{% else %}⏳ En attente{% endif %}</span></div>
     </div>
   </div>
+
+  <!-- Changer mot de passe -->
+  <div class="card">
+    <div class="card-title">🔒 Changer le mot de passe</div>
+    {% if success %}<div class="alert as">✓ {{ success }}</div>{% endif %}
+    {% if error %}<div class="alert ae">⚠ {{ error }}</div>{% endif %}
+    <form method="POST" action="/profile/password">
+      <div class="fg"><label>Mot de passe actuel</label><input type="password" name="current_password" required/></div>
+      <div class="fg"><label>Nouveau mot de passe</label><input type="password" name="new_password" required/></div>
+      <div class="fg"><label>Confirmer</label><input type="password" name="confirm_password" required/></div>
+      <button type="submit" class="btn">🔒 Mettre à jour</button>
+    </form>
+  </div>
+
+  <!-- Déconnexion -->
+  <form method="POST" action="/auth/logout">
+    <button type="submit" class="btn-logout">🚪 Se déconnecter</button>
+  </form>
 </div>
-<div class="toast" id="toast">✓ Copié !</div>
+<div id="toast"></div>
 <script>
-function copyRef(){
-  navigator.clipboard.writeText('https://winaffinity.vercel.app/auth/register?ref={{ user.referral_code }}');
-  const t=document.getElementById('toast');
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2500);
+function copyCode(){
+  navigator.clipboard.writeText("https://winaffinity.vercel.app/auth/register?ref={{ user.referral_code }}").then(()=>{
+    const t=document.getElementById("toast");
+    t.textContent="✓ Lien copié !";
+    t.className="show ok";
+    setTimeout(()=>t.className="",2500);
+  });
 }
 </script>
-<script>
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/assets/sw.js')
-    .then(()=>console.log('SW registered'))
-    .catch(e=>console.log('SW error',e));
-}
-</script>
-</body>
-</html>
+</body></html>

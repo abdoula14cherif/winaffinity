@@ -24,8 +24,10 @@ async def _get_user(request: Request):
 async def get_profile(request: Request):
     user = await _get_user(request)
     if not user: return RedirectResponse("/auth/login", status_code=302)
-    wallet = await get_wallet(get_supabase(), user["id"])
-    return templates.TemplateResponse("profile.html", {"request": request, "user": user, "wallet": wallet})
+    db = get_supabase()
+    wallet = await get_wallet(db, user["id"])
+    referrals = db.table("users").select("id").eq("sponsor_id", user["id"]).eq("is_active", True).execute().data or []
+    return templates.TemplateResponse("profile.html", {"request": request, "user": user, "wallet": wallet, "referrals_count": len(referrals)})
 
 @router.get("/faq", response_class=HTMLResponse)
 async def get_faq(request: Request):
