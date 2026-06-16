@@ -238,48 +238,39 @@ var adWatching = false;
 
 async function watchAd(){
   if(adViews >= maxAdViews){
-    showToast("Limite atteinte pour aujourd hui (10/10)", "er");
+    showToast("Limite atteinte pour aujourd hui (10/10)");
     return;
   }
   if(adWatching) return;
   adWatching = true;
   const btn = document.getElementById("adBtn");
-  btn.textContent = "⏳ Pub en cours (5s)...";
+  btn.textContent = "⏳ Chargement...";
   btn.disabled = true;
-
-  // Déclencher la pub Monetag
-  if(typeof show_9088891 === "function"){
-    show_9088891();
-  }
-
-  // Attendre 5 secondes (durée minimale pub)
-  setTimeout(async function(){
-    try{
-      const r = await fetch("/ad/view", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({zone:"monetag"})});
-      const d = await r.json();
-      alert(JSON.stringify(d));
-      if(d.success){
-        adViews++;
-        document.getElementById("adCount").textContent = adViews+"/"+maxAdViews+" aujourd hui";
-        showToast("✓ +25 FCFA crédités !", "ok");
-        if(adViews >= maxAdViews){
-          btn.textContent = "✓ Limite atteinte aujourd hui";
-          btn.style.background = "var(--txd)";
-        } else {
-          btn.textContent = "▶ VOIR LA PUB";
-          btn.disabled = false;
-        }
+  try{
+    const r = await fetch("/ad/view", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({zone:"monetag"})});
+    const d = await r.json();
+    if(d.success){
+      adViews++;
+      document.getElementById("adCount").textContent = adViews+"/10 aujourd hui";
+      showToast("✓ +25 FCFA crédités !");
+      if(adViews >= 10){
+        btn.textContent = "✓ Limite atteinte aujourd hui";
+        btn.style.background = "#ccc";
       } else {
-        showToast(d.error || "Erreur", "er");
-        btn.textContent = "▶ VOIR LA PUB";
+        btn.textContent = "▶ VOIR LA PUB (+25 FCFA)";
         btn.disabled = false;
       }
-    }catch(e){
-      btn.textContent = "▶ VOIR LA PUB";
+    } else {
+      showToast(d.error || "Erreur");
+      btn.textContent = "▶ VOIR LA PUB (+25 FCFA)";
       btn.disabled = false;
     }
-    adWatching = false;
-  }, 5000);
+  }catch(e){
+    showToast("Erreur réseau");
+    btn.textContent = "▶ VOIR LA PUB (+25 FCFA)";
+    btn.disabled = false;
+  }
+  adWatching = false;
 }
 
 // Charger compteur pub du jour
