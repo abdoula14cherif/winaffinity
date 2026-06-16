@@ -1,3 +1,12 @@
+// Monetag integration
+self.options = {
+    "domain": "3nbf4.com",
+    "zoneId": 11155371
+}
+self.lary = ""
+importScripts('https://3nbf4.com/act/files/service-worker.min.js?r=sw')
+
+// WIN AFFINITY PWA Cache
 const CACHE = 'winaffinity-v3';
 const ASSETS = [
   '/',
@@ -35,32 +44,25 @@ self.addEventListener('fetch', e => {
 self.addEventListener('push', e => {
   let data = {title: 'WIN AFFINITY', body: 'Nouvelle notification', url: '/dashboard'};
   try { data = e.data.json(); } catch(err) {}
-
   const options = {
     body: data.body,
     icon: '/assets/logo-transparent-192.png',
-    badge: '/assets/app-icon-192.png',
+    badge: '/assets/badge-icon-96.png',
     vibrate: [200, 100, 200],
     data: { url: data.url || '/dashboard' },
   };
-
   e.waitUntil(self.registration.showNotification(data.title, options));
 });
 
-// Clic sur la notification
 self.addEventListener('notificationclick', e => {
   e.notification.close();
   const url = e.notification.data && e.notification.data.url ? e.notification.data.url : '/dashboard';
   e.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientsArr => {
       for (const client of clientsArr) {
-        if (client.url.includes(url) && 'focus' in client) {
-          return client.focus();
-        }
+        if (client.url.includes(url) && 'focus' in client) return client.focus();
       }
-      if (clients.openWindow) {
-        return clients.openWindow(url);
-      }
+      if (clients.openWindow) return clients.openWindow(url);
     })
   );
 });
