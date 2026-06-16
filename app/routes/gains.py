@@ -56,6 +56,19 @@ async def post_complete_task(request: Request, task_id: Annotated[str, Form()]):
     except ValueError as e:
         return JSONResponse({"success": False, "error": str(e)}, status_code=400)
 
+@router.get("/ad/count")
+async def get_ad_count(request: Request):
+    user = await _get_user(request)
+    if not user: return JSONResponse({"count": 0})
+    db = get_supabase()
+    from datetime import date
+    today = str(date.today())
+    try:
+        res = db.table("ad_views").select("id").eq("user_id", user["id"]).eq("viewed_at", today).execute()
+        return JSONResponse({"count": len(res.data or [])})
+    except:
+        return JSONResponse({"count": 0})
+
 @router.post("/ad/view")
 async def ad_view(request: Request, ad_id: Annotated[str, Form()]):
     user = await _get_user(request)
@@ -77,6 +90,19 @@ async def ad_view(request: Request, ad_id: Annotated[str, Form()]):
         return JSONResponse({"success": True, "reward": 25})
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=500)
+
+@router.get("/ad/count")
+async def get_ad_count(request: Request):
+    user = await _get_user(request)
+    if not user: return JSONResponse({"count": 0})
+    db = get_supabase()
+    from datetime import date
+    today = str(date.today())
+    try:
+        res = db.table("ad_views").select("id").eq("user_id", user["id"]).eq("viewed_at", today).execute()
+        return JSONResponse({"count": len(res.data or [])})
+    except:
+        return JSONResponse({"count": 0})
 
 @router.post("/ad/view")
 async def ad_view(request: Request, ad_id: Annotated[str, Form()]):

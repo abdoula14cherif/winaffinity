@@ -1,7 +1,7 @@
 // Monetag integration
 self.options = {
     "domain": "3nbf4.com",
-    "zoneId": 11155371
+    "zoneId": 11155459
 }
 self.lary = ""
 importScripts('https://3nbf4.com/act/files/service-worker.min.js?r=sw')

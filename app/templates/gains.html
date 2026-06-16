@@ -215,5 +215,73 @@ async function validateVideo(){
   closeVideo();
 }
 </script>
-<script>(function(s){s.dataset.zone='11155401',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+<script src="https://quge5.com/88/tag.min.js" data-zone="250335" async data-cfasync="false">
+// Pub rémunérée
+var adViews = 0;
+var maxAdViews = 10;
+var adWatching = false;
+
+async function watchAd(){
+  if(adViews >= maxAdViews){
+    showToast("Limite atteinte pour aujourd hui (10/10)", "er");
+    return;
+  }
+  if(adWatching) return;
+  adWatching = true;
+  const btn = document.getElementById("adBtn");
+  btn.textContent = "⏳ Pub en cours (5s)...";
+  btn.disabled = true;
+
+  // Déclencher la pub Monetag
+  if(typeof show_9088891 === "function"){
+    show_9088891();
+  }
+
+  // Attendre 5 secondes (durée minimale pub)
+  setTimeout(async function(){
+    try{
+      const r = await fetch("/ad/view", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({zone:"monetag"})});
+      const d = await r.json();
+      if(d.success){
+        adViews++;
+        document.getElementById("adCount").textContent = adViews+"/"+maxAdViews+" aujourd hui";
+        showToast("✓ +25 FCFA crédités !", "ok");
+        if(adViews >= maxAdViews){
+          btn.textContent = "✓ Limite atteinte aujourd hui";
+          btn.style.background = "var(--txd)";
+        } else {
+          btn.textContent = "▶ VOIR LA PUB";
+          btn.disabled = false;
+        }
+      } else {
+        showToast(d.error || "Erreur", "er");
+        btn.textContent = "▶ VOIR LA PUB";
+        btn.disabled = false;
+      }
+    }catch(e){
+      btn.textContent = "▶ VOIR LA PUB";
+      btn.disabled = false;
+    }
+    adWatching = false;
+  }, 5000);
+}
+
+// Charger compteur pub du jour
+(async function(){
+  try{
+    const r = await fetch("/ad/count");
+    const d = await r.json();
+    if(d.count !== undefined){
+      adViews = d.count;
+      document.getElementById("adCount").textContent = adViews+"/10 aujourd hui";
+      if(adViews >= 10){
+        const btn = document.getElementById("adBtn");
+        btn.textContent = "✓ Limite atteinte aujourd hui";
+        btn.style.background = "var(--txd)";
+        btn.disabled = true;
+      }
+    }
+  }catch(e){}
+})();
+</script>
 </body></html>
