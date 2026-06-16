@@ -74,14 +74,25 @@ async def view_ad(request: Request):
     user = await _get_user(request)
     if not user:
         return JSONResponse({"success": False, "error": "Non authentifie"}, status_code=401)
+    if not user.get("is_active"):
+        return JSONResponse({"success": False, "error": "Compte non active"})
     db = get_supabase()
-    from datetime import date
+    from datetime import date, datetime, timezone
     today = str(date.today())
     try:
         # Verifier limite 10 vues/jour
-        views_today = db.table("ad_views").select("id").eq("user_id", user["id"]).eq("viewed_at", today).execute().data or []
+        views_today = db.table("ad_views").select("id,created_at").eq("user_id", user["id"]).eq("viewed_at", today).order("created_at", desc=True).execute().data or []
         if len(views_today) >= 10:
             return JSONResponse({"success": False, "error": "Limite de 10 pubs atteinte aujourd hui"})
+        # Verifier delai 30 secondes entre chaque vue
+        if views_today:
+            last = views_today[0]
+            last_time = datetime.fromisoformat(last["created_at"].replace("Z", "+00:00"))
+            now = datetime.now(timezone.utc)
+            diff = (now - last_time).total_seconds()
+            if diff < 30:
+                wait = int(30 - diff)
+                return JSONResponse({"success": False, "error": f"Attendez encore {wait} secondes"})
         # Enregistrer la vue
         db.table("ad_views").insert({"user_id": user["id"], "ad_id": "monetag", "reward": 25, "viewed_at": today}).execute()
         # Crediter le wallet

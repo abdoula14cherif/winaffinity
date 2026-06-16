@@ -236,16 +236,17 @@ var adViews = 0;
 var maxAdViews = 10;
 var adWatching = false;
 
+var adCooldown = false;
 async function watchAd(){
   if(adViews >= maxAdViews){
-    showToast("Limite atteinte pour aujourd hui (10/10)");
+    showToast("Limite de 10 pubs atteinte aujourd hui");
     return;
   }
-  if(adWatching) return;
+  if(adWatching || adCooldown) return;
   adWatching = true;
   const btn = document.getElementById("adBtn");
-  btn.textContent = "⏳ Chargement...";
   btn.disabled = true;
+  btn.textContent = "⏳ Traitement...";
   try{
     const r = await fetch("/ad/view", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({zone:"monetag"})});
     const d = await r.json();
@@ -255,10 +256,21 @@ async function watchAd(){
       showToast("✓ +25 FCFA crédités !");
       if(adViews >= 10){
         btn.textContent = "✓ Limite atteinte aujourd hui";
-        btn.style.background = "#ccc";
+        btn.style.background = "#aaa";
       } else {
-        btn.textContent = "▶ VOIR LA PUB (+25 FCFA)";
-        btn.disabled = false;
+        // Compte à rebours 30 secondes
+        adCooldown = true;
+        var secs = 30;
+        var iv = setInterval(function(){
+          btn.textContent = "⏳ Prochaine pub dans "+secs+"s";
+          secs--;
+          if(secs < 0){
+            clearInterval(iv);
+            adCooldown = false;
+            btn.disabled = false;
+            btn.textContent = "▶ VOIR LA PUB (+25 FCFA)";
+          }
+        }, 1000);
       }
     } else {
       showToast(d.error || "Erreur");
