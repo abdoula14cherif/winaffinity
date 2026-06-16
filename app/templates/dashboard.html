@@ -359,6 +359,20 @@ function urlBase64ToUint8Array(base64String){
 }
 initPush();
 
+// Déconnexion automatique après 30 min d inactivité
+var inactivityTimer;
+function resetTimer(){
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(function(){
+    alert("Votre session a expiré pour des raisons de sécurité. Vous allez être déconnecté.");
+    window.location.href = "/auth/logout";
+  }, 30 * 60 * 1000);
+}
+["mousemove","keydown","click","scroll","touchstart"].forEach(function(evt){
+  document.addEventListener(evt, resetTimer, true);
+});
+resetTimer();
+
 // Charger annonces
 (async function(){
   try{
