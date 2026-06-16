@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WIN AFFINITY — Conditions & Confidentialité</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="manifest" href="/assets/manifest.json"/>
+<link rel="icon" type="image/png" href="/assets/app-icon-192.png"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--or:#FF6B35;--bl:#1A3A5C;--bg:#F0F4F8;--wh:#FFFFFF;--tx:#1A2B3C;--txd:#6B7A8D;--bd:#D1DCE8;--t:.3s;--sh:0 4px 20px rgba(26,58,92,.08)}
+html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);color:var(--tx)}
+.header{position:fixed;top:0;left:0;right:0;z-index:20;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:var(--bl);box-shadow:0 2px 12px rgba(26,58,92,.2)}
+.brow{display:flex;align-items:center;gap:8px}
+.bico{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#FF6B35,#FF8C5A);display:flex;align-items:center;justify-content:center;font-size:16px}
+.bname{font-size:18px;font-weight:800;color:#fff}.bname span{color:#FF6B35}
+.back-btn{color:rgba(255,255,255,.8);text-decoration:none;font-size:13px;padding:7px 14px;border:1px solid rgba(255,255,255,.2);border-radius:8px}
+.page{min-height:100vh;padding:76px 16px 50px;max-width:720px;margin:0 auto}
+.tabs{display:flex;gap:8px;margin-bottom:24px;background:var(--wh);border-radius:12px;padding:6px;box-shadow:var(--sh)}
+.tab{flex:1;padding:10px;border-radius:8px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;color:var(--txd);transition:all var(--t)}
+.tab.active{background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff}
+.section{display:none}.section.active{display:block}
+.hero{background:linear-gradient(135deg,var(--bl),#2D5F8F);border-radius:16px;padding:24px;margin-bottom:20px;color:#fff;text-align:center}
+.hero h1{font-size:20px;font-weight:800;margin-bottom:6px}
+.hero p{font-size:12px;color:rgba(255,255,255,.7)}
+.card{background:var(--wh);border-radius:14px;padding:20px;box-shadow:var(--sh);border:1.5px solid var(--bd);margin-bottom:14px}
+.card h2{font-size:15px;font-weight:700;color:var(--bl);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card p,.card li{font-size:13px;color:var(--txd);line-height:1.7;margin-bottom:8px}
+.card ul,.card ol{padding-left:18px}
+.card li{margin-bottom:6px}
+.highlight{background:rgba(255,107,53,.06);border-left:3px solid var(--or);border-radius:0 8px 8px 0;padding:10px 14px;margin:10px 0;font-size:13px;color:var(--tx)}
+.last-update{text-align:center;font-size:11px;color:var(--txd);margin-top:20px}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="brow"><div class="bico">◈</div><div class="bname">WIN <span>AFFINITY</span></div></div>
+  <a href="/dashboard" class="back-btn">← Dashboard</a>
+</header>
+<div class="page">
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('cgu')">📋 Conditions</div>
+    <div class="tab" onclick="showTab('privacy')">🔒 Confidentialité</div>
+  </div>
+
+  <!-- CONDITIONS D UTILISATION -->
+  <div class="section active" id="sec-cgu">
+    <div class="hero">
+      <h1>📋 Conditions d'utilisation</h1>
+      <p>Dernière mise à jour : Juin 2026</p>
+    </div>
+
+    <div class="card">
+      <h2>1. Acceptation des conditions</h2>
+      <p>En vous inscrivant sur WIN AFFINITY (winaffinity.vercel.app), vous acceptez pleinement et sans réserve les présentes conditions d'utilisation. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser la plateforme.</p>
+    </div>
+
+    <div class="card">
+      <h2>2. Description du service</h2>
+      <p>WIN AFFINITY est une plateforme d'affiliation et de marketing de réseau permettant à ses membres de :</p>
+      <ul>
+        <li>Gagner des commissions en parrainant de nouveaux membres</li>
+        <li>Compléter des tâches quotidiennes rémunérées</li>
+        <li>Participer à des concours et à la roue de la chance</li>
+        <li>Accéder à des formations en ligne gratuites</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>3. Conditions d'inscription</h2>
+      <ul>
+        <li>Vous devez avoir au moins 18 ans pour vous inscrire</li>
+        <li>Vous devez fournir des informations exactes et complètes</li>
+        <li>Un seul compte par personne est autorisé</li>
+        <li>L'utilisation de faux comptes est strictement interdite</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>4. Activation du compte</h2>
+      <p>L'accès complet à la plateforme nécessite une activation payante :</p>
+      <ul>
+        <li>🥉 Starter : 1 000 FCFA</li>
+        <li>🥈 Standard : 2 500 FCFA</li>
+        <li>🥇 Premium : 5 000 FCFA</li>
+      </ul>
+      <div class="highlight">⚠️ Les frais d'activation ne sont pas remboursables une fois le compte activé.</div>
+    </div>
+
+    <div class="card">
+      <h2>5. Système de commissions</h2>
+      <p>Les commissions sont calculées selon votre niveau d'activation et versées automatiquement lors de l'activation de vos filleuls. WIN AFFINITY se réserve le droit de modifier les taux de commission avec un préavis de 7 jours.</p>
+    </div>
+
+    <div class="card">
+      <h2>6. Retraits</h2>
+      <ul>
+        <li>Minimum de retrait : 1 000 FCFA</li>
+        <li>Frais de retrait : 10% du montant</li>
+        <li>Délai de traitement : 24 à 72h ouvrables</li>
+        <li>Vous devez avoir au moins 1 filleul actif pour retirer</li>
+        <li>WIN AFFINITY se réserve le droit de suspendre les retraits en cas de fraude suspectée</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>7. Comportements interdits</h2>
+      <ul>
+        <li>Création de faux comptes pour gonfler les commissions</li>
+        <li>Utilisation de bots ou scripts automatisés</li>
+        <li>Partage de fausses informations sur la plateforme</li>
+        <li>Toute tentative de fraude ou manipulation du système</li>
+      </ul>
+      <div class="highlight">⚠️ Tout comportement frauduleux entraîne la suspension immédiate du compte et la confiscation des gains.</div>
+    </div>
+
+    <div class="card">
+      <h2>8. Limitation de responsabilité</h2>
+      <p>WIN AFFINITY ne peut être tenu responsable des pertes indirectes liées à l'utilisation de la plateforme. Les gains dépendent de l'activité de chaque membre et ne sont pas garantis.</p>
+    </div>
+
+    <div class="card">
+      <h2>9. Modification des conditions</h2>
+      <p>WIN AFFINITY se réserve le droit de modifier ces conditions à tout moment. Les membres seront notifiés par email et/ou notification push lors de toute modification importante.</p>
+    </div>
+
+    <div class="card">
+      <h2>10. Contact</h2>
+      <p>Pour toute question relative aux présentes conditions : <strong>abdoula13cherif@gmail.com</strong></p>
+    </div>
+  </div>
+
+  <!-- POLITIQUE DE CONFIDENTIALITE -->
+  <div class="section" id="sec-privacy">
+    <div class="hero">
+      <h1>🔒 Politique de confidentialité</h1>
+      <p>Dernière mise à jour : Juin 2026</p>
+    </div>
+
+    <div class="card">
+      <h2>1. Données collectées</h2>
+      <p>WIN AFFINITY collecte les données suivantes lors de votre inscription et utilisation :</p>
+      <ul>
+        <li>Nom complet, adresse email, numéro de téléphone</li>
+        <li>Données de paiement (traitées par LeekPay — non stockées sur nos serveurs)</li>
+        <li>Historique des transactions et commissions</li>
+        <li>Données d'utilisation (tâches complétées, connexions)</li>
+        <li>Informations de retrait (numéro Mobile Money, opérateur, pays)</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>2. Utilisation des données</h2>
+      <p>Vos données sont utilisées pour :</p>
+      <ul>
+        <li>Gérer votre compte et vos transactions</li>
+        <li>Calculer et verser vos commissions</li>
+        <li>Vous envoyer des notifications importantes</li>
+        <li>Améliorer nos services</li>
+        <li>Prévenir la fraude</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>3. Partage des données</h2>
+      <p>Vos données personnelles ne sont jamais vendues à des tiers. Elles peuvent être partagées uniquement avec :</p>
+      <ul>
+        <li>Nos prestataires de paiement (LeekPay) pour traiter vos transactions</li>
+        <li>Les autorités compétentes en cas d'obligation légale</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>4. Sécurité des données</h2>
+      <p>Nous utilisons des mesures de sécurité standard (chiffrement SSL, tokens JWT, hachage des mots de passe) pour protéger vos données. Cependant, aucun système n'est infaillible et nous ne pouvons garantir une sécurité absolue.</p>
+    </div>
+
+    <div class="card">
+      <h2>5. Cookies et tracking</h2>
+      <p>WIN AFFINITY utilise des cookies essentiels pour le fonctionnement de la plateforme (authentification, session). Des cookies publicitaires peuvent être déposés par nos partenaires publicitaires (Monetag) pour afficher des annonces pertinentes.</p>
+    </div>
+
+    <div class="card">
+      <h2>6. Notifications push</h2>
+      <p>Si vous acceptez les notifications push, nous utilisons votre abonnement pour vous envoyer des informations importantes sur votre compte. Vous pouvez désactiver ces notifications à tout moment dans les paramètres de votre navigateur.</p>
+    </div>
+
+    <div class="card">
+      <h2>7. Vos droits</h2>
+      <p>Conformément aux lois applicables, vous disposez des droits suivants :</p>
+      <ul>
+        <li>Droit d'accès à vos données personnelles</li>
+        <li>Droit de rectification des données inexactes</li>
+        <li>Droit à la suppression de votre compte et données</li>
+        <li>Droit d'opposition au traitement de vos données</li>
+      </ul>
+      <p>Pour exercer ces droits : <strong>abdoula13cherif@gmail.com</strong></p>
+    </div>
+
+    <div class="card">
+      <h2>8. Conservation des données</h2>
+      <p>Vos données sont conservées pendant toute la durée de votre compte actif, et pendant 2 ans après sa suppression pour des raisons légales et comptables.</p>
+    </div>
+
+    <div class="card">
+      <h2>9. Modifications</h2>
+      <p>Cette politique peut être mise à jour à tout moment. Nous vous informerons par notification ou email de tout changement significatif.</p>
+    </div>
+  </div>
+
+  <div class="last-update">© 2026 WIN AFFINITY — Tous droits réservés</div>
+</div>
+<script>
+function showTab(tab){
+  document.querySelectorAll(".tab").forEach(function(t,i){
+    t.classList.toggle("active", (i===0&&tab==="cgu")||(i===1&&tab==="privacy"));
+  });
+  document.getElementById("sec-cgu").classList.toggle("active", tab==="cgu");
+  document.getElementById("sec-privacy").classList.toggle("active", tab==="privacy");
+}
+</script>
+</body></html>

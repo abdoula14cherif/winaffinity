@@ -36,6 +36,11 @@ async def get_faq(request: Request):
     return templates.TemplateResponse("faq.html", {"request": request, "user": user})
 
 
+@router.get("/legal", response_class=HTMLResponse)
+async def get_legal(request: Request):
+    user = await _get_user(request)
+    return templates.TemplateResponse("legal.html", {"request": request, "user": user})
+
 @router.get("/contact", response_class=HTMLResponse)
 async def get_contact(request: Request):
     user = await _get_user(request)
