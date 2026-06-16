@@ -70,52 +70,21 @@ async def get_ad_count(request: Request):
         return JSONResponse({"count": 0})
 
 @router.post("/ad/view")
-async def ad_view(request: Request, ad_id: Annotated[str, Form()]):
+async def view_ad(request: Request):
     user = await _get_user(request)
-    if not user: return JSONResponse({"error": "Non authentifie"}, status_code=401)
-    db = get_supabase()
-    from datetime import datetime, timezone
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    try:
-        already = db.table("ad_views").select("id").eq("user_id", user["id"]).eq("ad_id", ad_id).gte("viewed_at", today).execute().data
-        if already:
-            return JSONResponse({"success": False, "error": "Pub deja vue.", "reward": 0})
-        db.table("ad_views").insert({"user_id": user["id"], "ad_id": ad_id, "reward": 25}).execute()
-        wallet = db.table("wallets").select("*").eq("user_id", user["id"]).execute().data
-        if wallet:
-            w = wallet[0]
-            db.table("wallets").update({"balance": w["balance"]+25, "total_earned": w["total_earned"]+25}).eq("user_id", user["id"]).execute()
-        else:
-            db.table("wallets").insert({"user_id": user["id"], "balance": 25, "total_earned": 25}).execute()
-        return JSONResponse({"success": True, "reward": 25})
-    except Exception as e:
-        return JSONResponse({"error": str(e)}, status_code=500)
-
-@router.get("/ad/count")
-async def get_ad_count(request: Request):
-    user = await _get_user(request)
-    if not user: return JSONResponse({"count": 0})
+    if not user:
+        return JSONResponse({"success": False, "error": "Non authentifie"}, status_code=401)
     db = get_supabase()
     from datetime import date
     today = str(date.today())
     try:
-        res = db.table("ad_views").select("id").eq("user_id", user["id"]).eq("viewed_at", today).execute()
-        return JSONResponse({"count": len(res.data or [])})
-    except:
-        return JSONResponse({"count": 0})
-
-@router.post("/ad/view")
-async def ad_view(request: Request, ad_id: Annotated[str, Form()]):
-    user = await _get_user(request)
-    if not user: return JSONResponse({"error": "Non authentifie"}, status_code=401)
-    db = get_supabase()
-    from datetime import datetime, timezone
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    try:
-        already = db.table("ad_views").select("id").eq("user_id", user["id"]).eq("ad_id", ad_id).gte("viewed_at", today).execute().data
-        if already:
-            return JSONResponse({"success": False, "error": "Pub deja vue.", "reward": 0})
-        db.table("ad_views").insert({"user_id": user["id"], "ad_id": ad_id, "reward": 25}).execute()
+        # Verifier limite 10 vues/jour
+        views_today = db.table("ad_views").select("id").eq("user_id", user["id"]).eq("viewed_at", today).execute().data or []
+        if len(views_today) >= 10:
+            return JSONResponse({"success": False, "error": "Limite de 10 pubs atteinte aujourd hui"})
+        # Enregistrer la vue
+        db.table("ad_views").insert({"user_id": user["id"], "ad_id": "monetag", "reward": 25, "viewed_at": today}).execute()
+        # Crediter le wallet
         wallet = db.table("wallets").select("*").eq("user_id", user["id"]).execute().data
         if wallet:
             w = wallet[0]
@@ -124,4 +93,4 @@ async def ad_view(request: Request, ad_id: Annotated[str, Form()]):
             db.table("wallets").insert({"user_id": user["id"], "balance": 25, "total_earned": 25}).execute()
         return JSONResponse({"success": True, "reward": 25})
     except Exception as e:
-        return JSONResponse({"error": str(e)}, status_code=500)
+        return JSONResponse({"success": False, "error": str(e)}, status_code=500)
