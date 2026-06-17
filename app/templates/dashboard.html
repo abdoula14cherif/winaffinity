@@ -311,6 +311,15 @@ tbody td{padding:11px 16px;font-size:13px;color:var(--txd);border-bottom:1px sol
     </div>
   </div>
 </main>
+<!-- Popup urgente admin -->
+<div id="urgentPopup" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(26,58,92,.85);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:20px;padding:28px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <div style="font-size:40px;margin-bottom:14px">📢</div>
+    <div style="font-size:17px;font-weight:800;color:#1A3A5C;margin-bottom:10px">Message important</div>
+    <div id="popupMsg" style="font-size:13.5px;color:#6B7A8D;line-height:1.6;margin-bottom:20px"></div>
+    <button onclick="closePopup()" style="background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;border:none;border-radius:10px;padding:12px 28px;font-family:Poppins,sans-serif;font-size:13px;font-weight:700;cursor:pointer">✓ J ai lu ce message</button>
+  </div>
+</div>
 <div id="toast"></div>
 <script>
 (function(){const now=new Date();const opts={weekday:"long",day:"numeric",month:"long",year:"numeric"};const el=document.getElementById("dateLabel");el.dataset.fr=now.toLocaleDateString("fr-FR",opts);el.dataset.en=now.toLocaleDateString("en-US",opts);el.textContent=el.dataset.fr;el.style.cssText="font-size:13px;color:var(--txd);margin-top:2px";})();
