@@ -427,3 +427,49 @@ async def popup_status(request: Request):
         "active": active[0]["value"] == "true" if active else False,
         "message": msg[0]["value"] if msg else ""
     })
+
+@router.get("/stats/advanced")
+async def get_advanced_stats(request: Request):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    try:
+        from datetime import datetime, timezone, timedelta
+        now = datetime.now(timezone.utc)
+
+        # Inscriptions par jour (7 derniers jours)
+        registrations = []
+        for i in range(6, -1, -1):
+            day = now - timedelta(days=i)
+            day_str = day.strftime("%Y-%m-%d")
+            count = db.table("users").select("id").gte("created_at", day_str+"T00:00:00").lte("created_at", day_str+"T23:59:59").execute().data or []
+            registrations.append({"date": day.strftime("%d/%m"), "count": len(count)})
+
+        # Paiements par jour (7 derniers jours)
+        payments = []
+        for i in range(6, -1, -1):
+            day = now - timedelta(days=i)
+            day_str = day.strftime("%Y-%m-%d")
+            p = db.table("payments").select("amount").gte("created_at", day_str+"T00:00:00").lte("created_at", day_str+"T23:59:59").execute().data or []
+            total = sum(x.get("amount", 0) for x in p)
+            payments.append({"date": day.strftime("%d/%m"), "total": total})
+
+        # Totaux globaux
+        total_users = db.table("users").select("id", count="exact").execute().count or 0
+        active_users = db.table("users").select("id", count="exact").eq("is_active", True).execute().count or 0
+        total_payments = db.table("payments").select("amount").execute().data or []
+        total_revenue = sum(x.get("amount", 0) for x in total_payments)
+        pending_withdrawals = db.table("withdrawals").select("id", count="exact").eq("status", "pending").execute().count or 0
+
+        return JSONResponse({
+            "registrations": registrations,
+            "payments": payments,
+            "totals": {
+                "total_users": total_users,
+                "active_users": active_users,
+                "total_revenue": total_revenue,
+                "pending_withdrawals": pending_withdrawals,
+            }
+        })
+    except Exception as e:
+        return JSONResponse({"error": str(e)})

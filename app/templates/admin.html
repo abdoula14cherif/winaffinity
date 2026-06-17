@@ -104,7 +104,7 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
     <div class="tab" onclick="showTab('withdrawals',this)">💸 Retraits</div>
     <div class="tab" onclick="showTab('tasks',this)">📋 Tâches</div>
     <div class="tab" onclick="showTab('notifs',this)">🔔 Notifications</div>
-    <div class="tab" onclick="showTab('stats',this)">📊 Stats</div>
+    <div class="tab" onclick="showTab('stats',this);loadAdvancedStats()">📊 Stats</div>
     <div class="tab" onclick="showTab('annonces',this)">📢 Annonces</div>
     <div class="tab" onclick="showTab('formations',this)">🎓 Formations</div>
     <div class="tab" onclick="showTab('groups',this)">👥 Groupes</div>
@@ -256,6 +256,21 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
   </div>
 
   <div class="tab-content" id="tab-stats">
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px" id="statsCards">
+      <div class="card" style="text-align:center"><div style="font-size:28px;font-weight:800;color:var(--bl)" id="st-total">—</div><div style="font-size:11px;color:var(--txd);margin-top:4px">MEMBRES TOTAL</div></div>
+      <div class="card" style="text-align:center"><div style="font-size:28px;font-weight:800;color:var(--ok)" id="st-active">—</div><div style="font-size:11px;color:var(--txd);margin-top:4px">COMPTES ACTIFS</div></div>
+      <div class="card" style="text-align:center"><div style="font-size:28px;font-weight:800;color:var(--or)" id="st-revenue">—</div><div style="font-size:11px;color:var(--txd);margin-top:4px">REVENUS TOTAL (F)</div></div>
+      <div class="card" style="text-align:center"><div style="font-size:28px;font-weight:800;color:var(--warn)" id="st-pending">—</div><div style="font-size:11px;color:var(--txd);margin-top:4px">RETRAITS EN ATTENTE</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📈 Inscriptions (7 derniers jours)</div>
+      <canvas id="regChart" height="120"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">💰 Revenus (7 derniers jours)</div>
+      <canvas id="revChart" height="120"></canvas>
+    </div>
+    <div id="oldStats">
     <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
       <div class="stat"><div class="sn">{{ stats.total_users or 0 }}</div><div class="sl">Total membres</div></div>
       <div class="stat"><div class="sn ok">{{ stats.active_users or 0 }}</div><div class="sl">Comptes actifs</div></div>
@@ -691,5 +706,43 @@ document.querySelectorAll(".tab").forEach(t=>{
     if(this.textContent.includes("Maintenance")) checkMaintenance();
   });
 });
+
+async function loadAdvancedStats(){
+  try{
+    const r = await fetch("/admin/stats/advanced");
+    const d = await r.json();
+    if(d.error) return;
+    const t = d.totals;
+    document.getElementById("st-total").textContent = t.total_users;
+    document.getElementById("st-active").textContent = t.active_users;
+    document.getElementById("st-revenue").textContent = t.total_revenue.toLocaleString();
+    document.getElementById("st-pending").textContent = t.pending_withdrawals;
+
+    // Graphique inscriptions
+    const regCtx = document.getElementById("regChart").getContext("2d");
+    if(window.regChartInstance) window.regChartInstance.destroy();
+    window.regChartInstance = new Chart(regCtx, {
+      type: "bar",
+      data: {
+        labels: d.registrations.map(x=>x.date),
+        datasets:[{label:"Inscriptions",data:d.registrations.map(x=>x.count),backgroundColor:"rgba(26,58,92,.7)",borderRadius:6}]
+      },
+      options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}
+    });
+
+    // Graphique revenus
+    const revCtx = document.getElementById("revChart").getContext("2d");
+    if(window.revChartInstance) window.revChartInstance.destroy();
+    window.revChartInstance = new Chart(revCtx, {
+      type: "line",
+      data: {
+        labels: d.payments.map(x=>x.date),
+        datasets:[{label:"Revenus (F)",data:d.payments.map(x=>x.total),borderColor:"#FF6B35",backgroundColor:"rgba(255,107,53,.1)",tension:.4,fill:true}]
+      },
+      options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+    });
+  }catch(e){}
+}
 </script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body></html>
