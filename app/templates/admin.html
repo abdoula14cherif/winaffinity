@@ -425,6 +425,14 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
 
   <div class="tab-content" id="tab-maintenance">
     <div class="card">
+      <div class="card-title">📢 Popup d urgence</div>
+      <div class="fg"><label>MESSAGE POPUP</label><input type="text" id="popupMsg" placeholder="Message urgent pour tous les utilisateurs..."/></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+        <button class="btn-add" onclick="setPopup(true)">📢 Activer popup</button>
+        <button class="btn-add" onclick="setPopup(false)" style="background:rgba(231,76,60,.1);color:#E74C3C;border:1.5px solid rgba(231,76,60,.3)">✕ Désactiver</button>
+      </div>
+    </div>
+    <div class="card">
       <div class="card-title">🔧 Mode Maintenance</div>
       <div id="maintStatus" style="padding:12px;border-radius:10px;margin-bottom:16px;font-size:13px;font-weight:600;text-align:center">Vérification...</div>
       <div class="fg"><label>Message affiché aux utilisateurs</label>
@@ -649,6 +657,17 @@ async function setMaintenance(on){
     toast(on?"🔴 Maintenance activée":"🟢 Maintenance désactivée");
     checkMaintenance();
   }
+}
+async function setPopup(on){
+  const msg = document.getElementById("popupMsg").value;
+  if(on && !msg){toast("Message requis","er");return;}
+  const f = new FormData();
+  if(on){f.append("message",msg);f.append("active","true");}
+  const url = on ? "/admin/popup/set" : "/admin/popup/off";
+  const r = await fetch(url, {method:"POST",body:f});
+  const d = await r.json();
+  if(d.success) toast(on?"✓ Popup activée !":"✓ Popup désactivée");
+  else toast("Erreur","er");
 }
 async function checkMaintenance(){
   const r = await fetch("/admin/maintenance/status");

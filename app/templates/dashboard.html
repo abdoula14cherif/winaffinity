@@ -373,6 +373,26 @@ function resetTimer(){
 });
 resetTimer();
 
+// Popup urgente
+async function checkPopup(){
+  try{
+    const r = await fetch("/dashboard/popup");
+    const d = await r.json();
+    if(d.active && d.message){
+      const shown = sessionStorage.getItem("popup_shown");
+      if(!shown){
+        document.getElementById("popupMsg").textContent = d.message;
+        document.getElementById("urgentPopup").style.display = "flex";
+      }
+    }
+  }catch(e){}
+}
+function closePopup(){
+  document.getElementById("urgentPopup").style.display = "none";
+  sessionStorage.setItem("popup_shown", "1");
+}
+checkPopup();
+
 // Charger annonces
 (async function(){
   try{

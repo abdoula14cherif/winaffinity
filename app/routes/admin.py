@@ -398,3 +398,32 @@ async def maintenance_status(request: Request):
     res = db.table("settings").select("value").eq("key", "maintenance").execute()
     is_on = res.data and res.data[0]["value"] == "true"
     return JSONResponse({"maintenance": is_on})
+
+@router.post("/popup/set")
+async def set_popup(request: Request, message: Annotated[str, Form()], active: Annotated[str, Form()] = "true"):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    db.table("settings").upsert({"key": "popup_active", "value": active}).execute()
+    db.table("settings").upsert({"key": "popup_message", "value": message}).execute()
+    return JSONResponse({"success": True})
+
+@router.post("/popup/off")
+async def popup_off(request: Request):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    db.table("settings").upsert({"key": "popup_active", "value": "false"}).execute()
+    return JSONResponse({"success": True})
+
+@router.get("/popup/status")
+async def popup_status(request: Request):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    active = db.table("settings").select("value").eq("key", "popup_active").execute().data
+    msg = db.table("settings").select("value").eq("key", "popup_message").execute().data
+    return JSONResponse({
+        "active": active[0]["value"] == "true" if active else False,
+        "message": msg[0]["value"] if msg else ""
+    })
