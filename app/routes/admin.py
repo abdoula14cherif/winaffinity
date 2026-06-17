@@ -377,22 +377,24 @@ async def get_suspicious(request: Request):
 async def maintenance_on(request: Request, message: Annotated[str, Form()] = "Site en maintenance. Revenez bientôt !"):
     admin = await _get_admin(request)
     if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
-    with open("maintenance.txt", "w") as f:
-        f.write(message)
+    db = get_supabase()
+    db.table("settings").upsert({"key": "maintenance", "value": "true"}).execute()
+    db.table("settings").upsert({"key": "maintenance_message", "value": message}).execute()
     return JSONResponse({"success": True, "status": "on"})
 
 @router.post("/maintenance/off")
 async def maintenance_off(request: Request):
     admin = await _get_admin(request)
     if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
-    import os
-    if os.path.exists("maintenance.txt"):
-        os.remove("maintenance.txt")
+    db = get_supabase()
+    db.table("settings").upsert({"key": "maintenance", "value": "false"}).execute()
     return JSONResponse({"success": True, "status": "off"})
 
 @router.get("/maintenance/status")
 async def maintenance_status(request: Request):
     admin = await _get_admin(request)
     if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
-    import os
-    return JSONResponse({"maintenance": os.path.exists("maintenance.txt")})
+    db = get_supabase()
+    res = db.table("settings").select("value").eq("key", "maintenance").execute()
+    is_on = res.data and res.data[0]["value"] == "true"
+    return JSONResponse({"maintenance": is_on})

@@ -1,27 +1,22 @@
 """
-Middleware mode maintenance
+Middleware mode maintenance via Supabase
 """
-import os
 from fastapi import Request
 from fastapi.responses import HTMLResponse
 
-MAINTENANCE_FILE = "maintenance.txt"
-
-def is_maintenance():
-    return os.path.exists(MAINTENANCE_FILE)
-
 async def maintenance_middleware(request: Request, call_next):
-    exempt = ["/admin", "/auth/login", "/auth/logout", "/assets/"]
+    exempt = ["/admin", "/auth/login", "/auth/logout", "/assets/", "/sw.js"]
     path = request.url.path
     if any(path.startswith(e) for e in exempt):
         return await call_next(request)
-    if is_maintenance():
-        try:
-            with open(MAINTENANCE_FILE, "r") as f:
-                msg = f.read().strip() or "Site en maintenance. Revenez bientôt !"
-        except:
-            msg = "Site en maintenance. Revenez bientôt !"
-        html = """<!DOCTYPE html>
+    try:
+        from app.database import get_supabase
+        db = get_supabase()
+        res = db.table("settings").select("value").eq("key", "maintenance").execute()
+        if res.data and res.data[0]["value"] == "true":
+            msg_res = db.table("settings").select("value").eq("key", "maintenance_message").execute()
+            msg = msg_res.data[0]["value"] if msg_res.data else "Site en maintenance. Revenez bientôt !"
+            html = """<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8"/>
@@ -46,5 +41,7 @@ p{font-size:14px;color:rgba(255,255,255,.7);line-height:1.6;margin-bottom:20px}
   <div class="badge">⏰ Revenez bientôt</div>
 </div>
 </body></html>"""
-        return HTMLResponse(content=html, status_code=503)
+            return HTMLResponse(content=html, status_code=503)
+    except Exception:
+        pass
     return await call_next(request)
