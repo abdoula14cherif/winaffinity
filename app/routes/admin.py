@@ -362,7 +362,9 @@ async def get_suspicious(request: Request):
         users = db.table("users").select("id,full_name,email,registration_ip,is_active,created_at").execute().data or []
         ip_counts = {}
         for u in users:
-            ip = u.get("registration_ip", "unknown")
+            ip = u.get("registration_ip")
+            if not ip:
+                continue  # Ignorer les anciens comptes sans IP
             if ip not in ip_counts:
                 ip_counts[ip] = []
             ip_counts[ip].append(u)
