@@ -372,3 +372,27 @@ async def get_suspicious(request: Request):
         return JSONResponse({"suspicious": suspicious})
     except Exception as e:
         return JSONResponse({"error": str(e)})
+
+@router.post("/maintenance/on")
+async def maintenance_on(request: Request, message: Annotated[str, Form()] = "Site en maintenance. Revenez bientôt !"):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    with open("maintenance.txt", "w") as f:
+        f.write(message)
+    return JSONResponse({"success": True, "status": "on"})
+
+@router.post("/maintenance/off")
+async def maintenance_off(request: Request):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    import os
+    if os.path.exists("maintenance.txt"):
+        os.remove("maintenance.txt")
+    return JSONResponse({"success": True, "status": "off"})
+
+@router.get("/maintenance/status")
+async def maintenance_status(request: Request):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    import os
+    return JSONResponse({"maintenance": os.path.exists("maintenance.txt")})

@@ -110,6 +110,7 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
     <div class="tab" onclick="showTab('groups',this)">👥 Groupes</div>
     <div class="tab" onclick="showTab('support',this)">💬 Support</div>
     <div class="tab" onclick="showTab('fraude',this)">🚨 Fraude</div>
+    <div class="tab" onclick="showTab('maintenance',this)">🔧 Maintenance</div>
   </div>
   <div class="tab-content active" id="tab-users">
     <div class="card">
@@ -421,6 +422,20 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
       <div id="suspiciousList"></div>
     </div>
   </div>
+
+  <div class="tab-content" id="tab-maintenance">
+    <div class="card">
+      <div class="card-title">🔧 Mode Maintenance</div>
+      <div id="maintStatus" style="padding:12px;border-radius:10px;margin-bottom:16px;font-size:13px;font-weight:600;text-align:center">Vérification...</div>
+      <div class="fg"><label>Message affiché aux utilisateurs</label>
+        <input type="text" id="maintMsg" value="Le site est en maintenance. Nous revenons bientôt !" style="margin-bottom:10px"/>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <button class="btn-add" onclick="setMaintenance(true)" style="background:rgba(231,76,60,.1);color:#E74C3C;border:1.5px solid rgba(231,76,60,.3)">🔴 Activer maintenance</button>
+        <button class="btn-add" onclick="setMaintenance(false)" style="background:rgba(0,184,148,.1);color:#00B894;border:1.5px solid rgba(0,184,148,.3)">🟢 Désactiver maintenance</button>
+      </div>
+    </div>
+  </div>
 </div>
 <div id="toast"></div>
 <script>
@@ -621,6 +636,40 @@ async function loadSuspicious(){
 document.querySelectorAll(".tab").forEach(t=>{
   t.addEventListener("click",function(){
     if(this.textContent.includes("Fraude")) loadSuspicious();
+  });
+});
+
+async function setMaintenance(on){
+  const msg = document.getElementById("maintMsg").value;
+  const f = new FormData();
+  if(on) f.append("message", msg);
+  const r = await fetch("/admin/maintenance/"+(on?"on":"off"), {method:"POST", body:f});
+  const d = await r.json();
+  if(d.success){
+    toast(on?"🔴 Maintenance activée":"🟢 Maintenance désactivée");
+    checkMaintenance();
+  }
+}
+async function checkMaintenance(){
+  const r = await fetch("/admin/maintenance/status");
+  const d = await r.json();
+  const el = document.getElementById("maintStatus");
+  if(!el) return;
+  if(d.maintenance){
+    el.style.background = "rgba(231,76,60,.1)";
+    el.style.color = "#E74C3C";
+    el.style.border = "1.5px solid rgba(231,76,60,.2)";
+    el.textContent = "🔴 Maintenance ACTIVE — Le site est fermé aux utilisateurs";
+  } else {
+    el.style.background = "rgba(0,184,148,.1)";
+    el.style.color = "#00B894";
+    el.style.border = "1.5px solid rgba(0,184,148,.2)";
+    el.textContent = "🟢 Site OUVERT — Tout fonctionne normalement";
+  }
+}
+document.querySelectorAll(".tab").forEach(t=>{
+  t.addEventListener("click",function(){
+    if(this.textContent.includes("Maintenance")) checkMaintenance();
   });
 });
 </script>
