@@ -109,6 +109,7 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
     <div class="tab" onclick="showTab('formations',this)">🎓 Formations</div>
     <div class="tab" onclick="showTab('groups',this)">👥 Groupes</div>
     <div class="tab" onclick="showTab('support',this)">💬 Support</div>
+    <div class="tab" onclick="showTab('fraude',this)">🚨 Fraude</div>
   </div>
   <div class="tab-content active" id="tab-users">
     <div class="card">
@@ -412,6 +413,14 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
       </div>
     </div>
   </div>
+
+  <div class="tab-content" id="tab-fraude">
+    <div class="card">
+      <div class="card-title">🚨 Comptes suspects (même IP)</div>
+      <button class="btn-add" onclick="loadSuspicious()" style="margin-bottom:14px">🔍 Analyser</button>
+      <div id="suspiciousList"></div>
+    </div>
+  </div>
 </div>
 <div id="toast"></div>
 <script>
@@ -585,6 +594,33 @@ document.getElementById("adminMsgInput") && document.getElementById("adminMsgInp
 document.querySelectorAll(".tab").forEach(t=>{
   t.addEventListener("click",function(){
     if(this.textContent.includes("Support"))loadConversations();
+  });
+});
+
+async function loadSuspicious(){
+  const r = await fetch("/admin/suspicious");
+  const d = await r.json();
+  const list = document.getElementById("suspiciousList");
+  if(!d.suspicious || !Object.keys(d.suspicious).length){
+    list.innerHTML = "<div style=padding:16px;color:var(--ok)>✓ Aucun compte suspect détecté</div>";
+    return;
+  }
+  let html = "";
+  for(const ip in d.suspicious){
+    const accs = d.suspicious[ip];
+    html += `<div style="margin-bottom:14px;padding:14px;background:rgba(231,76,60,.06);border:1.5px solid rgba(231,76,60,.2);border-radius:10px">
+      <div style="font-size:12px;font-weight:700;color:var(--er);margin-bottom:8px">⚠️ IP: ${ip} — ${accs.length} comptes</div>
+      ${accs.map(u=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bg);font-size:12px">
+        <span>${u.full_name} (${u.email})</span>
+        <span class="badge ${u.is_active?"b-ok":"b-warn"}">${u.is_active?"Actif":"Inactif"}</span>
+      </div>`).join("")}
+    </div>`;
+  }
+  list.innerHTML = html;
+}
+document.querySelectorAll(".tab").forEach(t=>{
+  t.addEventListener("click",function(){
+    if(this.textContent.includes("Fraude")) loadSuspicious();
   });
 });
 </script>

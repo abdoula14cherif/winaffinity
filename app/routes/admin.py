@@ -351,3 +351,22 @@ async def admin_reply(request: Request, user_id: Annotated[str, Form()], message
     except Exception:
         pass
     return JSONResponse({"success": ok})
+
+@router.get("/suspicious")
+async def get_suspicious(request: Request):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    try:
+        # Trouver les IPs avec plusieurs comptes
+        users = db.table("users").select("id,full_name,email,registration_ip,is_active,created_at").execute().data or []
+        ip_counts = {}
+        for u in users:
+            ip = u.get("registration_ip", "unknown")
+            if ip not in ip_counts:
+                ip_counts[ip] = []
+            ip_counts[ip].append(u)
+        suspicious = {ip: accs for ip, accs in ip_counts.items() if len(accs) > 1}
+        return JSONResponse({"suspicious": suspicious})
+    except Exception as e:
+        return JSONResponse({"error": str(e)})
