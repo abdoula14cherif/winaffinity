@@ -111,17 +111,6 @@ async def get_announcements(request: Request):
     except Exception as e:
         return JSONResponse({"announcements": []})
 
-@router.get("/popup")
-async def get_popup(request: Request):
-    db = get_supabase()
-    try:
-        active = db.table("settings").select("value").eq("key", "popup_active").execute().data
-        msg = db.table("settings").select("value").eq("key", "popup_message").execute().data
-        if active and active[0]["value"] == "true" and msg:
-            return JSONResponse({"active": True, "message": msg[0]["value"]})
-    except:
-        pass
-    return JSONResponse({"active": False})
 
 @router.get("/announcements")
 async def get_announcements(request: Request):
