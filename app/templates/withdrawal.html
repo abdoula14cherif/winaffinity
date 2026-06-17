@@ -240,6 +240,15 @@ function calcFee(v) {
 }
 
 function chk() {
+  // Double confirmation
+  var v = parseInt(document.getElementById("amt").value) || 0;
+  var fee = Math.round(v * 0.1);
+  var net = v - fee;
+  var op = document.getElementById("operatorInput").value;
+  var phone = document.getElementById("phoneInput").value;
+  if(!confirm("Confirmer le retrait ?\n\nMontant : "+v+" FCFA\nFrais (10%) : "+fee+" FCFA\nVous recevrez : "+net+" FCFA\nOpérateur : "+op+"\nNuméro : "+phone)){
+    return false;
+  }
   if (!currentOp) {
     alert("Veuillez choisir un opérateur");
     return false;
