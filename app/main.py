@@ -8,7 +8,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 from app.config import get_settings
-from app.routes import auth, payment, dashboard, withdrawal, gains, pages, admin, notifications, wheel, network, learning, admin_user, contest, support, push
+from app.routes import auth, payment, dashboard, withdrawal, gains, pages, admin, notifications, wheel, network, learning, admin_user, contest, support, push, password_reset
 
 settings = get_settings()
 logging.basicConfig(level=logging.INFO)
@@ -45,6 +45,7 @@ app.include_router(admin_user.router)
 app.include_router(contest.router)
 app.include_router(support.router)
 app.include_router(push.router)
+app.include_router(password_reset.router)
 
 @app.get("/sw.js", include_in_schema=False)
 async def service_worker():
@@ -57,8 +58,12 @@ async def root():
 
 @app.exception_handler(404)
 async def not_found(request: Request, exc):
-    return JSONResponse(status_code=404, content={"error": "Page introuvable."})
+    from fastapi.templating import Jinja2Templates
+    templates = Jinja2Templates(directory="app/templates")
+    return templates.TemplateResponse("404.html", {"request": request}, status_code=404)
 
 @app.exception_handler(500)
 async def error(request: Request, exc):
-    return JSONResponse(status_code=500, content={"error": "Erreur interne."})
+    from fastapi.templating import Jinja2Templates
+    templates = Jinja2Templates(directory="app/templates")
+    return templates.TemplateResponse("500.html", {"request": request}, status_code=500)
