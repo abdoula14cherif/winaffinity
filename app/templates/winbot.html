@@ -130,11 +130,6 @@ function hideTyping(){
 
 async function sendMsg(){
   var input = document.getElementById("msgInput");
-  var text = input.value.trim();
-  if(!text) return;
-  // Test basique
-  addMsg("DEBUG: envoi en cours...", "bot");
-  var input = document.getElementById("msgInput");
   var btn = document.getElementById("sendBtn");
   var text = input.value.trim();
   if(!text) return;
