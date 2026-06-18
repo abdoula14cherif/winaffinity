@@ -473,3 +473,28 @@ async def get_advanced_stats(request: Request):
         })
     except Exception as e:
         return JSONResponse({"error": str(e)})
+
+@router.post("/user/{user_id}/activate")
+async def activate_user_with_level(request: Request, user_id: str, level: Annotated[str, Form()] = "standard"):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    user = db.table("users").select("*").eq("id", user_id).execute().data
+    if not user: return JSONResponse({"error": "Utilisateur introuvable"}, status_code=404)
+    user = user[0]
+    if user.get("is_active"):
+        return JSONResponse({"error": "Compte déjà actif"})
+    amounts = {"starter": 1000, "standard": 2500, "premium": 5000}
+    amount = amounts.get(level, 2500)
+    db.table("users").update({"is_active": True, "level": level, "activation_amount": amount}).eq("id", user_id).execute()
+    try:
+        db.table("payments").insert({"user_id": user_id, "amount": amount, "level": level, "status": "completed", "payment_method": "admin_manual"}).execute()
+    except Exception as e:
+        logger.warning("[ADMIN] Erreur paiement: %s", e)
+    try:
+        from app.services.commission_service import process_commissions
+        await process_commissions(db, user_id)
+    except Exception as e:
+        logger.warning("[ADMIN] Erreur commissions: %s", e)
+    logger.info("[ADMIN] Compte %s activé manuellement en %s", user_id, level)
+    return JSONResponse({"success": True, "level": level, "amount": amount})
