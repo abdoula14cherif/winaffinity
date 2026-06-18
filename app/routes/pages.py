@@ -40,27 +40,30 @@ async def get_faq(request: Request):
 async def winbot_chat(request: Request):
     user = await _get_user(request)
     if not user: return JSONResponse({"error": "Non authentifié"}, status_code=401)
-    import httpx, os
+    import os
+    import httpx
     body = await request.json()
     messages = body.get("messages", [])
     system = body.get("system", "")
+    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+    if not api_key:
+        return JSONResponse({"error": "Clé API manquante"}, status_code=500)
     try:
-        async with httpx.AsyncClient() as client:
-            r = await client.post(
-                "https://api.anthropic.com/v1/messages",
-                headers={
-                    "x-api-key": os.environ.get("ANTHROPIC_API_KEY", ""),
-                    "anthropic-version": "2023-06-01",
-                    "content-type": "application/json"
-                },
-                json={
-                    "model": "claude-haiku-4-5-20251001",
-                    "max_tokens": 1000,
-                    "system": system,
-                    "messages": messages
-                },
-                timeout=30
-            )
+        r = httpx.post(
+            "https://api.anthropic.com/v1/messages",
+            headers={
+                "x-api-key": api_key,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json"
+            },
+            json={
+                "model": "claude-haiku-4-5-20251001",
+                "max_tokens": 1000,
+                "system": system,
+                "messages": messages
+            },
+            timeout=30
+        )
         return JSONResponse(r.json())
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=500)
