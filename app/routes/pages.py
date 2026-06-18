@@ -36,6 +36,20 @@ async def get_faq(request: Request):
     return templates.TemplateResponse("faq.html", {"request": request, "user": user})
 
 
+@router.get("/share", response_class=HTMLResponse)
+async def get_share(request: Request):
+    user = await _get_user(request)
+    if not user: return RedirectResponse("/auth/login", status_code=302)
+    db = get_supabase()
+    wallet = await get_wallet(db, user["id"])
+    referrals = db.table("users").select("id").eq("sponsor_id", user["id"]).eq("is_active", True).execute().data or []
+    return templates.TemplateResponse("share.html", {
+        "request": request,
+        "user": user,
+        "wallet": wallet,
+        "referrals_count": len(referrals)
+    })
+
 @router.get("/legal", response_class=HTMLResponse)
 async def get_legal(request: Request):
     user = await _get_user(request)
