@@ -38,8 +38,6 @@ async def get_faq(request: Request):
 
 @router.post("/winbot/chat")
 async def winbot_chat(request: Request):
-    user = await _get_user(request)
-    if not user: return JSONResponse({"error": "Non authentifié"}, status_code=401)
     import os
     import httpx
     body = await request.json()
