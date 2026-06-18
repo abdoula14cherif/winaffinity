@@ -177,7 +177,7 @@ async function sendMsg(){
 
   }catch(e){
     hideTyping();
-    addMsg("Désolé, une erreur s est produite. Veuillez réessayer. 🙏", "bot");
+    addMsg("ERREUR: " + e.message + " | " + e.toString(), "bot");
   }
 
   btn.disabled = false;
