@@ -144,12 +144,10 @@ async function sendMsg(){
   try{
     var systemPrompt = "Tu es WIN BOT, l assistant IA de la plateforme WIN AFFINITY. Tu aides les utilisateurs africains a maximiser leurs gains sur cette plateforme d affiliation.\n\nINFOS SUR L UTILISATEUR:\n- Nom: "+userData.name+"\n- Niveau: "+userData.level+"\n- Solde: "+userData.balance+" FCFA\n- Filleuls actifs: "+userData.referrals+"\n- Compte actif: "+userData.is_active+"\n\nINFOS SUR WIN AFFINITY:\n- Plateforme d affiliation avec 3 niveaux: Starter (1000F), Standard (2500F), Premium (5000F)\n- Commissions parrainage selon niveau minimum parrain/filleul\n- Starter: N1=500F, N2=240F, N3=120F\n- Standard: N1=1250F, N2=600F, N3=300F\n- Premium: N1=2500F, N2=1200F, N3=600F\n- Tâches quotidiennes jusqu a 300F/jour\n- Roue de la chance 1x/jour jusqu a 200F\n- Pubs rémunérées 25F/vue, max 10/jour\n- Grand Concours: 20 filleuls=5000F, 50=15000F+Tshirt, 100=30000F+iPhone15\n- Retrait minimum 1000F, frais 10%, besoin d au moins 1 filleul actif\n- 12 pays africains supportés\n\nRéponds toujours en français, sois encourageant, pratique et concis. Donne des conseils personnalisés basés sur le profil de l utilisateur. Utilise des emojis pour rendre la conversation vivante.";
 
-    var response = await fetch("https://api.anthropic.com/v1/messages", {
+    var response = await fetch("/winbot/chat", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 1000,
         system: systemPrompt,
         messages: history
       })
