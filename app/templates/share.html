@@ -343,7 +343,12 @@ function downloadImage(){
   win.document.close();
 }
 
-// Lancer le dessin
-drawCard();
+// Lancer le dessin après chargement complet
+if(document.fonts && document.fonts.ready){
+  document.fonts.ready.then(function(){ drawCard(); });
+} else {
+  window.onload = function(){ drawCard(); };
+  setTimeout(drawCard, 500);
+}
 </script>
 </body></html>
