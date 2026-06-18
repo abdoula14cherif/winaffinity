@@ -160,7 +160,7 @@ function drawCard(){
   // Header logo
   drawRoundRect(ctx, W/2-120, 80, 240, 80, 20, t.accent, null, 0.15);
   ctx.fillStyle = t.accent;
-  ctx.font = "bold 36px Poppins, Arial";
+  ctx.font = "bold 36px Arial";
   ctx.textAlign = "center";
   ctx.fillText("◈ WIN AFFINITY", W/2, 130);
 
@@ -178,13 +178,13 @@ function drawCard(){
 
   // Titre principal
   ctx.fillStyle = t.text;
-  ctx.font = "900 72px Poppins, Arial";
+  ctx.font = "900 72px Arial, sans-serif";
   ctx.textAlign = "center";
   ctx.fillText("MES GAINS", W/2, 310);
 
   // Sous-titre avec nom
   ctx.fillStyle = t.accent;
-  ctx.font = "bold 44px Poppins, Arial";
+  ctx.font = "bold 44px Arial";
   var displayName = userData.name.split(" ")[0].toUpperCase();
   ctx.fillText(displayName, W/2, 385);
 
@@ -192,20 +192,20 @@ function drawCard(){
   var levelText = userData.level === "premium" ? "🥇 PREMIUM" : userData.level === "starter" ? "🥉 STARTER" : "🥈 STANDARD";
   drawRoundRect(ctx, W/2-140, 420, 280, 70, 35, t.accent, null, 0.2);
   ctx.fillStyle = t.accent;
-  ctx.font = "bold 30px Poppins, Arial";
+  ctx.font = "bold 30px Arial";
   ctx.fillText(levelText, W/2, 463);
 
   // Carte solde principal
   drawGlowCard(ctx, 80, 530, W-160, 280, t);
   ctx.fillStyle = t.sub;
-  ctx.font = "600 34px Poppins, Arial";
+  ctx.font = "600 34px Arial";
   ctx.textAlign = "center";
   ctx.fillText("SOLDE DISPONIBLE", W/2, 600);
   ctx.fillStyle = t.text;
-  ctx.font = "900 130px Poppins, Arial";
+  ctx.font = "900 130px Arial";
   ctx.fillText(formatNum(userData.balance), W/2, 730);
   ctx.fillStyle = t.accent;
-  ctx.font = "bold 44px Poppins, Arial";
+  ctx.font = "bold 44px Arial";
   ctx.fillText("FCFA", W/2, 790);
 
   // Stats grid - 2x2
@@ -230,30 +230,30 @@ function drawCard(){
     ctx.textAlign = "center";
     ctx.fillText(cards[i].icon, cx + gw/2, cy + 60);
     ctx.fillStyle = t.text;
-    ctx.font = "bold 36px Poppins, Arial";
+    ctx.font = "bold 36px Arial";
     ctx.fillText(cards[i].value, cx + gw/2, cy + 110);
     ctx.fillStyle = t.sub;
-    ctx.font = "500 22px Poppins, Arial";
+    ctx.font = "500 22px Arial";
     ctx.fillText(cards[i].label, cx + gw/2, cy + 148);
   }
 
   // Motivation text
   ctx.fillStyle = t.text;
-  ctx.font = "italic 600 36px Poppins, Arial";
+  ctx.font = "italic 600 36px Arial";
   ctx.textAlign = "center";
   ctx.fillText(""Rejoins-moi et commence à gagner !"", W/2, 1380);
 
   // QR code zone / lien
   drawGlowCard(ctx, 80, 1420, W-160, 280, t);
   ctx.fillStyle = t.sub;
-  ctx.font = "500 28px Poppins, Arial";
+  ctx.font = "500 28px Arial";
   ctx.textAlign = "center";
   ctx.fillText("Utilise mon code pour t inscrire", W/2, 1475);
   ctx.fillStyle = t.accent;
-  ctx.font = "900 56px Poppins, Arial";
+  ctx.font = "900 56px Arial";
   ctx.fillText(userData.code, W/2, 1560);
   ctx.fillStyle = t.sub;
-  ctx.font = "500 26px Poppins, Arial";
+  ctx.font = "500 26px Arial";
   ctx.fillText("winaffinity.vercel.app", W/2, 1615);
 
   // Footer
@@ -264,11 +264,11 @@ function drawCard(){
   ctx.fillRect(0, H-180, W, 180);
 
   ctx.fillStyle = t.sub;
-  ctx.font = "500 26px Poppins, Arial";
+  ctx.font = "500 26px Arial";
   ctx.textAlign = "center";
   ctx.fillText("Plateforme d affiliation • Tâches • Roue de la chance", W/2, H-100);
   ctx.fillStyle = t.accent;
-  ctx.font = "bold 28px Poppins, Arial";
+  ctx.font = "bold 28px Arial";
   ctx.fillText("winaffinity.vercel.app", W/2, H-55);
 
   // Update share links
@@ -331,23 +331,16 @@ function formatNum(n){
 
 function downloadImage(){
   var canvas = document.getElementById("shareCanvas");
-  try {
-    canvas.toBlob(function(blob){
-      var url = URL.createObjectURL(blob);
-      var link = document.createElement("a");
-      link.download = "winaffinity-gains-"+userData.code+".png";
-      link.href = url;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    }, "image/png");
-  } catch(e) {
-    // Fallback - ouvrir dans nouvel onglet
-    var dataUrl = canvas.toDataURL("image/png");
-    var win = window.open();
-    win.document.write("<img src='"+dataUrl+"' style='max-width:100%'/><br><a download='winaffinity-gains.png' href='"+dataUrl+"'>Appuyer longtemps sur l image pour enregistrer</a>");
-  }
+  var dataUrl = canvas.toDataURL("image/png");
+  // Ouvrir dans nouvel onglet - compatible Android
+  var win = window.open("", "_blank");
+  win.document.write(
+    "<!DOCTYPE html><html><head><meta name=viewport content=width=device-width><title>WIN AFFINITY</title></head><body style=margin:0;background:#000;text-align:center>"
+    +"<p style=color:#FF6B35;font-family:Arial;font-size:14px;padding:10px>📸 Appuyez longtemps sur l image → Enregistrer</p>"
+    +"<img src='"+dataUrl+"' style='width:100%;max-width:480px'/>"
+    +"</body></html>"
+  );
+  win.document.close();
 }
 
 // Lancer le dessin
