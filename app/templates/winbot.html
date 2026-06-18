@@ -85,7 +85,7 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
 </div>
 <script>
 var userData = {
-  name: "{{ user.full_name }}",
+  name: "{{ user.full_name | replace('"', '') | replace("'", '') }}",
   level: "{{ user.level or 'standard' }}",
   balance: {{ wallet.balance or 0 }},
   referrals: {{ referrals_count or 0 }},
