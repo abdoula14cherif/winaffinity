@@ -88,111 +88,88 @@ var userData = {
   name: "{{ user.full_name | replace('"', '') | replace("'", '') }}",
   level: "{{ user.level or 'standard' }}",
   balance: {{ wallet.balance or 0 }},
-  referrals: {{ referrals_count or 0 }},
-  is_active: {{ 'true' if user.is_active else 'false' }}
+  referrals: {{ referrals_count or 0 }}
 };
 
-var history = [];
-
-function quickMsg(text){
-  document.getElementById("msgInput").value = text;
-  sendMsg();
-}
-
 function getTime(){
-  var d = new Date();
+  var d=new Date();
   return d.getHours().toString().padStart(2,"0")+":"+d.getMinutes().toString().padStart(2,"0");
 }
 
 function addMsg(text, sender){
-  var box = document.getElementById("chatMessages");
-  var div = document.createElement("div");
-  div.className = "msg msg-"+sender;
-  div.innerHTML = '<div class="msg-bubble">'+text.replace(/\n/g,"<br>")+'</div><div class="msg-time">'+getTime()+'</div>';
+  var box=document.getElementById("chatMessages");
+  var div=document.createElement("div");
+  div.className="msg msg-"+sender;
+  div.innerHTML="<div class='msg-bubble'>"+text+"</div><div class='msg-time'>"+getTime()+"</div>";
   box.appendChild(div);
-  box.scrollTop = box.scrollHeight;
+  box.scrollTop=box.scrollHeight;
 }
 
 function showTyping(){
-  var box = document.getElementById("chatMessages");
-  var div = document.createElement("div");
-  div.className = "msg msg-bot";
-  div.id = "typing";
-  div.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
-  box.appendChild(div);
-  box.scrollTop = box.scrollHeight;
+  var box=document.getElementById("chatMessages");
+  var div=document.createElement("div");
+  div.id="typing";div.className="msg msg-bot";
+  div.innerHTML="<div class='typing'><span></span><span></span><span></span></div>";
+  box.appendChild(div);box.scrollTop=box.scrollHeight;
 }
 
 function hideTyping(){
-  var el = document.getElementById("typing");
-  if(el) el.remove();
+  var el=document.getElementById("typing");
+  if(el)el.remove();
 }
 
-async function sendMsg(){
-  var input = document.getElementById("msgInput");
-  var btn = document.getElementById("sendBtn");
-  var text = input.value.trim();
-  if(!text) return;
+function quickMsg(text){
+  document.getElementById("msgInput").value=text;
+  sendMsg();
+}
 
-  addMsg(text, "user");
-  input.value = "";
-  btn.disabled = true;
+var history=[];
+
+function sendMsg(){
+  var input=document.getElementById("msgInput");
+  var btn=document.getElementById("sendBtn");
+  var text=input.value.trim();
+  if(!text)return;
+  addMsg(text,"user");
+  input.value="";
+  btn.disabled=true;
   showTyping();
+  history.push({role:"user",content:text});
 
-  history.push({role:"user", content: text});
+  var system = "Tu es WIN BOT, assistant IA de WIN AFFINITY. Utilisateur: "+userData.name+", niveau "+userData.level+", solde "+userData.balance+" FCFA, "+userData.referrals+" filleuls. Reponds en francais, sois concis et encourage.";
 
-  try{
-    var systemPrompt = "Tu es WIN BOT, l assistant IA de la plateforme WIN AFFINITY. Tu aides les utilisateurs africains a maximiser leurs gains sur cette plateforme d affiliation.\n\nINFOS SUR L UTILISATEUR:\n- Nom: "+userData.name+"\n- Niveau: "+userData.level+"\n- Solde: "+userData.balance+" FCFA\n- Filleuls actifs: "+userData.referrals+"\n- Compte actif: "+userData.is_active+"\n\nINFOS SUR WIN AFFINITY:\n- Plateforme d affiliation avec 3 niveaux: Starter (1000F), Standard (2500F), Premium (5000F)\n- Commissions parrainage selon niveau minimum parrain/filleul\n- Starter: N1=500F, N2=240F, N3=120F\n- Standard: N1=1250F, N2=600F, N3=300F\n- Premium: N1=2500F, N2=1200F, N3=600F\n- Tâches quotidiennes jusqu a 300F/jour\n- Roue de la chance 1x/jour jusqu a 200F\n- Pubs rémunérées 25F/vue, max 10/jour\n- Grand Concours: 20 filleuls=5000F, 50=15000F+Tshirt, 100=30000F+iPhone15\n- Retrait minimum 1000F, frais 10%, besoin d au moins 1 filleul actif\n- 12 pays africains supportés\n\nRéponds toujours en français, sois encourageant, pratique et concis. Donne des conseils personnalisés basés sur le profil de l utilisateur. Utilise des emojis pour rendre la conversation vivante.";
-
-    var response = await fetch("/winbot/chat", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      credentials: "include",
-      body: JSON.stringify({
-        system: systemPrompt,
-        messages: history
-      })
-    });
-    if(!response.ok){
-      hideTyping();
-      addMsg("Erreur HTTP: "+response.status, "bot");
-      btn.disabled=false;
-      return;
-    }
-
-    var data = await response.json();
-    console.log("BOT RESPONSE:", JSON.stringify(data));
-    // Gérer la structure de réponse
+  fetch("/winbot/chat", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    credentials:"include",
+    body:JSON.stringify({system:system, messages:history})
+  }).then(function(r){
+    return r.json();
+  }).then(function(data){
+    hideTyping();
     var reply;
     if(data.data && data.data.content && data.data.content[0]){
-      reply = data.data.content[0].text;
+      reply=data.data.content[0].text;
     } else if(data.content && data.content[0]){
-      reply = data.content[0].text;
-    } else if(data.error){
-      reply = "Erreur: " + data.error;
+      reply=data.content[0].text;
     } else {
-      reply = "Réponse inattendue: " + JSON.stringify(data);
+      reply="Erreur: "+JSON.stringify(data);
     }
-
+    addMsg(reply,"bot");
+    history.push({role:"assistant",content:reply});
+    if(history.length>20) history=history.slice(-20);
+    btn.disabled=false;
+  }).catch(function(e){
     hideTyping();
-    addMsg(reply, "bot");
-    history.push({role:"assistant", content: reply});
-
-    if(history.length > 20){
-      history = history.slice(-20);
-    }
-
-  }catch(e){
-    hideTyping();
-    addMsg("ERREUR: " + e.message + " | " + e.toString(), "bot");
-  }
-
-  btn.disabled = false;
-  input.focus();
+    addMsg("Erreur réseau: "+e.message,"bot");
+    btn.disabled=false;
+  });
 }
 
-document.getElementById("msgInput").addEventListener("keypress", function(e){
-  if(e.key === "Enter") sendMsg();
+document.addEventListener("DOMContentLoaded", function(){
+  document.getElementById("msgInput").addEventListener("keypress", function(e){
+    if(e.key==="Enter") sendMsg();
+  });
 });
 </script>
 </body></html>
