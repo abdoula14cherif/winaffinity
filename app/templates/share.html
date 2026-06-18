@@ -343,12 +343,20 @@ function downloadImage(){
   win.document.close();
 }
 
-// Lancer le dessin après chargement complet
-if(document.fonts && document.fonts.ready){
-  document.fonts.ready.then(function(){ drawCard(); });
-} else {
-  window.onload = function(){ drawCard(); };
-  setTimeout(drawCard, 500);
-}
+// Test basique canvas
+window.addEventListener("load", function(){
+  var canvas = document.getElementById("shareCanvas");
+  var ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#1A3A5C";
+  ctx.fillRect(0, 0, 1080, 1920);
+  ctx.fillStyle = "#FF6B35";
+  ctx.font = "bold 80px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText("WIN AFFINITY", 540, 200);
+  ctx.fillStyle = "#FFFFFF";
+  ctx.font = "60px Arial";
+  ctx.fillText("TEST OK", 540, 400);
+  drawCard();
+});
 </script>
 </body></html>
