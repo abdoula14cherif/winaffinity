@@ -154,7 +154,18 @@ async function sendMsg(){
     });
 
     var data = await response.json();
-    var reply = data.content && data.content[0] ? data.content[0].text : "Désolé, je n ai pas pu répondre. Réessayez !";
+    console.log("BOT RESPONSE:", JSON.stringify(data));
+    // Gérer la structure de réponse
+    var reply;
+    if(data.data && data.data.content && data.data.content[0]){
+      reply = data.data.content[0].text;
+    } else if(data.content && data.content[0]){
+      reply = data.content[0].text;
+    } else if(data.error){
+      reply = "Erreur: " + data.error;
+    } else {
+      reply = "Réponse inattendue: " + JSON.stringify(data);
+    }
 
     hideTyping();
     addMsg(reply, "bot");
