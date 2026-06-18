@@ -132,7 +132,7 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
               <td><span class="badge {% if u.role == "admin" %}b-or{% else %}b-warn{% endif %}">{{ u.role }}</span></td>
               <td style="font-size:12px">{{ u.created_at[:10] if u.created_at else "—" }}</td>
               <td style="display:flex;gap:5px;flex-wrap:wrap">
-                <button class="btn-xs {% if u.is_active %}btn-dea{% else %}btn-act{% endif %}" id="btn-{{ u.id }}" onclick="toggleUser('{{ u.id }}',{{ 'true' if u.is_active else 'false' }})">{% if u.is_active %}Désact.{% else %}Activer{% endif %}</button>
+                <button class="btn-xs {% if u.is_active %}btn-dea{% else %}btn-act{% endif %}" id="btn-{{ u.id }}" onclick="{% if u.is_active %}toggleUser('{{ u.id }}',true){% else %}showActivModal('{{ u.id }}','{{ u.full_name }}'){% endif %}">{% if u.is_active %}Désact.{% else %}Activer{% endif %}</button>
                 <button class="btn-xs" style="background:rgba(45,95,143,.1);color:#2D5F8F;border:1px solid rgba(45,95,143,.2)" onclick="openModal('{{ u.id }}','{{ u.full_name }}','{{ u.email }}','{{ u.phone }}','{{ u.role }}',{{ 'true' if u.is_active else 'false' }})">✏️</button>
                 <button class="btn-xs" style="background:rgba(0,184,148,.1);color:#00B894;border:1px solid rgba(0,184,148,.2)" onclick="openWallet('{{ u.id }}','{{ u.full_name }}')">💰</button>
               </td>
