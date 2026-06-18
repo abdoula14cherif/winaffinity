@@ -147,11 +147,18 @@ async function sendMsg(){
     var response = await fetch("/winbot/chat", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
+      credentials: "include",
       body: JSON.stringify({
         system: systemPrompt,
         messages: history
       })
     });
+    if(!response.ok){
+      hideTyping();
+      addMsg("Erreur HTTP: "+response.status, "bot");
+      btn.disabled=false;
+      return;
+    }
 
     var data = await response.json();
     console.log("BOT RESPONSE:", JSON.stringify(data));
