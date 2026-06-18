@@ -132,7 +132,7 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
               <td><span class="badge {% if u.role == "admin" %}b-or{% else %}b-warn{% endif %}">{{ u.role }}</span></td>
               <td style="font-size:12px">{{ u.created_at[:10] if u.created_at else "—" }}</td>
               <td style="display:flex;gap:5px;flex-wrap:wrap">
-                <button class="btn-xs {% if u.is_active %}btn-dea{% else %}btn-act{% endif %}" id="btn-{{ u.id }}" onclick="{% if u.is_active %}toggleUser('{{ u.id }}',true){% else %}showActivModal('{{ u.id }}','{{ u.full_name }}'){% endif %}">{% if u.is_active %}Désact.{% else %}Activer{% endif %}</button>
+                <button class="btn-xs {% if u.is_active %}btn-dea{% else %}btn-act{% endif %}" id="btn-{{ u.id }}" data-uid="{{ u.id }}" data-name="{{ u.full_name }}" data-active="{{ 'true' if u.is_active else 'false' }}" onclick="handleUserBtn(this)">{% if u.is_active %}Désact.{% else %}Activer{% endif %}</button>
                 <button class="btn-xs" style="background:rgba(45,95,143,.1);color:#2D5F8F;border:1px solid rgba(45,95,143,.2)" onclick="openModal('{{ u.id }}','{{ u.full_name }}','{{ u.email }}','{{ u.phone }}','{{ u.role }}',{{ 'true' if u.is_active else 'false' }})">✏️</button>
                 <button class="btn-xs" style="background:rgba(0,184,148,.1);color:#00B894;border:1px solid rgba(0,184,148,.2)" onclick="openWallet('{{ u.id }}','{{ u.full_name }}')">💰</button>
               </td>
@@ -770,6 +770,16 @@ async function loadAdvancedStats(){
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js">
 var currentActivUserId = null;
+function handleUserBtn(btn){
+  var uid = btn.dataset.uid;
+  var name = btn.dataset.name;
+  var isActive = btn.dataset.active === "true";
+  if(isActive){
+    toggleUser(uid, true);
+  } else {
+    showActivModal(uid, name);
+  }
+}
 function showActivModal(userId, name){
   currentActivUserId = userId;
   document.getElementById("activName").textContent = "Utilisateur : " + name;
