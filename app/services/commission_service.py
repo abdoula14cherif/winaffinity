@@ -49,6 +49,24 @@ async def _add_commission(db: Client, sponsor_id: str, new_user_id: str, tier: i
     except Exception as e:
         logger.error("[COMMISSION] Erreur _add_commission : %s", e)
 
+async def notify_sponsor(db: Client, sponsor_id: str, new_user_name: str, level: str, amount: int):
+    """Envoie une notification push + in-app au parrain quand son filleul s active."""
+    try:
+        title = "🎉 Nouveau filleul actif !"
+        body = f"{new_user_name} vient d activer son compte {level.upper()} ! Vous recevez +{amount} FCFA"
+        # Notification in-app
+        db.table("notifications").insert({
+            "user_id": sponsor_id,
+            "title": title,
+            "message": body,
+            "type": "success",
+        }).execute()
+        # Notification push
+        from app.services.push_service import send_push_to_user
+        await send_push_to_user(db, sponsor_id, title, body, "/dashboard")
+    except Exception as e:
+        logger.error("[NOTIFY] Erreur notify_sponsor : %s", e)
+
 async def process_commissions(db: Client, new_user_id: str):
     """
     Commission = min(niveau parrain, niveau filleul)
@@ -72,6 +90,14 @@ async def process_commissions(db: Client, new_user_id: str):
         effective1 = get_effective_level(s1.get("level") or "standard", referral_level)
         amount1 = COMMISSION_BY_LEVEL[effective1][1]
         await _add_commission(db, sponsor1_id, new_user_id, 1, amount1)
+        # Notifier le parrain N1
+        try:
+            new_user = db.table("users").select("full_name,level").eq("id", new_user_id).execute().data
+            if new_user:
+                u = new_user[0]
+                await notify_sponsor(db, sponsor1_id, u["full_name"], u.get("level","standard"), amount1)
+        except Exception:
+            pass
 
         sponsor2_id = s1.get("sponsor_id")
         if not sponsor2_id: return
