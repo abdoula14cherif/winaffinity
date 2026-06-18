@@ -338,6 +338,10 @@ function downloadImage(){
 }
 
 // Lancer le dessin
-drawCard();
+try {
+  drawCard();
+} catch(e) {
+  alert("Erreur: " + e.message);
+}
 </script>
 </body></html>
