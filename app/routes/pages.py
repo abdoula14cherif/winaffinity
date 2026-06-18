@@ -3,7 +3,7 @@ Routes pages statiques : profil, faq, support, contact
 """
 import logging
 from fastapi import APIRouter, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from app.database import get_supabase
 from app.security import decode_access_token
