@@ -147,15 +147,7 @@ function sendMsg(){
     return r.json();
   }).then(function(data){
     hideTyping();
-    var reply;
-    if(data.data && data.data.content && data.data.content[0]){
-      reply=data.data.content[0].text;
-    } else if(data.content && data.content[0]){
-      reply=data.content[0].text;
-    } else {
-      reply="Erreur: "+JSON.stringify(data);
-    }
-    addMsg(reply,"bot");
+    addMsg("RAW: "+JSON.stringify(data).substring(0,200),"bot");
     history.push({role:"assistant",content:reply});
     if(history.length>20) history=history.slice(-20);
     btn.disabled=false;
