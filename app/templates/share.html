@@ -109,6 +109,163 @@ function drawCard(){
   var W = 540, H = 960;
   var t = themes[currentTheme];
 
+  // Background avec dégradé
+  var g = ctx.createLinearGradient(0,0,W,H);
+  g.addColorStop(0,t.bg1);g.addColorStop(0.5,t.bg2);g.addColorStop(1,t.bg1);
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+
+  // Grille de points
+  ctx.fillStyle="rgba(255,255,255,0.03)";
+  for(var xi=0;xi<W;xi+=30){for(var yi=0;yi<H;yi+=30){ctx.beginPath();ctx.arc(xi,yi,1.5,0,Math.PI*2);ctx.fill();}}
+
+  // Grand cercle glow top right
+  var gr=ctx.createRadialGradient(W,0,0,W,0,350);
+  gr.addColorStop(0,t.accent.replace(")",",0.15)").replace("rgb","rgba"));
+  gr.addColorStop(1,"transparent");
+  ctx.fillStyle=gr;ctx.fillRect(0,0,W,H);
+
+  // Petit cercle glow bottom left
+  var gl=ctx.createRadialGradient(0,H,0,0,H,250);
+  gl.addColorStop(0,t.accent2.replace(")",",0.1)").replace("rgb","rgba"));
+  gl.addColorStop(1,"transparent");
+  ctx.fillStyle=gl;ctx.fillRect(0,0,W,H);
+
+  // Bande accent haut
+  var bt=ctx.createLinearGradient(0,0,W,0);
+  bt.addColorStop(0,"transparent");bt.addColorStop(0.5,t.accent);bt.addColorStop(1,"transparent");
+  ctx.fillStyle=bt;ctx.fillRect(0,0,W,4);
+
+  // Logo zone
+  ctx.save();
+  ctx.fillStyle="rgba(255,255,255,0.04)";
+  rr(ctx,W/2-130,20,260,60,30,"rgba(255,255,255,0.04)");
+  ctx.fillStyle=t.accent;ctx.font="bold 22px Arial";ctx.textAlign="center";
+  ctx.fillText("◈  WIN AFFINITY",W/2,56);
+  ctx.restore();
+
+  // Séparateur
+  var sep=ctx.createLinearGradient(0,0,W,0);
+  sep.addColorStop(0,"transparent");sep.addColorStop(0.5,t.accent);sep.addColorStop(1,"transparent");
+  ctx.strokeStyle=sep;ctx.globalAlpha=0.5;ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(40,95);ctx.lineTo(W-40,95);ctx.stroke();
+  ctx.globalAlpha=1;
+
+  // Titre
+  ctx.fillStyle="#FFFFFF";ctx.font="900 58px Arial";ctx.textAlign="center";
+  // Ombre texte
+  ctx.shadowColor=t.accent;ctx.shadowBlur=20;
+  ctx.fillText("MES GAINS",W/2,175);
+  ctx.shadowBlur=0;
+
+  // Nom utilisateur
+  ctx.fillStyle=t.accent;ctx.font="bold 28px Arial";
+  ctx.fillText(userData.name.split(" ")[0].toUpperCase(),W/2,215);
+
+  // Badge niveau stylisé
+  var lvl=userData.level==="premium"?"🥇 PREMIUM":userData.level==="starter"?"🥉 STARTER":"🥈 STANDARD";
+  var lvlColor=userData.level==="premium"?"#FFD700":userData.level==="starter"?"#CD7F32":t.accent;
+  ctx.save();
+  ctx.shadowColor=lvlColor;ctx.shadowBlur=10;
+  rr(ctx,W/2-90,228,180,38,19,lvlColor.replace("#","rgba(").replace(/([0-9A-F]{2})/gi,function(m){return parseInt(m,16)+","}).slice(0,-1)+",0.2)"));
+  ctx.strokeStyle=lvlColor;ctx.globalAlpha=0.8;ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.roundRect(W/2-90,228,180,38,19);ctx.stroke();
+  ctx.globalAlpha=1;ctx.shadowBlur=0;
+  ctx.fillStyle=lvlColor;ctx.font="bold 18px Arial";
+  ctx.fillText(lvl,W/2,252);
+  ctx.restore();
+
+  // Carte principale solde - avec effet glassmorphism
+  ctx.save();
+  ctx.shadowColor=t.accent;ctx.shadowBlur=30;
+  rr(ctx,25,285,W-50,165,20,"rgba(255,255,255,0.05)");
+  ctx.shadowBlur=0;
+  ctx.strokeStyle=t.accent;ctx.globalAlpha=0.4;ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.roundRect(25,285,W-50,165,20);ctx.stroke();
+  ctx.globalAlpha=1;
+  // Ligne accent en haut de la carte
+  var cardLine=ctx.createLinearGradient(25,285,W-25,285);
+  cardLine.addColorStop(0,"transparent");cardLine.addColorStop(0.5,t.accent);cardLine.addColorStop(1,"transparent");
+  ctx.strokeStyle=cardLine;ctx.globalAlpha=0.8;ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(45,286);ctx.lineTo(W-45,286);ctx.stroke();
+  ctx.globalAlpha=1;
+  ctx.restore();
+
+  ctx.fillStyle="rgba(255,255,255,0.45)";ctx.font="600 15px Arial";
+  ctx.fillText("SOLDE DISPONIBLE",W/2,318);
+  ctx.fillStyle="#FFFFFF";ctx.font="900 78px Arial";
+  ctx.shadowColor=t.accent;ctx.shadowBlur=15;
+  ctx.fillText(Number(userData.balance).toLocaleString("fr-FR"),W/2,408);
+  ctx.shadowBlur=0;
+  ctx.fillStyle=t.accent;ctx.font="bold 28px Arial";
+  ctx.fillText("FCFA",W/2,440);
+
+  // Stats grid améliorée
+  var stats=[
+    ["💰","TOTAL GAGNÉ",Number(userData.total_earned).toLocaleString("fr-FR")+" F"],
+    ["👥","FILLEULS",userData.referrals+" actifs"],
+    ["⭐","NIVEAU",lvl.split(" ")[1]||lvl],
+    ["🔗","MON CODE",userData.code]
+  ];
+  var sx=[25,W/2+8],sy=[475,590],sw=W/2-33,sh=95;
+  for(var i=0;i<4;i++){
+    var cx=sx[i%2],cy=sy[Math.floor(i/2)];
+    ctx.save();
+    ctx.shadowColor=t.accent;ctx.shadowBlur=8;
+    rr(ctx,cx,cy,sw,sh,14,"rgba(255,255,255,0.04)");
+    ctx.shadowBlur=0;
+    ctx.strokeStyle=t.accent;ctx.globalAlpha=0.2;ctx.lineWidth=1;
+    ctx.beginPath();ctx.roundRect(cx,cy,sw,sh,14);ctx.stroke();
+    ctx.globalAlpha=1;ctx.restore();
+    ctx.font="24px Arial";ctx.fillStyle="#FFFFFF";
+    ctx.fillText(stats[i][0],cx+sw/2,cy+32);
+    ctx.fillStyle=t.accent;ctx.font="bold 20px Arial";
+    ctx.fillText(stats[i][2],cx+sw/2,cy+58);
+    ctx.fillStyle="rgba(255,255,255,0.4)";ctx.font="11px Arial";
+    ctx.fillText(stats[i][1],cx+sw/2,cy+78);
+  }
+
+  // Citation
+  ctx.fillStyle="rgba(255,255,255,0.5)";ctx.font="italic 16px Arial";
+  ctx.fillText('"Rejoins-moi et commence à gagner !"',W/2,710);
+
+  // Carte code parrainage
+  ctx.save();
+  ctx.shadowColor=t.accent;ctx.shadowBlur=20;
+  rr(ctx,25,725,W-50,150,20,"rgba(255,255,255,0.04)");
+  ctx.shadowBlur=0;
+  ctx.strokeStyle=t.accent;ctx.globalAlpha=0.5;ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.roundRect(25,725,W-50,150,20);ctx.stroke();
+  ctx.globalAlpha=1;ctx.restore();
+
+  ctx.fillStyle="rgba(255,255,255,0.4)";ctx.font="13px Arial";
+  ctx.fillText("INSCRIS-TOI AVEC MON CODE",W/2,756);
+  ctx.fillStyle=t.accent;ctx.font="900 54px Arial";
+  ctx.shadowColor=t.accent;ctx.shadowBlur=15;
+  ctx.fillText(userData.code,W/2,820);
+  ctx.shadowBlur=0;
+  ctx.fillStyle="rgba(255,255,255,0.3)";ctx.font="13px Arial";
+  ctx.fillText("winaffinity.vercel.app",W/2,852);
+
+  // Bande accent bas
+  var bb=ctx.createLinearGradient(0,0,W,0);
+  bb.addColorStop(0,"transparent");bb.addColorStop(0.5,t.accent);bb.addColorStop(1,"transparent");
+  ctx.fillStyle=bb;ctx.fillRect(0,H-4,W,4);
+
+  ctx.fillStyle="rgba(255,255,255,0.15)";ctx.font="12px Arial";
+  ctx.fillText("Plateforme d affiliation • Gains quotidiens garantis",W/2,930);
+
+  // Liens
+  var txt=encodeURIComponent("Je gagne "+userData.balance+" FCFA avec WIN AFFINITY ! Code: "+userData.code+" https://winaffinity.vercel.app/auth/register?ref="+userData.code);
+  document.getElementById("btnShareWA").href="https://api.whatsapp.com/send?text="+txt;
+  document.getElementById("btnShareFB").href="https://www.facebook.com/sharer.php?u="+encodeURIComponent("https://winaffinity.vercel.app/auth/register?ref="+userData.code);
+}
+// FIN DOUBLON - on ignore le reste
+function _OLD_drawCard(){
+  var canvas = document.getElementById("shareCanvas");
+  var ctx = canvas.getContext("2d");
+  var W = 540, H = 960;
+  var t = themes[currentTheme];
+
   // Background
   var g = ctx.createLinearGradient(0,0,W,H);
   g.addColorStop(0,t.bg1);
