@@ -774,6 +774,7 @@ function handleUserBtn(btn){
   var uid = btn.dataset.uid;
   var name = btn.dataset.name;
   var isActive = btn.dataset.active === "true";
+  alert("uid="+uid+" active="+isActive);
   if(isActive){
     toggleUser(uid, true);
   } else {
