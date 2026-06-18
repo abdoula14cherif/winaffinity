@@ -40,8 +40,8 @@ async def admin_dashboard(request: Request):
         total_balance = sum(w.get("balance",0) for w in (db.table("wallets").select("balance").execute().data or []))
         stats = {
             "total_users": len(users),
-            "active_users": len([u for u in users if u.get("is_active")]),
-            "pending_users": len([u for u in users if not u.get("is_active")]),
+            "active_users": db.table("users").select("id", count="exact").eq("is_active", True).execute().count or 0,
+            "pending_users": db.table("users").select("id", count="exact").eq("is_active", False).execute().count or 0,
             "total_withdrawals": len(withdrawals),
             "pending_withdrawals": len([w for w in withdrawals if w.get("status")=="pending"]),
             "total_commissions": sum(com.get("amount",0) for com in commissions),
