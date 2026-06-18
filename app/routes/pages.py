@@ -64,9 +64,9 @@ async def winbot_chat(request: Request):
             },
             timeout=30
         )
-        return JSONResponse(r.json())
+        return JSONResponse({"status": r.status_code, "data": r.json()})
     except Exception as e:
-        return JSONResponse({"error": str(e)}, status_code=500)
+        return JSONResponse({"error": str(e), "type": type(e).__name__}, status_code=500)
 
 @router.get("/winbot", response_class=HTMLResponse)
 async def get_winbot(request: Request):
