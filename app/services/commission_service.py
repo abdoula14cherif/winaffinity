@@ -97,3 +97,21 @@ async def process_commissions(db: Client, new_user_id: str):
 
     except Exception as e:
         logger.error("[COMMISSION] Erreur process_commissions : %s", e)
+
+async def get_wallet(db: Client, user_id: str) -> dict:
+    try:
+        res = db.table("wallets").select("*").eq("user_id", user_id).execute().data
+        if res:
+            return res[0]
+        return {"user_id": user_id, "balance": 0, "total_earned": 0}
+    except Exception as e:
+        logger.error("[WALLET] Erreur : %s", e)
+        return {"user_id": user_id, "balance": 0, "total_earned": 0}
+
+async def get_commissions(db: Client, user_id: str) -> list:
+    try:
+        res = db.table("commissions").select("*").eq("sponsor_id", user_id).order("created_at", desc=True).execute().data
+        return res or []
+    except Exception as e:
+        logger.error("[COMMISSIONS] Erreur : %s", e)
+        return []
