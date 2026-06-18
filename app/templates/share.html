@@ -65,20 +65,165 @@ canvas{max-width:100%;border-radius:12px}
 </div>
 
 <script>
-window.addEventListener("load", function(){
+var userData = {
+  name: "{{ user.full_name }}",
+  level: "{{ user.level or 'standard' }}",
+  balance: {{ wallet.balance or 0 }},
+  total_earned: {{ wallet.total_earned or 0 }},
+  referrals: {{ referrals_count or 0 }},
+  code: "{{ user.referral_code }}"
+};
+
+var themes = [
+  {bg1:"#0d1f33",bg2:"#1A3A5C",accent:"#FF6B35",accent2:"#FF8C5A"},
+  {bg1:"#1a0a00",bg2:"#2d1500",accent:"#FFD700",accent2:"#FFA500"},
+  {bg1:"#001a00",bg2:"#0d2d0d",accent:"#00B894",accent2:"#00d4a8"}
+];
+var currentTheme = 0;
+
+function setTheme(idx, el){
+  currentTheme = idx;
+  document.querySelectorAll(".theme-btn").forEach(function(b){b.classList.remove("sel");});
+  el.classList.add("sel");
+  drawCard();
+}
+
+function rr(ctx,x,y,w,h,r,fill){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+}
+
+function drawCard(){
   var canvas = document.getElementById("shareCanvas");
-  if(!canvas){ alert("Canvas introuvable!"); return; }
   var ctx = canvas.getContext("2d");
-  if(!ctx){ alert("Context 2D non supporté!"); return; }
-  ctx.fillStyle = "#1A3A5C";
-  ctx.fillRect(0, 0, 540, 960);
-  ctx.fillStyle = "#FF6B35";
-  ctx.font = "bold 40px Arial";
+  var W = 540, H = 960;
+  var t = themes[currentTheme];
+
+  // Background
+  var g = ctx.createLinearGradient(0,0,W,H);
+  g.addColorStop(0,t.bg1);
+  g.addColorStop(1,t.bg2);
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,W,H);
+
+  // Cercles déco
+  ctx.save();
+  ctx.globalAlpha = 0.08;
+  ctx.fillStyle = t.accent;
+  ctx.beginPath();ctx.arc(W*0.85,H*0.1,200,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(W*0.1,H*0.9,150,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+
+  // Logo
+  ctx.fillStyle = t.accent;
+  ctx.font = "bold 28px Arial";
   ctx.textAlign = "center";
-  ctx.fillText("WIN AFFINITY", 270, 100);
+  ctx.fillText("◈ WIN AFFINITY", W/2, 70);
+
+  // Ligne
+  ctx.strokeStyle = t.accent;
+  ctx.globalAlpha = 0.4;
+  ctx.lineWidth = 1;
+  ctx.beginPath();ctx.moveTo(60,90);ctx.lineTo(W-60,90);ctx.stroke();
+  ctx.globalAlpha = 1;
+
+  // Titre
   ctx.fillStyle = "#FFFFFF";
-  ctx.font = "30px Arial";
-  ctx.fillText("Canvas OK!", 270, 200);
-});
+  ctx.font = "900 52px Arial";
+  ctx.fillText("MES GAINS", W/2, 170);
+
+  // Nom
+  ctx.fillStyle = t.accent;
+  ctx.font = "bold 30px Arial";
+  ctx.fillText(userData.name.split(" ")[0].toUpperCase(), W/2, 215);
+
+  // Badge niveau
+  var lvl = userData.level === "premium" ? "PREMIUM" : userData.level === "starter" ? "STARTER" : "STANDARD";
+  rr(ctx, W/2-80, 228, 160, 36, 18, "rgba(255,107,53,0.2)");
+  ctx.fillStyle = t.accent;
+  ctx.font = "bold 18px Arial";
+  ctx.fillText(lvl, W/2, 252);
+
+  // Carte solde
+  rr(ctx, 30, 285, W-60, 160, 16, "rgba(255,255,255,0.06)");
+  ctx.strokeStyle = t.accent;
+  ctx.globalAlpha = 0.3;
+  ctx.lineWidth = 1;
+  ctx.strokeRect(30, 285, W-60, 160);
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = "rgba(255,255,255,0.5)";
+  ctx.font = "600 18px Arial";
+  ctx.fillText("SOLDE DISPONIBLE", W/2, 320);
+  ctx.fillStyle = "#FFFFFF";
+  ctx.font = "900 72px Arial";
+  ctx.fillText(userData.balance.toLocaleString(), W/2, 405);
+  ctx.fillStyle = t.accent;
+  ctx.font = "bold 26px Arial";
+  ctx.fillText("FCFA", W/2, 435);
+
+  // Stats 2x2
+  var stats = [
+    ["TOTAL GAGNÉ", userData.total_earned.toLocaleString()+" F"],
+    ["FILLEULS", userData.referrals+" actifs"],
+    ["NIVEAU", lvl],
+    ["CODE", userData.code]
+  ];
+  var sx = [30, W/2+10];
+  var sy = [470, 580];
+  var sw = W/2-40, sh = 90;
+  for(var i=0;i<4;i++){
+    var cx=sx[i%2], cy=sy[Math.floor(i/2)];
+    rr(ctx,cx,cy,sw,sh,12,"rgba(255,255,255,0.05)");
+    ctx.strokeStyle=t.accent;ctx.globalAlpha=0.2;ctx.strokeRect(cx,cy,sw,sh);ctx.globalAlpha=1;
+    ctx.fillStyle="#FFFFFF";ctx.font="bold 24px Arial";ctx.textAlign="center";
+    ctx.fillText(stats[i][1],cx+sw/2,cy+38);
+    ctx.fillStyle="rgba(255,255,255,0.5)";ctx.font="14px Arial";
+    ctx.fillText(stats[i][0],cx+sw/2,cy+62);
+  }
+
+  // Message
+  ctx.fillStyle="rgba(255,255,255,0.7)";
+  ctx.font="italic 18px Arial";
+  ctx.textAlign="center";
+  ctx.fillText('"Rejoins-moi et commence a gagner !"',W/2,700);
+
+  // Code parrainage
+  rr(ctx,30,720,W-60,140,16,"rgba(255,255,255,0.06)");
+  ctx.fillStyle="rgba(255,255,255,0.5)";ctx.font="16px Arial";
+  ctx.fillText("MON CODE DE PARRAINAGE",W/2,752);
+  ctx.fillStyle=t.accent;ctx.font="900 48px Arial";
+  ctx.fillText(userData.code,W/2,808);
+  ctx.fillStyle="rgba(255,255,255,0.4)";ctx.font="14px Arial";
+  ctx.fillText("winaffinity.vercel.app",W/2,840);
+
+  // Footer
+  ctx.fillStyle="rgba(255,255,255,0.2)";ctx.font="13px Arial";
+  ctx.fillText("Plateforme d affiliation • Gains quotidiens",W/2,920);
+
+  // Update links
+  var txt = encodeURIComponent("Je gagne "+userData.balance+" FCFA avec WIN AFFINITY ! Code: "+userData.code+" https://winaffinity.vercel.app/auth/register?ref="+userData.code);
+  document.getElementById("btnShareWA").href = "https://api.whatsapp.com/send?text="+txt;
+  document.getElementById("btnShareFB").href = "https://www.facebook.com/sharer.php?u="+encodeURIComponent("https://winaffinity.vercel.app/auth/register?ref="+userData.code);
+}
+
+function downloadImage(){
+  var canvas = document.getElementById("shareCanvas");
+  var win = window.open("","_blank");
+  var dataUrl = canvas.toDataURL("image/png");
+  win.document.write("<!DOCTYPE html><html><head><meta name=viewport content=width=device-width><title>Mes Gains</title></head><body style=margin:0;background:#000;text-align:center><p style=color:#FF6B35;font-family:Arial;padding:12px;font-size:14px>📸 Appuyez longtemps sur l image puis Enregistrer</p><img src='"+dataUrl+"' style=width:100%;max-width:540px></body></html>");
+  win.document.close();
+}
+
+window.addEventListener("load", function(){ drawCard(); });
 </script>
 </body></html>
