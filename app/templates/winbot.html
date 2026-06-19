@@ -138,24 +138,39 @@ function sendMsg(){
 
   var system = "Tu es WIN BOT, assistant IA de WIN AFFINITY. Utilisateur: "+userData.name+", niveau "+userData.level+", solde "+userData.balance+" FCFA, "+userData.referrals+" filleuls. Reponds en francais, sois concis et encourage.";
 
-  fetch("/winbot/chat", {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    credentials:"include",
-    body:JSON.stringify({system:system, messages:history})
-  }).then(function(r){
-    return r.json();
-  }).then(function(data){
-    hideTyping();
-    addMsg("RAW: "+JSON.stringify(data).substring(0,200),"bot");
-    history.push({role:"assistant",content:reply});
-    if(history.length>20) history=history.slice(-20);
-    btn.disabled=false;
-  }).catch(function(e){
-    hideTyping();
-    addMsg("Erreur réseau: "+e.message,"bot");
-    btn.disabled=false;
-  });
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "/winbot/chat", true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.withCredentials = true;
+  xhr.onreadystatechange = function(){
+    if(xhr.readyState === 4){
+      hideTyping();
+      btn.disabled = false;
+      if(xhr.status === 200){
+        try{
+          var data = JSON.parse(xhr.responseText);
+          var reply;
+          if(data.data && data.data.content && data.data.content[0]){
+            reply = data.data.content[0].text;
+          } else if(data.content && data.content[0]){
+            reply = data.content[0].text;
+          } else if(data.error){
+            reply = "Erreur: " + data.error;
+          } else {
+            reply = "Reponse: " + xhr.responseText.substring(0,100);
+          }
+          addMsg(reply, "bot");
+          history.push({role:"assistant", content:reply});
+          if(history.length > 20) history = history.slice(-20);
+        }catch(e){
+          addMsg("Parse erreur: " + xhr.responseText.substring(0,100), "bot");
+        }
+      } else {
+        addMsg("HTTP " + xhr.status + ": " + xhr.responseText.substring(0,100), "bot");
+      }
+    }
+  };
+  xhr.send(JSON.stringify({system:system, messages:history}));
 }
 
 document.addEventListener("DOMContentLoaded", function(){
