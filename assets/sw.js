@@ -29,6 +29,19 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // Ne pas cacher les requetes POST et les routes API
+  if(e.request.method === 'POST' || 
+     e.request.url.includes('/winbot/') ||
+     e.request.url.includes('/support/') ||
+     e.request.url.includes('/ad/') ||
+     e.request.url.includes('/push/') ||
+     e.request.url.includes('/auth/') ||
+     e.request.url.includes('/payment/') ||
+     e.request.url.includes('/withdrawal') ||
+     e.request.url.includes('/admin/')) {
+    e.respondWith(fetch(e.request));
+    return;
+  }
   e.respondWith(
     fetch(e.request)
       .then(res => {
