@@ -49,6 +49,13 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
 .send-btn{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
 .send-btn:disabled{opacity:.5}
 </style>
+<script>
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    regs.forEach(function(reg){ reg.unregister(); });
+  });
+}
+</script>
 </head>
 <body>
 <header class="header">
