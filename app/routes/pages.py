@@ -66,6 +66,23 @@ async def winbot_chat(request: Request):
     except Exception as e:
         return JSONResponse({"error": str(e), "type": type(e).__name__}, status_code=500)
 
+@router.get("/recharge", response_class=HTMLResponse)
+async def get_recharge(request: Request):
+    user = await _get_user(request)
+    if not user: return RedirectResponse("/auth/login", status_code=302)
+    if not user.get("is_active"): return RedirectResponse("/payment", status_code=302)
+    db = get_supabase()
+    wallet = await get_wallet(db, user["id"])
+    recharges = db.table("recharges").select("*").eq("user_id", user["id"]).order("created_at", desc=True).limit(10).execute().data or []
+    cashback_total = sum(r.get("cashback", 0) for r in recharges if r.get("status") == "success")
+    return templates.TemplateResponse("recharge.html", {
+        "request": request,
+        "user": user,
+        "wallet": wallet,
+        "recharges": recharges,
+        "cashback_total": cashback_total
+    })
+
 @router.get("/winbot", response_class=HTMLResponse)
 async def get_winbot(request: Request):
     user = await _get_user(request)
