@@ -56,8 +56,18 @@ async def service_worker():
     return FileResponse("assets/sw.js", media_type="application/javascript")
 
 @app.get("/", include_in_schema=False)
-async def root():
-    return RedirectResponse(url="/auth/register")
+async def root(request: Request):
+    from fastapi.templating import Jinja2Templates
+    templates = Jinja2Templates(directory="app/templates")
+    # Si connecté → dashboard
+    token = request.cookies.get("access_token")
+    if token:
+        from app.security import decode_access_token
+        payload = decode_access_token(token)
+        if payload:
+            return RedirectResponse(url="/dashboard")
+    # Sinon → landing page
+    return templates.TemplateResponse("landing.html", {"request": request})
 
 @app.exception_handler(404)
 async def not_found(request: Request, exc):
