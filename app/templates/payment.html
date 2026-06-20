@@ -179,12 +179,6 @@ function pay(){
         }
       });
     },
-    onError: function(err){
-      btn.disabled = false;
-      document.getElementById("sp").style.display = "none";
-      document.getElementById("ptxt").textContent = "ACTIVER — "+amt.toLocaleString("fr-FR")+" FCFA";
-      alert("Erreur LeekPay: " + JSON.stringify(err));
-    },
     onCancel: function(){
       btn.disabled = false;
       document.getElementById("sp").style.display = "none";
