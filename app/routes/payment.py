@@ -202,8 +202,42 @@ async def leekpay_webhook(request: Request):
                 status="completed",
             )
 
+            # Déterminer le niveau selon le montant
+            amount_paid = payload.transaction.amount
+            if amount_paid <= 1000:
+                level = "starter"
+            elif amount_paid <= 2500:
+                level = "standard"
+            else:
+                level = "premium"
+
+            # Sauvegarder le niveau
+            db.table("users").update({
+                "level": level,
+                "activation_amount": amount_paid
+            }).eq("id", user_id).execute()
+
             # Activation du compte
             await activate_user_account(db, user_id)
+
+            # Distribuer les commissions
+            try:
+                from app.services.commission_service import process_commissions
+                await process_commissions(db, user_id)
+            except Exception as ce:
+                logger.error("[WEBHOOK] Erreur commissions : %s", ce)
+
+            # Notification push à l utilisateur
+            try:
+                from app.services.push_service import send_push_to_user
+                await send_push_to_user(
+                    db, user_id,
+                    "🎉 Compte activé !",
+                    "Votre compte WIN AFFINITY est maintenant actif. Commencez à gagner !",
+                    "/dashboard"
+                )
+            except Exception as pe:
+                logger.error("[WEBHOOK] Erreur push : %s", pe)
 
         except Exception as e:
             logger.error("[WEBHOOK] Erreur traitement webhook : %s", e)
