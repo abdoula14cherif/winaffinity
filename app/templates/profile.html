@@ -107,7 +107,14 @@ input:focus{border-color:var(--or)}
   </div>
 
   {% if user.level != 'premium' %}
-  <a href="/payment" class="upgrade-btn">⭐ Passer au niveau supérieur pour plus de commissions →</a>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+    <a href="/wallet#upgrade" onclick="localStorage.setItem('walletTab','upgrade')" class="upgrade-btn" style="margin-bottom:0;display:flex;align-items:center;justify-content:center;gap:6px">
+      💎 Upgrade avec solde
+    </a>
+    <a href="/payment" class="upgrade-btn" style="margin-bottom:0;display:flex;align-items:center;justify-content:center;gap:6px;background:linear-gradient(135deg,rgba(26,58,92,.08),rgba(45,95,143,.04));border-color:rgba(26,58,92,.25);color:var(--bl)">
+      💳 Payer par Mobile Money
+    </a>
+  </div>
   {% endif %}
 
   <!-- QR Code -->
