@@ -141,7 +141,7 @@ input[type=text]:focus{border-color:var(--or)}
       {% elif m.winners_count >= m.max_winners %}
       <button class="mc-btn btn-full">🔒 Places épuisées</button>
       {% else %}
-      <button class="mc-btn btn-participate" data-id="{{ m.id }}" data-title="{{ m.title|replace('"','') }}" data-desc="{{ m.description|replace('"','') }}" data-proof="{{ 'true' if m.requires_proof else 'false' }}" onclick="openModal(this.dataset.id,this.dataset.title,this.dataset.desc,this.dataset.proof)">⚡ Participer — +{{ m.reward }} FCFA</button>
+      <button class="mc-btn btn-participate" data-id="{{ m.id }}" data-title="{{ m.title }}" data-desc="{{ m.description }}" data-proof="{{ 'true' if m.requires_proof else 'false' }}" onclick="openModal(this.dataset.id,this.dataset.title,this.dataset.desc,this.dataset.proof)">⚡ Participer — +{{ m.reward }} FCFA</button>
       {% endif %}
     </div>
     {% endfor %}
