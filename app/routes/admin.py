@@ -498,3 +498,93 @@ async def activate_user_with_level(request: Request, user_id: str, level: Annota
         logger.warning("[ADMIN] Erreur commissions: %s", e)
     logger.info("[ADMIN] Compte %s activé manuellement en %s", user_id, level)
     return JSONResponse({"success": True, "level": level, "amount": amount})
+
+@router.post("/flash/add")
+async def add_flash_mission(
+    request: Request,
+    title: Annotated[str, Form()],
+    description: Annotated[str, Form()],
+    reward: Annotated[int, Form()],
+    max_winners: Annotated[int, Form()],
+    starts_at: Annotated[str, Form()],
+    ends_at: Annotated[str, Form()],
+    requires_proof: Annotated[str, Form()] = "true"
+):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    db.table("flash_missions").insert({
+        "title": title,
+        "description": description,
+        "reward": reward,
+        "max_winners": max_winners,
+        "starts_at": starts_at,
+        "ends_at": ends_at,
+        "requires_proof": requires_proof == "true",
+        "is_active": True
+    }).execute()
+    return JSONResponse({"success": True})
+
+@router.post("/flash/toggle")
+async def toggle_flash_mission(request: Request, mission_id: Annotated[str, Form()]):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    m = db.table("flash_missions").select("is_active").eq("id", mission_id).execute().data
+    if m: db.table("flash_missions").update({"is_active": not m[0]["is_active"]}).eq("id", mission_id).execute()
+    return JSONResponse({"success": True})
+
+@router.post("/flash/delete")
+async def delete_flash_mission(request: Request, mission_id: Annotated[str, Form()]):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    db.table("flash_missions").delete().eq("id", mission_id).execute()
+    return JSONResponse({"success": True})
+
+@router.post("/flash/update")
+async def update_flash_mission(
+    request: Request,
+    mission_id: Annotated[str, Form()],
+    title: Annotated[str, Form()],
+    description: Annotated[str, Form()],
+    reward: Annotated[int, Form()],
+    max_winners: Annotated[int, Form()]
+):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    db.table("flash_missions").update({
+        "title": title,
+        "description": description,
+        "reward": reward,
+        "max_winners": max_winners
+    }).eq("id", mission_id).execute()
+    return JSONResponse({"success": True})
+
+@router.get("/flash/completions")
+async def get_flash_completions(request: Request):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    comps = db.table("flash_completions").select("*").eq("status", "pending").order("created_at", desc=True).execute().data or []
+    result = []
+    for c in comps:
+        u = db.table("users").select("full_name,email").eq("id", c["user_id"]).execute().data
+        m = db.table("flash_missions").select("title,reward").eq("id", c["mission_id"]).execute().data
+        result.append({
+            **c,
+            "user_name": u[0]["full_name"] if u else "?",
+            "user_email": u[0]["email"] if u else "?",
+            "mission_title": m[0]["title"] if m else "?",
+            "mission_reward": m[0]["reward"] if m else 0,
+        })
+    return JSONResponse({"completions": result})
+
+@router.get("/flash/missions")
+async def get_flash_missions_admin(request: Request):
+    admin = await _get_admin(request)
+    if not admin: return JSONResponse({"error": "Non autorisé"}, status_code=403)
+    db = get_supabase()
+    missions = db.table("flash_missions").select("*").order("created_at", desc=True).execute().data or []
+    return JSONResponse({"missions": missions})

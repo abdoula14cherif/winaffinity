@@ -9,7 +9,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 from app.config import get_settings
 from app.middleware.maintenance import maintenance_middleware
-from app.routes import auth, payment, dashboard, withdrawal, gains, pages, admin, notifications, wheel, network, learning, admin_user, contest, support, push, password_reset, wallet
+from app.routes import auth, payment, dashboard, withdrawal, gains, pages, admin, notifications, wheel, network, learning, admin_user, contest, support, push, password_reset, wallet, flash
 
 settings = get_settings()
 logging.basicConfig(level=logging.INFO)
@@ -49,6 +49,7 @@ app.include_router(support.router)
 app.include_router(push.router)
 app.include_router(password_reset.router)
 app.include_router(wallet.router)
+app.include_router(flash.router)
 
 @app.get("/sw.js", include_in_schema=False)
 async def service_worker():

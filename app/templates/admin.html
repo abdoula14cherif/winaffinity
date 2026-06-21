@@ -111,6 +111,7 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
     <div class="tab" onclick="showTab('support',this)">💬 Support</div>
     <div class="tab" onclick="showTab('fraude',this)">🚨 Fraude</div>
     <div class="tab" onclick="showTab('maintenance',this)">🔧 Maintenance</div>
+    <div class="tab" onclick="showTab('flash',this);loadFlash()">⚡ Missions Flash</div>
   </div>
   <div class="tab-content active" id="tab-users">
     <div class="card">
@@ -483,6 +484,37 @@ tbody td{padding:11px 12px;color:var(--txd);border-bottom:1px solid var(--bg);ve
     </div>
   </div>
 </div>
+
+  <div class="tab-content" id="tab-flash">
+    <div class="card">
+      <div class="card-title">⚡ Créer une mission flash</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fg"><label>TITRE</label><input type="text" id="fmTitle" placeholder="Ex: Partagez sur Facebook"/></div>
+        <div class="fg"><label>RÉCOMPENSE (FCFA)</label><input type="number" id="fmReward" placeholder="500"/></div>
+        <div class="fg" style="grid-column:span 2"><label>DESCRIPTION</label><input type="text" id="fmDesc" placeholder="Description de la mission..."/></div>
+        <div class="fg"><label>DÉBUT</label><input type="datetime-local" id="fmStart"/></div>
+        <div class="fg"><label>FIN</label><input type="datetime-local" id="fmEnd"/></div>
+        <div class="fg"><label>MAX GAGNANTS</label><input type="number" id="fmMax" placeholder="10"/></div>
+        <div class="fg"><label>PREUVE REQUISE</label>
+          <select id="fmProof">
+            <option value="true">✅ Oui - capture requise</option>
+            <option value="false">❌ Non - validation auto</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-add" onclick="addFlashMission()" style="margin-top:10px">⚡ Créer la mission</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 Soumissions en attente</div>
+      <div id="flashCompletions"><div style="text-align:center;padding:20px;color:var(--txd)">Chargement...</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📝 Toutes les missions</div>
+      <div id="flashMissions"><div style="text-align:center;padding:20px;color:var(--txd)">Chargement...</div></div>
+    </div>
+  </div>
 </div>
 <div id="toast"></div>
 <script>
@@ -801,6 +833,90 @@ async function confirmActivation(){
   } else {
     toast(d.error || "Erreur", "er");
   }
+}
+
+async function addFlashMission(){
+  const title=document.getElementById("fmTitle").value.trim();
+  const desc=document.getElementById("fmDesc").value.trim();
+  const reward=document.getElementById("fmReward").value;
+  const max=document.getElementById("fmMax").value;
+  const start=document.getElementById("fmStart").value;
+  const end=document.getElementById("fmEnd").value;
+  const proof=document.getElementById("fmProof").value;
+  if(!title||!desc||!reward||!max||!start||!end){toast("Tous les champs sont requis","er");return;}
+  const f=new FormData();
+  f.append("title",title);f.append("description",desc);f.append("reward",reward);
+  f.append("max_winners",max);f.append("starts_at",new Date(start).toISOString());
+  f.append("ends_at",new Date(end).toISOString());f.append("requires_proof",proof);
+  const r=await post("/admin/flash/add",Object.fromEntries(f));
+  if(r.success){toast("✓ Mission créée !");loadFlash();}
+  else toast("Erreur","er");
+}
+
+async function loadFlash(){
+  // Charger soumissions
+  const rc=await fetch("/admin/flash/completions");
+  const dc=await rc.json();
+  const compEl=document.getElementById("flashCompletions");
+  if(!dc.completions||!dc.completions.length){
+    compEl.innerHTML="<div style=text-align:center;padding:20px;color:var(--txd)>Aucune soumission en attente</div>";
+  } else {
+    compEl.innerHTML=dc.completions.map(c=>`
+      <div style="background:var(--bg);border-radius:10px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:center">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;color:var(--bl)">${c.user_name}</div>
+          <div style="font-size:12px;color:var(--txd)">${c.mission_title} • +${c.mission_reward} FCFA</div>
+          ${c.proof_url?`<a href="${c.proof_url}" target="_blank" style="font-size:12px;color:var(--or)">📎 Voir la preuve</a>`:"<span style=font-size:12px;color:var(--txd)>Pas de preuve</span>"}
+        </div>
+        <button class="btn-xs btn-act" onclick="approveComp('${c.id}')">✓ Valider</button>
+        <button class="btn-xs btn-dea" onclick="rejectComp('${c.id}')">✗ Rejeter</button>
+      </div>`).join("");
+  }
+
+  // Charger missions
+  const rm=await fetch("/admin/flash/missions");
+  const dm=await rm.json();
+  const missEl=document.getElementById("flashMissions");
+  if(!dm.missions||!dm.missions.length){
+    missEl.innerHTML="<div style=text-align:center;padding:20px;color:var(--txd)>Aucune mission</div>";
+  } else {
+    missEl.innerHTML=dm.missions.map(m=>`
+      <div style="background:var(--bg);border-radius:10px;padding:14px;margin-bottom:8px;display:flex;gap:12px;align-items:center">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;color:var(--bl)">${m.title}</div>
+          <div style="font-size:12px;color:var(--txd)">+${m.reward} FCFA • ${m.winners_count}/${m.max_winners} gagnants</div>
+          <div style="font-size:11px;color:var(--txd)">${m.is_active?"🟢 Active":"🔴 Inactive"}</div>
+        </div>
+        <button class="btn-xs ${m.is_active?"btn-dea":"btn-act"}" onclick="togFlash('${m.id}')">${m.is_active?"Off":"On"}</button>
+        <button class="btn-xs btn-dea" onclick="delFlash('${m.id}')">🗑</button>
+      </div>`).join("");
+  }
+}
+
+async function approveComp(id){
+  const f=new FormData();f.append("completion_id",id);
+  const r=await fetch("/missions/admin/approve",{method:"POST",body:f});
+  const d=await r.json();
+  if(d.success){toast("✓ Validé et crédité !");loadFlash();}
+  else toast(d.error||"Erreur","er");
+}
+async function rejectComp(id){
+  const f=new FormData();f.append("completion_id",id);
+  const r=await fetch("/missions/admin/reject",{method:"POST",body:f});
+  const d=await r.json();
+  if(d.success){toast("✓ Rejeté");loadFlash();}
+  else toast("Erreur","er");
+}
+async function togFlash(id){
+  const r=await post("/admin/flash/toggle",{mission_id:id});
+  if(r.success){toast("✓ Mis à jour");loadFlash();}
+  else toast("Erreur","er");
+}
+async function delFlash(id){
+  if(!confirm("Supprimer cette mission ?")) return;
+  const r=await post("/admin/flash/delete",{mission_id:id});
+  if(r.success){toast("✓ Supprimée");loadFlash();}
+  else toast("Erreur","er");
 }
 </script>
 </body></html>

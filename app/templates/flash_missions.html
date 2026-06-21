@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WIN AFFINITY — Missions Flash</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="manifest" href="/assets/manifest.json"/>
+<link rel="icon" type="image/png" href="/assets/app-icon-192.png"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--or:#FF6B35;--orl:#FF8C5A;--ord:rgba(255,107,53,.1);--bl:#1A3A5C;--bg:#F0F4F8;--wh:#FFFFFF;--tx:#1A2B3C;--txd:#6B7A8D;--bd:#D1DCE8;--ok:#00B894;--er:#E74C3C;--warn:#F39C12;--t:.3s;--sh:0 4px 20px rgba(26,58,92,.08)}
+html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);color:var(--tx)}
+.header{position:fixed;top:0;left:0;right:0;z-index:20;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:var(--bl)}
+.brow{display:flex;align-items:center;gap:8px}
+.bico{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#FF6B35,#FF8C5A);display:flex;align-items:center;justify-content:center;font-size:16px}
+.bname{font-size:18px;font-weight:800;color:#fff}.bname span{color:#FF6B35}
+.back-btn{color:rgba(255,255,255,.8);text-decoration:none;font-size:13px;padding:7px 14px;border:1px solid rgba(255,255,255,.2);border-radius:8px}
+.page{min-height:100vh;padding:76px 16px 50px;max-width:680px;margin:0 auto}
+.hero{background:linear-gradient(135deg,#1a0a00,#2d1500);border-radius:18px;padding:22px;margin-bottom:20px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;top:-30px;right:-30px;width:150px;height:150px;border-radius:50%;background:rgba(255,107,53,.08)}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,107,53,.15);border:1px solid rgba(255,107,53,.3);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;color:#FF8C5A;margin-bottom:10px}
+.hero h1{font-size:22px;font-weight:900;color:#fff;margin-bottom:6px}
+.hero p{font-size:13px;color:rgba(255,255,255,.6)}
+.balance-strip{background:var(--wh);border-radius:12px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--sh)}
+.bs-left{font-size:12px;color:var(--txd)}
+.bs-num{font-size:20px;font-weight:800;color:var(--bl)}
+.bs-currency{font-size:13px;color:var(--or);font-weight:700}
+.empty-state{text-align:center;padding:60px 20px}
+.es-ico{font-size:56px;margin-bottom:16px;opacity:.4}
+.es-txt{font-size:15px;font-weight:700;color:var(--bl);margin-bottom:6px}
+.es-sub{font-size:13px;color:var(--txd)}
+.mission-card{background:var(--wh);border-radius:16px;padding:20px;box-shadow:var(--sh);border:1.5px solid var(--bd);margin-bottom:14px;position:relative;overflow:hidden;transition:all var(--t)}
+.mission-card.hot{border-color:rgba(255,107,53,.4)}
+.mission-card::before{content:"⚡ FLASH";position:absolute;top:12px;right:-22px;background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;font-size:10px;font-weight:800;padding:4px 30px;transform:rotate(30deg);letter-spacing:.05em}
+.mc-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}
+.mc-ico{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,rgba(255,107,53,.15),rgba(255,140,90,.08));display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.mc-info{flex:1}
+.mc-title{font-size:15px;font-weight:800;color:var(--bl);margin-bottom:4px}
+.mc-desc{font-size:12.5px;color:var(--txd);line-height:1.5}
+.mc-reward{text-align:right;flex-shrink:0}
+.mc-amount{font-size:22px;font-weight:900;color:var(--or)}
+.mc-label{font-size:10px;color:var(--txd);font-weight:600}
+.timer-bar{margin-bottom:14px}
+.timer-bg{height:6px;background:var(--bg);border-radius:3px;overflow:hidden;margin-bottom:6px}
+.timer-fill{height:100%;background:linear-gradient(90deg,#FF6B35,#FF8C5A);border-radius:3px;transition:width .5s}
+.timer-info{display:flex;justify-content:space-between;font-size:11px;color:var(--txd)}
+.timer-countdown{font-weight:700;color:var(--er)}
+.places-info{font-size:12px;color:var(--txd)}
+.mc-btn{width:100%;padding:12px;border-radius:10px;font-family:"Poppins",sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all var(--t)}
+.btn-participate{background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;box-shadow:0 4px 16px rgba(255,107,53,.4)}
+.btn-participate:hover{transform:translateY(-1px)}
+.btn-done{background:rgba(0,184,148,.1);color:var(--ok);border:1.5px solid rgba(0,184,148,.25);cursor:default}
+.btn-pending{background:rgba(243,156,18,.1);color:var(--warn);border:1.5px solid rgba(243,156,18,.25);cursor:default}
+.btn-full{background:var(--bg);color:var(--txd);border:1.5px solid var(--bd);cursor:not-allowed}
+/* Modal soumission */
+#submitModal{display:none;position:fixed;inset:0;z-index:300;background:rgba(26,58,92,.85);align-items:center;justify-content:center;padding:20px}
+.modal-card{background:#fff;border-radius:20px;padding:24px;max-width:400px;width:100%}
+.modal-title{font-size:16px;font-weight:800;color:var(--bl);margin-bottom:6px}
+.modal-desc{font-size:13px;color:var(--txd);margin-bottom:16px;line-height:1.5}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+label{font-size:11px;font-weight:600;color:var(--bl);letter-spacing:.05em;text-transform:uppercase}
+input[type=text]{width:100%;background:var(--bg);border:1.5px solid var(--bd);border-radius:10px;padding:11px 12px;font-family:"Poppins",sans-serif;font-size:13px;color:var(--tx);outline:none}
+input[type=text]:focus{border-color:var(--or)}
+.proof-hint{font-size:12px;color:var(--txd);background:rgba(255,107,53,.06);border-radius:8px;padding:10px;margin-bottom:14px;line-height:1.5}
+.modal-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-cancel{padding:12px;border:1.5px solid var(--bd);border-radius:10px;background:transparent;font-family:"Poppins",sans-serif;font-size:13px;cursor:pointer}
+.btn-submit{padding:12px;background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;border:none;border-radius:10px;font-family:"Poppins",sans-serif;font-size:13px;font-weight:700;cursor:pointer}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);z-index:999;color:#fff;border-radius:10px;padding:12px 22px;font-size:13px;transition:transform .4s,opacity .4s;opacity:0}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+#toast.ok{background:var(--ok)}#toast.er{background:var(--er)}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="brow"><div class="bico">◈</div><div class="bname">WIN <span>AFFINITY</span></div></div>
+  <a href="/dashboard" class="back-btn">← Dashboard</a>
+</header>
+
+<!-- Modal soumission -->
+<div id="submitModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(26,58,92,.85);align-items:center;justify-content:center;padding:20px">
+  <div class="modal-card">
+    <div class="modal-title" id="modalTitle">⚡ Soumettre la mission</div>
+    <div class="modal-desc" id="modalDesc"></div>
+    <div class="proof-hint" id="proofHint"></div>
+    <div class="fg" id="proofField">
+      <label>LIEN DE VOTRE PREUVE (image/capture)</label>
+      <input type="text" id="proofInput" placeholder="https://drive.google.com/... ou lien image"/>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">Annuler</button>
+      <button class="btn-submit" onclick="doSubmit()">✓ Soumettre</button>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="hero">
+    <div class="hero-badge">⚡ Missions limitées dans le temps</div>
+    <h1>Missions Flash</h1>
+    <p>Complétez des missions et gagnez des bonus instantanés</p>
+  </div>
+
+  <div class="balance-strip">
+    <div>
+      <div class="bs-left">Solde disponible</div>
+      <div><span class="bs-num">{{ wallet.balance|int }}</span> <span class="bs-currency">FCFA</span></div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:11px;color:var(--txd)">Missions actives</div>
+      <div style="font-size:20px;font-weight:800;color:var(--or)">{{ missions|length }}</div>
+    </div>
+  </div>
+
+  {% if missions %}
+    {% for m in missions %}
+    <div class="mission-card {% if m.winners_count < m.max_winners %}hot{% endif %}">
+      <div class="mc-top">
+        <div class="mc-ico">⚡</div>
+        <div class="mc-info">
+          <div class="mc-title">{{ m.title }}</div>
+          <div class="mc-desc">{{ m.description }}</div>
+        </div>
+        <div class="mc-reward">
+          <div class="mc-amount">+{{ m.reward }}</div>
+          <div class="mc-label">FCFA</div>
+        </div>
+      </div>
+      <div class="timer-bar">
+        <div class="timer-bg"><div class="timer-fill" id="fill-{{ m.id }}" style="width:100%"></div></div>
+        <div class="timer-info">
+          <span class="timer-countdown" id="timer-{{ m.id }}">⏳ Calcul...</span>
+          <span class="places-info">{{ m.winners_count }}/{{ m.max_winners }} places prises</span>
+        </div>
+      </div>
+      {% set status = completed_ids.get(m.id) %}
+      {% if status == 'approved' %}
+      <button class="mc-btn btn-done">✓ Mission complétée — +{{ m.reward }} FCFA reçus</button>
+      {% elif status == 'pending' %}
+      <button class="mc-btn btn-pending">⏳ En attente de validation</button>
+      {% elif m.winners_count >= m.max_winners %}
+      <button class="mc-btn btn-full">🔒 Places épuisées</button>
+      {% else %}
+      <button class="mc-btn btn-participate" onclick="openModal('{{ m.id }}','{{ m.title }}','{{ m.description }}',{{ 'true' if m.requires_proof else 'false' }})">⚡ Participer — +{{ m.reward }} FCFA</button>
+      {% endif %}
+    </div>
+    {% endfor %}
+  {% else %}
+  <div class="empty-state">
+    <div class="es-ico">⚡</div>
+    <div class="es-txt">Aucune mission flash active</div>
+    <div class="es-sub">Revenez bientôt ! Les missions apparaissent à des moments surprises.</div>
+  </div>
+  {% endif %}
+</div>
+<div id="toast"></div>
+
+<script>
+var currentMissionId = null;
+var requiresProof = false;
+
+function openModal(id, title, desc, proof){
+  currentMissionId = id;
+  requiresProof = proof === true || proof === "true";
+  document.getElementById("modalTitle").textContent = "⚡ " + title;
+  document.getElementById("modalDesc").textContent = desc;
+  if(requiresProof){
+    document.getElementById("proofHint").textContent = "📸 Pour valider cette mission, soumettez un lien vers votre capture d écran (Google Drive, Imgur, etc.)";
+    document.getElementById("proofField").style.display = "flex";
+    document.getElementById("proofInput").value = "";
+  } else {
+    document.getElementById("proofHint").textContent = "✅ Cette mission ne nécessite pas de preuve. Confirmez votre participation.";
+    document.getElementById("proofField").style.display = "none";
+  }
+  document.getElementById("submitModal").style.display = "flex";
+}
+
+function closeModal(){
+  document.getElementById("submitModal").style.display = "none";
+  currentMissionId = null;
+}
+
+function doSubmit(){
+  if(!currentMissionId) return;
+  var proof = document.getElementById("proofInput").value.trim();
+  if(requiresProof && !proof){
+    alert("Veuillez fournir un lien de preuve !");
+    return;
+  }
+  var f = new FormData();
+  f.append("mission_id", currentMissionId);
+  f.append("proof_url", proof);
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "/missions/submit", true);
+  xhr.withCredentials = true;
+  xhr.onreadystatechange = function(){
+    if(xhr.readyState === 4){
+      closeModal();
+      var d = JSON.parse(xhr.responseText);
+      var t = document.getElementById("toast");
+      if(d.success){
+        if(d.auto_credited){
+          t.textContent = "🎉 +"+d.reward+" FCFA crédités instantanément !";
+        } else {
+          t.textContent = "⏳ Mission soumise ! En attente de validation admin.";
+        }
+        t.className = "show ok";
+        setTimeout(function(){ location.reload(); }, 2000);
+      } else {
+        t.textContent = d.error || "Erreur";
+        t.className = "show er";
+      }
+      setTimeout(function(){ t.className = ""; }, 3500);
+    }
+  };
+  xhr.send(f);
+}
+
+// Timers countdown
+var missions = [
+  {% for m in missions %}
+  {id:"{{ m.id }}", ends:"{{ m.ends_at }}", starts:"{{ m.starts_at }}", max:{{ m.max_winners }}, count:{{ m.winners_count }}},
+  {% endfor %}
+];
+
+function updateTimers(){
+  var now = new Date().getTime();
+  missions.forEach(function(m){
+    var end = new Date(m.ends + (m.ends.includes("+") || m.ends.includes("Z") ? "" : "Z")).getTime();
+    var start = new Date(m.starts + (m.starts.includes("+") || m.starts.includes("Z") ? "" : "Z")).getTime();
+    var total = end - start;
+    var remaining = end - now;
+    var timerEl = document.getElementById("timer-"+m.id);
+    var fillEl = document.getElementById("fill-"+m.id);
+    if(!timerEl) return;
+    if(remaining <= 0){
+      timerEl.textContent = "⏰ Expirée";
+      if(fillEl) fillEl.style.width = "0%";
+      return;
+    }
+    var h = Math.floor(remaining / 3600000);
+    var min = Math.floor((remaining % 3600000) / 60000);
+    var sec = Math.floor((remaining % 60000) / 1000);
+    timerEl.textContent = "⏳ "+h+"h "+min+"m "+sec+"s";
+    var pct = Math.max(0, Math.min(100, (remaining/total)*100));
+    if(fillEl) fillEl.style.width = pct+"%";
+  });
+}
+setInterval(updateTimers, 1000);
+updateTimers();
+</script>
+</body></html>
