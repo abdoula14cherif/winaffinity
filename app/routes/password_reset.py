@@ -27,17 +27,8 @@ async def post_forgot(request: Request, email: Annotated[str, Form()]):
         token = result["token"]
         reset_url = f"https://winaffinity.vercel.app/auth/reset-password?token={token}"
         try:
-            httpx.post("https://api.emailjs.com/api/v1.0/email/send", json={
-                "service_id": "service_ps61bla",
-                "template_id": "template_aks186b",
-                "user_id": "fNyhiux6zn4u2CtRj",
-                "template_params": {
-                    "to_email": user["email"],
-                    "to_name": user["full_name"],
-                    "subject": "Réinitialisation de votre mot de passe WIN AFFINITY",
-                    "message": f"Bonjour {user['full_name']},\n\nVous avez demandé à réinitialiser votre mot de passe.\n\nCliquez sur ce lien (valable 1 heure) :\n{reset_url}\n\nSi vous n'avez pas fait cette demande, ignorez cet email.\n\nL'équipe WIN AFFINITY"
-                }
-            }, timeout=5)
+            from app.services.email_service import send_reset_password_email
+            await send_reset_password_email(user["email"], user["full_name"], reset_url)
         except Exception as e:
             logger.error("[RESET] Email error: %s", e)
     return templates.TemplateResponse("forgot_password.html", {

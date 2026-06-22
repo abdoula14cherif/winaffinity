@@ -239,6 +239,16 @@ async def leekpay_webhook(request: Request):
             except Exception as pe:
                 logger.error("[WEBHOOK] Erreur push : %s", pe)
 
+            # Email de confirmation activation
+            try:
+                user_data = db.table("users").select("email,full_name,referral_code").eq("id", user_id).execute().data
+                if user_data:
+                    u = user_data[0]
+                    from app.services.email_service import send_activation_email
+                    await send_activation_email(u["email"], u["full_name"], level, u.get("referral_code",""))
+            except Exception as ee:
+                logger.error("[WEBHOOK] Erreur email activation : %s", ee)
+
         except Exception as e:
             logger.error("[WEBHOOK] Erreur traitement webhook : %s", e)
             # On répond 200 quand même pour éviter les re-tentatives en boucle
