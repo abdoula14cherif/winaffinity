@@ -112,6 +112,15 @@ async def get_share(request: Request):
         "referrals_count": len(referrals)
     })
 
+@router.get("/test-email")
+async def test_email(request: Request):
+    try:
+        from app.services.email_service import send_email
+        ok = await send_email("abdoula13cherif@gmail.com", "Test", "Test Brevo WIN AFFINITY", "<h1>Brevo fonctionne !</h1>")
+        return JSONResponse({"success": ok})
+    except Exception as e:
+        return JSONResponse({"error": str(e)})
+
 @router.get("/legal", response_class=HTMLResponse)
 async def get_legal(request: Request):
     user = await _get_user(request)
