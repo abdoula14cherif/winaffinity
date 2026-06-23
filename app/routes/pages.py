@@ -114,9 +114,24 @@ async def get_share(request: Request):
 
 @router.get("/test-email")
 async def test_email(request: Request):
-    import os
+    import os, httpx
     key = os.environ.get("BREVO_API_KEY", "")
-    return JSONResponse({"key_present": bool(key), "key_prefix": key[:10] if key else "VIDE"})
+    try:
+        async with httpx.AsyncClient() as client:
+            r = await client.post(
+                "https://api.brevo.com/v3/smtp/email",
+                headers={"api-key": key, "Content-Type": "application/json"},
+                json={
+                    "sender": {"name": "WIN AFFINITY", "email": "winaffinitysupport@gmail.com"},
+                    "to": [{"email": "abdoula13cherif@gmail.com", "name": "Test"}],
+                    "subject": "Test Brevo",
+                    "htmlContent": "<h1>Test OK</h1>"
+                },
+                timeout=10
+            )
+        return JSONResponse({"status": r.status_code, "response": r.text})
+    except Exception as e:
+        return JSONResponse({"error": str(e)})
 
 @router.get("/legal", response_class=HTMLResponse)
 async def get_legal(request: Request):
