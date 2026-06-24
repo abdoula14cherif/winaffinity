@@ -16,3 +16,4 @@ slowapi==0.1.9
 resend==2.0.0
 pywebpush
 sib-api-v3-sdk
+# Resend migration Wed Jun 24 19:16:36 WAT 2026
