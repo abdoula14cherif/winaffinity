@@ -1,5 +1,5 @@
 """
-Service email via Brevo (Sendinblue)
+Service email via Resend
 """
 import os
 import logging
@@ -7,27 +7,27 @@ import httpx
 
 logger = logging.getLogger(__name__)
 
-BREVO_API_KEY = os.environ.get("BREVO_API_KEY", "")
-SENDER_EMAIL = os.environ.get("BREVO_SENDER_EMAIL", "abdoula12cherif@gmail.com")
-SENDER_NAME = os.environ.get("BREVO_SENDER_NAME", "WIN AFFINITY")
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
+SENDER_EMAIL = "onboarding@resend.dev"
+SENDER_NAME = "WIN AFFINITY"
 
 async def send_email(to_email: str, to_name: str, subject: str, html_content: str) -> bool:
-    if not BREVO_API_KEY:
-        logger.warning("[EMAIL] Clé Brevo manquante")
+    if not RESEND_API_KEY:
+        logger.warning("[EMAIL] Clé Resend manquante")
         return False
     try:
         async with httpx.AsyncClient() as client:
             r = await client.post(
-                "https://api.brevo.com/v3/smtp/email",
+                "https://api.resend.com/emails",
                 headers={
-                    "api-key": BREVO_API_KEY,
+                    "Authorization": f"Bearer {RESEND_API_KEY}",
                     "Content-Type": "application/json"
                 },
                 json={
-                    "sender": {"name": SENDER_NAME, "email": SENDER_EMAIL},
-                    "to": [{"email": to_email, "name": to_name}],
+                    "from": f"{SENDER_NAME} <{SENDER_EMAIL}>",
+                    "to": [to_email],
                     "subject": subject,
-                    "htmlContent": html_content
+                    "html": html_content
                 },
                 timeout=10
             )
