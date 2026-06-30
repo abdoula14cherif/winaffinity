@@ -355,7 +355,7 @@ async function creditAdCard(i){
   if(adCountdownIv){ clearInterval(adCountdownIv); adCountdownIv = null; }
 
   try{
-    const r = await fetch("/ad/view", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({zone:"monetag", index:i})});
+    const r = await fetch("/gains/ad/view", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({zone:"monetag", index:i})});
     const d = await r.json();
     if(d.success){
       adCompleted = i;
@@ -409,7 +409,7 @@ function incrementBalanceDisplay(amount){
 // Charger le nombre de pubs déjà regardées aujourd'hui puis afficher les cartes
 (async function(){
   try{
-    const r = await fetch("/ad/count");
+    const r = await fetch("/gains/ad/count");
     const d = await r.json();
     if(d.count !== undefined) adCompleted = Math.min(d.count, TOTAL_AD_CARDS);
   }catch(e){}
