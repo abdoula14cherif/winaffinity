@@ -65,11 +65,12 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
 .ad-card{position:relative;aspect-ratio:1/1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:1.5px solid var(--bd);background:var(--bg);color:var(--txd);transition:all var(--t);user-select:none}
 .ad-card .ac-icon{font-size:14px;line-height:1}
 .ad-card .ac-num{font-size:10px;font-weight:700;line-height:1}
-.ad-card.locked{cursor:not-allowed;opacity:.5}
+.ad-card.locked{cursor:not-allowed;opacity:.5;pointer-events:none}
 .ad-card.unlocked{cursor:pointer;background:rgba(255,107,53,.1);border-color:rgba(255,107,53,.45);color:var(--or);animation:pulseCard 1.8s ease-in-out infinite}
 .ad-card.unlocked:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(255,107,53,.3)}
 .ad-card.pending{cursor:wait;background:rgba(243,156,18,.12);border-color:rgba(243,156,18,.45);color:var(--warn);animation:none}
-.ad-card.done{cursor:default;opacity:1;background:rgba(0,184,148,.1);border-color:rgba(0,184,148,.35);color:var(--ok)}
+.ad-card.ready{cursor:pointer;background:rgba(0,184,148,.12);border-color:rgba(0,184,148,.45);color:var(--ok);animation:pulseCard 1.2s ease-in-out infinite}
+.ad-card.done{cursor:default;opacity:1;pointer-events:none;background:rgba(0,184,148,.1);border-color:rgba(0,184,148,.35);color:var(--ok)}
 @keyframes pulseCard{0%,100%{box-shadow:0 0 0 0 rgba(255,107,53,.35)}50%{box-shadow:0 0 0 6px rgba(255,107,53,0)}}
 @media(max-width:600px){.stats-grid{grid-template-columns:1fr 1fr}.task{flex-wrap:wrap}.ad-cards-grid{grid-template-columns:repeat(auto-fill,minmax(40px,1fr))}}
 </style>
@@ -94,7 +95,7 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
       <div class="ad-icon">📺</div>
       <div style="flex:1">
         <div class="card-title" style="margin-bottom:2px" data-fr="Regarder des publicités" data-en="Watch ads">Regarder des publicités</div>
-        <div class="card-sub" style="margin-bottom:0" data-fr="Ouvrez les cartes dans l'ordre. Chaque pub regardée rapporte 25 FCFA." data-en="Open the cards in order. Each ad watched earns 25 FCFA.">Ouvrez les cartes dans l'ordre. Chaque pub regardée rapporte 25 FCFA.</div>
+        <div class="card-sub" style="margin-bottom:0" data-fr="Ouvrez les cartes dans l'ordre. Chaque pub regardée rapporte 0,4 FCFA." data-en="Open the cards in order. Each ad watched earns 0.4 FCFA.">Ouvrez les cartes dans l'ordre. Chaque pub regardée rapporte 0,4 FCFA.</div>
       </div>
       <div style="text-align:right;flex-shrink:0">
         <div style="font-size:15px;font-weight:800;color:var(--or)" id="adCount">0/100</div>
@@ -250,16 +251,21 @@ async function validateVideo(){
 
 <!-- Système des 100 cartes de pub à déblocage séquentiel -->
 <script>
-const AD_REWARD = 25;                 // FCFA par pub
+const AD_REWARD = 0.4;                // FCFA par pub
 const TOTAL_AD_CARDS = 100;           // nombre total de cartes/jour
-const AD_RETURN_MIN_MS = 15000;       // temps minimum (ms) avant de créditer au retour
+const AD_WAIT_SECONDS = 15;           // délai minimum (s) avant de pouvoir valider
 // ⚠️ Remplacez ce lien par votre véritable lien direct du réseau publicitaire (Adsterra / Monetag "Direct Link")
 const AD_DIRECT_LINK = "https://your-ad-network-direct-link.com";
 
 let adCompleted = 0;       // nb de pubs déjà créditées aujourd'hui
-let adPendingIndex = null; // index de la carte en attente de retour
-let adOpenedAt = null;     // horodatage de l'ouverture
-let adListenerActive = false;
+let adPendingIndex = null; // index de la carte ouverte en attente
+let adCountdownIv = null;  // intervalle du compte à rebours
+let adCrediting = false;   // verrou anti double-crédit
+
+function fmtFCFA(n){
+  const r = Math.round(n*100)/100;
+  return (r % 1 === 0) ? r.toString() : r.toFixed(1);
+}
 
 function renderAdCards(){
   const grid = document.getElementById("adCardsGrid");
@@ -278,6 +284,7 @@ function renderAdCards(){
     } else {
       card.className = "ad-card locked";
       card.innerHTML = '<div class="ac-icon">🔒</div><div class="ac-num">'+i+'</div>';
+      card.onclick = null;
     }
     grid.appendChild(card);
   }
@@ -286,27 +293,55 @@ function renderAdCards(){
 }
 
 function openAdCard(i){
-  if(i !== adCompleted+1) return;     // seule la carte débloquée peut être ouverte
-  if(adPendingIndex !== null) return; // une carte est déjà en attente de retour
+  // Sécurité : seule la carte exactement débloquée peut être ouverte, une seule à la fois
+  if(i !== adCompleted+1) return;
+  if(adPendingIndex !== null) return;
 
   const card = document.getElementById("ad-card-"+i);
-  card.className = "ad-card pending";
-  card.innerHTML = '<div class="ac-icon">⏳</div><div class="ac-num">'+i+'</div>';
-  card.onclick = null;
+  if(!card) return;
 
   adPendingIndex = i;
-  adOpenedAt = Date.now();
+  let secondsLeft = AD_WAIT_SECONDS;
+
+  card.className = "ad-card pending";
+  card.onclick = null;
+  card.innerHTML = '<div class="ac-icon">⏳</div><div class="ac-num">'+secondsLeft+'s</div>';
 
   window.open(AD_DIRECT_LINK, "_blank");
 
-  if(!adListenerActive){
-    document.addEventListener("visibilitychange", handleAdReturn);
-    window.addEventListener("focus", handleAdReturn);
-    adListenerActive = true;
-  }
+  // Compte à rebours : après ce délai, la carte devient validable manuellement
+  adCountdownIv = setInterval(()=>{
+    secondsLeft--;
+    if(secondsLeft > 0){
+      card.innerHTML = '<div class="ac-icon">⏳</div><div class="ac-num">'+secondsLeft+'s</div>';
+    } else {
+      clearInterval(adCountdownIv);
+      adCountdownIv = null;
+      card.className = "ad-card ready";
+      card.innerHTML = '<div class="ac-icon">✓</div><div class="ac-num">Valider</div>';
+      card.onclick = ()=>creditAdCard(i);
+    }
+  }, 1000);
+
+  // Détection automatique du retour sur l'onglet : si l'utilisateur revient
+  // après le délai minimum, on crédite tout de suite sans attendre le clic.
+  document.addEventListener("visibilitychange", handleAutoReturn);
+  window.addEventListener("focus", handleAutoReturn);
 }
 
-function resetPendingCard(i){
+function handleAutoReturn(){
+  if(adPendingIndex === null) return;
+  if(document.visibilityState && document.visibilityState !== "visible") return;
+  if(adCountdownIv !== null) return; // délai minimum pas encore écoulé
+  creditAdCard(adPendingIndex);
+}
+
+function detachAutoReturn(){
+  document.removeEventListener("visibilitychange", handleAutoReturn);
+  window.removeEventListener("focus", handleAutoReturn);
+}
+
+function resetCardToUnlocked(i){
   const card = document.getElementById("ad-card-"+i);
   if(!card) return;
   card.className = "ad-card unlocked";
@@ -314,73 +349,60 @@ function resetPendingCard(i){
   card.onclick = ()=>openAdCard(i);
 }
 
-function detachAdListeners(){
-  document.removeEventListener("visibilitychange", handleAdReturn);
-  window.removeEventListener("focus", handleAdReturn);
-  adListenerActive = false;
-}
-
-async function handleAdReturn(){
-  if(adPendingIndex === null) return;
-  if(document.visibilityState && document.visibilityState !== "visible") return;
-  const elapsed = Date.now() - adOpenedAt;
-  if(elapsed < AD_RETURN_MIN_MS){
-    showToast("⏳ Regardez la pub un peu plus longtemps avant de revenir");
-    return;
-  }
-  const i = adPendingIndex;
-  await creditAdCard(i);
-}
-
 async function creditAdCard(i){
+  if(adCrediting) return; // anti double-clic / double-crédit
+  adCrediting = true;
+  if(adCountdownIv){ clearInterval(adCountdownIv); adCountdownIv = null; }
+
   try{
     const r = await fetch("/ad/view", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({zone:"monetag", index:i})});
     const d = await r.json();
     if(d.success){
       adCompleted = i;
       adPendingIndex = null;
-      detachAdListeners();
+      detachAutoReturn();
       if(d.balance !== undefined){
         updateBalanceDisplay(d.balance, d.total_earned);
       } else {
         incrementBalanceDisplay(AD_REWARD);
       }
-      showToast("🎉 +"+AD_REWARD+" FCFA crédités !");
+      showToast("🎉 +"+fmtFCFA(AD_REWARD)+" FCFA crédités !");
       renderAdCards();
       if(adCompleted >= TOTAL_AD_CARDS){
         showToast("✓ Toutes les publicités du jour sont terminées !");
       }
     } else {
       adPendingIndex = null;
-      detachAdListeners();
-      resetPendingCard(i);
+      detachAutoReturn();
+      resetCardToUnlocked(i);
       showToast("⚠ "+(d.error||"Erreur, réessayez"));
     }
   }catch(e){
     adPendingIndex = null;
-    detachAdListeners();
-    resetPendingCard(i);
+    detachAutoReturn();
+    resetCardToUnlocked(i);
     showToast("⚠ Erreur réseau, réessayez");
   }
+  adCrediting = false;
 }
 
 function updateBalanceDisplay(balance, totalEarned){
   const el = document.getElementById("balanceDisplay");
-  if(el && balance !== undefined) el.innerHTML = balance+' <span style="font-size:13px">F</span>';
+  if(el && balance !== undefined) el.innerHTML = fmtFCFA(balance)+' <span style="font-size:13px">F</span>';
   const el2 = document.getElementById("totalEarnedDisplay");
-  if(el2 && totalEarned !== undefined) el2.innerHTML = totalEarned+' <span style="font-size:13px">F</span>';
+  if(el2 && totalEarned !== undefined) el2.innerHTML = fmtFCFA(totalEarned)+' <span style="font-size:13px">F</span>';
 }
 
 function incrementBalanceDisplay(amount){
   const el = document.getElementById("balanceDisplay");
   const el2 = document.getElementById("totalEarnedDisplay");
   if(el){
-    const cur = parseInt(el.textContent.replace(/\D/g,""))||0;
-    el.innerHTML = (cur+amount)+' <span style="font-size:13px">F</span>';
+    const cur = parseFloat(el.textContent.replace(/[^\d.,]/g,"").replace(",","."))||0;
+    el.innerHTML = fmtFCFA(cur+amount)+' <span style="font-size:13px">F</span>';
   }
   if(el2){
-    const cur2 = parseInt(el2.textContent.replace(/\D/g,""))||0;
-    el2.innerHTML = (cur2+amount)+' <span style="font-size:13px">F</span>';
+    const cur2 = parseFloat(el2.textContent.replace(/[^\d.,]/g,"").replace(",","."))||0;
+    el2.innerHTML = fmtFCFA(cur2+amount)+' <span style="font-size:13px">F</span>';
   }
 }
 
