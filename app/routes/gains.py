@@ -113,27 +113,37 @@ async def view_ad(request: Request):
 
         if views_today:
             last = views_today[0]
-            last_time = datetime.fromisoformat(last["created_at"].replace("Z", "+00:00"))
-            now = datetime.now(timezone.utc)
-            diff = (now - last_time).total_seconds()
-            if diff < AD_COOLDOWN_SECONDS:
-                wait = int(AD_COOLDOWN_SECONDS - diff)
-                return JSONResponse({"success": False, "error": f"Attendez encore {wait} secondes", "wait": wait})
+            last_created = last.get("created_at")
+            if last_created:
+                try:
+                    last_time = datetime.fromisoformat(last_created.replace("Z", "+00:00"))
+                    now = datetime.now(timezone.utc)
+                    diff = (now - last_time).total_seconds()
+                    if diff < AD_COOLDOWN_SECONDS:
+                        wait = int(AD_COOLDOWN_SECONDS - diff)
+                        return JSONResponse({"success": False, "error": f"Attendez encore {wait} secondes", "wait": wait})
+                except (ValueError, TypeError):
+                    logger.warning("created_at invalide dans ad_views: %r", last_created)
+                    # on ne bloque pas l'utilisateur si la date est mal formée
 
-        # Enregistrer la vue
+        # Enregistrer la vue (created_at fourni explicitement au cas où la colonne
+        # n'a pas de valeur par défaut côté Supabase)
         db.table("ad_views").insert({
             "user_id": user["id"],
             "ad_id": "monetag",
             "reward": AD_REWARD,
             "viewed_at": today,
+            "created_at": datetime.now(timezone.utc).isoformat(),
         }).execute()
 
         # Créditer le wallet
         wallet_res = db.table("wallets").select("*").eq("user_id", user["id"]).execute().data
         if wallet_res:
             w = wallet_res[0]
-            new_balance = w["balance"] + AD_REWARD
-            new_total = w["total_earned"] + AD_REWARD
+            current_balance = w.get("balance") or 0
+            current_total = w.get("total_earned") or 0
+            new_balance = current_balance + AD_REWARD
+            new_total = current_total + AD_REWARD
             db.table("wallets").update({
                 "balance": new_balance,
                 "total_earned": new_total,
