@@ -95,7 +95,7 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
       <div class="ad-icon">📺</div>
       <div style="flex:1">
         <div class="card-title" style="margin-bottom:2px" data-fr="Regarder des publicités" data-en="Watch ads">Regarder des publicités</div>
-        <div class="card-sub" style="margin-bottom:0" data-fr="Ouvrez les cartes dans l'ordre. Chaque pub regardée rapporte 0,4 FCFA." data-en="Open the cards in order. Each ad watched earns 0.4 FCFA.">Ouvrez les cartes dans l'ordre. Chaque pub regardée rapporte 0,4 FCFA.</div>
+        <div class="card-sub" style="margin-bottom:0" data-fr="Ouvrez les cartes dans l'ordre. Chaque pub regardée rapporte 0,3 FCFA." data-en="Open the cards in order. Each ad watched earns 0.3 FCFA.">Ouvrez les cartes dans l'ordre. Chaque pub regardée rapporte 0,3 FCFA.</div>
       </div>
       <div style="text-align:right;flex-shrink:0">
         <div style="font-size:15px;font-weight:800;color:var(--or)" id="adCount">0/100</div>
@@ -251,9 +251,9 @@ async function validateVideo(){
 
 <!-- Système des 100 cartes de pub à déblocage séquentiel -->
 <script>
-const AD_REWARD = 0.4;                // FCFA par pub
+const AD_REWARD = 0.3;                // FCFA par pub — doit rester identique à AD_REWARD côté backend
 const TOTAL_AD_CARDS = 100;           // nombre total de cartes/jour
-const AD_WAIT_SECONDS = 15;           // délai minimum (s) avant de pouvoir valider
+const AD_WAIT_SECONDS = 60;           // doit rester identique à AD_COOLDOWN_SECONDS côté backend
 // ⚠️ Remplacez ce lien par votre véritable lien direct du réseau publicitaire (Adsterra / Monetag "Direct Link")
 const AD_DIRECT_LINK = "https://your-ad-network-direct-link.com";
 
