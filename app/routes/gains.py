@@ -80,28 +80,28 @@ async def view_ad(request: Request):
     from datetime import date, datetime, timezone
     today = str(date.today())
     try:
-        # Verifier limite 10 vues/jour
+        # Verifier limite 100 vues/jour
         views_today = db.table("ad_views").select("id,created_at").eq("user_id", user["id"]).eq("viewed_at", today).order("created_at", desc=True).execute().data or []
-        if len(views_today) >= 10:
-            return JSONResponse({"success": False, "error": "Limite de 10 pubs atteinte aujourd hui"})
-        # Verifier delai 30 secondes entre chaque vue
+        if len(views_today) >= 100:
+            return JSONResponse({"success": False, "error": "Limite de 100 pubs atteinte aujourd hui"})
+        # Verifier delai 60 secondes entre chaque vue
         if views_today:
             last = views_today[0]
             last_time = datetime.fromisoformat(last["created_at"].replace("Z", "+00:00"))
             now = datetime.now(timezone.utc)
             diff = (now - last_time).total_seconds()
-            if diff < 30:
-                wait = int(30 - diff)
+            if diff < 60:
+                wait = int(60 - diff)
                 return JSONResponse({"success": False, "error": f"Attendez encore {wait} secondes"})
         # Enregistrer la vue
-        db.table("ad_views").insert({"user_id": user["id"], "ad_id": "monetag", "reward": 25, "viewed_at": today}).execute()
+        db.table("ad_views").insert({"user_id": user["id"], "ad_id": "monetag", "reward": 0.3, "viewed_at": today}).execute()
         # Crediter le wallet
         wallet = db.table("wallets").select("*").eq("user_id", user["id"]).execute().data
         if wallet:
             w = wallet[0]
-            db.table("wallets").update({"balance": w["balance"]+25, "total_earned": w["total_earned"]+25}).eq("user_id", user["id"]).execute()
+            db.table("wallets").update({"balance": w["balance"]+0.3, "total_earned": w["total_earned"]+0.3}).eq("user_id", user["id"]).execute()
         else:
-            db.table("wallets").insert({"user_id": user["id"], "balance": 25, "total_earned": 25}).execute()
-        return JSONResponse({"success": True, "reward": 25})
+            db.table("wallets").insert({"user_id": user["id"], "balance": 0.3, "total_earned": 0.3}).execute()
+        return JSONResponse({"success": True, "reward": 0.3})
     except Exception as e:
         return JSONResponse({"success": False, "error": str(e)}, status_code=500)
