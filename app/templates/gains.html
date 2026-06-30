@@ -80,14 +80,14 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
     <div style="width:46px;height:46px;border-radius:12px;background:var(--ord);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📺</div>
     <div style="flex:1">
       <div style="font-size:14px;font-weight:700;color:var(--bl)">Regarder une publicité</div>
-      <div style="font-size:12px;color:var(--txd);margin-top:2px">Regardez une pub et gagnez 25 FCFA (max 10/jour)</div>
+      <div style="font-size:12px;color:var(--txd);margin-top:2px">Regardez une pub et gagnez 25 FCFA (max 100/jour)</div>
     </div>
     <div style="text-align:right">
       <div style="font-size:16px;font-weight:800;color:var(--or)">+25 F</div>
-      <div style="font-size:10px;color:var(--txd)" id="adCount">0/10 aujourd hui</div>
+      <div style="font-size:10px;color:var(--txd)" id="adCount">0/100 aujourd hui</div>
     </div>
   </div>
-  <button id="adBtn" onclick="watchAd()" style="width:100%;padding:11px;background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;border:none;border-radius:10px;font-family:Poppins,sans-serif;font-size:13px;font-weight:700;cursor:pointer">▶ VOIR LA PUB (+25 FCFA)</button>
+  <button id="adBtn" onclick="watchAd()" style="width:100%;padding:11px;background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;border:none;border-radius:10px;font-family:Poppins,sans-serif;font-size:13px;font-weight:700;cursor:pointer">▶ VOIR LA PUB (+0.3 FCFA)</button>
 </div>
 
 <div class="card-title" data-fr="Tâches du jour" data-en="Daily Tasks">Tâches du jour</div>
@@ -233,7 +233,7 @@ async function validateVideo(){
 <script src="https://quge5.com/88/tag.min.js" data-zone="250335" async data-cfasync="false">
 // Pub rémunérée
 var adViews = 0;
-var maxAdViews = 10;
+var maxAdViews = 100;
 var adWatching = false;
 
 var adCooldown = false;
@@ -253,14 +253,14 @@ async function watchAd(){
     if(d.success){
       adViews++;
       document.getElementById("adCount").textContent = adViews+"/10 aujourd hui";
-      showToast("✓ +25 FCFA crédités !");
-      if(adViews >= 10){
+      showToast("✓ +0.3 FCFA crédités !");
+      if(adViews >= 100){
         btn.textContent = "✓ Limite atteinte aujourd hui";
         btn.style.background = "#aaa";
       } else {
-        // Compte à rebours 30 secondes
+        // Compte à rebours 60 secondes
         adCooldown = true;
-        var secs = 30;
+        var secs = 60;
         var iv = setInterval(function(){
           btn.textContent = "⏳ Prochaine pub dans "+secs+"s";
           secs--;
@@ -268,18 +268,18 @@ async function watchAd(){
             clearInterval(iv);
             adCooldown = false;
             btn.disabled = false;
-            btn.textContent = "▶ VOIR LA PUB (+25 FCFA)";
+            btn.textContent = "▶ VOIR LA PUB (+0.3 FCFA)";
           }
         }, 1000);
       }
     } else {
       showToast(d.error || "Erreur");
-      btn.textContent = "▶ VOIR LA PUB (+25 FCFA)";
+      btn.textContent = "▶ VOIR LA PUB (+0.3 FCFA)";
       btn.disabled = false;
     }
   }catch(e){
     showToast("Erreur réseau");
-    btn.textContent = "▶ VOIR LA PUB (+25 FCFA)";
+    btn.textContent = "▶ VOIR LA PUB (+0.3 FCFA)";
     btn.disabled = false;
   }
   adWatching = false;
