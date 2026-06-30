@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 # Valeur unique de la récompense par pub et du délai entre 2 vues.
 # Garder ces deux constantes alignées avec AD_REWARD / AD_WAIT_SECONDS côté frontend (gains.html).
-AD_REWARD = 0.3
+AD_REWARD = 1
 AD_COOLDOWN_SECONDS = 60
 AD_DAILY_LIMIT = 100
 
