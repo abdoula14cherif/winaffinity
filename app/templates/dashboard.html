@@ -163,7 +163,7 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
   .sidebar{transform:translateX(-100%)}
   .sidebar.open{transform:translateX(0)}
   .sb-overlay.open{display:block}
-  .main{margin-left:0;padding-bottom:0}
+  .main{margin-left:0;padding-bottom:90px}
   .hamburger{display:flex;align-items:center;justify-content:center}
   .desktop-only{display:none !important}
   .app-header{padding:18px 18px 8px}
@@ -171,10 +171,10 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
   .stats-grid{margin:0 18px 18px;grid-template-columns:1fr 1fr;gap:10px}
   .two-col{margin:0 18px 16px}
   .tx-wrap{margin:0 18px 16px}
-  .legal-note{margin:16px 18px 90px}
+  .legal-note{margin:16px 18px 0}
 
-  /* Bottom nav visible en mobile */
-  .bottom-nav{display:grid;position:sticky;bottom:0;z-index:50;background:var(--wh);border-top:1.5px solid var(--bd);grid-template-columns:repeat(5,1fr);padding:8px 6px calc(8px + env(safe-area-inset-bottom));margin-top:8px}
+  /* Bottom nav vraiment fixe en bas de l'écran sur mobile */
+  .bottom-nav{display:grid;position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--wh);border-top:1.5px solid var(--bd);grid-template-columns:repeat(5,1fr);padding:8px 6px calc(8px + env(safe-area-inset-bottom))}
   .bn-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;border-radius:12px;cursor:pointer;color:var(--txd);text-decoration:none;background:none;border:none;font-family:"Poppins",sans-serif;transition:color var(--t)}
   .bn-item.active{color:var(--or)}
   .bn-ico{font-size:19px;line-height:1}
