@@ -8,7 +8,7 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--or:#FF6B35;--orl:#FF8C5A;--ord:rgba(255,107,53,.1);--bl:#1A3A5C;--blm:#2D5F8F;--bg:#F0F4F8;--wh:#FFFFFF;--tx:#1A2B3C;--txd:#6B7A8D;--bd:#D1DCE8;--ok:#00B894;--er:#E74C3C;--warn:#F39C12;--t:.25s cubic-bezier(.4,0,.2,1);--sw:260px;--sh:0 4px 20px rgba(26,58,92,.08)}
-html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);color:var(--tx)}
+html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);color:var(--tx);overflow-x:hidden;width:100%}
 
 /* ===== Sidebar (desktop) ===== */
 .sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sw);z-index:30;background:var(--bl);display:flex;flex-direction:column;padding:0;transition:transform var(--t);overflow-y:auto}
@@ -37,20 +37,22 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
 .main{margin-left:var(--sw);min-height:100vh;padding:0 0 28px}
 
 /* ===== App header ===== */
-.app-header{position:sticky;top:0;z-index:20;background:var(--bg);padding:22px 26px 14px;display:flex;align-items:center;justify-content:space-between;gap:14px}
-.hdr-left{display:flex;align-items:center;gap:12px;min-width:0}
-.hamburger{display:none;background:var(--wh);border:1.5px solid var(--bd);border-radius:12px;width:40px;height:40px;cursor:pointer;font-size:18px;color:var(--bl);flex-shrink:0}
-.hdr-avatar{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--bl),var(--blm));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:16px;flex-shrink:0}
-.hdr-greet{font-size:11.5px;color:var(--txd);font-weight:600}
-.hdr-name{font-size:17px;font-weight:800;color:var(--bl);line-height:1.25}
-.hdr-name span{color:var(--or)}
-.hdr-date{font-size:11px;color:var(--txd);margin-top:1px}
-.hdr-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.hdr-btn{width:40px;height:40px;border-radius:12px;background:var(--wh);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;position:relative;color:var(--bl);text-decoration:none;transition:all var(--t)}
+.app-header{position:sticky;top:0;z-index:20;background:var(--bg);padding:22px 26px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.hdr-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.hamburger{display:none;background:var(--wh);border:1.5px solid var(--bd);border-radius:12px;width:38px;height:38px;cursor:pointer;font-size:17px;color:var(--bl);flex-shrink:0}
+.hdr-avatar{width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,var(--bl),var(--blm));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px;flex-shrink:0}
+.hdr-text{min-width:0;flex:1}
+.hdr-greet{font-size:13.5px;font-weight:700;color:var(--bl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-greet b{color:var(--or)}
+.hdr-name{display:none}
+.hdr-date{font-size:11px;color:var(--txd);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.hdr-btn{width:38px;height:38px;border-radius:12px;background:var(--wh);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;position:relative;color:var(--bl);text-decoration:none;transition:all var(--t);flex-shrink:0}
 .hdr-btn:hover{border-color:var(--or);background:var(--ord)}
 .hdr-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--er);border:1.5px solid var(--wh);display:none}
-.lang-btn{background:var(--wh);border:1.5px solid var(--bd);border-radius:30px;padding:9px 14px;display:flex;align-items:center;gap:6px;cursor:pointer;font-family:"Poppins",sans-serif;font-size:12px;font-weight:600;color:var(--bl);transition:all var(--t)}
+.lang-btn{background:var(--wh);border:1.5px solid var(--bd);border-radius:30px;padding:9px 14px;display:flex;align-items:center;gap:6px;cursor:pointer;font-family:"Poppins",sans-serif;font-size:12px;font-weight:600;color:var(--bl);transition:all var(--t);flex-shrink:0;white-space:nowrap}
 .lang-btn:hover{border-color:var(--or);color:var(--or)}
+.lang-btn .lang-txt{display:inline}
 .desktop-only{display:flex}
 .btn-wide{display:flex;align-items:center;gap:6px;padding:9px 14px;border-radius:12px;font-size:12px;font-weight:700;text-decoration:none;border:1.5px solid var(--bd);white-space:nowrap}
 .btn-wa{background:rgba(37,211,102,.12);color:#25d366;border-color:rgba(37,211,102,.3)}
@@ -59,7 +61,7 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
 
 /* ===== Bandeau annonces ===== */
 #bannerZone{padding:0 26px;margin-bottom:6px}
-.banner-item{background:rgba(0,184,148,.09);border:1.5px solid rgba(0,184,148,.25);border-radius:13px;padding:11px 15px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12.5px;font-weight:600;margin-bottom:8px}
+.banner-item{background:rgba(0,184,148,.09);border:1.5px solid rgba(0,184,148,.25);border-radius:13px;padding:11px 15px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;font-size:12.5px;font-weight:600;margin-bottom:8px}
 
 /* ===== Carte solde héro ===== */
 .balance-hero{margin:14px 26px 18px;background:linear-gradient(135deg,var(--bl) 0%,var(--blm) 100%);border-radius:24px;padding:24px 24px 22px;position:relative;overflow:hidden;box-shadow:0 14px 30px rgba(26,58,92,.28)}
@@ -166,7 +168,10 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
   .main{margin-left:0;padding-bottom:0}
   .hamburger{display:flex;align-items:center;justify-content:center}
   .desktop-only{display:none !important}
-  .app-header{padding:18px 18px 8px}
+  .app-header{padding:16px 16px 8px;gap:8px}
+  .lang-btn{padding:9px 11px}
+  .lang-btn .lang-txt{display:none}
+  .hdr-date{display:none}
   .balance-hero{margin:12px 18px 16px}
   .stats-grid{margin:0 18px 18px;grid-template-columns:1fr 1fr;gap:10px}
   .two-col{margin:0 18px 16px}
@@ -234,15 +239,14 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
     <div class="hdr-left">
       <button class="hamburger" onclick="openSb()">☰</button>
       <div class="hdr-avatar">{{ user.full_name[0].upper() }}</div>
-      <div style="min-width:0">
-        <div class="hdr-greet" data-fr="Bonjour 👋" data-en="Hello 👋">Bonjour 👋</div>
-        <div class="hdr-name">{{ user.full_name.split()[0] }}</div>
+      <div class="hdr-text">
+        <div class="hdr-greet" data-fr="Bonjour, <b>{{ user.full_name.split()[0] }}</b> 👋" data-en="Hello, <b>{{ user.full_name.split()[0] }}</b> 👋">Bonjour, <b>{{ user.full_name.split()[0] }}</b> 👋</div>
         <div class="hdr-date" id="dateLabel"></div>
       </div>
     </div>
     <div class="hdr-actions">
       <a href="/notifications" class="hdr-btn">🔔<span class="hdr-dot" id="notifDot"></span></a>
-      <button class="lang-btn" onclick="tl()"><span id="lf">🇬🇧</span><span id="ll">English</span></button>
+      <button class="lang-btn" onclick="tl()"><span id="lf">🇬🇧</span><span class="lang-txt" id="ll">English</span></button>
       <a href="https://wa.me/?text=Rejoins%20WIN%20AFFINITY%20et%20gagne%20de%20l%27argent%20depuis%20ton%20telephone%20!%20Inscris-toi%20ici%20:%20https://winaffinity.vercel.app/auth/register?ref={{ user.referral_code }}" target="_blank" class="btn-wide btn-wa desktop-only">📱 WhatsApp</a>
       <a href="sms:?body=Rejoins%20WIN%20AFFINITY%20et%20gagne%20de%20l%27argent%20depuis%20ton%20telephone%20!%20https://winaffinity.vercel.app/auth/register?ref={{ user.referral_code }}" class="btn-wide btn-sms desktop-only">💬 SMS</a>
       <button class="btn-wide btn-share-top desktop-only" onclick="copyLink()">🔗 <span data-fr="Partager" data-en="Share">Partager</span></button>
