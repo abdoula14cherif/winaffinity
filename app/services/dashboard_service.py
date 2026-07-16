@@ -37,7 +37,7 @@ async def get_dashboard_stats(db: Client, user_id: str) -> dict:
     commissions = await get_commissions(db, user_id)
 
     # Lien de parrainage
-    referral_link = f"https://winaffinity.vercel.app/auth/register?ref={user['referral_code']}"
+    referral_link = f"https://www.winaffinity.vip/auth/register?ref={user['referral_code']}"
 
     stats = {
         "total_balance_fcfa"  : wallet["balance"],

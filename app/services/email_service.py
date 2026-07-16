@@ -56,7 +56,7 @@ async def send_welcome_email(to_email: str, to_name: str, referral_code: str) ->
           <p style="color:#FF6B35;font-size:24px;font-weight:800;margin:0">{referral_code}</p>
         </div>
         <p style="color:#6B7A8D">Activez votre compte pour commencer à gagner !</p>
-        <a href="https://winaffinity.vercel.app/payment" style="display:inline-block;background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:700;margin-top:10px">Activer mon compte</a>
+        <a href="https://www.winaffinity.vip/payment" style="display:inline-block;background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:700;margin-top:10px">Activer mon compte</a>
       </div>
       <p style="text-align:center;color:#6B7A8D;font-size:12px;margin-top:16px">© 2026 WIN AFFINITY • winaffinitysupport@gmail.com</p>
     </div>"""
@@ -76,9 +76,9 @@ async def send_activation_email(to_email: str, to_name: str, level: str, referra
         <p style="color:#6B7A8D">Votre compte est maintenant <strong style="color:#00B894">ACTIF</strong> en niveau <strong style="color:#FF6B35">{level_txt}</strong></p>
         <div style="background:#F0F4F8;border-radius:12px;padding:16px;margin:16px 0">
           <p style="color:#6B7A8D;font-size:12px;margin:0 0 6px">VOTRE LIEN DE PARRAINAGE</p>
-          <p style="color:#FF6B35;font-size:13px;margin:0">https://winaffinity.vercel.app/auth/register?ref={referral_code}</p>
+          <p style="color:#FF6B35;font-size:13px;margin:0">https://www.winaffinity.vip/auth/register?ref={referral_code}</p>
         </div>
-        <a href="https://winaffinity.vercel.app/dashboard" style="display:inline-block;background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:700">Accéder à mon dashboard</a>
+        <a href="https://www.winaffinity.vip/dashboard" style="display:inline-block;background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:700">Accéder à mon dashboard</a>
       </div>
       <p style="text-align:center;color:#6B7A8D;font-size:12px;margin-top:16px">© 2026 WIN AFFINITY • winaffinitysupport@gmail.com</p>
     </div>"""

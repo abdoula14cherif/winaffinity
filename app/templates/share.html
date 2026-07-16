@@ -223,7 +223,7 @@ function drawCard(){
   ctx.shadowColor=t.accent;ctx.shadowBlur=12;
   ctx.fillText(userData.code,W/2,800);ctx.shadowBlur=0;
   ctx.fillStyle="rgba(255,255,255,0.25)";ctx.font="12px Arial";
-  ctx.fillText("winaffinity.vercel.app",W/2,832);
+  ctx.fillText("www.winaffinity.vip",W/2,832);
 
   // Bande accent bas
   ctx.fillStyle=bt;ctx.fillRect(0,H-4,W,4);
@@ -231,9 +231,9 @@ function drawCard(){
   ctx.fillText("Plateforme d affiliation • Gains quotidiens",W/2,924);
 
   // Liens partage
-  var txt=encodeURIComponent("Je gagne "+userData.balance+" FCFA avec WIN AFFINITY ! Code: "+userData.code+" - https://winaffinity.vercel.app/auth/register?ref="+userData.code);
+  var txt=encodeURIComponent("Je gagne "+userData.balance+" FCFA avec WIN AFFINITY ! Code: "+userData.code+" - https://www.winaffinity.vip/auth/register?ref="+userData.code);
   document.getElementById("btnShareWA").href="https://api.whatsapp.com/send?text="+txt;
-  document.getElementById("btnShareFB").href="https://www.facebook.com/sharer.php?u="+encodeURIComponent("https://winaffinity.vercel.app/auth/register?ref="+userData.code);
+  document.getElementById("btnShareFB").href="https://www.facebook.com/sharer.php?u="+encodeURIComponent("https://www.winaffinity.vip/auth/register?ref="+userData.code);
 }
 
 function downloadImage(){

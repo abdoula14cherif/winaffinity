@@ -98,12 +98,12 @@ input:focus{border-color:var(--or)}
       <button class="copy-btn" onclick="copyCode()">📋 Copier</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
-      <a href="https://wa.me/?text=Rejoins%20WIN%20AFFINITY%20et%20gagne%20de%20l%27argent%20depuis%20ton%20telephone%20!%20https://winaffinity.vercel.app/auth/register?ref={{ user.referral_code }}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:rgba(37,211,102,.1);color:#25d366;border:1.5px solid rgba(37,211,102,.25);border-radius:10px;font-size:12.5px;font-weight:700;text-decoration:none">📱 Partager WhatsApp</a>
-      <a href="sms:?body=Rejoins%20WIN%20AFFINITY%20:%20https://winaffinity.vercel.app/auth/register?ref={{ user.referral_code }}" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:rgba(45,95,143,.08);color:var(--bl);border:1.5px solid var(--bd);border-radius:10px;font-size:12.5px;font-weight:700;text-decoration:none">💬 Partager SMS</a>
+      <a href="https://wa.me/?text=Rejoins%20WIN%20AFFINITY%20et%20gagne%20de%20l%27argent%20depuis%20ton%20telephone%20!%20https://www.winaffinity.vip/auth/register?ref={{ user.referral_code }}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:rgba(37,211,102,.1);color:#25d366;border:1.5px solid rgba(37,211,102,.25);border-radius:10px;font-size:12.5px;font-weight:700;text-decoration:none">📱 Partager WhatsApp</a>
+      <a href="sms:?body=Rejoins%20WIN%20AFFINITY%20:%20https://www.winaffinity.vip/auth/register?ref={{ user.referral_code }}" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:rgba(45,95,143,.08);color:var(--bl);border:1.5px solid var(--bd);border-radius:10px;font-size:12.5px;font-weight:700;text-decoration:none">💬 Partager SMS</a>
     </div>
     <div style="display:none">
     </div>
-    <div class="ref-link">https://winaffinity.vercel.app/auth/register?ref={{ user.referral_code }}</div>
+    <div class="ref-link">https://www.winaffinity.vip/auth/register?ref={{ user.referral_code }}</div>
   </div>
 
   {% if user.level != 'premium' %}
@@ -121,7 +121,7 @@ input:focus{border-color:var(--or)}
   <div class="card">
     <div class="card-title">📱 Mon QR Code de parrainage</div>
     <div style="text-align:center;padding:10px">
-      <img id="qrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://winaffinity.vercel.app/auth/register?ref={{ user.referral_code }}&color=1A3A5C&bgcolor=F0F4F8" style="border-radius:12px;border:2px solid var(--bd);width:180px;height:180px"/>
+      <img id="qrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://www.winaffinity.vip/auth/register?ref={{ user.referral_code }}&color=1A3A5C&bgcolor=F0F4F8" style="border-radius:12px;border:2px solid var(--bd);width:180px;height:180px"/>
       <div style="font-size:12px;color:var(--txd);margin-top:10px;margin-bottom:12px">Faites scanner ce QR code pour vous rejoindre</div>
       <button onclick="downloadQR()" style="background:linear-gradient(135deg,#FF6B35,#FF8C5A);color:#fff;border:none;border-radius:10px;padding:10px 20px;font-family:Poppins,sans-serif;font-size:13px;font-weight:700;cursor:pointer">⬇ Télécharger</button>
     </div>
@@ -162,13 +162,13 @@ input:focus{border-color:var(--or)}
 <script>
 function downloadQR(){
   const link = document.createElement("a");
-  link.href = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://winaffinity.vercel.app/auth/register?ref={{ user.referral_code }}&color=1A3A5C&bgcolor=F0F4F8";
+  link.href = "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=https://www.winaffinity.vip/auth/register?ref={{ user.referral_code }}&color=1A3A5C&bgcolor=F0F4F8";
   link.download = "qr-winaffinity-{{ user.referral_code }}.png";
   link.target = "_blank";
   link.click();
 }
 function copyCode(){
-  navigator.clipboard.writeText("https://winaffinity.vercel.app/auth/register?ref={{ user.referral_code }}").then(()=>{
+  navigator.clipboard.writeText("https://www.winaffinity.vip/auth/register?ref={{ user.referral_code }}").then(()=>{
     const t=document.getElementById("toast");
     t.textContent="✓ Lien copié !";
     t.className="show ok";

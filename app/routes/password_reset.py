@@ -25,7 +25,7 @@ async def post_forgot(request: Request, email: Annotated[str, Form()]):
     if result.get("token") and result.get("user"):
         user = result["user"]
         token = result["token"]
-        reset_url = f"https://winaffinity.vercel.app/auth/reset-password?token={token}"
+        reset_url = f"https://www.winaffinity.vip/auth/reset-password?token={token}"
         try:
             from app.services.email_service import send_reset_password_email
             await send_reset_password_email(user["email"], user["full_name"], reset_url)
