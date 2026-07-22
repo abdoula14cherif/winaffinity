@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>WIN AFFINITY — Ma Carte</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 <link rel="manifest" href="/assets/manifest.json"/>
 <link rel="icon" type="image/png" href="/assets/app-icon-192.png"/>
 <style>
@@ -18,26 +19,86 @@ html,body{min-height:100%;font-family:"Poppins",sans-serif;background:var(--bg);
 .back-btn{color:rgba(255,255,255,.8);text-decoration:none;font-size:13px;padding:7px 14px;border:1px solid rgba(255,255,255,.2);border-radius:8px}
 .page{min-height:100vh;padding:76px 16px 50px;max-width:680px;margin:0 auto}
 
-/* Carte bancaire visuelle */
-.card-visual{background:linear-gradient(135deg,#1A3A5C 0%,#2D5F8F 50%,#1A3A5C 100%);border-radius:20px;padding:28px;margin-bottom:20px;position:relative;overflow:hidden;min-height:200px;box-shadow:0 20px 60px rgba(26,58,92,.4)}
-.card-visual::before{content:"";position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,107,53,.1)}
-.card-visual::after{content:"";position:absolute;bottom:-40px;left:-40px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.04)}
-.card-chip{width:44px;height:34px;background:linear-gradient(135deg,#FFD700,#FFA500);border-radius:6px;margin-bottom:20px;display:flex;align-items:center;justify-content:center;position:relative}
-.card-chip::before{content:"";position:absolute;width:30px;height:22px;border:1px solid rgba(0,0,0,.2);border-radius:4px}
-.card-number{font-size:18px;font-weight:700;color:#fff;letter-spacing:.2em;margin-bottom:20px;font-family:"Courier New",monospace}
-.card-bottom{display:flex;justify-content:space-between;align-items:flex-end}
-.card-holder-label{font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
-.card-holder-name{font-size:14px;font-weight:700;color:#fff;text-transform:uppercase}
-.card-logo{text-align:right}
-.card-logo-txt{font-size:20px;font-weight:900;color:#fff;opacity:.9}
-.card-logo-sub{font-size:10px;color:rgba(255,255,255,.5)}
-.card-balance{position:absolute;top:24px;right:24px;text-align:right}
-.cb-label{font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase}
-.cb-amount{font-size:24px;font-weight:900;color:#FF8C5A}
-.cb-currency{font-size:12px;color:rgba(255,255,255,.6)}
-.card-status-badge{position:absolute;bottom:24px;right:24px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700}
-.cs-active{background:rgba(0,184,148,.2);color:#00B894;border:1px solid rgba(0,184,148,.3)}
-.cs-pending{background:rgba(243,156,18,.2);color:var(--warn);border:1px solid rgba(243,156,18,.3)}
+/* ===================== CARTE BANCAIRE VIRTUELLE (style réel) ===================== */
+.card-wrap{perspective:1200px;margin-bottom:20px}
+.card-visual{
+  position:relative;
+  width:100%;
+  aspect-ratio:1.586/1; /* format carte bancaire ISO réel (85.6mm x 53.98mm) */
+  max-height:230px;
+  border-radius:18px;
+  padding:22px 22px 18px;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 85% 15%, rgba(255,140,90,.35), transparent 45%),
+    radial-gradient(circle at 10% 90%, rgba(45,95,143,.5), transparent 50%),
+    linear-gradient(135deg,#0F2036 0%,#1A3A5C 45%,#0F2036 100%);
+  box-shadow:0 20px 45px rgba(15,32,54,.45), inset 0 1px 0 rgba(255,255,255,.08);
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+/* texture fine imitation carte plastifiée */
+.card-visual::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    repeating-linear-gradient(115deg, rgba(255,255,255,.025) 0px, rgba(255,255,255,.025) 1px, transparent 1px, transparent 3px);
+  mix-blend-mode:overlay;
+}
+.card-visual::after{content:"";position:absolute;top:-70px;right:-70px;width:220px;height:220px;border-radius:50%;background:rgba(255,107,53,.12)}
+
+/* -- ligne du haut : logo + statut + oeil -- */
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;position:relative;z-index:2}
+.card-brandmark{display:flex;align-items:center;gap:7px}
+.card-brandmark .cbm-ico{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#FF6B35,#FF8C5A);display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 3px 8px rgba(255,107,53,.5)}
+.card-brandmark .cbm-txt{font-size:14px;font-weight:800;letter-spacing:.03em}
+.card-brandmark .cbm-txt span{color:#FF8C5A}
+.card-top-right{display:flex;align-items:center;gap:10px}
+.card-status-pill{padding:3px 10px;border-radius:20px;font-size:9.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase}
+.cs-active{background:rgba(0,184,148,.22);color:#4CE0BE;border:1px solid rgba(0,184,148,.4)}
+.cs-pending{background:rgba(243,156,18,.22);color:#FFC868;border:1px solid rgba(243,156,18,.4)}
+.eye-toggle{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:background var(--t)}
+.eye-toggle:hover{background:rgba(255,255,255,.2)}
+
+/* -- puce + contactless -- */
+.card-mid{display:flex;align-items:center;gap:14px;position:relative;z-index:2}
+.card-chip{width:42px;height:32px;border-radius:6px;background:linear-gradient(145deg,#FFE9A8,#D4A94A);position:relative;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.card-chip::before{content:"";position:absolute;inset:5px;border:1px solid rgba(0,0,0,.25);border-radius:3px}
+.card-chip::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(0,0,0,.2)}
+.card-contactless{font-size:20px;opacity:.85;transform:rotate(90deg)}
+
+/* -- numero de carte -- */
+.card-number-row{display:flex;align-items:center;gap:10px;position:relative;z-index:2}
+.card-number{font-family:"Space Mono",monospace;font-size:19px;font-weight:700;letter-spacing:.14em;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.card-number .grp{display:inline-block;min-width:4.4ch}
+
+/* -- bas de carte : titulaire / expiration / cvv / logo reseau -- */
+.card-bottom{display:flex;align-items:flex-end;justify-content:space-between;position:relative;z-index:2;gap:10px}
+.card-bottom-left{display:flex;gap:22px}
+.card-field{display:flex;flex-direction:column;gap:3px}
+.cf-label{font-size:8px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.08em}
+.cf-value{font-family:"Space Mono",monospace;font-size:12.5px;font-weight:700;letter-spacing:.04em}
+.card-holder-name{font-family:"Poppins",sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+
+/* -- logo reseau type Visa/Mastercard -- */
+.card-network{display:flex;align-items:center}
+.network-dots{position:relative;width:46px;height:28px}
+.network-dots span{position:absolute;top:0;width:28px;height:28px;border-radius:50%}
+.network-dots span:first-child{left:0;background:rgba(255,107,53,.85)}
+.network-dots span:last-child{left:18px;background:rgba(45,95,143,.85);mix-blend-mode:screen}
+
+/* -- solde carte (badge flottant, discret) -- */
+.card-balance-badge{position:absolute;top:20px;right:20px;text-align:right;z-index:2;display:none}
+.cbb-label{font-size:8px;color:rgba(255,255,255,.5);text-transform:uppercase}
+.cbb-amount{font-size:15px;font-weight:800;color:#FF8C5A}
+
+/* solde affiché séparément sous la carte, toujours visible */
+.card-balance-strip{display:flex;justify-content:space-between;align-items:center;background:var(--wh);border-radius:14px;padding:14px 18px;box-shadow:var(--sh);border:1.5px solid var(--bd);margin-bottom:16px}
+.cbs-label{font-size:11px;color:var(--txd);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.cbs-amount{font-size:22px;font-weight:900;color:var(--bl)}
+.cbs-amount span{font-size:13px;color:var(--txd);font-weight:600}
+/* ===================== FIN CARTE ===================== */
 
 /* Actions rapides */
 .quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
@@ -128,28 +189,65 @@ input:focus,select:focus{border-color:var(--or)}
 
 <div class="page">
   {% if card %}
-  <!-- Carte existante -->
-  <div class="card-visual">
-    <div class="card-balance">
-      <div class="cb-label">Solde carte</div>
-      <div class="cb-amount">{{ card.balance|int }}</div>
-      <div class="cb-currency">FCFA</div>
-    </div>
-    <div class="card-chip"></div>
-    <div class="card-number">{{ card.card_number or "•••• •••• •••• ••••" }}</div>
-    <div class="card-bottom">
-      <div>
-        <div class="card-holder-label">Titulaire</div>
-        <div class="card-holder-name">{{ card.card_holder }}</div>
+  <!-- ===== Carte bancaire virtuelle (style réel) ===== -->
+  <div class="card-wrap">
+    <div class="card-visual" id="cardVisual"
+         data-full="{{ card.card_number or '0000000000000000' }}"
+         data-masked="•••• •••• •••• {{ (card.card_number or '0000000000000000')[-4:] }}"
+         data-cvv-full="{{ card.cvv or '•••' }}"
+         data-cvv-masked="•••">
+
+      <div class="card-top">
+        <div class="card-brandmark">
+          <div class="cbm-ico">◈</div>
+          <div class="cbm-txt">WIN <span>AFFINITY</span></div>
+        </div>
+        <div class="card-top-right">
+          <span class="card-status-pill {% if card.status == 'active' %}cs-active{% else %}cs-pending{% endif %}">
+            {% if card.status == 'active' %}Active{% else %}En attente{% endif %}
+          </span>
+          <div class="eye-toggle" id="eyeToggle" onclick="toggleCardInfo()" title="Afficher / masquer les infos">👁️</div>
+        </div>
       </div>
-      <div class="card-logo">
-        <div class="card-logo-txt">WIN</div>
-        <div class="card-logo-sub">AFFINITY CARD</div>
+
+      <div class="card-mid">
+        <div class="card-chip"></div>
+        <div class="card-contactless">))) </div>
+      </div>
+
+      <div class="card-number-row">
+        <div class="card-number" id="cardNumberDisplay">•••• •••• •••• {{ (card.card_number or '0000000000000000')[-4:] }}</div>
+      </div>
+
+      <div class="card-bottom">
+        <div class="card-bottom-left">
+          <div class="card-field">
+            <div class="cf-label">Titulaire</div>
+            <div class="card-holder-name">{{ card.card_holder }}</div>
+          </div>
+          <div class="card-field">
+            <div class="cf-label">Exp.</div>
+            <div class="cf-value">{{ card.expiry_date or "••/••" }}</div>
+          </div>
+          <div class="card-field">
+            <div class="cf-label">CVV</div>
+            <div class="cf-value" id="cardCvvDisplay">•••</div>
+          </div>
+        </div>
+        <div class="card-network">
+          <div class="network-dots"><span></span><span></span></div>
+        </div>
       </div>
     </div>
-    <span class="card-status-badge {% if card.status == 'active' %}cs-active{% else %}cs-pending{% endif %}">
-      {% if card.status == 'active' %}✅ Active{% else %}⏳ En attente{% endif %}
-    </span>
+  </div>
+
+  <!-- Solde, toujours visible sous la carte -->
+  <div class="card-balance-strip">
+    <div>
+      <div class="cbs-label">Solde carte</div>
+      <div class="cbs-amount">{{ card.balance|int }} <span>FCFA</span></div>
+    </div>
+    <div class="qa-ico" style="font-size:26px">💳</div>
   </div>
 
   <!-- Actions rapides -->
@@ -294,6 +392,7 @@ input:focus,select:focus{border-color:var(--or)}
 var walletBalance = {{ wallet.balance|int }};
 var cardBalance = {{ card.balance|int if card else 0 }};
 var foundRecv = null;
+var cardInfoVisible = false;
 
 function toast(msg, type){
   var t=document.getElementById("toast");
@@ -308,6 +407,27 @@ function showTab(name){
   var secEl = document.getElementById("sec-"+name);
   if(tabEl) tabEl.classList.add("active");
   if(secEl) secEl.classList.add("active");
+}
+
+// Afficher / masquer numéro complet + CVV de la carte
+function formatCardNumber(num){
+  return num.replace(/(.{4})/g, "$1 ").trim();
+}
+function toggleCardInfo(){
+  var el = document.getElementById("cardVisual");
+  var numDisplay = document.getElementById("cardNumberDisplay");
+  var cvvDisplay = document.getElementById("cardCvvDisplay");
+  var eye = document.getElementById("eyeToggle");
+  cardInfoVisible = !cardInfoVisible;
+  if(cardInfoVisible){
+    numDisplay.textContent = formatCardNumber(el.getAttribute("data-full"));
+    cvvDisplay.textContent = el.getAttribute("data-cvv-full");
+    eye.textContent = "🙈";
+  } else {
+    numDisplay.textContent = el.getAttribute("data-masked");
+    cvvDisplay.textContent = el.getAttribute("data-cvv-masked");
+    eye.textContent = "👁️";
+  }
 }
 
 // Créer carte
