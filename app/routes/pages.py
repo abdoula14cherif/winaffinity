@@ -47,21 +47,21 @@ async def winbot_chat(request: Request):
     if not api_key:
         return JSONResponse({"error": "Clé API manquante"}, status_code=500)
     try:
-        r = httpx.post(
-            "https://api.anthropic.com/v1/messages",
-            headers={
-                "x-api-key": api_key,
-                "anthropic-version": "2023-06-01",
-                "content-type": "application/json"
-            },
-            json={
-                "model": "claude-haiku-4-5-20251001",
-                "max_tokens": 1000,
-                "system": system,
-                "messages": messages
-            },
-            timeout=30
-        )
+        async with httpx.AsyncClient(timeout=30) as client:
+            r = await client.post(
+                "https://api.anthropic.com/v1/messages",
+                headers={
+                    "x-api-key": api_key,
+                    "anthropic-version": "2023-06-01",
+                    "content-type": "application/json"
+                },
+                json={
+                    "model": "claude-haiku-4-5-20251001",
+                    "max_tokens": 1000,
+                    "system": system,
+                    "messages": messages
+                }
+            )
         return JSONResponse({"status": r.status_code, "data": r.json()})
     except Exception as e:
         return JSONResponse({"error": str(e), "type": type(e).__name__}, status_code=500)
