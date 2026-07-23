@@ -5,6 +5,8 @@ import logging
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
+
+logger = logging.getLogger(__name__)
 from app.database import get_supabase
 from app.security import decode_access_token
 from app.services.auth_service import get_user_by_id
