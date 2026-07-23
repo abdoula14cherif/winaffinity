@@ -3,6 +3,7 @@ Routes Carte Virtuelle WIN AFFINITY
 """
 import logging
 import random
+from datetime import datetime, timedelta
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
@@ -26,6 +27,13 @@ def generate_card_number():
     groups = [str(random.randint(1000,9999)) for _ in range(4)]
     groups[0] = "4242"
     return " ".join(groups)
+
+def generate_expiry():
+    exp = datetime.now() + timedelta(days=365*3)
+    return exp.strftime("%m/%y")
+
+def generate_cvv():
+    return str(random.randint(100, 999))
 
 @router.get("", response_class=HTMLResponse)
 async def get_card(request: Request):
@@ -65,6 +73,8 @@ async def create_card(request: Request):
         "user_id": user["id"],
         "card_number": card_number,
         "card_holder": user["full_name"].upper(),
+        "expiry_date": generate_expiry(),
+        "cvv": generate_cvv(),
         "balance": 0,
         "status": "active"
     }).execute()
