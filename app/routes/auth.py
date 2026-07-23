@@ -291,6 +291,7 @@ async def post_login(
         httponly=True,
         samesite="lax",
         secure=settings.cookie_secure,
+        domain=".winaffinity.vip",
     )
     redirect_response.set_cookie("access_token", access_token, max_age=3600, **cookie_opts)
     redirect_response.set_cookie("refresh_token", refresh_token, max_age=604800, **cookie_opts)
