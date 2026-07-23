@@ -44,8 +44,10 @@ async def winbot_chat(request: Request):
     messages = body.get("messages", [])
     system = body.get("system", "")
     api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+    logger.info("[WINBOT] Requete recue, messages=%d, api_key_present=%s", len(messages), bool(api_key))
     if not api_key:
-        return JSONResponse({"error": "Clé API manquante"}, status_code=500)
+        logger.error("[WINBOT] ANTHROPIC_API_KEY absente des variables d environnement")
+        return JSONResponse({"error": "Clé API manquante", "debug": "ANTHROPIC_API_KEY non definie sur le serveur"}, status_code=500)
     try:
         async with httpx.AsyncClient(timeout=30) as client:
             r = await client.post(
@@ -62,8 +64,20 @@ async def winbot_chat(request: Request):
                     "messages": messages
                 }
             )
-        return JSONResponse({"status": r.status_code, "data": r.json()})
+        logger.info("[WINBOT] Reponse Anthropic status=%s", r.status_code)
+        try:
+            data = r.json()
+        except Exception as je:
+            logger.error("[WINBOT] Reponse non-JSON: %s", r.text[:500])
+            return JSONResponse({"error": "Reponse invalide de l API", "debug": r.text[:500], "status_code": r.status_code}, status_code=502)
+        if r.status_code != 200:
+            logger.error("[WINBOT] Erreur API Anthropic: %s", data)
+        return JSONResponse({"status": r.status_code, "data": data})
+    except httpx.TimeoutException as e:
+        logger.error("[WINBOT] Timeout: %s", e)
+        return JSONResponse({"error": "Timeout - l API n a pas repondu a temps", "type": "TimeoutException"}, status_code=504)
     except Exception as e:
+        logger.error("[WINBOT] Exception: %s: %s", type(e).__name__, str(e))
         return JSONResponse({"error": str(e), "type": type(e).__name__}, status_code=500)
 
 @router.get("/recharge", response_class=HTMLResponse)
