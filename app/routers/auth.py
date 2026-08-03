@@ -113,3 +113,16 @@ async def get_me(request: Request, user_id: str = Depends(get_current_user_id)):
         full_name=user.get("full_name"),
         referral_code=user["referral_code"],
     )
+
+
+@router.get("/solde")
+@limiter.limit("30/minute")
+async def get_solde(request: Request, user_id: str = Depends(get_current_user_id)):
+    result = (
+        supabase_admin.table("transactions")
+        .select("commission")
+        .eq("referrer_id", user_id)
+        .execute()
+    )
+    total = sum(row["commission"] for row in result.data)
+    return {"solde": total, "nombre_ventes": len(result.data)}
