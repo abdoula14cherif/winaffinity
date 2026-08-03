@@ -100,7 +100,7 @@
     <div class="stat-row">
       <div class="stat-card"><div class="label">Solde</div><div class="value" id="soldeValue">0</div><div class="unit">F CFA</div></div>
       <div class="stat-card"><div class="label">Abonnement</div><div class="value" style="font-size:1rem;">Actif</div><div class="unit">Illimité</div></div>
-      <div class="stat-card"><div class="label">Réseau</div><div class="value">0</div><div class="unit">filleuls</div></div>
+      <div class="stat-card"><div class="label">Ventes</div><div class="value" id="ventesValue">0</div><div class="unit">via ton lien</div></div>
     </div>
   </div>
 </div>
@@ -140,22 +140,6 @@
     <div class="ref-box">
       <span id="refLink">Chargement...</span>
       <div class="copy-pill" onclick="copyRef()">Copier</div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">Derniers gains</div>
-    <div class="list-card">
-      <div class="list-row">
-        <div class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-        <div class="info"><div class="who">Aïcha D.</div><div class="what">Excel pour débutants</div></div>
-        <div class="amount">+1 600 F</div>
-      </div>
-      <div class="list-row">
-        <div class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-        <div class="info"><div class="who">Moussa K.</div><div class="what">Abonnement illimité</div></div>
-        <div class="amount">+2 450 F</div>
-      </div>
     </div>
   </div>
 
@@ -214,6 +198,15 @@
       document.getElementById("greetEmail").textContent = data.email;
       document.getElementById("avatarInitial").textContent = firstName.charAt(0).toUpperCase();
       document.getElementById("refLink").textContent = `winaffinity.vip/r/${data.referral_code}`;
+
+      const soldeRes = await fetch(`${API_BASE}/auth/solde`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (soldeRes.ok) {
+        const soldeData = await soldeRes.json();
+        document.getElementById("soldeValue").textContent = soldeData.solde.toLocaleString('fr-FR');
+        document.getElementById("ventesValue").textContent = soldeData.nombre_ventes;
+      }
     } catch (e) { logout(); }
   }
   loadMe();
