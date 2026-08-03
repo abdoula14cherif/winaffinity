@@ -366,6 +366,7 @@
       submitBtn.textContent = currentTab === "register" ? "Créer mon compte" : "Se connecter";
     }
   }
+  if (new URLSearchParams(window.location.search).get("register") === "1") { openAuthModal("register"); }
 </script>
 
 </body>
