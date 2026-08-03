@@ -21,7 +21,7 @@
   }
 
   *{ box-sizing: border-box; margin:0; padding:0; }
-  html{ scroll-behavior: smooth; }
+  html{ scroll-behavior: smooth; overflow-x: hidden; }
   body{ background: var(--bg); color: var(--text); font-family: 'Manrope', sans-serif; line-height: 1.5; overflow-x: hidden; }
   h1, h2, h3, .display{ font-family: 'Fraunces', serif; font-weight: 600; letter-spacing: -0.01em; line-height: 1.08; }
   .mono{ font-family: 'IBM Plex Mono', monospace; }
@@ -38,7 +38,7 @@
   .nav-cta{ background: var(--gold); color: #14100A; font-weight:700; padding: 10px 20px; border-radius: 999px; font-size: 0.9rem; }
   @media (max-width: 720px){ .nav-links{ display:none; } }
 
-  .hero{ padding: 90px 0 60px; position: relative; }
+  .hero{ padding: 90px 0 60px; position: relative; overflow: hidden; }
   .hero::before{ content:""; position:absolute; top: -120px; right: -180px; width: 480px; height: 480px; border-radius: 50%; background: radial-gradient(circle, var(--gold-soft), transparent 70%); pointer-events:none; }
   .eyebrow{ color: var(--gold); font-size: 0.82rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 18px; display:flex; align-items:center; gap:10px; }
   .eyebrow::before{ content:""; width:24px; height:1px; background: var(--gold); }
