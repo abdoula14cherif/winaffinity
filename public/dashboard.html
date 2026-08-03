@@ -8,117 +8,72 @@
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap');
 
   :root{
-    --navy: #0B1A3D;
-    --red: #7A1F2B;
-    --cream: #F3EFE6;
-    --gold: #E8B84B;
-    --silver: #C6CDD6;
-    --bronze: #C3793F;
-    --text-dark: #16223F;
-    --text-dim: #6B7385;
-    --green: #2FBF8F;
-    --line: #E4DFD3;
+    --navy: #0B1A3D; --red: #7A1F2B; --cream: #F3EFE6; --gold: #E8B84B;
+    --text-dark: #16223F; --text-dim: #6B7385; --green: #2FBF8F; --line: #E4DFD3;
   }
-
-  *{ box-sizing: border-box; margin:0; padding:0; } html,body{ overflow-x: hidden; max-width: 100vw; }
-  body{ background: var(--cream); color: var(--text-dark); font-family: 'Manrope', sans-serif; overflow-x: hidden; width: 100%; }
+  *{ box-sizing: border-box; margin:0; padding:0; }
+  html,body{ overflow-x: hidden; max-width: 100vw; }
+  body{ background: var(--cream); color: var(--text-dark); font-family: 'Manrope', sans-serif; padding-bottom: 78px; }
   h1,h2,h3{ font-family: 'Fraunces', serif; font-weight: 600; }
   a{ color: inherit; text-decoration: none; }
   .wrap{ max-width: 720px; margin: 0 auto; padding: 0 20px; }
 
-  .header{
-    background: linear-gradient(115deg, var(--navy) 0%, var(--navy) 45%, var(--red) 100%);
-    padding-bottom: 34px; color: #fff; position: relative; overflow: hidden;
-  }
-  .header::after{
-    content:""; position:absolute; top:-60px; right:-60px; width:220px; height:220px;
-    border-radius:50%; background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%);
-  }
+  .header{ background: linear-gradient(115deg, var(--navy) 0%, var(--navy) 45%, var(--red) 100%); padding-bottom: 30px; color: #fff; position: relative; overflow: hidden; }
+  .header::after{ content:""; position:absolute; top:-60px; right:-60px; width:220px; height:220px; border-radius:50%; background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%); }
   .topbar{ display:flex; align-items:center; justify-content:space-between; padding: 18px 20px 0; }
   .brand{ display:flex; align-items:center; gap:10px; }
-  .brand .mark{
-    width:38px; height:38px; border-radius:10px; background: var(--gold);
-    display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-weight:700; color: var(--navy); font-size:1.1rem;
-  }
-  .brand .name{ font-family:'Fraunces', serif; font-weight:700; letter-spacing:0.04em; font-size:1.05rem; }
-  .menu-btn{ width:40px; height:40px; border-radius:10px; background: rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; }
+  .brand .mark{ width:36px; height:36px; border-radius:10px; background: var(--gold); display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-weight:700; color: var(--navy); font-size:1rem; }
+  .brand .name{ font-family:'Fraunces', serif; font-weight:700; letter-spacing:0.04em; font-size:1rem; }
+  .menu-btn{ width:38px; height:38px; border-radius:10px; background: rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; }
 
-  .greet-row{ display:flex; align-items:flex-start; justify-content:space-between; padding: 26px 20px 0; }
-  .greet-row h2{ font-family:'Manrope', sans-serif; font-weight:700; font-size:1.3rem; }
-  .greet-row .sub{ color: rgba(255,255,255,0.6); font-size:0.85rem; margin-top:4px; }
-  .avatar-badge{
-    width:56px; height:56px; border-radius:16px; background: var(--gold);
-    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.3rem; color: var(--navy);
-    box-shadow: 0 10px 24px -8px rgba(232,184,75,0.6);
-  }
+  .greet-row{ display:flex; align-items:flex-start; justify-content:space-between; padding: 22px 20px 0; }
+  .greet-row h2{ font-family:'Manrope', sans-serif; font-weight:700; font-size:1.2rem; }
+  .greet-row .sub{ color: rgba(255,255,255,0.6); font-size:0.82rem; margin-top:4px; }
+  .avatar-badge{ width:50px; height:50px; border-radius:14px; background: var(--gold); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.15rem; color: var(--navy); box-shadow: 0 10px 24px -8px rgba(232,184,75,0.6); }
 
-  .stat-row{ display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; padding: 22px 20px 0; }
-  .stat-card{
-    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 14px; padding: 14px 12px;
-  }
-  .stat-card .label{ font-size:0.66rem; letter-spacing:0.08em; text-transform:uppercase; color: rgba(255,255,255,0.55); font-weight:700; }
-  .stat-card .value{ font-family:'Fraunces', serif; font-size:1.5rem; margin-top:6px; }
-  .stat-card .unit{ font-size:0.72rem; color: rgba(255,255,255,0.55); margin-top:2px; }
+  .stat-row{ display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; padding: 20px 20px 0; }
+  .stat-card{ background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 12px 10px; }
+  .stat-card .label{ font-size:0.64rem; letter-spacing:0.07em; text-transform:uppercase; color: rgba(255,255,255,0.55); font-weight:700; }
+  .stat-card .value{ font-family:'Fraunces', serif; font-size:1.35rem; margin-top:6px; }
+  .stat-card .unit{ font-size:0.7rem; color: rgba(255,255,255,0.55); margin-top:2px; }
 
-  .section{ padding: 30px 20px 0; }
-  .section-title{
-    display:flex; align-items:center; gap:12px; font-size:0.78rem; letter-spacing:0.1em;
-    text-transform:uppercase; color: var(--text-dim); font-weight:800; margin-bottom:16px;
-  }
+  .section{ padding: 26px 20px 0; }
+  .section-title{ display:flex; align-items:center; gap:12px; font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase; color: var(--text-dim); font-weight:800; margin-bottom:14px; }
   .section-title::after{ content:""; flex:1; height:1px; background: var(--line); }
 
-  .medal-row{ display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; }
-  .medal-card{
-    background:#fff; border-radius:16px; padding: 20px 10px; text-align:center;
-    box-shadow: 0 8px 20px -14px rgba(22,34,63,0.3); border: 1px solid var(--line);
-  }
-  .medal-card svg{ width:24px; height:24px; margin-bottom:8px; }
-  .medal-card .value{ font-family:'Fraunces', serif; font-size:1.4rem; font-weight:700; }
-  .medal-card .label{ font-size:0.76rem; color: var(--text-dim); margin-top:4px; }
+  .medal-row{ display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; }
+  .medal-card{ background:#fff; border-radius:14px; padding: 14px 8px; text-align:center; box-shadow: 0 6px 16px -12px rgba(22,34,63,0.3); border: 1px solid var(--line); }
+  .medal-card svg{ width:18px; height:18px; margin-bottom:6px; }
+  .medal-card .value{ font-family:'Fraunces', serif; font-size:1.15rem; font-weight:700; }
+  .medal-card .label{ font-size:0.68rem; color: var(--text-dim); margin-top:3px; line-height:1.25; }
 
   .quick-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
-  .quick-card{
-    background:#fff; border-radius:16px; padding: 18px; display:flex; align-items:center; gap:14px;
-    border: 1px solid var(--line); box-shadow: 0 8px 20px -14px rgba(22,34,63,0.25);
-  }
-  .quick-card .icon-box{
-    width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
-  }
-  .quick-card .icon-box svg{ width:24px; height:24px; }
-  .quick-card .title{ font-weight:700; font-size:0.95rem; }
-  .quick-card .sub{ font-size:0.78rem; color: var(--text-dim); }
-
+  .quick-card{ background:#fff; border-radius:16px; padding: 16px; display:flex; align-items:center; gap:12px; border: 1px solid var(--line); box-shadow: 0 8px 20px -14px rgba(22,34,63,0.25); }
+  .quick-card .icon-box{ width:42px; height:42px; border-radius:11px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .quick-card .icon-box svg{ width:20px; height:20px; }
+  .quick-card .title{ font-weight:700; font-size:0.9rem; }
+  .quick-card .sub{ font-size:0.75rem; color: var(--text-dim); }
   .icon-blue{ background:#E4EBFB; color:#3B5BDB; }
   .icon-gold{ background:#FBF0D8; color:#B8860B; }
 
-  .list-card{
-    background:#fff; border-radius:16px; padding: 8px; border: 1px solid var(--line);
-    box-shadow: 0 8px 20px -14px rgba(22,34,63,0.25);
-  }
+  .list-card{ background:#fff; border-radius:16px; padding: 8px; border: 1px solid var(--line); box-shadow: 0 8px 20px -14px rgba(22,34,63,0.25); }
   .list-row{ display:flex; align-items:center; gap:14px; padding: 14px 12px; border-bottom: 1px solid var(--line); }
   .list-row:last-child{ border-bottom:none; }
-  .list-row .dot{ width:40px; height:40px; border-radius:10px; background: var(--cream); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-  .list-row .dot svg{ width:20px; height:20px; color: var(--red); }
+  .list-row .dot{ width:38px; height:38px; border-radius:10px; background: var(--cream); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .list-row .dot svg{ width:18px; height:18px; color: var(--red); }
   .list-row .info{ flex:1; min-width:0; }
-  .list-row .who{ font-weight:700; font-size:0.9rem; }
-  .list-row .what{ font-size:0.78rem; color: var(--text-dim); }
-  .list-row .amount{ font-weight:800; color: var(--green); font-size:0.9rem; white-space:nowrap; }
+  .list-row .who{ font-weight:700; font-size:0.88rem; }
+  .list-row .what{ font-size:0.76rem; color: var(--text-dim); }
+  .list-row .amount{ font-weight:800; color: var(--green); font-size:0.88rem; white-space:nowrap; }
 
-  .ref-box{
-    display:flex; align-items:center; gap:10px; background: var(--cream); border: 1px dashed var(--text-dim);
-    border-radius: 12px; padding: 12px 14px; margin-top: 14px; font-size:0.8rem; color: var(--text-dim);
-  }
+  .ref-box{ display:flex; align-items:center; gap:10px; background: var(--cream); border: 1px dashed var(--text-dim); border-radius: 12px; padding: 12px 14px; margin-top: 14px; font-size:0.78rem; color: var(--text-dim); }
   .ref-box span{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; color: var(--text-dark); }
-  .copy-pill{ background: var(--navy); color:#fff; font-weight:700; font-size:0.75rem; padding:8px 14px; border-radius:999px; flex-shrink:0; }
+  .copy-pill{ background: var(--navy); color:#fff; font-weight:700; font-size:0.73rem; padding:8px 14px; border-radius:999px; flex-shrink:0; }
 
-  .bottom-nav{
-    position: sticky; bottom:0; background:#fff; border-top: 1px solid var(--line);
-    display:flex; justify-content: space-around; padding: 10px 0 16px; margin-top: 40px;
-  }
-  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:5px; font-size:0.7rem; color: var(--text-dim); font-weight:700; }
+  .bottom-nav{ position: fixed; left:0; right:0; bottom:0; background:#fff; border-top: 1px solid var(--line); display:flex; justify-content: space-around; padding: 10px 0 14px; z-index: 50; }
+  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; font-size:0.68rem; color: var(--text-dim); font-weight:700; }
   .nav-item.active{ color: var(--red); }
-  .nav-item svg{ width:22px; height:22px; }
+  .nav-item svg{ width:20px; height:20px; }
 
   footer{ text-align:center; padding: 20px; font-size:0.75rem; color: var(--text-dim); }
 </style>
@@ -127,40 +82,25 @@
 
 <div class="header">
   <div class="topbar">
-    <div class="brand">
-      <div class="mark">W</div>
-      <div class="name">WINAFFINITY</div>
-    </div>
-    <div class="menu-btn">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    <div class="brand"><div class="mark">W</div><div class="name">WINAFFINITY</div></div>
+    <div class="menu-btn" onclick="logout()">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
     </div>
   </div>
 
   <div class="greet-row">
     <div>
-      <h2>Bonjour 👋</h2>
-      <div class="sub">Content de te revoir</div>
+      <h2 id="greetName">Bonjour 👋</h2>
+      <div class="sub" id="greetEmail">Content de te revoir</div>
     </div>
-    <div class="avatar-badge">A</div>
+    <div class="avatar-badge" id="avatarInitial">•</div>
   </div>
 
   <div class="wrap">
     <div class="stat-row">
-      <div class="stat-card">
-        <div class="label">Solde</div>
-        <div class="value" id="statSolde">0</div>
-        <div class="unit">F CFA</div>
-      </div>
-      <div class="stat-card">
-        <div class="label">Abonnement</div>
-        <div class="value" style="font-size:1.1rem;">Actif</div>
-        <div class="unit">Illimité</div>
-      </div>
-      <div class="stat-card">
-        <div class="label">Réseau</div>
-        <div class="value" id="statReseau">0</div>
-        <div class="unit">filleuls</div>
-      </div>
+      <div class="stat-card"><div class="label">Solde</div><div class="value">0</div><div class="unit">F CFA</div></div>
+      <div class="stat-card"><div class="label">Abonnement</div><div class="value" style="font-size:1rem;">Actif</div><div class="unit">Illimité</div></div>
+      <div class="stat-card"><div class="label">Réseau</div><div class="value">0</div><div class="unit">filleuls</div></div>
     </div>
   </div>
 </div>
@@ -172,18 +112,15 @@
     <div class="medal-row">
       <div class="medal-card">
         <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="9" r="6" fill="#E8B84B"/><path d="M8 14l-2 7 6-3 6 3-2-7" fill="#C99A2E"/></svg>
-        <div class="value">7</div>
-        <div class="label">Formations en cours</div>
+        <div class="value">7</div><div class="label">Formations en cours</div>
       </div>
       <div class="medal-card">
         <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="9" r="6" fill="#C6CDD6"/><path d="M8 14l-2 7 6-3 6 3-2-7" fill="#9AA2AC"/></svg>
-        <div class="value">12</div>
-        <div class="label">Ebooks terminés</div>
+        <div class="value">12</div><div class="label">Ebooks terminés</div>
       </div>
       <div class="medal-card">
         <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="9" r="6" fill="#C3793F"/><path d="M8 14l-2 7 6-3 6 3-2-7" fill="#9C5E2E"/></svg>
-        <div class="value">3</div>
-        <div class="label">Certificats obtenus</div>
+        <div class="value">3</div><div class="label">Certificats obtenus</div>
       </div>
     </div>
   </div>
@@ -191,27 +128,17 @@
   <div class="section">
     <div class="section-title">Accès rapide</div>
     <div class="quick-grid">
-      <a href="#" class="quick-card">
-        <div class="icon-box icon-blue">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
-        </div>
-        <div>
-          <div class="title">Retrait</div>
-          <div class="sub">Mes gains</div>
-        </div>
+      <a href="/retrait" class="quick-card">
+        <div class="icon-box icon-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></div>
+        <div><div class="title">Retrait</div><div class="sub">Mes gains</div></div>
       </a>
-      <a href="#" class="quick-card">
-        <div class="icon-box icon-gold">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-        </div>
-        <div>
-          <div class="title">Parrainage</div>
-          <div class="sub">Mon lien</div>
-        </div>
+      <a href="/parrainage" class="quick-card">
+        <div class="icon-box icon-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
+        <div><div class="title">Parrainage</div><div class="sub">Mon lien</div></div>
       </a>
     </div>
     <div class="ref-box">
-      <span id="refLink">winaffinity.vip/r/...</span>
+      <span id="refLink">Chargement...</span>
       <div class="copy-pill" onclick="copyRef()">Copier</div>
     </div>
   </div>
@@ -229,30 +156,25 @@
         <div class="info"><div class="who">Moussa K.</div><div class="what">Abonnement illimité</div></div>
         <div class="amount">+2 450 F</div>
       </div>
-      <div class="list-row">
-        <div class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-        <div class="info"><div class="who">Fatou S.</div><div class="what">Coder son 1er site</div></div>
-        <div class="amount">+2 100 F</div>
-      </div>
     </div>
   </div>
 
 </div>
 
 <div class="bottom-nav">
-  <a href="#" class="nav-item active">
+  <a href="/catalogue" class="nav-item active">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
     <span>eBooks</span>
   </a>
-  <a href="#" class="nav-item">
+  <a href="/retrait" class="nav-item">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
     <span>Retrait</span>
   </a>
-  <a href="#" class="nav-item">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v9H4v-9"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+  <a href="/promo" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v9H4v-9"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/></svg>
     <span>Promo</span>
   </a>
-  <a href="#" class="nav-item">
+  <a href="/business" class="nav-item">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><path d="M2 13h20"/></svg>
     <span>Business</span>
   </a>
@@ -261,6 +183,15 @@
 <footer>© 2026 Winaffinity</footer>
 
 <script>
+  const API_BASE = "https://www.winaffinity.vip";
+  const token = localStorage.getItem("winaffinity_token");
+  if (!token) { window.location.href = "/"; }
+
+  function logout() {
+    localStorage.removeItem("winaffinity_token");
+    window.location.href = "/";
+  }
+
   function copyRef() {
     const text = document.getElementById("refLink").textContent;
     navigator.clipboard.writeText(text).then(() => {
@@ -271,10 +202,21 @@
     });
   }
 
-  const token = localStorage.getItem("winaffinity_token");
-  if (!token) {
-    window.location.href = "/";
+  async function loadMe() {
+    try {
+      const res = await fetch(`${API_BASE}/auth/me`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (!res.ok) { logout(); return; }
+      const data = await res.json();
+      const firstName = data.full_name ? data.full_name.split(" ")[0] : data.email.split("@")[0];
+      document.getElementById("greetName").textContent = `Bonjour ${firstName} 👋`;
+      document.getElementById("greetEmail").textContent = data.email;
+      document.getElementById("avatarInitial").textContent = firstName.charAt(0).toUpperCase();
+      document.getElementById("refLink").textContent = `winaffinity.vip/r/${data.referral_code}`;
+    } catch (e) { logout(); }
   }
+  loadMe();
 </script>
 
 </body>

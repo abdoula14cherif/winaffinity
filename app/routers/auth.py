@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
 from app.database import supabase_admin
+from app.dependencies import get_current_user_id
 from app.schemas import UserRegister, UserLogin, UserOut, Token
 from app.security import hash_password, verify_password, create_access_token
 from app.utils import generate_referral_code
@@ -91,3 +92,24 @@ async def login(request: Request, payload: UserLogin):
 
     token = create_access_token({"sub": user["id"]})
     return Token(access_token=token)
+
+
+@router.get("/me", response_model=UserOut)
+@limiter.limit("30/minute")
+async def get_me(request: Request, user_id: str = Depends(get_current_user_id)):
+    result = (
+        supabase_admin.table("users")
+        .select("*")
+        .eq("id", user_id)
+        .execute()
+    )
+    if not result.data:
+        raise HTTPException(status_code=404, detail="Utilisateur introuvable")
+
+    user = result.data[0]
+    return UserOut(
+        id=user["id"],
+        email=user["email"],
+        full_name=user.get("full_name"),
+        referral_code=user["referral_code"],
+    )
