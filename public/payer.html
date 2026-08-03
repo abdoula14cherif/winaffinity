@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Winaffinity — Paiement</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700&family=Manrope:wght@400;600;700;800&display=swap');
+  :root{ --navy:#0B1A3D; --red:#7A1F2B; --cream:#F3EFE6; --gold:#E8B84B; --text-dark:#16223F; --text-dim:#6B7385; --green:#2FBF8F; --line:#E4DFD3; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ background:var(--cream); color:var(--text-dark); font-family:'Manrope', sans-serif; min-height:100vh; }
+  .header{ background: linear-gradient(115deg, var(--navy) 0%, var(--navy) 45%, var(--red) 100%); padding:20px; color:#fff; display:flex; align-items:center; gap:14px; }
+  .back-btn{ width:36px; height:36px; border-radius:10px; background: rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; }
+  .header h1{ font-family:'Fraunces', serif; font-size:1.15rem; }
+  .wrap{ max-width:480px; margin:0 auto; padding:24px 20px; }
+  .card{ background:#fff; border-radius:18px; padding:22px; border:1px solid var(--line); box-shadow:0 8px 20px -14px rgba(22,34,63,0.25); }
+  .titre{ font-family:'Fraunces', serif; font-weight:700; font-size:1.1rem; margin-bottom:4px; }
+  .cat{ color:var(--text-dim); font-size:0.85rem; margin-bottom:18px; }
+  .prix-row{ display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); margin-bottom:20px; }
+  .prix-row .label{ color:var(--text-dim); font-size:0.85rem; }
+  .prix-row .value{ font-family:'Fraunces', serif; font-weight:700; font-size:1.3rem; }
+  .pay-btn{ width:100%; background:var(--navy); color:#fff; font-weight:700; padding:15px; border-radius:12px; text-align:center; font-size:0.95rem; cursor:pointer; border:none; font-family:inherit; }
+  .pay-btn[disabled]{ opacity:0.6; }
+  .status-msg{ text-align:center; margin-top:16px; font-size:0.85rem; color:var(--text-dim); display:none; }
+  .status-msg.show{ display:block; }
+  .success-box{ text-align:center; padding: 20px 0; display:none; }
+  .success-box.show{ display:block; }
+  .success-box svg{ width:56px; height:56px; color:var(--green); margin-bottom:14px; }
+  .success-box h2{ font-family:'Fraunces', serif; font-size:1.2rem; margin-bottom:8px; }
+  .success-box p{ color:var(--text-dim); font-size:0.88rem; margin-bottom:20px; }
+  .access-btn{ display:inline-block; background:var(--gold); color:#14100A; font-weight:700; padding:13px 28px; border-radius:999px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="/catalogue" class="back-btn">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+  </a>
+  <h1>Paiement</h1>
+</div>
+
+<div class="wrap">
+  <div class="card" id="payCard">
+    <div class="titre" id="titre">Chargement...</div>
+    <div class="cat" id="cat"></div>
+    <div class="prix-row">
+      <div class="label">Montant à payer</div>
+      <div class="value" id="prix">-</div>
+    </div>
+    <button class="pay-btn" id="payBtn" onclick="simulerPaiement()">Payer avec Mobile Money</button>
+    <div class="status-msg" id="statusMsg"></div>
+  </div>
+
+  <div class="success-box" id="successBox">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    <h2>Paiement confirmé</h2>
+    <p>Tu vas être redirigé vers ton contenu...</p>
+    <a href="#" class="access-btn" id="accessBtn">Accéder maintenant</a>
+  </div>
+</div>
+
+<script>
+  const API_BASE = "https://www.winaffinity.vip";
+  const params = new URLSearchParams(window.location.search);
+  const contenuId = params.get("id");
+  let contenuData = null;
+
+  async function loadContenu() {
+    if (!contenuId) { document.getElementById("titre").textContent = "Contenu introuvable"; return; }
+    try {
+      const res = await fetch(`${API_BASE}/contenus/${contenuId}`);
+      if (!res.ok) throw new Error();
+      contenuData = await res.json();
+      document.getElementById("titre").textContent = contenuData.titre;
+      document.getElementById("cat").textContent = contenuData.categorie;
+      document.getElementById("prix").textContent = `${contenuData.prix.toLocaleString('fr-FR')} F CFA`;
+    } catch (e) {
+      document.getElementById("titre").textContent = "Contenu introuvable";
+    }
+  }
+
+  function simulerPaiement() {
+    const btn = document.getElementById("payBtn");
+    const statusMsg = document.getElementById("statusMsg");
+    btn.disabled = true;
+    btn.textContent = "Traitement en cours...";
+    statusMsg.classList.add("show");
+    statusMsg.textContent = "Confirmation de la transaction mobile money...";
+
+    // Simulation — sera remplacé par l'appel réel à l'agrégateur de paiement
+    setTimeout(() => {
+      document.getElementById("payCard").style.display = "none";
+      document.getElementById("successBox").classList.add("show");
+      const accessBtn = document.getElementById("accessBtn");
+      if (contenuData && contenuData.lien_acces) {
+        accessBtn.href = contenuData.lien_acces;
+      }
+      setTimeout(() => {
+        if (contenuData && contenuData.lien_acces) {
+          window.location.href = contenuData.lien_acces;
+        }
+      }, 2500);
+    }, 2000);
+  }
+
+  loadContenu();
+</script>
+
+</body>
+</html>

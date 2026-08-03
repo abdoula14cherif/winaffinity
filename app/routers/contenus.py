@@ -31,3 +31,12 @@ async def contenus_stats(request: Request):
         cat = row["categorie"]
         counts[cat] = counts.get(cat, 0) + 1
     return {"total": len(result.data), "par_categorie": counts}
+
+
+@router.get("/{contenu_id}")
+@limiter.limit("30/minute")
+async def get_contenu(request: Request, contenu_id: str):
+    result = supabase_public.table("contenus").select("*").eq("id", contenu_id).execute()
+    if not result.data:
+        raise HTTPException(status_code=404, detail="Contenu introuvable")
+    return result.data[0]
