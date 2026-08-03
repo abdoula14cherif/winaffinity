@@ -35,6 +35,15 @@ async def add_security_headers(request: Request, call_next):
 app.include_router(auth.router)
 
 
+@app.get("/")
+@limiter.limit("30/minute")
+async def root(request: Request):
+    return {
+        "name": "Winaffinity API",
+        "status": "online",
+    }
+
+
 @app.get("/health")
 @limiter.limit("30/minute")
 async def health(request: Request):
