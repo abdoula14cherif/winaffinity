@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Winaffinity — Tableau de bord</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root{
+    --bg: #0B1220;
+    --bg-soft: #121C31;
+    --bg-card: #16213A;
+    --gold: #F5B942;
+    --gold-soft: #F5B94222;
+    --green: #2FBF8F;
+    --green-soft: #2FBF8F1f;
+    --coral: #FF6B5C;
+    --blue: #6C7CF5;
+    --text: #F1ECE0;
+    --text-dim: #A8AFC0;
+    --line: #26314C;
+  }
+
+  *{ box-sizing: border-box; margin:0; padding:0; }
+
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    line-height: 1.5;
+  }
+
+  h1, h2, h3, .display{ font-family: 'Fraunces', serif; font-weight: 600; letter-spacing: -0.01em; }
+  .mono{ font-family: 'IBM Plex Mono', monospace; }
+  a{ color: inherit; text-decoration: none; }
+
+  .wrap{ max-width: 980px; margin: 0 auto; padding: 0 20px; }
+
+  /* NAV */
+  nav{
+    position: sticky; top:0; z-index: 50;
+    background: rgba(11,18,32,0.9); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  nav .wrap{ display:flex; align-items:center; justify-content: space-between; height: 68px; }
+  .logo{ font-family:'Fraunces', serif; font-weight:700; font-size: 1.2rem; }
+  .logo .dot{ color: var(--gold); }
+  .avatar{
+    width: 38px; height:38px; border-radius: 50%;
+    background: linear-gradient(160deg, var(--gold), #d99524);
+    display:flex; align-items:center; justify-content:center;
+    font-weight: 800; color:#14100A; font-size: 0.9rem;
+  }
+
+  /* HEADER */
+  .page-header{ padding: 36px 0 8px; }
+  .greeting{ color: var(--text-dim); font-size: 0.9rem; margin-bottom: 6px; }
+  .page-header h1{ font-size: clamp(1.5rem, 4vw, 2rem); }
+  .plan-badge{
+    display:inline-flex; align-items:center; gap:8px; margin-top:14px;
+    background: var(--green-soft); border: 1px solid var(--green);
+    color: var(--green); font-size: 0.82rem; font-weight:700;
+    padding: 6px 14px; border-radius: 999px;
+  }
+  .plan-badge::before{ content:"●"; font-size: 0.6rem; }
+
+  /* STATS */
+  .stats{
+    display:grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+    background: var(--line); border: 1px solid var(--line); border-radius: 18px;
+    overflow:hidden; margin: 28px 0 40px;
+  }
+  .stat{ background: var(--bg-soft); padding: 20px 18px; }
+  .stat .num{ font-family:'Fraunces', serif; font-size: 1.6rem; color: var(--gold); }
+  .stat .label{ color: var(--text-dim); font-size: 0.78rem; margin-top: 4px; }
+  @media (max-width: 720px){ .stats{ grid-template-columns: repeat(2, 1fr); } }
+
+  /* SECTION HEAD */
+  .section{ margin-bottom: 44px; }
+  .section-head{ display:flex; align-items:baseline; justify-content: space-between; margin-bottom: 18px; }
+  .section-head h2{ font-size: 1.25rem; }
+  .section-head a{ color: var(--gold); font-size: 0.85rem; font-weight: 700; }
+
+  /* CONTINUE LEARNING */
+  .continue-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media (max-width: 640px){ .continue-grid{ grid-template-columns: 1fr; } }
+  .continue-card{
+    background: var(--bg-card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 20px; display:flex; flex-direction:column; gap: 12px;
+  }
+  .continue-card .tag{ font-family:'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; }
+  .continue-card h3{ font-size: 1.05rem; font-weight: 600; font-family: 'Manrope', sans-serif; }
+  .progress-track{ height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+  .progress-fill{ height: 100%; border-radius: 999px; background: var(--gold); }
+  .continue-meta{ display:flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-dim); }
+  .btn-resume{
+    align-self: flex-start; margin-top: 4px;
+    font-size: 0.82rem; font-weight: 700; color: var(--gold);
+    display:flex; align-items:center; gap:6px;
+  }
+
+  /* EARNINGS */
+  .earnings-card{
+    background: linear-gradient(135deg, var(--bg-card), var(--bg-soft));
+    border: 1px solid var(--line); border-radius: 20px; padding: 28px;
+  }
+  .earnings-top{ display:flex; justify-content: space-between; align-items:flex-start; flex-wrap: wrap; gap: 16px; }
+  .earnings-total .label{ color: var(--text-dim); font-size: 0.82rem; }
+  .earnings-total .amount{ font-family:'Fraunces', serif; font-size: 2.2rem; color: var(--green); margin-top: 4px; }
+  .ref-link-box{
+    display:flex; align-items:center; gap: 10px;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 12px;
+    padding: 10px 14px; font-family:'IBM Plex Mono', monospace; font-size: 0.8rem;
+    color: var(--text-dim); max-width: 100%;
+  }
+  .ref-link-box span{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .copy-btn{
+    background: var(--gold); color:#14100A; font-weight: 800; font-size: 0.78rem;
+    padding: 8px 14px; border-radius: 8px; flex-shrink: 0;
+  }
+  .commissions-list{ margin-top: 22px; display:flex; flex-direction:column; gap: 12px; }
+  .commission-row{
+    display:flex; justify-content: space-between; align-items:center;
+    padding: 12px 0; border-top: 1px solid var(--line); font-size: 0.88rem;
+  }
+  .commission-row .who{ color: var(--text); font-weight: 600; }
+  .commission-row .what{ color: var(--text-dim); font-size: 0.8rem; }
+  .commission-row .amount{ color: var(--green); font-weight: 700; font-family: 'IBM Plex Mono', monospace; }
+
+  /* CATALOG SHORTCUTS */
+  .cat-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  @media (max-width: 640px){ .cat-grid{ grid-template-columns: repeat(2, 1fr); } }
+  .cat-card{
+    border-radius: 14px; padding: 18px; font-weight: 700; font-size: 0.9rem;
+    display:flex; flex-direction: column; justify-content: space-between; height: 100px;
+    transition: transform 0.2s ease;
+  }
+  .cat-card:hover{ transform: translateY(-3px); }
+  .cat-card .count{ font-family:'IBM Plex Mono', monospace; font-size: 0.72rem; opacity: 0.75; font-weight: 500; }
+  .c1{ background: linear-gradient(160deg, #2FBF8F, #1c8a66); color:#08140F; }
+  .c2{ background: linear-gradient(160deg, #F5B942, #d99524); color:#241A05; }
+  .c3{ background: linear-gradient(160deg, #6C7CF5, #3f4bc9); color:#0B0E2A; }
+
+  footer{ border-top: 1px solid var(--line); padding: 24px 0; color: var(--text-dim); font-size: 0.82rem; text-align:center; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="logo">Win<span class="dot">•</span>affinity</div>
+    <div class="avatar">AC</div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <div class="page-header">
+    <div class="greeting">Bon retour</div>
+    <h1>Salut Abdoul 👋</h1>
+    <div class="plan-badge">Abonnement illimité actif</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="num">7</div><div class="label">Formations en cours</div></div>
+    <div class="stat"><div class="num">12</div><div class="label">Ebooks terminés</div></div>
+    <div class="stat"><div class="num">34 200</div><div class="label">FCFA gagnés</div></div>
+    <div class="stat"><div class="num">9</div><div class="label">Filleuls actifs</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>Reprendre où tu t'es arrêté</h2>
+      <a href="#">Voir tout →</a>
+    </div>
+    <div class="continue-grid">
+      <div class="continue-card">
+        <div class="tag">Formation</div>
+        <h3>Anglais des affaires</h3>
+        <div class="progress-track"><div class="progress-fill" style="width:64%"></div></div>
+        <div class="continue-meta"><span>64% terminé</span><span>Module 5/8</span></div>
+        <div class="btn-resume">Continuer →</div>
+      </div>
+      <div class="continue-card">
+        <div class="tag">Ebook</div>
+        <h3>Maraîchage rentable</h3>
+        <div class="progress-track"><div class="progress-fill" style="width:30%"></div></div>
+        <div class="continue-meta"><span>30% lu</span><span>Chapitre 3/10</span></div>
+        <div class="btn-resume">Continuer →</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h2>Tes gains de partage</h2></div>
+    <div class="earnings-card">
+      <div class="earnings-top">
+        <div class="earnings-total">
+          <div class="label">Total gagné ce mois</div>
+          <div class="amount">12 400 FCFA</div>
+        </div>
+        <div>
+          <div class="label" style="margin-bottom:8px;">Ton lien de parrainage</div>
+          <div class="ref-link-box">
+            <span>winaffinity.app/r/abdoul-cherif</span>
+            <div class="copy-btn">Copier</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="commissions-list">
+        <div class="commission-row">
+          <div><div class="who">Aïcha D.</div><div class="what">a acheté « Excel pour débutants »</div></div>
+          <div class="amount">+ 1 600 FCFA</div>
+        </div>
+        <div class="commission-row">
+          <div><div class="who">Moussa K.</div><div class="what">s'est abonné via ton lien</div></div>
+          <div class="amount">+ 2 450 FCFA</div>
+        </div>
+        <div class="commission-row">
+          <div><div class="who">Fatou S.</div><div class="what">a acheté « Coder son 1er site »</div></div>
+          <div class="amount">+ 2 100 FCFA</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>Explorer le catalogue</h2>
+      <a href="#">Tout voir →</a>
+    </div>
+    <div class="cat-grid">
+      <div class="cat-card c1"><div>Business</div><div class="count">310 contenus</div></div>
+      <div class="cat-card c2"><div>Langues</div><div class="count">180 contenus</div></div>
+      <div class="cat-card c3"><div>Tech & Code</div><div class="count">265 contenus</div></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>© 2026 Winaffinity — Apprendre et gagner, ensemble.</footer>
+
+</body>
+</html>

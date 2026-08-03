@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Winaffinity — Apprends. Partage. Gagne.</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root{
+    --bg: #0B1220;
+    --bg-soft: #121C31;
+    --bg-card: #16213A;
+    --gold: #F5B942;
+    --gold-soft: #F5B94222;
+    --green: #2FBF8F;
+    --coral: #FF6B5C;
+    --text: #F1ECE0;
+    --text-dim: #A8AFC0;
+    --line: #26314C;
+  }
+
+  *{ box-sizing: border-box; margin:0; padding:0; }
+
+  html{ scroll-behavior: smooth; }
+
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .display{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.08;
+  }
+
+  .mono{ font-family: 'IBM Plex Mono', monospace; }
+
+  a{ color: inherit; text-decoration: none; }
+
+  .wrap{
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* NAV */
+  nav{
+    position: sticky; top:0; z-index: 50;
+    background: rgba(11,18,32,0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  nav .wrap{
+    display:flex; align-items:center; justify-content: space-between;
+    height: 72px;
+  }
+  .logo{
+    font-family:'Fraunces', serif; font-weight:700; font-size: 1.3rem;
+    display:flex; align-items:center; gap:8px;
+  }
+  .logo .dot{ color: var(--gold); }
+  .nav-links{ display:flex; gap: 32px; font-size: 0.92rem; color: var(--text-dim); }
+  .nav-links a:hover{ color: var(--text); }
+  .nav-cta{
+    background: var(--gold); color: #14100A; font-weight:700;
+    padding: 10px 20px; border-radius: 999px; font-size: 0.9rem;
+  }
+  @media (max-width: 720px){ .nav-links{ display:none; } }
+
+  /* HERO */
+  .hero{
+    padding: 90px 0 60px;
+    position: relative;
+  }
+  .hero::before{
+    content:"";
+    position:absolute; top: -120px; right: -180px;
+    width: 480px; height: 480px; border-radius: 50%;
+    background: radial-gradient(circle, var(--gold-soft), transparent 70%);
+    pointer-events:none;
+  }
+  .eyebrow{
+    color: var(--gold); font-size: 0.82rem; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    margin-bottom: 18px; display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{ content:""; width:24px; height:1px; background: var(--gold); }
+  .hero h1{
+    font-size: clamp(2.3rem, 6vw, 3.8rem);
+    max-width: 780px;
+  }
+  .hero h1 em{
+    font-style: italic; color: var(--gold);
+  }
+  .hero p.lede{
+    margin-top: 22px; max-width: 560px;
+    color: var(--text-dim); font-size: 1.08rem;
+  }
+  .hero-ctas{ margin-top: 34px; display:flex; gap: 16px; flex-wrap: wrap; }
+  .btn{
+    padding: 14px 26px; border-radius: 999px; font-weight: 700; font-size: 0.95rem;
+    display:inline-flex; align-items:center; gap:8px;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+  .btn:hover{ transform: translateY(-2px); }
+  .btn-primary{ background: var(--gold); color:#14100A; }
+  .btn-ghost{ border: 1px solid var(--line); color: var(--text); }
+  .btn-ghost:hover{ border-color: var(--gold); }
+
+  /* STATS */
+  .stats{
+    display:grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+    background: var(--line); border: 1px solid var(--line); border-radius: 20px;
+    overflow:hidden; margin-top: 64px;
+  }
+  .stat{ background: var(--bg-soft); padding: 26px 22px; }
+  .stat .num{ font-family:'Fraunces', serif; font-size: 2.1rem; color: var(--gold); }
+  .stat .label{ color: var(--text-dim); font-size: 0.85rem; margin-top: 4px; }
+  @media (max-width: 640px){ .stats{ grid-template-columns: 1fr; } }
+
+  /* LIVING SHELF */
+  .shelf-section{ padding: 70px 0 30px; border-top: 1px solid var(--line); }
+  .section-head{ margin-bottom: 30px; }
+  .section-head h2{ font-size: clamp(1.6rem, 3.5vw, 2.2rem); }
+  .section-head p{ color: var(--text-dim); margin-top: 10px; max-width: 480px; }
+
+  .shelf-track{
+    display:flex; gap: 16px; overflow-x: auto; padding: 10px 4px 24px;
+    scrollbar-width: none;
+  }
+  .shelf-track::-webkit-scrollbar{ display:none; }
+  .spine{
+    flex: 0 0 auto; width: 132px; height: 190px; border-radius: 10px;
+    padding: 16px 14px; display:flex; flex-direction:column; justify-content: space-between;
+    font-weight: 700; font-size: 0.9rem; transform: rotate(0deg);
+    transition: transform 0.25s ease;
+    box-shadow: 0 12px 24px -12px rgba(0,0,0,0.6);
+  }
+  .spine:nth-child(odd){ transform: translateY(6px); }
+  .spine:hover{ transform: translateY(-6px) rotate(-1deg); }
+  .spine .cat{ font-family:'IBM Plex Mono', monospace; font-size: 0.68rem; opacity:0.75; }
+  .spine .count{ font-family:'Fraunces', serif; font-size: 1.6rem; font-weight: 600; }
+
+  .s1{ background: linear-gradient(160deg, #2FBF8F, #1c8a66); color:#08140F; }
+  .s2{ background: linear-gradient(160deg, #F5B942, #d99524); color:#241A05; }
+  .s3{ background: linear-gradient(160deg, #FF6B5C, #d8483b); color:#2A0B07; }
+  .s4{ background: linear-gradient(160deg, #6C7CF5, #3f4bc9); color:#0B0E2A; }
+  .s5{ background: linear-gradient(160deg, #F1ECE0, #cfc8b4); color:#1A1710; }
+  .s6{ background: linear-gradient(160deg, #2A9BB8, #1a6c81); color:#04171C; }
+
+  /* TICKER */
+  .ticker-wrap{
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    background: var(--bg-soft); padding: 14px 0; margin-top: 40px;
+    overflow: hidden;
+  }
+  .ticker{ display:flex; gap: 48px; white-space: nowrap; animation: scroll 32s linear infinite; width: max-content; }
+  .ticker span{ font-family:'IBM Plex Mono', monospace; font-size: 0.85rem; color: var(--text-dim); }
+  .ticker span b{ color: var(--green); }
+  @keyframes scroll{ from{ transform: translateX(0); } to{ transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce){ .ticker{ animation: none; } }
+
+  /* HOW IT WORKS */
+  .how{ padding: 80px 0; }
+  .steps{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 40px; }
+  .step{ border: 1px solid var(--line); border-radius: 18px; padding: 28px; background: var(--bg-card); }
+  .step .idx{ font-family:'Fraunces', serif; font-size: 1rem; color: var(--gold); margin-bottom: 14px; }
+  .step h3{ font-size: 1.2rem; margin-bottom: 10px; }
+  .step p{ color: var(--text-dim); font-size: 0.94rem; }
+  @media (max-width: 780px){ .steps{ grid-template-columns: 1fr; } }
+
+  /* PRICING */
+  .pricing{ padding: 20px 0 90px; }
+  .plans{ display:grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 40px; }
+  .plan{ border-radius: 20px; padding: 32px; border: 1px solid var(--line); background: var(--bg-card); }
+  .plan.featured{ border-color: var(--gold); position: relative; }
+  .plan.featured::before{
+    content:"Le plus choisi"; position:absolute; top:-13px; left: 28px;
+    background: var(--gold); color:#14100A; font-size: 0.72rem; font-weight:800;
+    padding: 4px 12px; border-radius: 999px;
+  }
+  .plan h3{ font-size: 1.1rem; color: var(--text-dim); font-weight: 600; font-family: 'Manrope', sans-serif; }
+  .plan .price{ font-family:'Fraunces', serif; font-size: 2.4rem; margin: 14px 0 6px; }
+  .plan .price span{ font-size: 1rem; color: var(--text-dim); font-family: 'Manrope', sans-serif; }
+  .plan ul{ list-style:none; margin: 22px 0; display:flex; flex-direction:column; gap: 12px; }
+  .plan li{ font-size: 0.92rem; color: var(--text-dim); display:flex; gap:10px; }
+  .plan li::before{ content:"✓"; color: var(--green); font-weight:700; }
+  @media (max-width: 640px){ .plans{ grid-template-columns: 1fr; } }
+
+  /* FOOTER CTA */
+  .cta-final{
+    border-top: 1px solid var(--line); padding: 80px 0; text-align:center;
+  }
+  .cta-final h2{ font-size: clamp(1.8rem, 4vw, 2.6rem); max-width: 600px; margin: 0 auto; }
+  .cta-final p{ color: var(--text-dim); margin: 16px auto 30px; max-width: 460px; }
+  footer{ border-top: 1px solid var(--line); padding: 28px 0; color: var(--text-dim); font-size: 0.85rem; text-align:center; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="logo">Win<span class="dot">•</span>affinity</div>
+    <div class="nav-links">
+      <a href="#shelf">Catalogue</a>
+      <a href="#how">Comment ça marche</a>
+      <a href="#pricing">Tarifs</a>
+    </div>
+    <a href="#pricing" class="nav-cta">Rejoindre</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">2000+ livres · 54+ formations · mobile money</div>
+    <h1>Apprends ce qui te fait avancer.<br>Partage ce qui <em>vaut le coup</em>.<br>Gagne à chaque fois.</h1>
+    <p class="lede">Winaffinity réunit une bibliothèque massive de formations et d'ebooks, accessible en mobile money — et chaque contenu que tu partages avec ta communauté te rapporte une vraie commission.</p>
+    <div class="hero-ctas">
+      <a href="#pricing" class="btn btn-primary">Voir les formules →</a>
+      <a href="#shelf" class="btn btn-ghost">Explorer le catalogue</a>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="num">2 000+</div>
+        <div class="label">Ebooks disponibles</div>
+      </div>
+      <div class="stat">
+        <div class="num">54+</div>
+        <div class="label">Formations certifiantes</div>
+      </div>
+      <div class="stat">
+        <div class="num">100%</div>
+        <div class="label">Paiement mobile money</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="shelf-section" id="shelf">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>La bibliothèque vivante</h2>
+      <p>Un aperçu des rayons qui composent le catalogue — chacun mis à jour en continu.</p>
+    </div>
+    <div class="shelf-track">
+      <div class="spine s1"><div class="cat">BUSINESS</div><div class="count">310</div></div>
+      <div class="spine s2"><div class="cat">TECH & CODE</div><div class="count">265</div></div>
+      <div class="spine s3"><div class="cat">LANGUES</div><div class="count">180</div></div>
+      <div class="spine s4"><div class="cat">AGRICULTURE</div><div class="count">140</div></div>
+      <div class="spine s5"><div class="cat">DÉV. PERSO</div><div class="count">420</div></div>
+      <div class="spine s6"><div class="cat">SANTÉ</div><div class="count">95</div></div>
+      <div class="spine s1"><div class="cat">FINANCE</div><div class="count">210</div></div>
+      <div class="spine s2"><div class="cat">MÉTIERS</div><div class="count">160</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="ticker-wrap">
+  <div class="ticker">
+    <span>Aïcha vient de gagner <b>3 200 FCFA</b> en partageant « Excel pour débutants »</span>
+    <span>Moussa vient de gagner <b>5 000 FCFA</b> en partageant « Anglais des affaires »</span>
+    <span>Fatou vient de gagner <b>1 800 FCFA</b> en partageant « Maraîchage rentable »</span>
+    <span>Ibrahim vient de gagner <b>4 500 FCFA</b> en partageant « Coder son 1er site »</span>
+    <span>Aïcha vient de gagner <b>3 200 FCFA</b> en partageant « Excel pour débutants »</span>
+    <span>Moussa vient de gagner <b>5 000 FCFA</b> en partageant « Anglais des affaires »</span>
+    <span>Fatou vient de gagner <b>1 800 FCFA</b> en partageant « Maraîchage rentable »</span>
+    <span>Ibrahim vient de gagner <b>4 500 FCFA</b> en partageant « Coder son 1er site »</span>
+  </div>
+</div>
+
+<section class="how" id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Comment ça marche</h2>
+      <p>Trois étapes, du premier accès au premier gain.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="idx">01</div>
+        <h3>Accède</h3>
+        <p>Abonne-toi ou achète un contenu à l'unité, paiement en mobile money ou carte, sans friction.</p>
+      </div>
+      <div class="step">
+        <div class="idx">02</div>
+        <h3>Apprends</h3>
+        <p>Suis les formations à ton rythme, télécharge les ebooks, obtiens un certificat vérifiable.</p>
+      </div>
+      <div class="step">
+        <div class="idx">03</div>
+        <h3>Partage & gagne</h3>
+        <p>Recommande un contenu utile à ton réseau avec ton lien personnel, touche une commission sur chaque vente.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pricing" id="pricing">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Choisis ta formule</h2>
+      <p>Sans engagement, résiliable à tout moment.</p>
+    </div>
+    <div class="plans">
+      <div class="plan">
+        <h3>À l'unité</h3>
+        <div class="price">Dès 500 <span>FCFA</span></div>
+        <ul>
+          <li>Achète un livre ou une formation au choix</li>
+          <li>Accès à vie au contenu acheté</li>
+          <li>Lien de partage avec commission</li>
+        </ul>
+        <a href="#" class="btn btn-ghost" style="width:100%; justify-content:center;">Choisir un contenu</a>
+      </div>
+      <div class="plan featured">
+        <h3>Abonnement illimité</h3>
+        <div class="price">4 900 <span>FCFA / mois</span></div>
+        <ul>
+          <li>Accès à tout le catalogue : 2000+ livres, 54+ formations</li>
+          <li>Nouveaux contenus ajoutés chaque mois</li>
+          <li>Certificats sur toutes les formations</li>
+          <li>Commission de partage doublée</li>
+        </ul>
+        <a href="#" class="btn btn-primary" style="width:100%; justify-content:center;">Commencer l'abonnement</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-final">
+  <div class="wrap">
+    <h2>Ta prochaine compétence est déjà dans le catalogue.</h2>
+    <p>Rejoins Winaffinity aujourd'hui — apprends, et fais gagner ta communauté avec toi.</p>
+    <a href="#pricing" class="btn btn-primary">Créer mon compte</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">© 2026 Winaffinity — Apprendre et gagner, ensemble.</div>
+</footer>
+
+</body>
+</html>
