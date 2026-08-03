@@ -20,7 +20,7 @@
 
   .header{ background: linear-gradient(115deg, var(--navy) 0%, var(--navy) 45%, var(--red) 100%); padding: 20px 20px 24px; color:#fff; }
   .header-top{ display:flex; align-items:center; gap:14px; }
-  .back-btn{ width:36px; height:36px; border-radius:10px; background: rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; }
+  .back-btn{ width:36px; height:36px; border-radius:10px; background: rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
   .header h1{ font-size:1.2rem; }
   .header p{ color: rgba(255,255,255,0.6); font-size:0.82rem; margin-top:4px; }
 
@@ -30,16 +30,18 @@
   .filter-pill.active{ background: var(--navy); color:#fff; border-color: var(--navy); }
 
   .grid{ padding: 16px 20px 0; display:flex; flex-direction:column; gap:12px; }
-  .card{ background:#fff; border-radius:16px; padding:16px; border:1px solid var(--line); box-shadow: 0 8px 20px -14px rgba(22,34,63,0.25); display:flex; gap:14px; align-items:center; cursor:pointer; }
-  .card .type-badge{ width:44px; height:44px; border-radius:11px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:0.68rem; font-weight:800; text-transform:uppercase; }
+  .card{ background:#fff; border-radius:16px; padding:14px; border:1px solid var(--line); box-shadow: 0 8px 20px -14px rgba(22,34,63,0.25); display:flex; gap:14px; align-items:center; cursor:pointer; }
+  .thumb{ width:56px; height:56px; border-radius:12px; flex-shrink:0; object-fit:cover; background: var(--cream); }
+  .type-badge{ width:56px; height:56px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:0.66rem; font-weight:800; text-transform:uppercase; }
   .type-formation{ background:#E4EBFB; color:#3B5BDB; }
   .type-ebook{ background:#FBF0D8; color:#B8860B; }
   .card .info{ flex:1; min-width:0; }
-  .card .titre{ font-weight:700; font-size:0.95rem; }
-  .card .cat{ font-size:0.75rem; color: var(--text-dim); margin-top:2px; }
-  .prix-block{ text-align:right; }
-  .card .prix{ font-family:'Fraunces', serif; font-weight:700; color: var(--navy); font-size:0.95rem; white-space:nowrap; }
-  .commission{ font-size:0.68rem; color: var(--green); font-weight:700; margin-top:2px; white-space:nowrap; }
+  .card .titre{ font-weight:700; font-size:0.94rem; }
+  .card .cat{ font-size:0.72rem; color: var(--text-dim); margin-top:2px; font-weight:700; text-transform:uppercase; letter-spacing:0.03em; }
+  .card .snippet{ font-size:0.78rem; color: var(--text-dim); margin-top:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .prix-block{ text-align:right; flex-shrink:0; }
+  .card .prix{ font-family:'Fraunces', serif; font-weight:700; color: var(--navy); font-size:0.92rem; white-space:nowrap; }
+  .commission{ font-size:0.66rem; color: var(--green); font-weight:700; margin-top:2px; white-space:nowrap; }
 
   .empty{ text-align:center; color: var(--text-dim); padding: 40px 20px; }
 
@@ -48,12 +50,14 @@
   .nav-item.active{ color: var(--red); }
   .nav-item svg{ width:20px; height:20px; }
 
-  /* MODAL */
   .modal-overlay{ display:none; position:fixed; inset:0; background:rgba(11,26,61,0.6); z-index:100; align-items:flex-end; justify-content:center; }
   .modal-overlay.open{ display:flex; }
-  .modal{ background:#fff; width:100%; max-width:480px; border-radius:20px 20px 0 0; padding:24px 20px 30px; }
+  .modal{ background:#fff; width:100%; max-width:480px; border-radius:20px 20px 0 0; padding:0 0 24px; max-height:88vh; overflow-y:auto; }
+  .modal-img{ width:100%; height:160px; object-fit:cover; border-radius:20px 20px 0 0; display:none; }
+  .modal-body{ padding:20px 20px 0; }
   .modal h2{ font-size:1.15rem; margin-bottom:4px; }
-  .modal .sub{ color:var(--text-dim); font-size:0.82rem; margin-bottom:20px; }
+  .modal .sub{ color:var(--text-dim); font-size:0.82rem; margin-bottom:14px; }
+  .modal-desc{ font-size:0.85rem; color:var(--text-dim); line-height:1.5; margin-bottom:18px; }
   .modal-price-row{ display:flex; justify-content:space-between; align-items:center; background:var(--cream); border-radius:12px; padding:14px 16px; margin-bottom:20px; }
   .modal-price-row .p{ font-family:'Fraunces', serif; font-weight:700; font-size:1.2rem; }
   .modal-price-row .c{ color:var(--green); font-size:0.78rem; font-weight:700; }
@@ -106,18 +110,22 @@
 
 <div class="modal-overlay" id="contentModal">
   <div class="modal">
-    <h2 id="modalTitre">Titre</h2>
-    <p class="sub" id="modalCat">Catégorie</p>
-    <div class="modal-price-row">
-      <div>
-        <div class="p" id="modalPrix">0 F</div>
-        <div class="c" id="modalCommission">Tu gagnes 0 F (50%)</div>
+    <img class="modal-img" id="modalImg" src="" alt="">
+    <div class="modal-body">
+      <h2 id="modalTitre">Titre</h2>
+      <p class="sub" id="modalCat">Catégorie</p>
+      <p class="modal-desc" id="modalDesc"></p>
+      <div class="modal-price-row">
+        <div>
+          <div class="p" id="modalPrix">0 F</div>
+          <div class="c" id="modalCommission">Tu gagnes 0 F (50%)</div>
+        </div>
       </div>
-    </div>
-    <div class="modal-actions">
-      <div class="modal-btn btn-buy" onclick="goToPay()">Acheter maintenant</div>
-      <div class="modal-btn btn-affiliate" onclick="goToAffiliate()">Affilier ce contenu</div>
-      <div class="btn-cancel" onclick="closeModal()">Annuler</div>
+      <div class="modal-actions">
+        <div class="modal-btn btn-buy" onclick="goToPay()">Acheter maintenant</div>
+        <div class="modal-btn btn-affiliate" onclick="goToAffiliate()">Affilier ce contenu</div>
+        <div class="btn-cancel" onclick="closeModal()">Annuler</div>
+      </div>
     </div>
   </div>
 </div>
@@ -140,15 +148,25 @@
       const card = document.createElement("div");
       card.className = "card";
       card.onclick = () => openModal(item);
+
+      const thumbHtml = item.image_url
+        ? `<img class="thumb" src="${item.image_url}" alt="">`
+        : `<div class="type-badge ${isFormation ? 'type-formation' : 'type-ebook'}">${isFormation ? 'FORM.' : 'EBOOK'}</div>`;
+
+      const snippetHtml = item.description_longue
+        ? `<div class="snippet">${item.description_longue}</div>`
+        : "";
+
       card.innerHTML = `
-        <div class="type-badge ${isFormation ? 'type-formation' : 'type-ebook'}">${isFormation ? 'FORM.' : 'EBOOK'}</div>
+        ${thumbHtml}
         <div class="info">
           <div class="titre">${item.titre}</div>
           <div class="cat">${item.categorie}</div>
+          ${snippetHtml}
         </div>
         <div class="prix-block">
           <div class="prix">${item.prix.toLocaleString('fr-FR')} F</div>
-          <div class="commission">Tu gagnes ${Math.round(item.prix * 0.5).toLocaleString('fr-FR')} F (50%)</div>
+          <div class="commission">Tu gagnes ${Math.round(item.prix * 0.5).toLocaleString('fr-FR')} F</div>
         </div>
       `;
       grid.appendChild(card);
@@ -179,8 +197,18 @@
     selectedId = item.id;
     document.getElementById("modalTitre").textContent = item.titre;
     document.getElementById("modalCat").textContent = item.categorie;
+    document.getElementById("modalDesc").textContent = item.description_longue || "";
     document.getElementById("modalPrix").textContent = `${item.prix.toLocaleString('fr-FR')} F`;
     document.getElementById("modalCommission").textContent = `Tu gagnes ${Math.round(item.prix * 0.5).toLocaleString('fr-FR')} F (50%)`;
+
+    const modalImg = document.getElementById("modalImg");
+    if (item.image_url) {
+      modalImg.src = item.image_url;
+      modalImg.style.display = "block";
+    } else {
+      modalImg.style.display = "none";
+    }
+
     document.getElementById("contentModal").classList.add("open");
   }
 
@@ -189,13 +217,8 @@
     selectedId = null;
   }
 
-  function goToPay() {
-    if (selectedId) window.location.href = `/payer?id=${selectedId}`;
-  }
-
-  function goToAffiliate() {
-    if (selectedId) window.location.href = `/parrainage?id=${selectedId}`;
-  }
+  function goToPay() { if (selectedId) window.location.href = `/payer?id=${selectedId}`; }
+  function goToAffiliate() { if (selectedId) window.location.href = `/parrainage?id=${selectedId}`; }
 
   async function loadCatalogue() {
     try {
