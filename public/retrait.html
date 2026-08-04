@@ -157,20 +157,20 @@
   if (!token) { window.location.href = "/"; }
 
   const COUNTRIES = [
-    { zone: "Zone XOF — LeekPay", flag: "🇧🇯", name: "Bénin", code: "BJ", operators: ["MTN Money", "Moov Money"], confirmed: true },
-    { zone: "Zone XOF — LeekPay", flag: "🇧🇫", name: "Burkina Faso", code: "BF", operators: ["Orange Money", "Moov Money"], confirmed: true },
-    { zone: "Zone XOF — LeekPay", flag: "🇨🇮", name: "Côte d'Ivoire", code: "CI", operators: ["Orange Money", "MTN Money", "Moov Money", "Wave"], confirmed: true },
-    { zone: "Zone XOF — LeekPay", flag: "🇬🇼", name: "Guinée-Bissau", code: "GW", operators: ["Orange Money"], confirmed: true },
-    { zone: "Zone XOF — LeekPay", flag: "🇲🇱", name: "Mali", code: "ML", operators: ["Orange Money", "Moov Money"], confirmed: true },
-    { zone: "Zone XOF — LeekPay", flag: "🇳🇪", name: "Niger", code: "NE", operators: ["Orange Money", "Moov Money", "Airtel Money"], confirmed: true },
-    { zone: "Zone XOF — LeekPay", flag: "🇸🇳", name: "Sénégal", code: "SN", operators: ["Orange Money", "Wave", "Free Money"], confirmed: true },
-    { zone: "Zone XOF — LeekPay", flag: "🇹🇬", name: "Togo", code: "TG", operators: ["Togocom Money", "Moov Money"], confirmed: true },
-    { zone: "Zone XAF — SoleasPay", flag: "🇨🇲", name: "Cameroun", code: "CM", operators: ["Orange Money", "MTN MoMo"], confirmed: true },
-    { zone: "Zone XAF — SoleasPay", flag: "🇬🇦", name: "Gabon", code: "GA", operators: ["Airtel Money", "Moov Money"], confirmed: false },
-    { zone: "Zone XAF — SoleasPay", flag: "🇹🇩", name: "Tchad", code: "TD", operators: ["Airtel Money", "Moov Money"], confirmed: false },
-    { zone: "Zone XAF — SoleasPay", flag: "🇨🇬", name: "Congo", code: "CG", operators: ["Airtel Money", "MTN Money"], confirmed: false },
-    { zone: "Zone XAF — SoleasPay", flag: "🇨🇫", name: "Centrafrique", code: "CF", operators: ["Orange Money"], confirmed: false },
-    { zone: "Zone XAF — SoleasPay", flag: "🇬🇶", name: "Guinée équatoriale", code: "GQ", operators: ["Orange Money"], confirmed: false },
+    { zone: "Afrique de l'Ouest", flag: "🇧🇯", name: "Bénin", code: "BJ", operators: ["MTN Money", "Moov Money"], confirmed: true },
+    { zone: "Afrique de l'Ouest", flag: "🇧🇫", name: "Burkina Faso", code: "BF", operators: ["Orange Money", "Moov Money"], confirmed: true },
+    { zone: "Afrique de l'Ouest", flag: "🇨🇮", name: "Côte d'Ivoire", code: "CI", operators: ["Orange Money", "MTN Money", "Moov Money", "Wave"], confirmed: true },
+    { zone: "Afrique de l'Ouest", flag: "🇬🇼", name: "Guinée-Bissau", code: "GW", operators: ["Orange Money"], confirmed: true },
+    { zone: "Afrique de l'Ouest", flag: "🇲🇱", name: "Mali", code: "ML", operators: ["Orange Money", "Moov Money"], confirmed: true },
+    { zone: "Afrique de l'Ouest", flag: "🇳🇪", name: "Niger", code: "NE", operators: ["Orange Money", "Moov Money", "Airtel Money"], confirmed: true },
+    { zone: "Afrique de l'Ouest", flag: "🇸🇳", name: "Sénégal", code: "SN", operators: ["Orange Money", "Wave", "Free Money"], confirmed: true },
+    { zone: "Afrique de l'Ouest", flag: "🇹🇬", name: "Togo", code: "TG", operators: ["Togocom Money", "Moov Money"], confirmed: true },
+    { zone: "Afrique Centrale", flag: "🇨🇲", name: "Cameroun", code: "CM", operators: ["Orange Money", "MTN MoMo"], confirmed: true },
+    { zone: "Afrique Centrale", flag: "🇬🇦", name: "Gabon", code: "GA", operators: ["Airtel Money", "Moov Money"], confirmed: false },
+    { zone: "Afrique Centrale", flag: "🇹🇩", name: "Tchad", code: "TD", operators: ["Airtel Money", "Moov Money"], confirmed: false },
+    { zone: "Afrique Centrale", flag: "🇨🇬", name: "Congo", code: "CG", operators: ["Airtel Money", "MTN Money"], confirmed: false },
+    { zone: "Afrique Centrale", flag: "🇨🇫", name: "Centrafrique", code: "CF", operators: ["Orange Money"], confirmed: false },
+    { zone: "Afrique Centrale", flag: "🇬🇶", name: "Guinée équatoriale", code: "GQ", operators: ["Orange Money"], confirmed: false },
   ];
 
   let selectedCountry = null;
@@ -194,7 +194,7 @@
       row.innerHTML = `
         <div class="flag">${c.flag}</div>
         <div class="name">${c.name}</div>
-        ${!c.confirmed ? '<div class="badge-unconfirmed">à confirmer</div>' : ''}
+        
       `;
       list.appendChild(row);
     });
