@@ -18,11 +18,16 @@
   a,button{ color: inherit; text-decoration: none; font-family: inherit; }
   .wrap{ max-width: 720px; margin: 0 auto; padding: 0 20px; }
 
-  .header{ background: linear-gradient(115deg, var(--navy) 0%, var(--navy) 45%, var(--red) 100%); padding: 20px 20px 24px; color:#fff; }
+  .header{ background: linear-gradient(115deg, var(--navy) 0%, var(--navy) 45%, var(--red) 100%); padding: 20px 20px 0; color:#fff; }
   .header-top{ display:flex; align-items:center; gap:14px; }
   .back-btn{ width:36px; height:36px; border-radius:10px; background: rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
   .header h1{ font-size:1.2rem; }
   .header p{ color: rgba(255,255,255,0.6); font-size:0.82rem; margin-top:4px; }
+
+  .tabs{ display:flex; gap:4px; margin-top:20px; background: rgba(255,255,255,0.1); border-radius:12px; padding:4px; }
+  .tab{ flex:1; text-align:center; padding:10px; border-radius:9px; font-size:0.85rem; font-weight:700; color: rgba(255,255,255,0.6); cursor:pointer; }
+  .tab.active{ background:#fff; color: var(--navy); }
+  .tabs-spacer{ height:16px; }
 
   .filters{ display:flex; gap:8px; overflow-x:auto; padding: 16px 20px 4px; scrollbar-width:none; }
   .filters::-webkit-scrollbar{ display:none; }
@@ -44,6 +49,19 @@
   .commission{ font-size:0.66rem; color: var(--green); font-weight:700; margin-top:2px; white-space:nowrap; }
 
   .empty{ text-align:center; color: var(--text-dim); padding: 40px 20px; }
+
+  /* ABONNEMENTS */
+  .plan-card{ background:#fff; border-radius:18px; padding:22px; border:1px solid var(--line); box-shadow: 0 8px 20px -14px rgba(22,34,63,0.25); margin-bottom:14px; }
+  .plan-card.featured{ border-color: var(--gold); position:relative; }
+  .plan-card.featured::before{ content:"Recommandé"; position:absolute; top:-11px; left:20px; background:var(--gold); color:#14100A; font-size:0.68rem; font-weight:800; padding:4px 12px; border-radius:999px; }
+  .plan-card h3{ font-size:1rem; color: var(--text-dim); font-weight:700; font-family:'Manrope', sans-serif; }
+  .plan-card .price{ font-family:'Fraunces', serif; font-size:2rem; margin:10px 0 4px; }
+  .plan-card .price span{ font-size:0.9rem; color:var(--text-dim); font-family:'Manrope', sans-serif; }
+  .plan-card ul{ list-style:none; margin:16px 0; display:flex; flex-direction:column; gap:9px; }
+  .plan-card li{ font-size:0.86rem; color:var(--text-dim); display:flex; gap:8px; }
+  .plan-card li::before{ content:"✓"; color:var(--green); font-weight:700; }
+  .plan-btn{ width:100%; text-align:center; padding:13px; border-radius:12px; font-weight:700; font-size:0.9rem; background:var(--navy); color:#fff; }
+  .plan-card.featured .plan-btn{ background:var(--gold); color:#14100A; }
 
   .bottom-nav{ position: fixed; left:0; right:0; bottom:0; background:#fff; border-top: 1px solid var(--line); display:flex; justify-content: space-around; padding: 10px 0 14px; z-index: 50; }
   .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; font-size:0.68rem; color: var(--text-dim); font-weight:700; }
@@ -80,13 +98,19 @@
       <p id="countLabel">Chargement...</p>
     </div>
   </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="ebook" onclick="selectTab('ebook', this)">Livres</div>
+    <div class="tab" data-tab="formation" onclick="selectTab('formation', this)">Vidéos</div>
+    <div class="tab" data-tab="abonnement" onclick="selectTab('abonnement', this)">Abonnements</div>
+  </div>
+  <div class="tabs-spacer"></div>
 </div>
 
-<div class="filters" id="filters">
-  <div class="filter-pill active" data-cat="">Tout</div>
-</div>
+<div class="filters" id="filters"></div>
 
 <div class="grid" id="grid"></div>
+<div class="wrap" id="plansWrap" style="display:none; padding-top:16px;"></div>
 <div class="empty" id="emptyMsg" style="display:none;">Aucun contenu dans cette catégorie.</div>
 
 <div class="bottom-nav">
@@ -133,11 +157,14 @@
 <script>
   const API_BASE = "https://www.winaffinity.vip";
   let allContenus = [];
+  let currentTab = "ebook";
   let selectedId = null;
 
   function renderContenus(list) {
     const grid = document.getElementById("grid");
     const emptyMsg = document.getElementById("emptyMsg");
+    grid.style.display = "flex";
+    document.getElementById("plansWrap").style.display = "none";
     grid.innerHTML = "";
 
     if (list.length === 0) { emptyMsg.style.display = "block"; return; }
@@ -151,7 +178,7 @@
 
       const thumbHtml = item.image_url
         ? `<img class="thumb" src="${item.image_url}" alt="">`
-        : `<div class="type-badge ${isFormation ? 'type-formation' : 'type-ebook'}">${isFormation ? 'FORM.' : 'EBOOK'}</div>`;
+        : `<div class="type-badge ${isFormation ? 'type-formation' : 'type-ebook'}">${isFormation ? 'VIDÉO' : 'LIVRE'}</div>`;
 
       const snippetHtml = item.description_longue
         ? `<div class="snippet">${item.description_longue}</div>`
@@ -173,8 +200,41 @@
     });
   }
 
+  function renderPlans() {
+    document.getElementById("grid").style.display = "none";
+    document.getElementById("emptyMsg").style.display = "none";
+    const plansWrap = document.getElementById("plansWrap");
+    plansWrap.style.display = "block";
+    plansWrap.innerHTML = `
+      <div class="plan-card">
+        <h3>Accès à l'unité</h3>
+        <div class="price">Dès 300 <span>F CFA</span></div>
+        <ul>
+          <li>Achète un contenu au choix dans le catalogue</li>
+          <li>Accès à vie au contenu acheté</li>
+          <li>Lien de partage avec commission</li>
+        </ul>
+        <a href="/catalogue" class="plan-btn" style="background:#fff; color:var(--navy); border:1px solid var(--line);">Voir le catalogue</a>
+      </div>
+      <div class="plan-card featured">
+        <h3>Abonnement illimité</h3>
+        <div class="price">4 900 <span>F CFA / mois</span></div>
+        <ul>
+          <li>Accès à tout le catalogue : livres et vidéos</li>
+          <li>Nouveaux contenus ajoutés chaque mois</li>
+          <li>Commission de partage doublée</li>
+        </ul>
+        <a href="#" class="plan-btn">Bientôt disponible</a>
+      </div>
+    `;
+    document.getElementById("countLabel").textContent = "Choisis ta formule";
+    document.getElementById("filters").innerHTML = "";
+  }
+
   function renderFilters(categories) {
     const filtersEl = document.getElementById("filters");
+    filtersEl.innerHTML = `<div class="filter-pill active" data-cat="">Tout</div>`;
+    filtersEl.querySelector('.filter-pill').onclick = () => selectFilter("", filtersEl.querySelector('.filter-pill'));
     categories.forEach(cat => {
       const pill = document.createElement("div");
       pill.className = "filter-pill";
@@ -183,14 +243,31 @@
       pill.onclick = () => selectFilter(cat, pill);
       filtersEl.appendChild(pill);
     });
-    document.querySelector('.filter-pill[data-cat=""]').onclick = () => selectFilter("", document.querySelector('.filter-pill[data-cat=""]'));
   }
 
   function selectFilter(cat, el) {
     document.querySelectorAll(".filter-pill").forEach(p => p.classList.remove("active"));
     el.classList.add("active");
-    const filtered = cat ? allContenus.filter(c => c.categorie === cat) : allContenus;
+    const typed = allContenus.filter(c => c.type === currentTab);
+    const filtered = cat ? typed.filter(c => c.categorie === cat) : typed;
     renderContenus(filtered);
+  }
+
+  function selectTab(tab, el) {
+    currentTab = tab;
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    el.classList.add("active");
+
+    if (tab === "abonnement") {
+      renderPlans();
+      return;
+    }
+
+    const typed = allContenus.filter(c => c.type === tab);
+    document.getElementById("countLabel").textContent = `${typed.length} contenus disponibles`;
+    const categories = [...new Set(typed.map(c => c.categorie))];
+    renderFilters(categories);
+    renderContenus(typed);
   }
 
   function openModal(item) {
@@ -202,21 +279,13 @@
     document.getElementById("modalCommission").textContent = `Tu gagnes ${Math.round(item.prix * 0.5).toLocaleString('fr-FR')} F (50%)`;
 
     const modalImg = document.getElementById("modalImg");
-    if (item.image_url) {
-      modalImg.src = item.image_url;
-      modalImg.style.display = "block";
-    } else {
-      modalImg.style.display = "none";
-    }
+    if (item.image_url) { modalImg.src = item.image_url; modalImg.style.display = "block"; }
+    else { modalImg.style.display = "none"; }
 
     document.getElementById("contentModal").classList.add("open");
   }
 
-  function closeModal() {
-    document.getElementById("contentModal").classList.remove("open");
-    selectedId = null;
-  }
-
+  function closeModal() { document.getElementById("contentModal").classList.remove("open"); selectedId = null; }
   function goToPay() { if (selectedId) window.location.href = `/payer?id=${selectedId}`; }
   function goToAffiliate() { if (selectedId) window.location.href = `/parrainage?id=${selectedId}`; }
 
@@ -224,10 +293,7 @@
     try {
       const res = await fetch(`${API_BASE}/contenus/`);
       allContenus = await res.json();
-      document.getElementById("countLabel").textContent = `${allContenus.length} contenus disponibles`;
-      const categories = [...new Set(allContenus.map(c => c.categorie))];
-      renderFilters(categories);
-      renderContenus(allContenus);
+      selectTab("ebook", document.querySelector('.tab[data-tab="ebook"]'));
     } catch (e) {
       document.getElementById("countLabel").textContent = "Erreur de chargement";
     }
