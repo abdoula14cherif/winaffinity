@@ -5,7 +5,7 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
 from app.config import settings
-from app.routers import auth, contenus, webhooks, retraits
+from app.routers import auth, contenus, webhooks, retraits, promotions
 
 limiter = Limiter(key_func=get_remote_address)
 
@@ -36,6 +36,7 @@ app.include_router(auth.router)
 app.include_router(contenus.router)
 app.include_router(webhooks.router)
 app.include_router(retraits.router)
+app.include_router(promotions.router)
 
 
 @app.get("/")

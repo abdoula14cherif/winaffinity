@@ -3,17 +3,210 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Winaffinity — promo</title>
+<title>Winaffinity — Promo</title>
 <style>
-  body{ margin:0; background:#0B1220; color:#F1ECE0; font-family: sans-serif; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; }
-  h1{ font-size:1.4rem; margin-bottom:10px; text-transform: capitalize; }
-  p{ color:#A8AFC0; margin-bottom:24px; }
-  a{ background:#F5B942; color:#14100A; padding:12px 24px; border-radius:999px; text-decoration:none; font-weight:700; }
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap');
+  :root{
+    --navy:#0B1A3D; --red:#7A1F2B; --cream:#F3EFE6; --gold:#E8B84B;
+    --text-dark:#16223F; --text-dim:#6B7385; --green:#2FBF8F; --line:#E4DFD3;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ overflow-x:hidden; max-width:100vw; }
+  body{ background:var(--cream); color:var(--text-dark); font-family:'Manrope', sans-serif; min-height:100vh; padding-bottom:78px; }
+  a,button{ color:inherit; text-decoration:none; font-family:inherit; border:none; cursor:pointer; background:none; }
+  .header{ background: linear-gradient(115deg, var(--navy) 0%, var(--navy) 45%, var(--red) 100%); padding:20px; color:#fff; display:flex; align-items:center; gap:14px; }
+  .back-btn{ width:36px; height:36px; border-radius:10px; background: rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .header h1{ font-family:'Fraunces', serif; font-size:1.15rem; }
+  .wrap{ max-width:560px; margin:0 auto; padding:20px; }
+
+  .section{ margin-bottom:30px; }
+  .section-head{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .section-head h2{ font-family:'Fraunces', serif; font-size:1.05rem; }
+  .section-head::after{ content:""; flex:1; height:1px; background:var(--line); }
+
+  /* OFFRES */
+  .offer-card{ background:#fff; border-radius:16px; padding:18px; border:1px solid var(--line); box-shadow:0 8px 20px -14px rgba(22,34,63,0.25); margin-bottom:12px; }
+  .offer-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+  .offer-badge{ background:var(--gold); color:#14100A; font-size:0.66rem; font-weight:800; padding:4px 10px; border-radius:999px; text-transform:uppercase; flex-shrink:0; }
+  .offer-titre{ font-weight:700; font-size:0.95rem; margin-top:8px; }
+  .offer-desc{ color:var(--text-dim); font-size:0.85rem; margin-top:6px; line-height:1.5; }
+  .offer-countdown{ margin-top:12px; font-size:0.76rem; color:var(--red); font-weight:700; }
+  .empty-state{ text-align:center; color:var(--text-dim); font-size:0.85rem; padding:20px 0; }
+
+  /* KIT MARKETING */
+  .kit-card{ background:#fff; border-radius:16px; padding:16px; border:1px solid var(--line); box-shadow:0 8px 20px -14px rgba(22,34,63,0.25); margin-bottom:12px; }
+  .kit-label{ font-size:0.7rem; font-weight:800; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:8px; }
+  .kit-text{ font-size:0.85rem; color:var(--text-dark); line-height:1.55; background:var(--cream); border-radius:10px; padding:12px; margin-bottom:10px; }
+  .kit-copy{ background:var(--navy); color:#fff; font-weight:700; font-size:0.8rem; padding:9px 16px; border-radius:999px; display:inline-block; }
+
+  /* DEFIS */
+  .challenge-card{ background:#fff; border-radius:16px; padding:18px; border:1px solid var(--line); box-shadow:0 8px 20px -14px rgba(22,34,63,0.25); margin-bottom:12px; }
+  .challenge-card.locked{ opacity:0.55; }
+  .challenge-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .challenge-titre{ font-weight:700; font-size:0.92rem; }
+  .challenge-reward{ font-size:0.76rem; color:var(--green); font-weight:700; }
+  .progress-track{ height:8px; border-radius:999px; background:var(--line); overflow:hidden; }
+  .progress-fill{ height:100%; border-radius:999px; background:var(--gold); transition: width 0.4s ease; }
+  .challenge-meta{ font-size:0.74rem; color:var(--text-dim); margin-top:6px; }
+
+  .bottom-nav{ position: fixed; left:0; right:0; bottom:0; background:#fff; border-top: 1px solid var(--line); display:flex; justify-content: space-around; padding: 10px 0 14px; z-index: 50; }
+  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; font-size:0.68rem; color: var(--text-dim); font-weight:700; }
+  .nav-item.active{ color: var(--red); }
+  .nav-item svg{ width:20px; height:20px; }
 </style>
 </head>
 <body>
-  <h1>promo</h1>
-  <p>Cette section arrive bientôt.</p>
-  <a href="/dashboard">← Retour au tableau de bord</a>
+
+<div class="header">
+  <a href="/dashboard" class="back-btn">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+  </a>
+  <h1>Promo</h1>
+</div>
+
+<div class="wrap">
+
+  <div class="section">
+    <div class="section-head"><h2>Offres en cours</h2></div>
+    <div id="offersList"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h2>Kit marketing</h2></div>
+
+    <div class="kit-card">
+      <div class="kit-label">Message WhatsApp</div>
+      <div class="kit-text" id="kitWhatsapp">Salut ! Je viens de découvrir Winaffinity, une plateforme avec plus de 2000 ebooks et 54+ formations en mobile money. En plus, tu peux gagner de l'argent en partageant les contenus que tu aimes. Regarde 👉 https://www.winaffinity.vip</div>
+      <button class="kit-copy" onclick="copyKit('kitWhatsapp', this)">Copier</button>
+    </div>
+
+    <div class="kit-card">
+      <div class="kit-label">Légende Instagram</div>
+      <div class="kit-text" id="kitInstagram">📚 J'apprends et je gagne avec Winaffinity !
+Formations + ebooks accessibles en mobile money, et une commission de 50% à chaque partage.
+Lien dans ma bio 🔗 #Winaffinity #ApprendreEtGagner</div>
+      <button class="kit-copy" onclick="copyKit('kitInstagram', this)">Copier</button>
+    </div>
+
+    <div class="kit-card">
+      <div class="kit-label">Story / Statut</div>
+      <div class="kit-text" id="kitStory">💡 Tu veux apprendre un nouveau métier ET gagner de l'argent en le partageant ? C'est Winaffinity. Swipe up 👆</div>
+      <button class="kit-copy" onclick="copyKit('kitStory', this)">Copier</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h2>Défis affiliés</h2></div>
+    <div id="challengesList"></div>
+  </div>
+
+</div>
+
+<div class="bottom-nav">
+  <a href="/catalogue" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    <span>eBooks</span>
+  </a>
+  <a href="/retrait" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+    <span>Retrait</span>
+  </a>
+  <a href="/promo" class="nav-item active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v9H4v-9"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/></svg>
+    <span>Promo</span>
+  </a>
+  <a href="/business" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><path d="M2 13h20"/></svg>
+    <span>Business</span>
+  </a>
+</div>
+
+<script>
+  const API_BASE = "https://www.winaffinity.vip";
+  const token = localStorage.getItem("winaffinity_token");
+
+  const CHALLENGES = [
+    { seuil: 5, titre: "Premiers pas", reward: "Badge Affilié Actif" },
+    { seuil: 10, titre: "En pleine forme", reward: "Commission à 55% sur tes prochaines ventes" },
+    { seuil: 20, titre: "Ambassadeur", reward: "Commission à 60% + mise en avant Business" },
+  ];
+
+  async function loadOffers() {
+    const listEl = document.getElementById("offersList");
+    try {
+      const res = await fetch(`${API_BASE}/promotions/`);
+      const data = await res.json();
+      if (data.length === 0) {
+        listEl.innerHTML = '<div class="empty-state">Aucune offre active pour le moment.</div>';
+        return;
+      }
+      listEl.innerHTML = "";
+      data.forEach(promo => {
+        const div = document.createElement("div");
+        div.className = "offer-card";
+        let countdownHtml = "";
+        if (promo.date_fin) {
+          const daysLeft = Math.max(0, Math.ceil((new Date(promo.date_fin) - new Date()) / (1000*60*60*24)));
+          countdownHtml = `<div class="offer-countdown">${daysLeft > 0 ? `Se termine dans ${daysLeft} jour${daysLeft > 1 ? 's' : ''}` : 'Se termine aujourd\'hui'}</div>`;
+        }
+        div.innerHTML = `
+          <div class="offer-top">
+            <div class="offer-titre">${promo.titre}</div>
+            ${promo.badge ? `<div class="offer-badge">${promo.badge}</div>` : ''}
+          </div>
+          <div class="offer-desc">${promo.description || ''}</div>
+          ${countdownHtml}
+        `;
+        listEl.appendChild(div);
+      });
+    } catch (e) {
+      listEl.innerHTML = '<div class="empty-state">Erreur de chargement.</div>';
+    }
+  }
+
+  function copyKit(id, btn) {
+    const text = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const old = btn.textContent;
+      btn.textContent = "Copié !";
+      setTimeout(() => { btn.textContent = old; }, 1500);
+    });
+  }
+
+  async function loadChallenges() {
+    let ventes = 0;
+    if (token) {
+      try {
+        const res = await fetch(`${API_BASE}/auth/solde`, { headers: { "Authorization": `Bearer ${token}` } });
+        if (res.ok) {
+          const data = await res.json();
+          ventes = data.nombre_ventes || 0;
+        }
+      } catch (e) {}
+    }
+
+    const listEl = document.getElementById("challengesList");
+    listEl.innerHTML = "";
+    CHALLENGES.forEach(ch => {
+      const atteint = ventes >= ch.seuil;
+      const pct = Math.min(100, Math.round((ventes / ch.seuil) * 100));
+      const div = document.createElement("div");
+      div.className = "challenge-card" + (atteint ? "" : "");
+      div.innerHTML = `
+        <div class="challenge-top">
+          <div class="challenge-titre">${ch.titre} — ${ch.seuil} ventes</div>
+          <div class="challenge-reward">${atteint ? "✓ Débloqué" : ""}</div>
+        </div>
+        <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <div class="challenge-meta">${ventes}/${ch.seuil} ventes — ${ch.reward}</div>
+      `;
+      listEl.appendChild(div);
+    });
+  }
+
+  loadOffers();
+  loadChallenges();
+</script>
+
 </body>
 </html>
