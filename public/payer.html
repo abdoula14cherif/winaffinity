@@ -40,18 +40,7 @@
   .pay-btn[disabled]{ opacity:0.6; }
   .status-msg{ text-align:center; margin-top:16px; font-size:0.85rem; color:var(--text-dim); display:none; }
   .status-msg.show{ display:block; }
-
-  .success-box{ text-align:center; padding: 30px 0 10px; display:none; }
-  .success-box.show{ display:block; }
-  .success-box svg{ width:56px; height:56px; color:var(--green); margin-bottom:14px; }
-  .success-box h2{ font-family:'Fraunces', serif; font-size:1.2rem; margin-bottom:8px; }
-  .success-box p{ color:var(--text-dim); font-size:0.88rem; margin-bottom:22px; }
-  .access-btn{ display:block; background:var(--gold); color:#14100A; font-weight:700; padding:14px; border-radius:12px; margin-bottom:12px; }
-  .affiliate-cta{ background:var(--navy); color:#fff; border-radius:14px; padding:18px; text-align:left; display:flex; align-items:center; gap:14px; }
-  .affiliate-cta .icon{ width:42px; height:42px; border-radius:10px; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-  .affiliate-cta .icon svg{ width:20px; height:20px; }
-  .affiliate-cta .txt b{ display:block; font-size:0.92rem; }
-  .affiliate-cta .txt span{ display:block; font-size:0.78rem; color:rgba(255,255,255,0.7); margin-top:2px; }
+  .status-msg.error{ color:#C0392B; }
 </style>
 </head>
 <body>
@@ -83,19 +72,8 @@
       <div class="label">Montant à payer</div>
       <div class="value" id="prix">-</div>
     </div>
-    <button class="pay-btn" id="payBtn" onclick="simulerPaiement()">Payer avec Mobile Money</button>
+    <button class="pay-btn" id="payBtn" onclick="lancerPaiement()">Payer avec Mobile Money</button>
     <div class="status-msg" id="statusMsg"></div>
-  </div>
-
-  <div class="success-box" id="successBox">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-    <h2>Paiement confirmé</h2>
-    <p>Ton contenu est prêt.</p>
-    <a href="#" class="access-btn" id="accessBtn">Accéder maintenant</a>
-    <div class="affiliate-cta" onclick="goRegister()">
-      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
-      <div class="txt"><b>Deviens affilié</b><span>Inscris-toi et gagne 50% en partageant ce contenu</span></div>
-    </div>
   </div>
 </div>
 
@@ -140,39 +118,31 @@
     }
   }
 
-  function goRegister() {
-    window.location.href = "/?register=1";
-  }
-
-  function simulerPaiement() {
+  async function lancerPaiement() {
     const btn = document.getElementById("payBtn");
     const statusMsg = document.getElementById("statusMsg");
     btn.disabled = true;
-    btn.textContent = "Traitement en cours...";
-    statusMsg.classList.add("show");
-    statusMsg.textContent = "Confirmation de la transaction mobile money...";
+    btn.textContent = "Redirection...";
+    statusMsg.className = "status-msg show";
+    statusMsg.textContent = "Création du paiement sécurisé...";
 
-    setTimeout(async () => {
-      try {
-        const res = await fetch(`${API_BASE}/contenus/achat`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ contenu_id: contenuId, referral_code: refCode || null })
-        });
-        const data = await res.json();
+    try {
+      const res = await fetch(`${API_BASE}/contenus/checkout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contenu_id: contenuId, referral_code: refCode || null })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Erreur");
 
-        document.getElementById("payCard").style.display = "none";
-        document.querySelector(".social-proof").style.display = "none";
-        document.getElementById("successBox").classList.add("show");
-        const accessBtn = document.getElementById("accessBtn");
-        const lien = data.lien_acces || (contenuData && contenuData.lien_acces);
-        if (lien) accessBtn.href = lien;
-      } catch (e) {
-        statusMsg.textContent = "Erreur lors de la confirmation. Réessaie.";
-        btn.disabled = false;
-        btn.textContent = "Payer avec Mobile Money";
-      }
-    }, 2000);
+      localStorage.setItem("winaffinity_last_checkout", data.checkout_id);
+      window.location.href = data.payment_url;
+    } catch (e) {
+      statusMsg.className = "status-msg show error";
+      statusMsg.textContent = "Erreur lors de la création du paiement. Réessaie.";
+      btn.disabled = false;
+      btn.textContent = "Payer avec Mobile Money";
+    }
   }
 
   loadContenu();
