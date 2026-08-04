@@ -35,16 +35,26 @@
   .field label{ display:block; font-size:0.76rem; color:var(--text-dim); margin-bottom:5px; font-weight:600; }
   .field input, .field select, .field textarea{ width:100%; border:1px solid var(--line); border-radius:9px; padding:10px 12px; font-family:inherit; font-size:0.87rem; background:var(--cream); }
   .field textarea{ resize:vertical; min-height:60px; }
+
+  .upload-box{ border:2px dashed var(--line); border-radius:12px; padding:16px; text-align:center; cursor:pointer; background:var(--cream); }
+  .upload-box.has-image{ padding:0; border-style:solid; overflow:hidden; }
+  .upload-box img{ width:100%; height:140px; object-fit:cover; display:block; }
+  .upload-box .placeholder{ color:var(--text-dim); font-size:0.85rem; }
+  .upload-box .placeholder svg{ width:24px; height:24px; margin-bottom:6px; }
+  .upload-status{ font-size:0.76rem; margin-top:6px; color:var(--text-dim); }
+  .upload-status.uploading{ color:var(--gold); }
+  .upload-status.error{ color:#C0392B; }
+  .upload-status.success{ color:var(--green); }
+
   .modal-actions{ display:flex; gap:10px; margin-top:16px; }
   .btn{ flex:1; padding:12px; border-radius:10px; font-weight:700; font-size:0.88rem; text-align:center; }
   .btn-save{ background:var(--navy); color:#fff; }
+  .btn-save[disabled]{ opacity:0.5; }
   .btn-cancel{ background:var(--line); color:var(--text-dark); }
   .msg{ font-size:0.8rem; margin-top:10px; text-align:center; display:none; }
   .msg.show{ display:block; }
   .msg.error{ color:#C0392B; }
   .msg.success{ color:var(--green); }
-
-  .denied{ text-align:center; padding:60px 20px; color:var(--text-dim); }
 </style>
 </head>
 <body>
@@ -54,7 +64,7 @@
   <button class="add-btn" onclick="openModal()">+ Ajouter</button>
 </div>
 
-<div class="wrap" id="content">
+<div class="wrap">
   <div id="list"></div>
 </div>
 
@@ -63,6 +73,21 @@
     <h2 id="modalTitle">Nouveau contenu</h2>
     <form id="contenuForm" onsubmit="return saveContenu(event)">
       <input type="hidden" id="contenuId">
+      <input type="hidden" id="f_image_url">
+
+      <div class="field">
+        <label>Image</label>
+        <div class="upload-box" id="uploadBox" onclick="document.getElementById('fileInput').click()">
+          <div class="placeholder" id="uploadPlaceholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 6px;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>
+            Touche pour choisir une image
+          </div>
+          <img id="previewImg" style="display:none;">
+        </div>
+        <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
+        <div class="upload-status" id="uploadStatus"></div>
+      </div>
+
       <div class="field"><label>Titre</label><input type="text" id="f_titre" required></div>
       <div class="field"><label>Type</label>
         <select id="f_type" required>
@@ -74,13 +99,12 @@
       <div class="field"><label>Prix (F CFA)</label><input type="number" id="f_prix" required></div>
       <div class="field"><label>Description courte</label><textarea id="f_description"></textarea></div>
       <div class="field"><label>Description longue</label><textarea id="f_description_longue"></textarea></div>
-      <div class="field"><label>URL image</label><input type="url" id="f_image_url"></div>
       <div class="field"><label>Points forts (séparés par |)</label><input type="text" id="f_points_forts" placeholder="Accès à vie|Certificat inclus"></div>
       <div class="field"><label>Lien d'accès</label><input type="url" id="f_lien_acces"></div>
 
       <div class="modal-actions">
         <button type="button" class="btn btn-cancel" onclick="closeModal()">Annuler</button>
-        <button type="submit" class="btn btn-save">Enregistrer</button>
+        <button type="submit" class="btn btn-save" id="saveBtn">Enregistrer</button>
       </div>
       <div class="msg" id="formMsg"></div>
     </form>
@@ -99,9 +123,7 @@
       const meRes = await fetch(`${API_BASE}/auth/me`, { headers: { "Authorization": `Bearer ${token}` } });
       if (!meRes.ok) { window.location.href = "/"; return; }
       await loadList();
-    } catch (e) {
-      document.getElementById("content").innerHTML = '<div class="denied">Erreur de chargement.</div>';
-    }
+    } catch (e) {}
   }
 
   async function loadList() {
@@ -131,10 +153,21 @@
     });
   }
 
+  function resetUploadBox() {
+    document.getElementById("f_image_url").value = "";
+    document.getElementById("previewImg").style.display = "none";
+    document.getElementById("uploadPlaceholder").style.display = "block";
+    document.getElementById("uploadBox").classList.remove("has-image");
+    document.getElementById("uploadStatus").className = "upload-status";
+    document.getElementById("uploadStatus").textContent = "";
+    document.getElementById("fileInput").value = "";
+  }
+
   function openModal() {
     document.getElementById("modalTitle").textContent = "Nouveau contenu";
     document.getElementById("contenuForm").reset();
     document.getElementById("contenuId").value = "";
+    resetUploadBox();
     document.getElementById("formMsg").className = "msg";
     document.getElementById("formModal").classList.add("open");
   }
@@ -148,15 +181,65 @@
     document.getElementById("f_prix").value = item.prix || 0;
     document.getElementById("f_description").value = item.description || "";
     document.getElementById("f_description_longue").value = item.description_longue || "";
-    document.getElementById("f_image_url").value = item.image_url || "";
     document.getElementById("f_points_forts").value = item.points_forts || "";
     document.getElementById("f_lien_acces").value = item.lien_acces || "";
+
+    resetUploadBox();
+    if (item.image_url) {
+      document.getElementById("f_image_url").value = item.image_url;
+      document.getElementById("previewImg").src = item.image_url;
+      document.getElementById("previewImg").style.display = "block";
+      document.getElementById("uploadPlaceholder").style.display = "none";
+      document.getElementById("uploadBox").classList.add("has-image");
+    }
+
     document.getElementById("formMsg").className = "msg";
     document.getElementById("formModal").classList.add("open");
   }
 
   function closeModal() {
     document.getElementById("formModal").classList.remove("open");
+  }
+
+  async function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      document.getElementById("previewImg").src = ev.target.result;
+      document.getElementById("previewImg").style.display = "block";
+      document.getElementById("uploadPlaceholder").style.display = "none";
+      document.getElementById("uploadBox").classList.add("has-image");
+    };
+    reader.readAsDataURL(file);
+
+    const status = document.getElementById("uploadStatus");
+    const saveBtn = document.getElementById("saveBtn");
+    status.className = "upload-status uploading";
+    status.textContent = "Envoi de l'image...";
+    saveBtn.disabled = true;
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch(`${API_BASE}/contenus/admin/upload-image`, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}` },
+        body: formData
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Erreur d'envoi");
+
+      document.getElementById("f_image_url").value = data.url;
+      status.className = "upload-status success";
+      status.textContent = "Image envoyée ✓";
+    } catch (err) {
+      status.className = "upload-status error";
+      status.textContent = err.message;
+    } finally {
+      saveBtn.disabled = false;
+    }
   }
 
   async function saveContenu(e) {

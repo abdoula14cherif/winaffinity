@@ -84,6 +84,9 @@ async def enregistrer_achat(request: Request, payload: AchatPayload):
 
 
 from app.dependencies import get_current_admin_id
+from fastapi import UploadFile, File
+import uuid
+from app.config import settings
 
 
 class ContenuCreate(BaseModel):
@@ -137,3 +140,18 @@ async def update_contenu(request: Request, contenu_id: str, payload: ContenuUpda
 async def delete_contenu(request: Request, contenu_id: str, admin_id: str = Depends(get_current_admin_id)):
     result = supabase_admin.table("contenus").delete().eq("id", contenu_id).execute()
     return {"deleted": True}
+
+
+@router.post("/admin/upload-image")
+@limiter.limit("20/minute")
+async def upload_image(request: Request, file: UploadFile = File(...), admin_id: str = Depends(get_current_admin_id)):
+    ext = file.filename.split(".")[-1] if "." in file.filename else "jpg"
+    path = f"{uuid.uuid4()}.{ext}"
+    content = await file.read()
+
+    supabase_admin.storage.from_("contenus-images").upload(
+        path, content, {"content-type": file.content_type}
+    )
+
+    url = f"{settings.supabase_url}/storage/v1/object/public/contenus-images/{path}"
+    return {"url": url}
