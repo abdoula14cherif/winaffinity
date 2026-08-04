@@ -122,6 +122,7 @@ async def get_solde(request: Request, user_id: str = Depends(get_current_user_id
         supabase_admin.table("transactions")
         .select("commission")
         .eq("referrer_id", user_id)
+        .eq("statut", "paid")
         .execute()
     )
     total = sum(row["commission"] for row in result.data)

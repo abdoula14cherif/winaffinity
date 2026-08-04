@@ -3,6 +3,7 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 
 from app.database import supabase_public, supabase_admin
+from app.config import settings
 
 router = APIRouter(prefix="/contenus", tags=["contenus"])
 limiter = Limiter(key_func=get_remote_address)
@@ -155,3 +156,75 @@ async def upload_image(request: Request, file: UploadFile = File(...), admin_id:
 
     url = f"{settings.supabase_url}/storage/v1/object/public/contenus-images/{path}"
     return {"url": url}
+
+
+import httpx
+import hmac
+import hashlib
+
+
+class CheckoutPayload(BaseModel):
+    contenu_id: str
+    referral_code: str | None = None
+
+
+@router.post("/checkout")
+@limiter.limit("10/minute")
+async def create_checkout(request: Request, payload: CheckoutPayload):
+    contenu_result = supabase_admin.table("contenus").select("*").eq("id", payload.contenu_id).execute()
+    if not contenu_result.data:
+        raise HTTPException(status_code=404, detail="Contenu introuvable")
+
+    contenu = contenu_result.data[0]
+    montant = contenu["prix"]
+
+    referrer_id = None
+    if payload.referral_code:
+        referrer_result = supabase_admin.table("users").select("id").eq("referral_code", payload.referral_code).execute()
+        if referrer_result.data:
+            referrer_id = referrer_result.data[0]["id"]
+
+    async with httpx.AsyncClient() as client:
+        leekpay_res = await client.post(
+            "https://leekpay.fr/api/v1/checkout",
+            headers={"Authorization": f"Bearer {settings.leekpay_secret_key}"},
+            json={
+                "amount": montant,
+                "currency": "XOF",
+                "description": contenu["titre"],
+                "return_url": f"https://www.winaffinity.vip/confirmation?contenu_id={payload.contenu_id}",
+                "cancel_url": f"https://www.winaffinity.vip/payer?id={payload.contenu_id}",
+                "metadata": {"contenu_id": payload.contenu_id, "referral_code": payload.referral_code},
+            },
+        )
+
+    if leekpay_res.status_code != 201:
+        raise HTTPException(status_code=502, detail="Erreur lors de la création du paiement")
+
+    leekpay_data = leekpay_res.json()["data"]
+
+    transaction = {
+        "contenu_id": payload.contenu_id,
+        "montant": montant,
+        "referrer_id": referrer_id,
+        "commission": round(montant * 0.5) if referrer_id else 0,
+        "statut": "pending",
+        "checkout_id": leekpay_data["id"],
+    }
+    supabase_admin.table("transactions").insert(transaction).execute()
+
+    return {"payment_url": leekpay_data["payment_url"], "checkout_id": leekpay_data["id"]}
+
+
+@router.get("/checkout/{checkout_id}/status")
+@limiter.limit("30/minute")
+async def checkout_status(request: Request, checkout_id: str):
+    result = supabase_admin.table("transactions").select("statut, contenu_id").eq("checkout_id", checkout_id).execute()
+    if not result.data:
+        raise HTTPException(status_code=404, detail="Transaction introuvable")
+
+    transaction = result.data[0]
+    contenu_result = supabase_admin.table("contenus").select("lien_acces").eq("id", transaction["contenu_id"]).execute()
+    lien_acces = contenu_result.data[0]["lien_acces"] if contenu_result.data else None
+
+    return {"statut": transaction["statut"], "lien_acces": lien_acces if transaction["statut"] == "paid" else None}

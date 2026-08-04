@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     jwt_access_token_expire_minutes: int = 30
 
     resend_api_key: str = ""
+    leekpay_public_key: str = ""
+    leekpay_secret_key: str = ""
 
     allowed_origins: str = "http://localhost:3000"
 
