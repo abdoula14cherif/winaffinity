@@ -5,85 +5,106 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Winaffinity — Catalogue</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500&display=swap');
 
   :root{
-    --navy: #0B1A3D; --red: #7A1F2B; --cream: #F3EFE6; --gold: #E8B84B;
-    --text-dark: #16223F; --text-dim: #6B7385; --green: #2FBF8F; --line: #E4DFD3;
+    --navy: #0B1220; --navy-2: #121C31; --red: #7A1F2B; --gold: #E8B84B;
+    --text: #F1ECE0; --text-dim: #9AA2B5; --green: #2FBF8F; --line: #26314C;
   }
   *{ box-sizing: border-box; margin:0; padding:0; }
   html,body{ overflow-x: hidden; max-width: 100vw; }
-  body{ background: var(--cream); color: var(--text-dark); font-family: 'Manrope', sans-serif; padding-bottom: 78px; }
-  h1,h2{ font-family: 'Fraunces', serif; font-weight: 600; }
+  body{ background: var(--navy); color: var(--text); font-family: 'Manrope', sans-serif; padding-bottom: 78px; }
+  h1,h2{ font-family: 'Fraunces', serif; font-weight: 700; }
   a,button{ color: inherit; text-decoration: none; font-family: inherit; }
-  .wrap{ max-width: 720px; margin: 0 auto; padding: 0 20px; }
+  .wrap{ max-width: 780px; margin: 0 auto; padding: 0 18px; }
 
-  .header{ background: linear-gradient(115deg, var(--navy) 0%, var(--navy) 45%, var(--red) 100%); padding: 20px 20px 0; color:#fff; }
+  .header{ padding: 20px 18px 0; position: relative; }
   .header-top{ display:flex; align-items:center; gap:14px; }
-  .back-btn{ width:36px; height:36px; border-radius:10px; background: rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-  .header h1{ font-size:1.2rem; }
-  .header p{ color: rgba(255,255,255,0.6); font-size:0.82rem; margin-top:4px; }
+  .back-btn{ width:36px; height:36px; border-radius:10px; background: rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .header h1{ font-size:1.35rem; }
+  .header p{ color: var(--text-dim); font-size:0.8rem; margin-top:2px; }
 
-  .tabs{ display:flex; gap:4px; margin-top:20px; background: rgba(255,255,255,0.1); border-radius:12px; padding:4px; }
-  .tab{ flex:1; text-align:center; padding:10px; border-radius:9px; font-size:0.85rem; font-weight:700; color: rgba(255,255,255,0.6); cursor:pointer; }
-  .tab.active{ background:#fff; color: var(--navy); }
-  .tabs-spacer{ height:16px; }
+  .tabs{ display:flex; gap:6px; margin-top:20px; }
+  .tab{ padding:9px 18px; border-radius:999px; font-size:0.84rem; font-weight:700; color: var(--text-dim); background: rgba(255,255,255,0.06); cursor:pointer; }
+  .tab.active{ background: var(--gold); color:#14100A; }
 
-  .filters{ display:flex; gap:8px; overflow-x:auto; padding: 16px 20px 4px; scrollbar-width:none; }
+  .featured-section{ margin-top: 26px; }
+  .featured-label{ padding: 0 18px; font-family:'IBM Plex Mono', monospace; font-size:0.68rem; letter-spacing:0.14em; text-transform:uppercase; color: var(--gold); margin-bottom: 12px; display:flex; align-items:center; gap:10px; }
+  .featured-label::after{ content:""; flex:1; height:1px; background: var(--line); }
+  .featured-track{ display:flex; gap:14px; overflow-x:auto; padding: 0 18px 6px; scrollbar-width:none; }
+  .featured-track::-webkit-scrollbar{ display:none; }
+  .poster{
+    flex:0 0 auto; width: 190px; aspect-ratio: 2/3; border-radius:16px; position:relative; overflow:hidden;
+    background: linear-gradient(160deg, var(--navy-2), #1a2540); cursor:pointer;
+    box-shadow: 0 18px 34px -18px rgba(0,0,0,0.7); transition: transform 0.2s ease;
+  }
+  .poster:active{ transform: scale(0.97); }
+  .poster img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .poster .overlay{ position:absolute; inset:0; background: linear-gradient(0deg, rgba(6,10,20,0.95) 5%, rgba(6,10,20,0.15) 55%, transparent 75%); }
+  .poster .rank{ position:absolute; top:10px; left:10px; font-family:'Fraunces', serif; font-weight:800; font-size:1.6rem; color: rgba(255,255,255,0.85); text-shadow: 0 2px 8px rgba(0,0,0,0.6); }
+  .poster .content{ position:absolute; left:0; right:0; bottom:0; padding:14px; }
+  .poster .badge{ display:inline-block; font-size:0.6rem; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; background: rgba(255,255,255,0.15); backdrop-filter: blur(4px); padding:3px 8px; border-radius:6px; margin-bottom:8px; }
+  .poster .titre{ font-weight:800; font-size:0.92rem; line-height:1.2; margin-bottom:6px; }
+  .poster .meta-row{ display:flex; justify-content:space-between; align-items:flex-end; }
+  .poster .prix{ font-family:'Fraunces', serif; font-weight:700; font-size:1rem; }
+  .poster .commission{ font-size:0.64rem; color: var(--green); font-weight:700; }
+
+  .filters{ display:flex; gap:8px; overflow-x:auto; padding: 22px 18px 4px; scrollbar-width:none; }
   .filters::-webkit-scrollbar{ display:none; }
-  .filter-pill{ flex-shrink:0; padding:8px 16px; border-radius:999px; font-size:0.8rem; font-weight:700; background:#fff; border:1px solid var(--line); color: var(--text-dim); cursor:pointer; }
-  .filter-pill.active{ background: var(--navy); color:#fff; border-color: var(--navy); }
+  .filter-pill{ flex-shrink:0; padding:7px 15px; border-radius:999px; font-size:0.76rem; font-weight:700; background: rgba(255,255,255,0.06); border:1px solid var(--line); color: var(--text-dim); cursor:pointer; }
+  .filter-pill.active{ background:#fff; color: var(--navy); border-color:#fff; }
 
-  .grid{ padding: 16px 20px 0; display:flex; flex-direction:column; gap:12px; }
-  .card{ background:#fff; border-radius:16px; padding:14px; border:1px solid var(--line); box-shadow: 0 8px 20px -14px rgba(22,34,63,0.25); display:flex; gap:14px; align-items:center; cursor:pointer; }
-  .thumb{ width:56px; height:56px; border-radius:12px; flex-shrink:0; object-fit:cover; background: var(--cream); }
-  .type-badge{ width:56px; height:56px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:0.66rem; font-weight:800; text-transform:uppercase; }
-  .type-formation{ background:#E4EBFB; color:#3B5BDB; }
-  .type-ebook{ background:#FBF0D8; color:#B8860B; }
-  .card .info{ flex:1; min-width:0; }
-  .card .titre{ font-weight:700; font-size:0.94rem; }
-  .card .cat{ font-size:0.72rem; color: var(--text-dim); margin-top:2px; font-weight:700; text-transform:uppercase; letter-spacing:0.03em; }
-  .card .snippet{ font-size:0.78rem; color: var(--text-dim); margin-top:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .prix-block{ text-align:right; flex-shrink:0; }
-  .card .prix{ font-family:'Fraunces', serif; font-weight:700; color: var(--navy); font-size:0.92rem; white-space:nowrap; }
-  .commission{ font-size:0.66rem; color: var(--green); font-weight:700; margin-top:2px; white-space:nowrap; }
+  .grid{ padding: 12px 18px 0; display:grid; grid-template-columns: repeat(2, 1fr); gap:12px; }
+  .grid-card{
+    border-radius:16px; aspect-ratio: 3/4; position:relative; overflow:hidden; cursor:pointer;
+    background: linear-gradient(160deg, var(--navy-2), #1a2540); box-shadow: 0 14px 26px -16px rgba(0,0,0,0.65);
+  }
+  .grid-card img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .grid-card .overlay{ position:absolute; inset:0; background: linear-gradient(0deg, rgba(6,10,20,0.96) 10%, rgba(6,10,20,0.2) 60%, transparent 80%); }
+  .grid-card .badge{ position:absolute; top:10px; left:10px; font-size:0.6rem; font-weight:800; text-transform:uppercase; letter-spacing:0.04em; background: rgba(255,255,255,0.15); backdrop-filter: blur(4px); padding:3px 8px; border-radius:6px; }
+  .grid-card .content{ position:absolute; left:0; right:0; bottom:0; padding:12px; }
+  .grid-card .cat{ font-size:0.6rem; color: var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; font-weight:700; margin-bottom:3px; }
+  .grid-card .titre{ font-weight:800; font-size:0.82rem; line-height:1.22; margin-bottom:6px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .grid-card .prix{ font-family:'Fraunces', serif; font-weight:700; font-size:0.86rem; }
+  .grid-card .commission{ font-size:0.6rem; color: var(--green); font-weight:700; }
 
-  .empty{ text-align:center; color: var(--text-dim); padding: 40px 20px; }
+  .empty{ text-align:center; color: var(--text-dim); padding: 50px 20px; grid-column: 1/-1; }
 
-  /* ABONNEMENTS */
-  .plan-card{ background:#fff; border-radius:18px; padding:22px; border:1px solid var(--line); box-shadow: 0 8px 20px -14px rgba(22,34,63,0.25); margin-bottom:14px; }
+  .plan-card{ background: linear-gradient(160deg, var(--navy-2), #1a2540); border-radius:20px; padding:24px; border:1px solid var(--line); margin-bottom:14px; }
   .plan-card.featured{ border-color: var(--gold); position:relative; }
-  .plan-card.featured::before{ content:"Recommandé"; position:absolute; top:-11px; left:20px; background:var(--gold); color:#14100A; font-size:0.68rem; font-weight:800; padding:4px 12px; border-radius:999px; }
+  .plan-card.featured::before{ content:"Recommandé"; position:absolute; top:-11px; left:22px; background:var(--gold); color:#14100A; font-size:0.66rem; font-weight:800; padding:4px 12px; border-radius:999px; }
   .plan-card h3{ font-size:1rem; color: var(--text-dim); font-weight:700; font-family:'Manrope', sans-serif; }
-  .plan-card .price{ font-family:'Fraunces', serif; font-size:2rem; margin:10px 0 4px; }
+  .plan-card .price{ font-family:'Fraunces', serif; font-size:2.1rem; margin:10px 0 4px; color:#fff; }
   .plan-card .price span{ font-size:0.9rem; color:var(--text-dim); font-family:'Manrope', sans-serif; }
   .plan-card ul{ list-style:none; margin:16px 0; display:flex; flex-direction:column; gap:9px; }
   .plan-card li{ font-size:0.86rem; color:var(--text-dim); display:flex; gap:8px; }
   .plan-card li::before{ content:"✓"; color:var(--green); font-weight:700; }
-  .plan-btn{ width:100%; text-align:center; padding:13px; border-radius:12px; font-weight:700; font-size:0.9rem; background:var(--navy); color:#fff; }
+  .plan-btn{ display:block; width:100%; text-align:center; padding:13px; border-radius:12px; font-weight:700; font-size:0.9rem; background: rgba(255,255,255,0.08); color:#fff; }
   .plan-card.featured .plan-btn{ background:var(--gold); color:#14100A; }
 
-  .bottom-nav{ position: fixed; left:0; right:0; bottom:0; background:#fff; border-top: 1px solid var(--line); display:flex; justify-content: space-around; padding: 10px 0 14px; z-index: 50; }
-  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; font-size:0.68rem; color: var(--text-dim); font-weight:700; }
-  .nav-item.active{ color: var(--red); }
+  .bottom-nav{ position: fixed; left:0; right:0; bottom:0; background: var(--navy-2); border-top: 1px solid var(--line); display:flex; justify-content: space-around; padding: 10px 0 14px; z-index: 50; }
+  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; font-size:0.66rem; color: var(--text-dim); font-weight:700; }
+  .nav-item.active{ color: var(--gold); }
   .nav-item svg{ width:20px; height:20px; }
 
-  .modal-overlay{ display:none; position:fixed; inset:0; background:rgba(11,26,61,0.6); z-index:100; align-items:flex-end; justify-content:center; }
+  .modal-overlay{ display:none; position:fixed; inset:0; background:rgba(4,6,12,0.75); z-index:100; align-items:flex-end; justify-content:center; backdrop-filter: blur(3px); }
   .modal-overlay.open{ display:flex; }
-  .modal{ background:#fff; width:100%; max-width:480px; border-radius:20px 20px 0 0; padding:0 0 24px; max-height:88vh; overflow-y:auto; }
-  .modal-img{ width:100%; height:160px; object-fit:cover; border-radius:20px 20px 0 0; display:none; }
-  .modal-body{ padding:20px 20px 0; }
-  .modal h2{ font-size:1.15rem; margin-bottom:4px; }
-  .modal .sub{ color:var(--text-dim); font-size:0.82rem; margin-bottom:14px; }
-  .modal-desc{ font-size:0.85rem; color:var(--text-dim); line-height:1.5; margin-bottom:18px; }
-  .modal-price-row{ display:flex; justify-content:space-between; align-items:center; background:var(--cream); border-radius:12px; padding:14px 16px; margin-bottom:20px; }
-  .modal-price-row .p{ font-family:'Fraunces', serif; font-weight:700; font-size:1.2rem; }
+  .modal{ background: var(--navy-2); width:100%; max-width:480px; border-radius:22px 22px 0 0; padding:0 0 26px; max-height:90vh; overflow-y:auto; border:1px solid var(--line); border-bottom:none; }
+  .modal-img-wrap{ position:relative; width:100%; height:220px; }
+  .modal-img-wrap img{ width:100%; height:100%; object-fit:cover; }
+  .modal-img-wrap .fade{ position:absolute; inset:0; background: linear-gradient(0deg, var(--navy-2) 0%, transparent 45%); }
+  .modal-body{ padding:0 22px; margin-top:-18px; position:relative; }
+  .modal h2{ font-size:1.2rem; margin-bottom:4px; color:#fff; }
+  .modal .sub{ color: var(--gold); font-size:0.76rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:14px; }
+  .modal-desc{ font-size:0.85rem; color:var(--text-dim); line-height:1.55; margin-bottom:18px; }
+  .modal-price-row{ display:flex; justify-content:space-between; align-items:center; background: rgba(255,255,255,0.05); border-radius:14px; padding:16px 18px; margin-bottom:20px; }
+  .modal-price-row .p{ font-family:'Fraunces', serif; font-weight:700; font-size:1.3rem; color:#fff; }
   .modal-price-row .c{ color:var(--green); font-size:0.78rem; font-weight:700; }
   .modal-actions{ display:flex; flex-direction:column; gap:10px; }
-  .modal-btn{ width:100%; padding:14px; border-radius:12px; font-weight:700; font-size:0.95rem; text-align:center; }
-  .btn-buy{ background:var(--navy); color:#fff; }
-  .btn-affiliate{ background:var(--gold); color:#14100A; }
-  .btn-cancel{ color:var(--text-dim); font-size:0.85rem; text-align:center; padding:6px; }
+  .modal-btn{ width:100%; padding:15px; border-radius:13px; font-weight:800; font-size:0.95rem; text-align:center; }
+  .btn-buy{ background: var(--gold); color:#14100A; }
+  .btn-affiliate{ background: rgba(255,255,255,0.08); color:#fff; border:1px solid var(--line); }
+  .btn-cancel{ color:var(--text-dim); font-size:0.85rem; text-align:center; padding:8px; }
 </style>
 </head>
 <body>
@@ -104,14 +125,17 @@
     <div class="tab" data-tab="formation" onclick="selectTab('formation', this)">Vidéos</div>
     <div class="tab" data-tab="abonnement" onclick="selectTab('abonnement', this)">Abonnements</div>
   </div>
-  <div class="tabs-spacer"></div>
+</div>
+
+<div class="featured-section" id="featuredSection">
+  <div class="featured-label">En vedette</div>
+  <div class="featured-track" id="featuredTrack"></div>
 </div>
 
 <div class="filters" id="filters"></div>
 
 <div class="grid" id="grid"></div>
-<div class="wrap" id="plansWrap" style="display:none; padding-top:16px;"></div>
-<div class="empty" id="emptyMsg" style="display:none;">Aucun contenu dans cette catégorie.</div>
+<div class="wrap" id="plansWrap" style="display:none; padding-top:20px;"></div>
 
 <div class="bottom-nav">
   <a href="/catalogue" class="nav-item active">
@@ -134,7 +158,10 @@
 
 <div class="modal-overlay" id="contentModal">
   <div class="modal">
-    <img class="modal-img" id="modalImg" src="" alt="">
+    <div class="modal-img-wrap" id="modalImgWrap" style="display:none;">
+      <img id="modalImg" src="" alt="">
+      <div class="fade"></div>
+    </div>
     <div class="modal-body">
       <h2 id="modalTitre">Titre</h2>
       <p class="sub" id="modalCat">Catégorie</p>
@@ -160,38 +187,63 @@
   let currentTab = "ebook";
   let selectedId = null;
 
+  function posterBadge(item){ return item.type === "formation" ? "VIDÉO" : "LIVRE"; }
+
+  function renderFeatured(list) {
+    const track = document.getElementById("featuredTrack");
+    const section = document.getElementById("featuredSection");
+    track.innerHTML = "";
+    const top = list.slice(0, 5);
+    if (top.length === 0) { section.style.display = "none"; return; }
+    section.style.display = "block";
+
+    top.forEach((item, i) => {
+      const el = document.createElement("div");
+      el.className = "poster";
+      el.onclick = () => openModal(item);
+      const bg = item.image_url ? `<img src="${item.image_url}">` : "";
+      el.innerHTML = `
+        ${bg}
+        <div class="overlay"></div>
+        <div class="rank">${i + 1}</div>
+        <div class="content">
+          <div class="badge">${posterBadge(item)}</div>
+          <div class="titre">${item.titre}</div>
+          <div class="meta-row">
+            <div class="prix">${item.prix.toLocaleString('fr-FR')} F</div>
+            <div class="commission">+${Math.round(item.prix * 0.5).toLocaleString('fr-FR')} F</div>
+          </div>
+        </div>
+      `;
+      track.appendChild(el);
+    });
+  }
+
   function renderContenus(list) {
     const grid = document.getElementById("grid");
-    const emptyMsg = document.getElementById("emptyMsg");
-    grid.style.display = "flex";
+    grid.style.display = "grid";
     document.getElementById("plansWrap").style.display = "none";
     grid.innerHTML = "";
 
-    if (list.length === 0) { emptyMsg.style.display = "block"; return; }
-    emptyMsg.style.display = "none";
+    renderFeatured(list);
+
+    if (list.length === 0) {
+      grid.innerHTML = '<div class="empty">Aucun contenu dans cette catégorie.</div>';
+      return;
+    }
 
     list.forEach(item => {
-      const isFormation = item.type === "formation";
       const card = document.createElement("div");
-      card.className = "card";
+      card.className = "grid-card";
       card.onclick = () => openModal(item);
-
-      const thumbHtml = item.image_url
-        ? `<img class="thumb" src="${item.image_url}" alt="">`
-        : `<div class="type-badge ${isFormation ? 'type-formation' : 'type-ebook'}">${isFormation ? 'VIDÉO' : 'LIVRE'}</div>`;
-
-      const snippetHtml = item.description_longue
-        ? `<div class="snippet">${item.description_longue}</div>`
-        : "";
-
+      const bg = item.image_url ? `<img src="${item.image_url}">` : "";
       card.innerHTML = `
-        ${thumbHtml}
-        <div class="info">
-          <div class="titre">${item.titre}</div>
+        ${bg}
+        <div class="overlay"></div>
+        <div class="badge">${posterBadge(item)}</div>
+        <div class="content">
           <div class="cat">${item.categorie}</div>
-          ${snippetHtml}
-        </div>
-        <div class="prix-block">
+          <div class="titre">${item.titre}</div>
           <div class="prix">${item.prix.toLocaleString('fr-FR')} F</div>
           <div class="commission">Tu gagnes ${Math.round(item.prix * 0.5).toLocaleString('fr-FR')} F</div>
         </div>
@@ -201,8 +253,8 @@
   }
 
   function renderPlans() {
+    document.getElementById("featuredSection").style.display = "none";
     document.getElementById("grid").style.display = "none";
-    document.getElementById("emptyMsg").style.display = "none";
     const plansWrap = document.getElementById("plansWrap");
     plansWrap.style.display = "block";
     plansWrap.innerHTML = `
@@ -214,7 +266,7 @@
           <li>Accès à vie au contenu acheté</li>
           <li>Lien de partage avec commission</li>
         </ul>
-        <a href="/catalogue" class="plan-btn" style="background:#fff; color:var(--navy); border:1px solid var(--line);">Voir le catalogue</a>
+        <a href="/catalogue" class="plan-btn">Voir le catalogue</a>
       </div>
       <div class="plan-card featured">
         <h3>Abonnement illimité</h3>
@@ -258,10 +310,7 @@
     document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
     el.classList.add("active");
 
-    if (tab === "abonnement") {
-      renderPlans();
-      return;
-    }
+    if (tab === "abonnement") { renderPlans(); return; }
 
     const typed = allContenus.filter(c => c.type === tab);
     document.getElementById("countLabel").textContent = `${typed.length} contenus disponibles`;
@@ -278,9 +327,13 @@
     document.getElementById("modalPrix").textContent = `${item.prix.toLocaleString('fr-FR')} F`;
     document.getElementById("modalCommission").textContent = `Tu gagnes ${Math.round(item.prix * 0.5).toLocaleString('fr-FR')} F (50%)`;
 
-    const modalImg = document.getElementById("modalImg");
-    if (item.image_url) { modalImg.src = item.image_url; modalImg.style.display = "block"; }
-    else { modalImg.style.display = "none"; }
+    const wrap = document.getElementById("modalImgWrap");
+    if (item.image_url) {
+      document.getElementById("modalImg").src = item.image_url;
+      wrap.style.display = "block";
+    } else {
+      wrap.style.display = "none";
+    }
 
     document.getElementById("contentModal").classList.add("open");
   }
