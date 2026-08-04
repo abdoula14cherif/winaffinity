@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Winaffinity — Admin</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap');
+  :root{ --navy:#0B1A3D; --red:#7A1F2B; --cream:#F3EFE6; --gold:#E8B84B; --text-dark:#16223F; --text-dim:#6B7385; --green:#2FBF8F; --line:#E4DFD3; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ overflow-x:hidden; max-width:100vw; }
+  body{ background:var(--cream); color:var(--text-dark); font-family:'Manrope', sans-serif; min-height:100vh; padding-bottom:40px; }
+  a,button{ color:inherit; text-decoration:none; font-family:inherit; border:none; cursor:pointer; background:none; }
+  .header{ background: linear-gradient(115deg, var(--navy) 0%, var(--navy) 45%, var(--red) 100%); padding:20px; color:#fff; display:flex; align-items:center; justify-content:space-between; }
+  .header h1{ font-family:'Fraunces', serif; font-size:1.15rem; }
+  .add-btn{ background:var(--gold); color:#14100A; font-weight:700; font-size:0.82rem; padding:9px 16px; border-radius:999px; }
+  .wrap{ max-width:640px; margin:0 auto; padding:20px; }
+
+  .item{ background:#fff; border-radius:14px; padding:14px; border:1px solid var(--line); display:flex; gap:12px; align-items:center; margin-bottom:10px; }
+  .item img{ width:48px; height:48px; border-radius:10px; object-fit:cover; background:var(--cream); flex-shrink:0; }
+  .item .info{ flex:1; min-width:0; }
+  .item .titre{ font-weight:700; font-size:0.88rem; }
+  .item .meta{ font-size:0.74rem; color:var(--text-dim); margin-top:2px; }
+  .item-actions{ display:flex; gap:6px; flex-shrink:0; }
+  .icon-btn{ width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; }
+  .icon-btn.edit{ background:#E4EBFB; color:#3B5BDB; }
+  .icon-btn.delete{ background:#FBE4E4; color:#C0392B; }
+  .icon-btn svg{ width:16px; height:16px; }
+
+  .modal-overlay{ display:none; position:fixed; inset:0; background:rgba(11,26,61,0.6); z-index:100; align-items:center; justify-content:center; padding:16px; }
+  .modal-overlay.open{ display:flex; }
+  .modal{ background:#fff; border-radius:18px; padding:22px; width:100%; max-width:440px; max-height:88vh; overflow-y:auto; }
+  .modal h2{ font-family:'Fraunces', serif; font-size:1.1rem; margin-bottom:16px; }
+  .field{ margin-bottom:12px; }
+  .field label{ display:block; font-size:0.76rem; color:var(--text-dim); margin-bottom:5px; font-weight:600; }
+  .field input, .field select, .field textarea{ width:100%; border:1px solid var(--line); border-radius:9px; padding:10px 12px; font-family:inherit; font-size:0.87rem; background:var(--cream); }
+  .field textarea{ resize:vertical; min-height:60px; }
+  .modal-actions{ display:flex; gap:10px; margin-top:16px; }
+  .btn{ flex:1; padding:12px; border-radius:10px; font-weight:700; font-size:0.88rem; text-align:center; }
+  .btn-save{ background:var(--navy); color:#fff; }
+  .btn-cancel{ background:var(--line); color:var(--text-dark); }
+  .msg{ font-size:0.8rem; margin-top:10px; text-align:center; display:none; }
+  .msg.show{ display:block; }
+  .msg.error{ color:#C0392B; }
+  .msg.success{ color:var(--green); }
+
+  .denied{ text-align:center; padding:60px 20px; color:var(--text-dim); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Admin — Catalogue</h1>
+  <button class="add-btn" onclick="openModal()">+ Ajouter</button>
+</div>
+
+<div class="wrap" id="content">
+  <div id="list"></div>
+</div>
+
+<div class="modal-overlay" id="formModal">
+  <div class="modal">
+    <h2 id="modalTitle">Nouveau contenu</h2>
+    <form id="contenuForm" onsubmit="return saveContenu(event)">
+      <input type="hidden" id="contenuId">
+      <div class="field"><label>Titre</label><input type="text" id="f_titre" required></div>
+      <div class="field"><label>Type</label>
+        <select id="f_type" required>
+          <option value="formation">Formation</option>
+          <option value="ebook">Ebook</option>
+        </select>
+      </div>
+      <div class="field"><label>Catégorie</label><input type="text" id="f_categorie" required></div>
+      <div class="field"><label>Prix (F CFA)</label><input type="number" id="f_prix" required></div>
+      <div class="field"><label>Description courte</label><textarea id="f_description"></textarea></div>
+      <div class="field"><label>Description longue</label><textarea id="f_description_longue"></textarea></div>
+      <div class="field"><label>URL image</label><input type="url" id="f_image_url"></div>
+      <div class="field"><label>Points forts (séparés par |)</label><input type="text" id="f_points_forts" placeholder="Accès à vie|Certificat inclus"></div>
+      <div class="field"><label>Lien d'accès</label><input type="url" id="f_lien_acces"></div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-cancel" onclick="closeModal()">Annuler</button>
+        <button type="submit" class="btn btn-save">Enregistrer</button>
+      </div>
+      <div class="msg" id="formMsg"></div>
+    </form>
+  </div>
+</div>
+
+<script>
+  const API_BASE = "https://www.winaffinity.vip";
+  const token = localStorage.getItem("winaffinity_token");
+  if (!token) { window.location.href = "/"; }
+
+  let allContenus = [];
+
+  async function checkAdminAndLoad() {
+    try {
+      const meRes = await fetch(`${API_BASE}/auth/me`, { headers: { "Authorization": `Bearer ${token}` } });
+      if (!meRes.ok) { window.location.href = "/"; return; }
+      await loadList();
+    } catch (e) {
+      document.getElementById("content").innerHTML = '<div class="denied">Erreur de chargement.</div>';
+    }
+  }
+
+  async function loadList() {
+    const res = await fetch(`${API_BASE}/contenus/`);
+    allContenus = await res.json();
+    const listEl = document.getElementById("list");
+    listEl.innerHTML = "";
+    allContenus.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        ${item.image_url ? `<img src="${item.image_url}">` : `<div style="width:48px;height:48px;border-radius:10px;background:var(--line);flex-shrink:0;"></div>`}
+        <div class="info">
+          <div class="titre">${item.titre}</div>
+          <div class="meta">${item.categorie} · ${item.prix.toLocaleString('fr-FR')} F</div>
+        </div>
+        <div class="item-actions">
+          <div class="icon-btn edit" onclick='editContenu(${JSON.stringify(item).replace(/'/g, "&#39;")})'>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          <div class="icon-btn delete" onclick="deleteContenu('${item.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </div>
+        </div>
+      `;
+      listEl.appendChild(div);
+    });
+  }
+
+  function openModal() {
+    document.getElementById("modalTitle").textContent = "Nouveau contenu";
+    document.getElementById("contenuForm").reset();
+    document.getElementById("contenuId").value = "";
+    document.getElementById("formMsg").className = "msg";
+    document.getElementById("formModal").classList.add("open");
+  }
+
+  function editContenu(item) {
+    document.getElementById("modalTitle").textContent = "Modifier le contenu";
+    document.getElementById("contenuId").value = item.id;
+    document.getElementById("f_titre").value = item.titre || "";
+    document.getElementById("f_type").value = item.type || "formation";
+    document.getElementById("f_categorie").value = item.categorie || "";
+    document.getElementById("f_prix").value = item.prix || 0;
+    document.getElementById("f_description").value = item.description || "";
+    document.getElementById("f_description_longue").value = item.description_longue || "";
+    document.getElementById("f_image_url").value = item.image_url || "";
+    document.getElementById("f_points_forts").value = item.points_forts || "";
+    document.getElementById("f_lien_acces").value = item.lien_acces || "";
+    document.getElementById("formMsg").className = "msg";
+    document.getElementById("formModal").classList.add("open");
+  }
+
+  function closeModal() {
+    document.getElementById("formModal").classList.remove("open");
+  }
+
+  async function saveContenu(e) {
+    e.preventDefault();
+    const id = document.getElementById("contenuId").value;
+    const msg = document.getElementById("formMsg");
+
+    const payload = {
+      titre: document.getElementById("f_titre").value,
+      type: document.getElementById("f_type").value,
+      categorie: document.getElementById("f_categorie").value,
+      prix: parseInt(document.getElementById("f_prix").value),
+      description: document.getElementById("f_description").value || null,
+      description_longue: document.getElementById("f_description_longue").value || null,
+      image_url: document.getElementById("f_image_url").value || null,
+      points_forts: document.getElementById("f_points_forts").value || null,
+      lien_acces: document.getElementById("f_lien_acces").value || null,
+    };
+
+    try {
+      const url = id ? `${API_BASE}/contenus/admin/${id}` : `${API_BASE}/contenus/admin/create`;
+      const method = id ? "PUT" : "POST";
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Erreur");
+
+      msg.className = "msg success show";
+      msg.textContent = "Enregistré !";
+      await loadList();
+      setTimeout(closeModal, 700);
+    } catch (err) {
+      msg.className = "msg error show";
+      msg.textContent = err.message;
+    }
+  }
+
+  async function deleteContenu(id) {
+    if (!confirm("Supprimer ce contenu définitivement ?")) return;
+    try {
+      const res = await fetch(`${API_BASE}/contenus/admin/${id}`, {
+        method: "DELETE",
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error("Erreur lors de la suppression");
+      await loadList();
+    } catch (e) {
+      alert(e.message);
+    }
+  }
+
+  checkAdminAndLoad();
+</script>
+
+</body>
+</html>

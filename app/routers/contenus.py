@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Depends
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
@@ -81,3 +81,59 @@ async def enregistrer_achat(request: Request, payload: AchatPayload):
         "transaction": result.data[0] if result.data else None,
         "lien_acces": contenu.get("lien_acces"),
     }
+
+
+from app.dependencies import get_current_admin_id
+
+
+class ContenuCreate(BaseModel):
+    titre: str
+    type: str
+    categorie: str
+    prix: int
+    description: str | None = None
+    description_longue: str | None = None
+    image_url: str | None = None
+    points_forts: str | None = None
+    lien_acces: str | None = None
+
+
+class ContenuUpdate(BaseModel):
+    titre: str | None = None
+    type: str | None = None
+    categorie: str | None = None
+    prix: int | None = None
+    description: str | None = None
+    description_longue: str | None = None
+    image_url: str | None = None
+    points_forts: str | None = None
+    lien_acces: str | None = None
+
+
+@router.post("/admin/create", status_code=201)
+@limiter.limit("20/minute")
+async def create_contenu(request: Request, payload: ContenuCreate, admin_id: str = Depends(get_current_admin_id)):
+    data = {k: v for k, v in payload.model_dump().items() if v is not None}
+    result = supabase_admin.table("contenus").insert(data).execute()
+    if not result.data:
+        raise HTTPException(status_code=500, detail="Erreur lors de la création")
+    return result.data[0]
+
+
+@router.put("/admin/{contenu_id}")
+@limiter.limit("20/minute")
+async def update_contenu(request: Request, contenu_id: str, payload: ContenuUpdate, admin_id: str = Depends(get_current_admin_id)):
+    data = {k: v for k, v in payload.model_dump().items() if v is not None}
+    if not data:
+        raise HTTPException(status_code=400, detail="Aucune donnée à mettre à jour")
+    result = supabase_admin.table("contenus").update(data).eq("id", contenu_id).execute()
+    if not result.data:
+        raise HTTPException(status_code=404, detail="Contenu introuvable")
+    return result.data[0]
+
+
+@router.delete("/admin/{contenu_id}")
+@limiter.limit("20/minute")
+async def delete_contenu(request: Request, contenu_id: str, admin_id: str = Depends(get_current_admin_id)):
+    result = supabase_admin.table("contenus").delete().eq("id", contenu_id).execute()
+    return {"deleted": True}
