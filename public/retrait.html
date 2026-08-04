@@ -2,604 +2,333 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>VGN – Retrait</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Winaffinity — Retrait</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{
-  --g:#16A34A;--gd:#15803D;--gl:#22C55E;
-  --o:#F97316;--r:#EF4444;--b:#3B82F6;
-  --bg:#F0F2F5;--card:#fff;--txt:#111827;--mu:#6B7280;--bd:#E5E7EB;
-  --H:56px;--B:58px;
-  --sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px)
-}
-html{font-family:'Nunito',sans-serif;background:var(--bg)}
-body{max-width:430px;margin:0 auto;background:var(--bg);overflow-x:hidden}
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap');
+  :root{
+    --navy:#0B1A3D; --red:#7A1F2B; --cream:#F3EFE6; --gold:#E8B84B;
+    --text-dark:#16223F; --text-dim:#6B7385; --green:#2FBF8F; --line:#E4DFD3; --amber:#C99A2E;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ overflow-x:hidden; max-width:100vw; }
+  body{ background:var(--cream); color:var(--text-dark); font-family:'Manrope', sans-serif; min-height:100vh; padding-bottom:40px; }
+  a,button{ color:inherit; text-decoration:none; font-family:inherit; border:none; cursor:pointer; background:none; }
+  .header{ background: linear-gradient(115deg, var(--navy) 0%, var(--navy) 45%, var(--red) 100%); padding:20px; color:#fff; display:flex; align-items:center; gap:14px; }
+  .back-btn{ width:36px; height:36px; border-radius:10px; background: rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .header h1{ font-family:'Fraunces', serif; font-size:1.15rem; }
+  .wrap{ max-width:520px; margin:0 auto; padding:20px; }
 
-.topbar{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;
-  height:calc(var(--H) + var(--sat));background:linear-gradient(135deg,var(--gd),var(--gl));
-  display:flex;align-items:center;justify-content:space-between;
-  padding:var(--sat) 14px 0;z-index:999;box-shadow:0 2px 12px rgba(0,0,0,.18)}
-.tbt{font-size:1rem;font-weight:900;color:#fff}
-.tbsolde{font-size:.68rem;font-weight:800;color:#fff;background:rgba(255,255,255,.15);
-  padding:4px 10px;border-radius:16px;border:1px solid rgba(255,255,255,.25)}
+  .solde-card{ background: linear-gradient(115deg, var(--navy), #1a2a5c); border-radius:18px; padding:22px; color:#fff; margin-bottom:20px; }
+  .solde-card .label{ font-size:0.78rem; color: rgba(255,255,255,0.65); }
+  .solde-card .amount{ font-family:'Fraunces', serif; font-size:2.1rem; margin-top:6px; }
+  .solde-card .sub{ font-size:0.75rem; color: rgba(255,255,255,0.5); margin-top:4px; }
 
-.scroll{padding-top:calc(var(--H) + var(--sat) + 10px);
-  padding-bottom:calc(var(--B) + var(--sab) + 24px);min-height:100vh}
+  .card{ background:#fff; border-radius:18px; padding:22px; border:1px solid var(--line); box-shadow:0 8px 20px -14px rgba(22,34,63,0.25); margin-bottom:20px; }
+  .card h2{ font-family:'Fraunces', serif; font-size:1.05rem; margin-bottom:16px; }
 
-.solde-card{margin:0 12px 14px;background:linear-gradient(135deg,var(--gd),#22C55E);
-  border-radius:18px;padding:16px 18px;box-shadow:0 4px 18px rgba(22,163,74,.25);
-  position:relative;overflow:hidden}
-.solde-card::after{content:'💰';position:absolute;right:-6px;bottom:-8px;font-size:5rem;opacity:.1}
-.sc-lbl{font-size:.65rem;font-weight:800;color:rgba(255,255,255,.7);
-  text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
-.sc-val{font-size:2rem;font-weight:900;color:#fff}
-.sc-sub{font-size:.65rem;color:rgba(255,255,255,.65);margin-top:5px;font-weight:600}
-.sc-chips{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.chip{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);color:#fff;
-  font-size:.65rem;font-weight:800;padding:4px 10px;border-radius:20px;
-  cursor:pointer;touch-action:manipulation}
-.chip:active{background:rgba(255,255,255,.35)}
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:0.78rem; color:var(--text-dim); margin-bottom:6px; font-weight:600; }
+  .field input{ width:100%; border:1px solid var(--line); border-radius:10px; padding:12px 14px; font-family:inherit; font-size:0.92rem; background:var(--cream); }
+  .field input:focus{ outline:none; border-color:var(--gold); }
 
-.sec-h{padding:10px 14px 6px;font-size:.78rem;font-weight:900;color:var(--mu);
-  text-transform:uppercase;letter-spacing:.04em}
+  .country-selector{ display:flex; align-items:center; gap:12px; border:1px solid var(--line); border-radius:12px; padding:12px 14px; background:var(--cream); cursor:pointer; }
+  .country-selector .flag{ font-size:1.6rem; }
+  .country-selector .info{ flex:1; }
+  .country-selector .name{ font-weight:700; font-size:0.9rem; }
+  .country-selector .zone{ font-size:0.72rem; color:var(--text-dim); }
+  .country-selector.placeholder .name{ color:var(--text-dim); font-weight:600; }
+  .country-selector svg{ width:18px; height:18px; color:var(--text-dim); flex-shrink:0; }
 
-.methods{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 12px;margin-bottom:10px}
-.meth{background:var(--card);border:2px solid var(--bd);border-radius:14px;
-  padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;
-  cursor:pointer;touch-action:manipulation;transition:all .18s}
-.meth:active{transform:scale(.96)}
-.meth.on{border-color:var(--g);background:#F0FDF4}
-.meth-ico{font-size:1.5rem}
-.meth-nom{font-size:.74rem;font-weight:900;color:var(--txt)}
-.meth-tag{font-size:.58rem;color:var(--mu);font-weight:600}
+  .operator-grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap:8px; }
+  .operator-chip{ padding:10px; border-radius:10px; border:1px solid var(--line); background:var(--cream); font-size:0.82rem; font-weight:700; text-align:center; }
+  .operator-chip.active{ background:var(--navy); color:#fff; border-color:var(--navy); }
 
-.form-card{margin:0 12px 12px;background:var(--card);border-radius:18px;
-  padding:16px 14px;box-shadow:0 1px 8px rgba(0,0,0,.07)}
-.field{margin-bottom:14px}
-.field label{font-size:.74rem;font-weight:800;color:var(--txt);display:block;margin-bottom:6px}
-.field input{width:100%;padding:11px 14px;border:1.5px solid var(--bd);border-radius:12px;
-  font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:700;color:var(--txt);
-  background:#F9FAFB;outline:none;transition:border-color .2s}
-.field input:focus{border-color:var(--g);background:#fff}
-.hint{font-size:.63rem;color:var(--mu);margin-top:5px;font-weight:600}
-.hint.red{color:var(--r)}
-.hint.green{color:var(--g)}
+  .submit-btn{ width:100%; background:var(--gold); color:#14100A; font-weight:800; padding:15px; border-radius:12px; font-size:0.95rem; }
+  .submit-btn[disabled]{ opacity:0.5; }
 
-/* PAYS */
-.pays-row{display:flex;gap:8px}
-.pays-flag-btn{flex-shrink:0;display:flex;align-items:center;gap:5px;
-  padding:11px 12px;background:#F9FAFB;border:1.5px solid var(--bd);
-  border-radius:12px;cursor:pointer;touch-action:manipulation;font-size:.8rem;font-weight:800}
-.pays-flag-btn:active{background:#eee}
-.pays-num-inp{flex:1;padding:11px 14px;border:1.5px solid var(--bd);border-radius:12px;
-  font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:700;
-  color:var(--txt);background:#F9FAFB;outline:none;transition:border-color .2s}
-.pays-num-inp:focus{border-color:var(--g);background:#fff}
+  .msg{ font-size:0.82rem; margin-top:12px; text-align:center; display:none; padding:10px; border-radius:10px; }
+  .msg.show{ display:block; }
+  .msg.error{ background:#FBE4E4; color:#C0392B; }
+  .msg.success{ background:#E4F7EF; color:var(--green); }
 
-.pays-dd{position:fixed;background:#fff;border-radius:16px;
-  box-shadow:0 8px 32px rgba(0,0,0,.2);max-height:280px;overflow-y:auto;
-  display:none;border:1px solid var(--bd);z-index:9999;width:calc(100% - 24px);max-width:406px}
-.pays-dd.show{display:block}
-.pays-opt{display:flex;align-items:center;gap:10px;padding:11px 16px;
-  cursor:pointer;touch-action:manipulation;border-bottom:1px solid #F8FAFC}
-.pays-opt:last-child{border-bottom:none}
-.pays-opt:active,.pays-opt.actif{background:#F0FDF4}
-.po-flag{font-size:1.3rem;flex-shrink:0}
-.po-nom{font-size:.8rem;font-weight:800;color:var(--txt)}
-.po-detail{font-size:.62rem;color:var(--mu)}
-.po-reseaux{font-size:.6rem;color:var(--g);font-weight:700;margin-top:1px}
+  .history-item{ display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--line); }
+  .history-item:last-child{ border-bottom:none; }
+  .history-item .flag{ font-size:1.3rem; }
+  .history-item .info{ flex:1; }
+  .history-item .amount{ font-weight:700; font-size:0.9rem; }
+  .history-item .meta{ font-size:0.74rem; color:var(--text-dim); }
+  .status-badge{ font-size:0.68rem; font-weight:800; padding:4px 10px; border-radius:999px; text-transform:uppercase; }
+  .status-en_attente{ background:#FBF0D8; color:var(--amber); }
+  .status-approuve{ background:#E4F7EF; color:var(--green); }
+  .status-rejete{ background:#FBE4E4; color:#C0392B; }
+  .empty-history{ text-align:center; color:var(--text-dim); font-size:0.85rem; padding:20px 0; }
 
-.frais-box{background:#FFF7ED;border:1px solid #FED7AA;border-radius:12px;
-  padding:11px 14px;margin:0 12px 14px}
-.fr-row{display:flex;justify-content:space-between;margin-bottom:5px}
-.fr-row:last-child{margin-bottom:0;padding-top:6px;border-top:1px dashed #FED7AA}
-.fr-lbl{font-size:.7rem;color:#92400E;font-weight:700}
-.fr-val{font-size:.75rem;font-weight:900;color:#92400E}
-.fr-row.net .fr-lbl,.fr-row.net .fr-val{color:var(--g);font-size:.82rem}
-
-.btn-submit{width:100%;padding:14px;background:linear-gradient(135deg,var(--g),var(--gd));
-  border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-size:1rem;
-  font-weight:900;color:#fff;cursor:pointer;box-shadow:0 4px 14px rgba(22,163,74,.3);
-  touch-action:manipulation;transition:transform .15s}
-.btn-submit:active{transform:scale(.97)}
-.btn-submit:disabled{opacity:.5;cursor:not-allowed;transform:none}
-
-.hist-list{padding:0 12px;display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
-.hi{background:var(--card);border-radius:14px;padding:11px 13px;
-  display:flex;align-items:center;gap:10px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
-.hi-ico{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;
-  justify-content:center;font-size:1rem;flex-shrink:0}
-.ic-v{background:#F0FDF4}.ic-p{background:#FFF7ED}.ic-r{background:#FEF2F2}
-.hi-info{flex:1;min-width:0}
-.hi-nom{font-size:.77rem;font-weight:800;color:var(--txt);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hi-date{font-size:.61rem;color:var(--mu);margin-top:2px}
-.hi-right{text-align:right;flex-shrink:0}
-.hi-mont{font-size:.85rem;font-weight:900;color:#DC2626}
-.hi-stat{font-size:.58rem;font-weight:800;padding:2px 8px;border-radius:8px;display:inline-block;margin-top:3px}
-.sv{background:#F0FDF4;color:var(--g)}.sp{background:#FFF7ED;color:var(--o)}.sr{background:#FEF2F2;color:var(--r)}
-.vide{text-align:center;padding:30px;color:var(--mu);font-size:.75rem;font-weight:700}
-.vide-ico{font-size:2.5rem;margin-bottom:8px}
-
-.ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;
-  display:flex;align-items:flex-end;justify-content:center;
-  opacity:0;pointer-events:none;transition:opacity .25s}
-.ov.open{opacity:1;pointer-events:all}
-.ov-box{background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:430px;
-  padding:22px 20px calc(20px + var(--sab));
-  transform:translateY(100%);transition:transform .3s cubic-bezier(.34,1.2,.64,1)}
-.ov.open .ov-box{transform:translateY(0)}
-.ov-title{font-size:1rem;font-weight:900;color:var(--txt);text-align:center;margin-bottom:16px}
-.ov-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bd)}
-.ov-row:last-of-type{border-bottom:none}
-.ov-lbl{font-size:.72rem;color:var(--mu);font-weight:700}
-.ov-val{font-size:.78rem;font-weight:900;color:var(--txt)}
-.ov-val.g{color:var(--g)}.ov-val.r{color:var(--r)}
-.ov-btns{display:flex;gap:10px;margin-top:18px}
-.btn-cancel{flex:1;padding:13px;background:#F3F4F6;border:none;border-radius:12px;
-  font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:800;color:var(--mu);
-  cursor:pointer;touch-action:manipulation}
-.btn-confirm{flex:2;padding:13px;background:linear-gradient(135deg,var(--g),var(--gd));
-  border:none;border-radius:12px;font-family:'Nunito',sans-serif;
-  font-size:.88rem;font-weight:900;color:#fff;cursor:pointer;touch-action:manipulation}
-.btn-confirm:disabled{opacity:.5}
-
-.botnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;
-  height:calc(var(--B) + var(--sab));padding-bottom:var(--sab);background:#fff;
-  border-top:1px solid var(--bd);display:flex;align-items:center;z-index:999;
-  box-shadow:0 -2px 10px rgba(0,0,0,.07)}
-.bn{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;
-  padding:6px 0;text-decoration:none}
-.bni{font-size:1.2rem}.bnl{font-size:.57rem;font-weight:800;color:var(--mu)}
-
-.tst{position:fixed;top:calc(var(--H) + var(--sat) + 8px);left:50%;
-  transform:translateX(-50%) translateY(-80px);background:#111;color:#fff;
-  padding:9px 22px;border-radius:22px;font-size:.77rem;font-weight:700;
-  z-index:99999;white-space:nowrap;transition:transform .3s cubic-bezier(.34,1.56,.64,1);
-  pointer-events:none}
-.tst.show{transform:translateX(-50%) translateY(0)}
-.tst.ok{background:var(--g)}.tst.err{background:var(--r)}
-.ld{display:inline-block;width:11px;height:11px;border:2px solid rgba(255,255,255,.4);
-  border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite;vertical-align:middle}
-@keyframes sp{to{transform:rotate(360deg)}}
+  .modal-overlay{ display:none; position:fixed; inset:0; background:rgba(11,26,61,0.6); z-index:100; align-items:flex-end; justify-content:center; }
+  .modal-overlay.open{ display:flex; }
+  .modal{ background:#fff; width:100%; max-width:480px; border-radius:20px 20px 0 0; padding:20px 0 10px; max-height:78vh; display:flex; flex-direction:column; }
+  .modal-head{ padding:0 20px 14px; display:flex; align-items:center; justify-content:space-between; }
+  .modal-head h3{ font-family:'Fraunces', serif; font-size:1.05rem; }
+  .modal-close{ width:30px; height:30px; border-radius:8px; background:var(--cream); display:flex; align-items:center; justify-content:center; }
+  .zone-label{ padding:10px 20px 6px; font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-dim); }
+  .country-list{ overflow-y:auto; padding-bottom:10px; }
+  .country-row{ display:flex; align-items:center; gap:14px; padding:12px 20px; }
+  .country-row:active{ background:var(--cream); }
+  .country-row .flag{ font-size:1.5rem; }
+  .country-row .name{ font-weight:600; font-size:0.9rem; flex:1; }
+  .badge-unconfirmed{ font-size:0.6rem; font-weight:700; color:var(--text-dim); background:var(--cream); padding:2px 8px; border-radius:999px; }
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <a href="dashboard.html" style="color:#fff;font-size:1.4rem;font-weight:900;text-decoration:none;line-height:1">‹</a>
-  <span class="tbt">💸 Retrait</span>
-  <div class="tbsolde">💰 <span id="tb-solde">—</span></div>
+<div class="header">
+  <a href="/dashboard" class="back-btn">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+  </a>
+  <h1>Retrait</h1>
 </div>
 
-<div class="tst" id="tst"></div>
+<div class="wrap">
 
-<div class="scroll">
-
-  <!-- SOLDE -->
   <div class="solde-card">
-    <div class="sc-lbl">Solde disponible</div>
-    <div class="sc-val" id="sc-solde"><span class="ld"></span></div>
-    <div class="sc-sub" id="sc-sub">Chargement...</div>
-    <div class="sc-chips">
-      <div class="chip" onclick="setM(600)">600</div>
-      <div class="chip" onclick="setM(1000)">1 000</div>
-      <div class="chip" onclick="setM(5000)">5 000</div>
-      <div class="chip" onclick="setMax()">Max</div>
-    </div>
+    <div class="label">Solde disponible</div>
+    <div class="amount" id="soldeDisponible">— F CFA</div>
+    <div class="sub">Minimum de retrait : 1 000 F CFA</div>
   </div>
 
-  <!-- METHODE -->
-  <div class="sec-h">Méthode</div>
-  <div class="methods">
-    <div class="meth on" id="m-momo" onclick="setMeth('momo')">
-      <span class="meth-ico">📱</span>
-      <span class="meth-nom">Mobile Money</span>
-      <span class="meth-tag">MTN · Orange · Moov</span>
-    </div>
-    <div class="meth" id="m-wave" onclick="setMeth('wave')">
-      <span class="meth-ico">🌊</span>
-      <span class="meth-nom">Wave</span>
-      <span class="meth-tag">Instantané</span>
-    </div>
-    <div class="meth" id="m-bank" onclick="setMeth('bank')">
-      <span class="meth-ico">🏦</span>
-      <span class="meth-nom">Virement</span>
-      <span class="meth-tag">2–5 jours</span>
-    </div>
-    <div class="meth" id="m-crypto" onclick="setMeth('crypto')">
-      <span class="meth-ico">₿</span>
-      <span class="meth-nom">Crypto USDT</span>
-      <span class="meth-tag">TRC-20</span>
-    </div>
-  </div>
+  <div class="card">
+    <h2>Nouvelle demande</h2>
+    <form id="retraitForm" onsubmit="return submitRetrait(event)">
 
-  <!-- FORMULAIRE -->
-  <div class="form-card">
-
-    <!-- Montant -->
-    <div class="field">
-      <label>Montant à retirer</label>
-      <div style="position:relative">
-        <input type="number" id="inp-montant" placeholder="0" min="0"
-          inputmode="numeric" oninput="calcFrais()" style="padding-right:58px">
-        <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);
-          font-size:.72rem;font-weight:900;color:var(--mu)">FCFA</span>
-      </div>
-      <div class="hint" id="hint-m"></div>
-    </div>
-
-    <!-- PAYS + NUMÉRO -->
-    <div class="field" id="f-pays">
-      <label>Pays &amp; Numéro</label>
-      <div class="pays-row">
-        <div class="pays-flag-btn" id="btn-pays" onclick="toggleDD(event)">
-          <span id="p-flag">🇨🇲</span>
-          <span id="p-ind" style="font-size:.75rem;font-weight:800">+237</span>
-          <span style="font-size:.6rem;color:var(--mu)">▼</span>
+      <div class="field">
+        <label>Pays</label>
+        <div class="country-selector placeholder" id="countrySelector" onclick="openCountryModal()">
+          <div class="flag" id="selectedFlag">🌍</div>
+          <div class="info">
+            <div class="name" id="selectedCountryName">Choisir un pays</div>
+            <div class="zone" id="selectedZone"></div>
+          </div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
         </div>
-        <input class="pays-num-inp" id="inp-tel" type="tel"
-          placeholder="Numéro" inputmode="tel">
       </div>
-      <div class="hint" id="hint-pays">🇨🇲 Cameroun — MTN, Orange</div>
-    </div>
 
-    <!-- Dropdown pays — hors form-card pour z-index -->
+      <div class="field" id="operatorField" style="display:none;">
+        <label>Opérateur</label>
+        <div class="operator-grid" id="operatorGrid"></div>
+      </div>
 
-    <!-- Réseau -->
-    <div class="field" id="f-reseau">
-      <label>Réseau</label>
-      <input type="text" id="inp-reseau" readonly onclick="nextReseau()"
-        placeholder="Appuyer pour changer" style="cursor:pointer;background:#F9FAFB">
-      <div class="hint">Appuyez pour changer de réseau</div>
-    </div>
+      <div class="field">
+        <label>Numéro de téléphone (mobile money)</label>
+        <input type="tel" id="telephone" placeholder="+225 07 00 00 00 00" required>
+      </div>
 
-    <!-- Banque -->
-    <div class="field" id="f-nom" style="display:none">
-      <label>Nom du bénéficiaire</label>
-      <input type="text" id="inp-nom" placeholder="Nom complet">
-    </div>
-    <div class="field" id="f-iban" style="display:none">
-      <label>IBAN / RIB</label>
-      <input type="text" id="inp-iban" placeholder="FRXX XXXX XXXX...">
-    </div>
+      <div class="field">
+        <label>Montant à retirer (F CFA)</label>
+        <input type="number" id="montant" min="1000" required>
+      </div>
 
-    <!-- Crypto -->
-    <div class="field" id="f-crypto" style="display:none">
-      <label>Adresse USDT (TRC-20)</label>
-      <input type="text" id="inp-crypto" placeholder="T...">
-      <div class="hint">Réseau TRC-20 uniquement</div>
-    </div>
-
+      <button type="submit" class="submit-btn" id="submitBtn">Envoyer la demande</button>
+      <div class="msg" id="formMsg"></div>
+    </form>
   </div>
 
-  <!-- DROPDOWN PAYS (en dehors du form pour z-index) -->
-  <div class="pays-dd" id="pays-dd"></div>
-
-  <!-- FRAIS -->
-  <div class="frais-box" id="frais-box" style="display:none">
-    <div class="fr-row">
-      <span class="fr-lbl">Montant demandé</span>
-      <span class="fr-val" id="f-mont">—</span>
-    </div>
-    <div class="fr-row">
-      <span class="fr-lbl">Frais (5%)</span>
-      <span class="fr-val" id="f-frais">—</span>
-    </div>
-    <div class="fr-row net">
-      <span class="fr-lbl">Vous recevrez</span>
-      <span class="fr-val" id="f-net">—</span>
-    </div>
+  <div class="card">
+    <h2>Historique</h2>
+    <div id="historyList"></div>
   </div>
 
-  <!-- BOUTON -->
-  <div style="padding:0 12px 14px">
-    <button class="btn-submit" id="btn-retrait" onclick="confirmer()">
-      💳 Demander le retrait
-    </button>
-  </div>
-
-  <!-- HISTORIQUE -->
-  <div class="sec-h">Historique des retraits</div>
-  <div class="hist-list" id="hist-list">
-    <div class="vide"><div class="vide-ico">⏳</div>Chargement...</div>
-  </div>
-
-</div><!-- /scroll -->
-
-<!-- OVERLAY -->
-<div class="ov" id="ov">
-  <div class="ov-box">
-    <div class="ov-title">✅ Confirmer le retrait</div>
-    <div class="ov-row"><span class="ov-lbl">🌍 Pays</span><span class="ov-val" id="ov-pays">—</span></div>
-    <div class="ov-row"><span class="ov-lbl">Compte</span><span class="ov-val" id="ov-compte">—</span></div>
-    <div class="ov-row"><span class="ov-lbl">Montant</span><span class="ov-val" id="ov-mont">—</span></div>
-    <div class="ov-row"><span class="ov-lbl">Frais (5%)</span><span class="ov-val r" id="ov-frais">—</span></div>
-    <div class="ov-row"><span class="ov-lbl">Vous recevrez</span><span class="ov-val g" id="ov-net">—</span></div>
-    <div class="ov-btns">
-      <button class="btn-cancel" onclick="closeOv()">Annuler</button>
-      <button class="btn-confirm" id="ov-btn" onclick="soumettre()">✅ Confirmer</button>
-    </div>
-  </div>
 </div>
 
-<nav class="botnav">
-  <a class="bn" href="dashboard.html"><span class="bni">🏠</span><span class="bnl">Accueil</span></a>
-  <a class="bn" href="taches.html"><span class="bni">✅</span><span class="bnl">Tâches</span></a>
-  <a class="bn" href="rapport.html"><span class="bni">📊</span><span class="bnl">Rapports</span></a>
-  <a class="bn" href="profil.html"><span class="bni">👤</span><span class="bnl">Mon Compte</span></a>
-</nav>
+<div class="modal-overlay" id="countryModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Choisir un pays</h3>
+      <div class="modal-close" onclick="closeCountryModal()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+    <div class="country-list" id="countryList"></div>
+  </div>
+</div>
 
 <script>
-const SB = supabase.createClient(
-  'https://tgrfzybemuwvhkbpuzmz.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRncmZ6eWJlbXV3dmhrYnB1em16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDMwOTgsImV4cCI6MjA4NzY3OTA5OH0.M20AwabfyHK_btwhgCmdUUbP2IAtY4TeYbc3Ovzj7CE',
-  {auth:{persistSession:true,storageKey:'vgn-auth',storage:window.localStorage}}
-);
+  const API_BASE = "https://www.winaffinity.vip";
+  const token = localStorage.getItem("winaffinity_token");
+  if (!token) { window.location.href = "/"; }
 
-const fmt  = n => Number(n||0).toLocaleString('fr-FR');
-const fmtF = n => fmt(n)+' FCFA';
-const $    = id => document.getElementById(id);
-const $s   = (id,v) => { const e=$(id); if(e) e.textContent=v; };
-function toast(msg, type=''){
-  const el=$('tst');
-  el.textContent=msg;
-  el.className='tst show'+(type?' '+type:'');
-  setTimeout(()=>{ el.className='tst'; },3500);
-}
+  const COUNTRIES = [
+    { zone: "Zone XOF — LeekPay", flag: "🇧🇯", name: "Bénin", code: "BJ", operators: ["MTN Money", "Moov Money"], confirmed: true },
+    { zone: "Zone XOF — LeekPay", flag: "🇧🇫", name: "Burkina Faso", code: "BF", operators: ["Orange Money", "Moov Money"], confirmed: true },
+    { zone: "Zone XOF — LeekPay", flag: "🇨🇮", name: "Côte d'Ivoire", code: "CI", operators: ["Orange Money", "MTN Money", "Moov Money", "Wave"], confirmed: true },
+    { zone: "Zone XOF — LeekPay", flag: "🇬🇼", name: "Guinée-Bissau", code: "GW", operators: ["Orange Money"], confirmed: true },
+    { zone: "Zone XOF — LeekPay", flag: "🇲🇱", name: "Mali", code: "ML", operators: ["Orange Money", "Moov Money"], confirmed: true },
+    { zone: "Zone XOF — LeekPay", flag: "🇳🇪", name: "Niger", code: "NE", operators: ["Orange Money", "Moov Money", "Airtel Money"], confirmed: true },
+    { zone: "Zone XOF — LeekPay", flag: "🇸🇳", name: "Sénégal", code: "SN", operators: ["Orange Money", "Wave", "Free Money"], confirmed: true },
+    { zone: "Zone XOF — LeekPay", flag: "🇹🇬", name: "Togo", code: "TG", operators: ["Togocom Money", "Moov Money"], confirmed: true },
+    { zone: "Zone XAF — SoleasPay", flag: "🇨🇲", name: "Cameroun", code: "CM", operators: ["Orange Money", "MTN MoMo"], confirmed: true },
+    { zone: "Zone XAF — SoleasPay", flag: "🇬🇦", name: "Gabon", code: "GA", operators: ["Airtel Money", "Moov Money"], confirmed: false },
+    { zone: "Zone XAF — SoleasPay", flag: "🇹🇩", name: "Tchad", code: "TD", operators: ["Airtel Money", "Moov Money"], confirmed: false },
+    { zone: "Zone XAF — SoleasPay", flag: "🇨🇬", name: "Congo", code: "CG", operators: ["Airtel Money", "MTN Money"], confirmed: false },
+    { zone: "Zone XAF — SoleasPay", flag: "🇨🇫", name: "Centrafrique", code: "CF", operators: ["Orange Money"], confirmed: false },
+    { zone: "Zone XAF — SoleasPay", flag: "🇬🇶", name: "Guinée équatoriale", code: "GQ", operators: ["Orange Money"], confirmed: false },
+  ];
 
-/* ───── DONNÉES PAYS ───── */
-const PAYS = [
-  {f:'🇨🇲',n:'Cameroun',         t:'+237',r:['MTN','Orange']},
-  {f:'🇧🇯',n:'Bénin',            t:'+229',r:['MTN','Moov','Wave']},
-  {f:'🇸🇳',n:'Sénégal',          t:'+221',r:['Orange','Wave','Free']},
-  {f:'🇨🇮',n:"Côte d'Ivoire",   t:'+225',r:['MTN','Orange','Moov']},
-  {f:'🇲🇱',n:'Mali',             t:'+223',r:['Orange','Moov']},
-  {f:'🇧🇫',n:'Burkina Faso',     t:'+226',r:['Orange','Moov']},
-  {f:'🇬🇳',n:'Guinée',           t:'+224',r:['Orange','MTN','Moov']},
-  {f:'🇹🇬',n:'Togo',             t:'+228',r:['Moov','TMoney']},
-  {f:'🇳🇪',n:'Niger',            t:'+227',r:['Airtel','Orange']},
-  {f:'🇬🇦',n:'Gabon',            t:'+241',r:['Airtel','MTN']},
-  {f:'🇨🇬',n:'Congo Brazzaville',t:'+242',r:['MTN','Airtel']},
-  {f:'🇨🇩',n:'RD Congo',         t:'+243',r:['Airtel','Orange','Vodacom']},
-  {f:'🇬🇭',n:'Ghana',            t:'+233',r:['MTN','Vodafone']},
-  {f:'🇳🇬',n:'Nigeria',          t:'+234',r:['MTN','Airtel','Glo']},
-  {f:'🇨🇫',n:'Rép. Centrafricaine',t:'+236',r:['Orange','Moov']},
-  {f:'🇹🇩',n:'Tchad',            t:'+235',r:['Airtel','MTN']},
-  {f:'🇬🇶',n:'Guinée Équatoriale',t:'+240',r:['Orange']},
-];
+  let selectedCountry = null;
+  let selectedOperator = null;
 
-let U=null, P=null, MIN=600;
-const FRAIS=0.05;
-let meth='momo', pi=0, ri=0; // pi=index pays, ri=index réseau
-
-/* ───── DROPDOWN PAYS ───── */
-function buildDD(){
-  $('pays-dd').innerHTML = PAYS.map((p,i)=>
-    `<div class="pays-opt${i===pi?' actif':''}" onclick="choisirPays(${i})">
-      <span class="po-flag">${p.f}</span>
-      <div>
-        <div class="po-nom">${p.n} <span style="color:var(--mu);font-weight:600;font-size:.65rem">${p.t}</span></div>
-        <div class="po-reseaux">${p.r.join(' · ')}</div>
-      </div>
-    </div>`
-  ).join('');
-}
-
-function toggleDD(e){
-  e.stopPropagation();
-  const dd=$('pays-dd');
-  if(dd.classList.contains('show')){
-    dd.classList.remove('show'); return;
-  }
-  buildDD();
-  const rect=$('btn-pays').getBoundingClientRect();
-  dd.style.top  = (rect.bottom + window.scrollY + 4)+'px';
-  dd.style.left = '12px';
-  dd.classList.add('show');
-}
-
-document.addEventListener('click', ()=>$('pays-dd').classList.remove('show'));
-
-function choisirPays(i){
-  pi=i; ri=0;
-  const p=PAYS[i];
-  $s('p-flag',p.f);
-  $s('p-ind',p.t);
-  $s('hint-pays',p.f+' '+p.n+' — '+p.r.join(', '));
-  $('inp-reseau').value = p.r[0]||'';
-  $('inp-tel').placeholder = 'Ex: '+p.t.slice(1)+'XXXXXX';
-  $('pays-dd').classList.remove('show');
-}
-
-function nextReseau(){
-  const p=PAYS[pi];
-  ri=(ri+1)%p.r.length;
-  $('inp-reseau').value=p.r[ri];
-}
-
-/* ───── MÉTHODE ───── */
-function setMeth(m){
-  meth=m;
-  ['momo','wave','bank','crypto'].forEach(k=>$('m-'+k).classList.remove('on'));
-  $('m-'+m).classList.add('on');
-  $('f-pays').style.display   = (m==='momo'||m==='wave') ? 'block':'none';
-  $('f-reseau').style.display = m==='momo'  ? 'block':'none';
-  $('f-nom').style.display    = m==='bank'  ? 'block':'none';
-  $('f-iban').style.display   = m==='bank'  ? 'block':'none';
-  $('f-crypto').style.display = m==='crypto'? 'block':'none';
-  calcFrais();
-}
-
-/* ───── MONTANT ───── */
-function setM(v){ $('inp-montant').value=v; calcFrais(); }
-function setMax(){
-  if(!P) return;
-  const max=Math.floor(P.solde||0);
-  if(max<MIN){ toast('⚠️ Solde insuffisant','err'); return; }
-  $('inp-montant').value=max; calcFrais();
-}
-
-function calcFrais(){
-  const v=parseInt($('inp-montant').value)||0;
-  const hint=$('hint-m'), box=$('frais-box');
-  hint.className='hint';
-  if(!v){ box.style.display='none'; hint.textContent=''; return; }
-  if(v<MIN){
-    hint.textContent='⚠️ Minimum '+fmtF(MIN);
-    hint.className='hint red'; box.style.display='none'; return;
-  }
-  if(v>(P?.solde||0)){
-    hint.textContent='⚠️ Solde insuffisant';
-    hint.className='hint red'; box.style.display='none'; return;
-  }
-  hint.textContent='✓ Montant valide'; hint.className='hint green';
-  const frais=Math.ceil(v*FRAIS), net=v-frais;
-  $s('f-mont',fmtF(v)); $s('f-frais',fmtF(frais)); $s('f-net',fmtF(net));
-  box.style.display='block';
-}
-
-/* ───── CONFIRMATION ───── */
-function confirmer(){
-  const v=parseInt($('inp-montant').value)||0;
-  if(v<MIN){ toast('⚠️ Minimum '+fmtF(MIN),'err'); return; }
-  if(v>(P?.solde||0)){ toast('⚠️ Solde insuffisant','err'); return; }
-  if(meth==='momo'||meth==='wave'){
-    if($('inp-tel').value.trim().length<5){ toast('⚠️ Numéro invalide','err'); return; }
-  }
-  if(meth==='bank'){
-    if(!$('inp-nom').value.trim()){ toast('⚠️ Nom requis','err'); return; }
-    if($('inp-iban').value.trim().length<10){ toast('⚠️ IBAN invalide','err'); return; }
-  }
-  if(meth==='crypto'){
-    if($('inp-crypto').value.trim().length<15){ toast('⚠️ Adresse invalide','err'); return; }
-  }
-  const p=PAYS[pi];
-  const tel=$('inp-tel').value.trim();
-  const compte = {
-    momo:   p.t+tel+' ('+($('inp-reseau').value||'—')+')',
-    wave:   p.t+tel,
-    bank:   ($('inp-nom').value.trim())+' – '+($('inp-iban').value.trim()),
-    crypto: $('inp-crypto').value.trim()
-  }[meth];
-  const frais=Math.ceil(v*FRAIS), net=v-frais;
-  $s('ov-pays', p.f+' '+p.n);
-  $s('ov-compte', compte);
-  $s('ov-mont', fmtF(v));
-  $s('ov-frais', fmtF(frais));
-  $s('ov-net', fmtF(net));
-  $('ov').classList.add('open');
-}
-function closeOv(){ $('ov').classList.remove('open'); }
-
-/* ───── SOUMETTRE ───── */
-async function soumettre(){
-  const v=parseInt($('inp-montant').value);
-  const p=PAYS[pi];
-  const tel=$('inp-tel').value.trim();
-  const frais=Math.ceil(v*FRAIS), net=v-frais;
-  const compte = {
-    momo:   p.t+tel+' ('+($('inp-reseau').value||'—')+')',
-    wave:   p.t+tel,
-    bank:   ($('inp-nom').value.trim())+' – '+($('inp-iban').value.trim()),
-    crypto: $('inp-crypto').value.trim()
-  }[meth];
-  const btn=$('ov-btn');
-  btn.textContent='⏳...'; btn.disabled=true;
-  try{
-    const{error:e1}=await SB.from('transactions').insert({
-      user_id:U.id, type:'retrait',
-      montant:v, frais:frais, montant_net:net,
-      methode:meth, compte:compte,
-      note:p.f+' '+p.n,
-      statut:'en_attente',
-      created_at:new Date().toISOString()
+  function openCountryModal() {
+    const list = document.getElementById("countryList");
+    list.innerHTML = "";
+    let currentZone = "";
+    COUNTRIES.forEach(c => {
+      if (c.zone !== currentZone) {
+        currentZone = c.zone;
+        const zoneLabel = document.createElement("div");
+        zoneLabel.className = "zone-label";
+        zoneLabel.textContent = currentZone;
+        list.appendChild(zoneLabel);
+      }
+      const row = document.createElement("div");
+      row.className = "country-row";
+      row.onclick = () => selectCountry(c);
+      row.innerHTML = `
+        <div class="flag">${c.flag}</div>
+        <div class="name">${c.name}</div>
+        ${!c.confirmed ? '<div class="badge-unconfirmed">à confirmer</div>' : ''}
+      `;
+      list.appendChild(row);
     });
-    if(e1) throw new Error(e1.message);
-    const{error:e2}=await SB.from('profiles')
-      .update({solde:(P.solde||0)-v}).eq('id',U.id);
-    if(e2) throw new Error(e2.message);
-    P.solde=(P.solde||0)-v;
-    $s('sc-solde',fmtF(P.solde));
-    $s('tb-solde',fmtF(P.solde));
-    closeOv();
-    toast('✅ Demande envoyée ! Traitement sous 24h','ok');
-    $('inp-montant').value='';
-    $('frais-box').style.display='none';
-    $('hint-m').textContent='';
-    MIN=await getMin();
-    $s('sc-sub','Minimum : '+fmtF(MIN)+' · Frais : 5%');
-    chargerHisto();
-  }catch(err){
-    toast('❌ '+err.message,'err');
-  }finally{
-    btn.textContent='✅ Confirmer'; btn.disabled=false;
+    document.getElementById("countryModal").classList.add("open");
   }
-}
 
-/* ───── MINIMUM DYNAMIQUE ───── */
-async function getMin(){
-  const{count}=await SB.from('transactions')
-    .select('id',{count:'exact',head:true})
-    .eq('user_id',U.id).eq('type','retrait')
-    .in('statut',['valide','en_attente']);
-  return (count||0)===0 ? 600 : 1000;
-}
-
-/* ───── HISTORIQUE ───── */
-async function chargerHisto(){
-  const{data:hist}=await SB.from('transactions')
-    .select('*').eq('user_id',U.id).eq('type','retrait')
-    .order('created_at',{ascending:false}).limit(20);
-  const list=$('hist-list');
-  if(!hist||!hist.length){
-    list.innerHTML='<div class="vide"><div class="vide-ico">📋</div>Aucun retrait effectué</div>';
-    return;
+  function closeCountryModal() {
+    document.getElementById("countryModal").classList.remove("open");
   }
-  const sL={en_attente:'En attente',valide:'Validé',rejete:'Rejeté'};
-  const sC={en_attente:'sp',valide:'sv',rejete:'sr'};
-  const mI={momo:'📱',bank:'🏦',wave:'🌊',crypto:'₿'};
-  const mN={momo:'Mobile Money',bank:'Virement',wave:'Wave',crypto:'Crypto'};
-  const iC={en_attente:'ic-p',valide:'ic-v',rejete:'ic-r'};
-  list.innerHTML=hist.map(h=>{
-    const st=h.statut||'en_attente';
-    const dt=new Date(h.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});
-    return `<div class="hi">
-      <div class="hi-ico ${iC[st]||'ic-p'}">${mI[h.methode]||'💳'}</div>
-      <div class="hi-info">
-        <div class="hi-nom">${mN[h.methode]||h.methode}${h.note?' · '+h.note:''}</div>
-        <div class="hi-date">${dt} — ${h.compte||'—'}</div>
-      </div>
-      <div class="hi-right">
-        <div class="hi-mont">-${fmtF(h.montant)}</div>
-        <span class="hi-stat ${sC[st]||'sp'}">${sL[st]||st}</span>
-      </div>
-    </div>`;
-  }).join('');
-}
 
-/* ───── INIT ───── */
-async function init(){
-  const{data:{session}}=await SB.auth.getSession();
-  if(!session){ window.location.href='index.html'; return; }
-  U=session.user;
-  const{data:p}=await SB.from('profiles').select('*').eq('id',U.id).single();
-  P=p||{solde:0};
-  MIN=await getMin();
-  $s('sc-solde',fmtF(P.solde));
-  $s('tb-solde',fmtF(P.solde));
-  $s('sc-sub','Minimum : '+fmtF(MIN)+' · Frais : 5%');
-  if((P.solde||0)<=0){
-    $('btn-retrait').disabled=true;
-    $('btn-retrait').textContent='Solde insuffisant';
+  function selectCountry(country) {
+    selectedCountry = country;
+    selectedOperator = null;
+
+    const selector = document.getElementById("countrySelector");
+    selector.classList.remove("placeholder");
+    document.getElementById("selectedFlag").textContent = country.flag;
+    document.getElementById("selectedCountryName").textContent = country.name;
+    document.getElementById("selectedZone").textContent = country.zone;
+
+    const opField = document.getElementById("operatorField");
+    const opGrid = document.getElementById("operatorGrid");
+    opGrid.innerHTML = "";
+    country.operators.forEach(op => {
+      const chip = document.createElement("div");
+      chip.className = "operator-chip";
+      chip.textContent = op;
+      chip.onclick = () => selectOperator(op, chip);
+      opGrid.appendChild(chip);
+    });
+    opField.style.display = "block";
+
+    closeCountryModal();
   }
-  choisirPays(0); // Cameroun par défaut
-  await chargerHisto();
-}
-init();
+
+  function selectOperator(op, el) {
+    selectedOperator = op;
+    document.querySelectorAll(".operator-chip").forEach(c => c.classList.remove("active"));
+    el.classList.add("active");
+  }
+
+  async function loadSolde() {
+    try {
+      const res = await fetch(`${API_BASE}/retraits/solde-disponible`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      const data = await res.json();
+      document.getElementById("soldeDisponible").textContent = `${data.solde.toLocaleString('fr-FR')} F CFA`;
+    } catch (e) {}
+  }
+
+  async function loadHistory() {
+    const listEl = document.getElementById("historyList");
+    try {
+      const res = await fetch(`${API_BASE}/retraits/mes`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.length === 0) {
+        listEl.innerHTML = '<div class="empty-history">Aucune demande de retrait pour l\'instant.</div>';
+        return;
+      }
+      listEl.innerHTML = "";
+      data.forEach(r => {
+        const country = COUNTRIES.find(c => c.code === r.pays) || {};
+        const div = document.createElement("div");
+        div.className = "history-item";
+        div.innerHTML = `
+          <div class="flag">${country.flag || "🌍"}</div>
+          <div class="info">
+            <div class="amount">${r.montant.toLocaleString('fr-FR')} F CFA</div>
+            <div class="meta">${r.operateur} · ${new Date(r.created_at).toLocaleDateString('fr-FR')}</div>
+          </div>
+          <div class="status-badge status-${r.statut}">${r.statut.replace('_', ' ')}</div>
+        `;
+        listEl.appendChild(div);
+      });
+    } catch (e) {
+      listEl.innerHTML = '<div class="empty-history">Erreur de chargement.</div>';
+    }
+  }
+
+  async function submitRetrait(e) {
+    e.preventDefault();
+    const msg = document.getElementById("formMsg");
+    const submitBtn = document.getElementById("submitBtn");
+
+    if (!selectedCountry) { msg.className = "msg error show"; msg.textContent = "Choisis un pays."; return; }
+    if (!selectedOperator) { msg.className = "msg error show"; msg.textContent = "Choisis un opérateur."; return; }
+
+    const payload = {
+      montant: parseInt(document.getElementById("montant").value),
+      pays: selectedCountry.code,
+      operateur: selectedOperator,
+      telephone: document.getElementById("telephone").value,
+    };
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Envoi...";
+
+    try {
+      const res = await fetch(`${API_BASE}/retraits/demander`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Erreur");
+
+      msg.className = "msg success show";
+      msg.textContent = "Demande envoyée ! Elle sera traitée sous peu.";
+      document.getElementById("retraitForm").reset();
+      selectedCountry = null;
+      selectedOperator = null;
+      document.getElementById("countrySelector").classList.add("placeholder");
+      document.getElementById("selectedFlag").textContent = "🌍";
+      document.getElementById("selectedCountryName").textContent = "Choisir un pays";
+      document.getElementById("selectedZone").textContent = "";
+      document.getElementById("operatorField").style.display = "none";
+
+      loadSolde();
+      loadHistory();
+    } catch (err) {
+      msg.className = "msg error show";
+      msg.textContent = err.message;
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Envoyer la demande";
+    }
+  }
+
+  loadSolde();
+  loadHistory();
 </script>
+
 </body>
 </html>
