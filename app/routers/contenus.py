@@ -228,3 +228,21 @@ async def checkout_status(request: Request, checkout_id: str):
     lien_acces = contenu_result.data[0]["lien_acces"] if contenu_result.data else None
 
     return {"statut": transaction["statut"], "lien_acces": lien_acces if transaction["statut"] == "paid" else None}
+
+
+@router.post("/admin/upload-video")
+@limiter.limit("10/minute")
+async def upload_video(request: Request, file: UploadFile = File(...), admin_id: str = Depends(get_current_admin_id)):
+    ext = file.filename.split(".")[-1] if "." in file.filename else "mp4"
+    path = f"{uuid.uuid4()}.{ext}"
+    content = await file.read()
+
+    if len(content) > 45 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="Vidéo trop lourde (max ~45 Mo sur Vercel)")
+
+    supabase_admin.storage.from_("contenus-videos").upload(
+        path, content, {"content-type": file.content_type}
+    )
+
+    url = f"{settings.supabase_url}/storage/v1/object/public/contenus-videos/{path}"
+    return {"url": url}
