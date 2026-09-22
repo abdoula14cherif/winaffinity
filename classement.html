@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Affinity Network — Classement</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --wa-green: #25D366;
+    --wa-dark: #128C7E;
+    --wa-deep: #075E54;
+    --alibaba: #FF6A00;
+    --gold: #FFB800;
+    --silver: #A8B5C2;
+    --bronze: #CD7F32;
+    --bg: #f7f9f8;
+    --text: #1a1a1a;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+  }
+  body {
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    padding-bottom: 80px; min-height: 100vh; overflow-x: hidden;
+  }
+
+  /* LOADER */
+  .loader {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--wa-deep);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 22px;
+    transition: opacity .6s ease, visibility .6s ease;
+  }
+  .loader.hidden { opacity: 0; visibility: hidden; }
+  .loader-logo { font-size: 24px; font-weight: 700; color: #fff; }
+  .loader-logo span { color: var(--wa-green); }
+  .spinner {
+    width: 46px; height: 46px;
+    border: 4px solid rgba(255,255,255,.2);
+    border-top-color: var(--wa-green);
+    border-radius: 50%;
+    animation: spin .9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+  @keyframes trophyPulse {
+    0%,100% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.1) rotate(5deg); }
+  }
+  .anim { opacity: 0; animation: fadeInUp .5s ease forwards; }
+  .d1 { animation-delay: .05s; }
+  .d2 { animation-delay: .1s; }
+  .d3 { animation-delay: .15s; }
+
+  /* HEADER */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px;
+    background: var(--wa-deep); color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+  .burger {
+    cursor: pointer; width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: rgba(255,255,255,.12);
+  }
+  .burger svg { stroke: #fff; }
+  .logo { font-weight: 700; font-size: 18px; letter-spacing: .5px; }
+  .logo span { color: var(--wa-green); }
+
+  /* MENU */
+  .menu {
+    position: fixed; top: 0; left: 0; height: 100%; width: 280px;
+    background: #fff; z-index: 200;
+    transform: translateX(-100%);
+    transition: transform .35s cubic-bezier(.4,0,.2,1);
+    box-shadow: 4px 0 20px rgba(0,0,0,.2);
+    padding-top: 18px;
+    display: flex; flex-direction: column;
+  }
+  .menu.open { transform: translateX(0); }
+  .menu-header {
+    padding: 8px 20px 18px; border-bottom: 1px solid #eee; margin-bottom: 10px;
+    font-weight: 700; color: var(--wa-deep); font-size: 17px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .menu-header svg { stroke: var(--wa-green); }
+  .menu-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 15px 22px; cursor: pointer; font-size: 15px;
+    color: #333;
+  }
+  .menu-item svg { stroke: var(--wa-dark); flex-shrink: 0; }
+  .menu-footer {
+    margin-top: auto; padding: 16px 20px 22px;
+    border-top: 1px solid #eee;
+  }
+  .btn-logout {
+    width: 100%; padding: 14px;
+    background: #fee2e2; color: #b91c1c;
+    border: none; border-radius: 12px;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-logout svg { stroke: #b91c1c; }
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.45);
+    z-index: 150; opacity: 0; pointer-events: none; transition: opacity .3s;
+  }
+  .overlay.open { opacity: 1; pointer-events: auto; }
+
+  /* CONTENU */
+  .content { padding: 0 0 20px; }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, var(--wa-deep), var(--wa-dark));
+    color: #fff; padding: 26px 20px 30px;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute;
+    width: 220px; height: 220px; border-radius: 50%;
+    background: rgba(37,211,102,.15);
+    top: -100px; right: -70px;
+  }
+  .hero::after {
+    content: ''; position: absolute;
+    width: 160px; height: 160px; border-radius: 50%;
+    background: rgba(255,184,0,.1);
+    bottom: -80px; left: -50px;
+  }
+  .hero-content { position: relative; z-index: 2; }
+  .hero-icon {
+    width: 52px; height: 52px; border-radius: 16px;
+    background: rgba(255,184,0,.2);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px;
+    animation: trophyPulse 2.5s ease-in-out infinite;
+  }
+  .hero-icon svg { stroke: var(--gold); }
+  .hero h1 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
+  .hero p { font-size: 13.5px; opacity: .9; line-height: 1.5; }
+
+  /* PODIUM */
+  .podium {
+    padding: 0 20px;
+    margin-top: -20px;
+    position: relative; z-index: 3;
+    display: flex; align-items: flex-end; justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .podium-item {
+    flex: 1;
+    text-align: center;
+    animation: fadeInUp .6s ease forwards; opacity: 0;
+  }
+  .podium-item .pi-photo {
+    width: 68px; height: 68px;
+    border-radius: 50%; overflow: hidden;
+    margin: 0 auto 8px;
+    box-shadow: 0 6px 20px rgba(0,0,0,.2);
+    position: relative;
+    background: #fff;
+  }
+  .podium-item .pi-photo img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .podium-item.rank-1 .pi-photo {
+    width: 84px; height: 84px;
+    border: 4px solid var(--gold);
+  }
+  .podium-item.rank-2 .pi-photo {
+    border: 4px solid var(--silver);
+  }
+  .podium-item.rank-3 .pi-photo {
+    border: 4px solid var(--bronze);
+  }
+  .podium-item .pi-medal {
+    position: absolute; bottom: -6px; right: -6px;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--gold); color: #fff;
+    font-size: 13px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    border: 3px solid #fff;
+    box-shadow: 0 3px 8px rgba(0,0,0,.2);
+  }
+  .podium-item.rank-2 .pi-medal { background: var(--silver); }
+  .podium-item.rank-3 .pi-medal { background: var(--bronze); }
+  .podium-item .pi-name {
+    font-size: 12.5px; font-weight: 800;
+    color: var(--wa-deep);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-bottom: 2px;
+  }
+  .podium-item .pi-score {
+    font-size: 11px; color: var(--wa-dark); font-weight: 700;
+  }
+  .podium-item .pi-base {
+    background: #fff;
+    border-radius: 12px 12px 0 0;
+    padding: 10px 6px;
+    box-shadow: 0 -3px 12px rgba(0,0,0,.08);
+    margin-top: 8px;
+    border-top: 3px solid var(--wa-green);
+  }
+  .podium-item.rank-1 .pi-base {
+    padding-top: 20px; border-color: var(--gold);
+    background: linear-gradient(to bottom, #fffef5, #fff);
+  }
+  .podium-item.rank-2 .pi-base { border-color: var(--silver); }
+  .podium-item.rank-3 .pi-base { border-color: var(--bronze); }
+
+  /* FILTRES */
+  .filters {
+    display: flex; gap: 6px; overflow-x: auto;
+    padding: 0 20px 18px;
+    -ms-overflow-style: none; scrollbar-width: none;
+  }
+  .filters::-webkit-scrollbar { display: none; }
+  .filter-chip {
+    background: #fff; color: var(--muted);
+    border: 1.5px solid var(--border);
+    padding: 8px 14px; border-radius: 20px;
+    font-size: 12px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    white-space: nowrap;
+    transition: all .2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .filter-chip.active {
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    color: #fff; border-color: transparent;
+    box-shadow: 0 3px 10px rgba(18,140,126,.3);
+  }
+  .filter-chip svg { stroke: currentColor; }
+
+  /* SECTION TITLE */
+  .section-title {
+    padding: 0 20px;
+    font-size: 15px; font-weight: 700; color: var(--wa-deep);
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title svg { stroke: var(--wa-green); }
+
+  /* LISTE */
+  .rank-list { padding: 0 20px; }
+  .rank-item {
+    background: #fff; border-radius: 16px;
+    padding: 12px; margin-bottom: 12px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.06);
+    display: flex; align-items: center; gap: 12px;
+    cursor: pointer;
+    transition: transform .15s;
+    animation: fadeInUp .4s ease forwards; opacity: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .rank-item:active { transform: scale(.98); }
+  .rank-item.top-1 {
+    border: 2px solid var(--gold);
+    background: linear-gradient(to right, #fffef5, #fff);
+  }
+  .rank-item.top-2 { border: 2px solid var(--silver); }
+  .rank-item.top-3 { border: 2px solid var(--bronze); }
+
+  .rank-badge {
+    width: 36px; height: 36px;
+    border-radius: 50%; flex-shrink: 0;
+    background: #f3f4f6; color: var(--text);
+    font-size: 14px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid #e5e7eb;
+  }
+  .rank-item.top-1 .rank-badge {
+    background: linear-gradient(135deg, #FFB800, #FFD966);
+    color: #fff; border-color: var(--gold);
+    box-shadow: 0 4px 12px rgba(255,184,0,.4);
+  }
+  .rank-item.top-2 .rank-badge {
+    background: linear-gradient(135deg, #A8B5C2, #D1D9E0);
+    color: #fff; border-color: var(--silver);
+  }
+  .rank-item.top-3 .rank-badge {
+    background: linear-gradient(135deg, #CD7F32, #E5A76A);
+    color: #fff; border-color: var(--bronze);
+  }
+
+  .rank-photo {
+    width: 52px; height: 52px; border-radius: 12px;
+    object-fit: cover; flex-shrink: 0;
+    background: #f3f4f6;
+  }
+  .rank-body { flex: 1; min-width: 0; }
+  .rank-name {
+    font-size: 15px; font-weight: 800; color: var(--text);
+    margin-bottom: 4px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .rank-name .star {
+    color: var(--gold); font-size: 12px;
+  }
+  .rank-meta {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; color: var(--muted);
+    flex-wrap: wrap;
+  }
+  .rank-meta .green { color: var(--wa-dark); font-weight: 700; }
+  .rank-meta .dot { color: #d1d5db; }
+
+  .rank-score {
+    text-align: right; flex-shrink: 0;
+  }
+  .rank-score .val {
+    font-size: 16px; font-weight: 800; color: var(--alibaba);
+    line-height: 1;
+  }
+  .rank-score .lbl {
+    font-size: 9.5px; color: var(--muted);
+    text-transform: uppercase; font-weight: 700;
+    letter-spacing: .3px; margin-top: 3px;
+  }
+
+  /* EXPLICATION BANNER */
+  .explain-banner {
+    margin: 20px 20px 0;
+    background: linear-gradient(135deg, rgba(255,106,0,.08), rgba(18,140,126,.08));
+    border-radius: 14px;
+    padding: 16px 18px;
+    border-left: 4px solid var(--alibaba);
+    animation: fadeInUp .5s ease forwards; opacity: 0;
+  }
+  .explain-banner .eb-head {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13.5px; font-weight: 800; color: var(--wa-deep);
+    margin-bottom: 8px;
+  }
+  .explain-banner .eb-head svg { stroke: var(--alibaba); }
+  .explain-banner p {
+    font-size: 12.5px; line-height: 1.65;
+    color: #4b5563;
+  }
+  .explain-banner strong { color: var(--wa-dark); }
+
+  /* SKELETON */
+  .sk-item {
+    background: #fff; border-radius: 16px;
+    padding: 12px; margin-bottom: 12px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.05);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .sk-img {
+    width: 52px; height: 52px; border-radius: 12px;
+    background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+    background-size: 200% 100%; animation: shimmer 1.4s infinite;
+  }
+  .sk-line {
+    height: 12px; border-radius: 6px;
+    background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+    background-size: 200% 100%; animation: shimmer 1.4s infinite;
+    margin-bottom: 6px;
+  }
+  .sk-line.w1 { width: 60%; height: 15px; }
+  .sk-line.w2 { width: 85%; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(0,0,0,.6);
+    display: flex; align-items: flex-end; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity .3s; backdrop-filter: blur(3px);
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: auto; }
+  .modal {
+    background: #fff; width: 100%; max-width: 500px;
+    border-radius: 24px 24px 0 0;
+    transform: translateY(100%);
+    transition: transform .4s cubic-bezier(.4,0,.2,1);
+    max-height: 92vh; overflow-y: auto;
+    position: relative;
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-handle {
+    width: 42px; height: 5px; border-radius: 5px;
+    background: #d1d5db; margin: 12px auto 6px;
+  }
+  .modal-close-floating {
+    position: absolute; top: 14px; right: 14px;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(0,0,0,.55); color: #fff;
+    border: none; cursor: pointer; z-index: 10;
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(6px);
+  }
+  .modal-close-floating svg { stroke: #fff; }
+
+  .modal-hero {
+    height: 180px; position: relative; overflow: hidden;
+    border-radius: 24px 24px 0 0;
+  }
+  .modal-hero img { width: 100%; height: 100%; object-fit: cover; }
+  .modal-hero::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.75), transparent 60%);
+  }
+  .modal-hero .m-title {
+    position: absolute; bottom: 16px; left: 20px; right: 20px;
+    color: #fff; z-index: 2;
+  }
+  .modal-hero .m-title h2 {
+    font-size: 22px; font-weight: 800; margin-bottom: 4px;
+  }
+  .modal-hero .m-title .m-rank {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--gold); color: #fff;
+    font-size: 11px; font-weight: 800;
+    padding: 4px 10px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: .5px;
+  }
+
+  .modal-body { padding: 20px 20px 28px; }
+
+  .m-stats-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 10px; margin-bottom: 18px;
+  }
+  .m-stat {
+    background: #f7faf8; border-radius: 12px;
+    padding: 12px; text-align: center;
+    border-left: 3px solid var(--wa-green);
+  }
+  .m-stat.orange { border-color: var(--alibaba); }
+  .m-stat.gold { border-color: var(--gold); }
+  .m-stat .k {
+    font-size: 10px; color: var(--muted);
+    text-transform: uppercase; font-weight: 700;
+    letter-spacing: .3px; margin-bottom: 5px;
+  }
+  .m-stat .v {
+    font-size: 15px; font-weight: 800; color: var(--text);
+  }
+  .m-stat .v.green { color: var(--wa-dark); }
+  .m-stat .v.orange { color: var(--alibaba); }
+
+  .m-block {
+    margin-bottom: 16px;
+  }
+  .m-block h3 {
+    font-size: 14px; font-weight: 800; color: var(--wa-deep);
+    margin-bottom: 8px;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .m-block h3 svg { stroke: var(--wa-green); }
+  .m-block p {
+    font-size: 13.5px; line-height: 1.7; color: #4b5563;
+  }
+  .m-block p strong { color: var(--wa-dark); font-weight: 700; }
+
+  .m-highlight {
+    background: linear-gradient(135deg, rgba(18,140,126,.08), rgba(37,211,102,.12));
+    border-radius: 12px;
+    padding: 14px 16px;
+    border: 1px dashed rgba(18,140,126,.35);
+    margin-bottom: 16px;
+  }
+  .m-highlight .h-row {
+    display: flex; justify-content: space-between;
+    font-size: 13px; margin-bottom: 6px;
+  }
+  .m-highlight .h-row:last-child { margin-bottom: 0; }
+  .m-highlight .h-row .k { color: #4b5563; }
+  .m-highlight .h-row .v { color: var(--text); font-weight: 700; }
+  .m-highlight .h-row.total {
+    border-top: 1px solid rgba(18,140,126,.25);
+    padding-top: 8px; margin-top: 6px;
+    font-size: 15px;
+  }
+  .m-highlight .h-row.total .v {
+    color: var(--alibaba); font-size: 17px; font-weight: 800;
+  }
+
+  .btn-cta {
+    width: 100%; border: none;
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    color: #fff; padding: 15px;
+    border-radius: 14px; font-size: 15px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    box-shadow: 0 4px 14px rgba(18,140,126,.35);
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    transition: transform .15s;
+  }
+  .btn-cta:active { transform: scale(.97); }
+  .btn-cta svg { stroke: #fff; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    display: flex; background: #fff;
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 -2px 12px rgba(0,0,0,.06);
+    z-index: 100;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    padding: 9px 0 10px; cursor: pointer;
+    color: #9ca3af; font-size: 11px; gap: 4px;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .nav-item svg { stroke: #9ca3af; }
+  .nav-item.active { color: var(--wa-dark); font-weight: 700; }
+  .nav-item.active svg { stroke: var(--wa-green); }
+</style>
+</head>
+<body>
+
+  <div class="loader" id="loader">
+    <div class="loader-logo">Affinity<span> Network</span></div>
+    <div class="spinner"></div>
+  </div>
+
+  <header class="header">
+    <div class="burger" onclick="toggleMenu()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </div>
+    <div class="logo">Affinity<span> Network</span></div>
+    <div style="width:40px"></div>
+  </header>
+
+  <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+  <nav class="menu" id="menu">
+    <div class="menu-header">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01"/>
+      </svg>
+      Affinity Network
+    </div>
+    <div class="menu-item" onclick="go('travail.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+      </svg>
+      Travail
+    </div>
+    <div class="menu-item" onclick="go('support.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+      </svg>
+      Support
+    </div>
+    <div class="menu-item" onclick="go('faq.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      FAQ
+    </div>
+    <div class="menu-item" onclick="go('entreprise.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M3 21h18M5 21V7l7-4 7 4v14"/>
+      </svg>
+      Notre entreprise
+    </div>
+    <div class="menu-footer">
+      <button class="btn-logout" onclick="logout()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Se déconnecter
+      </button>
+    </div>
+  </nav>
+
+  <main class="content">
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-content">
+        <div class="hero-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+            <path d="M4 22h16"/>
+            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+          </svg>
+        </div>
+        <h1>Classement des cultures</h1>
+        <p>Les plantations les plus rentables, classées par performance de gains.</p>
+      </div>
+    </div>
+
+    <!-- PODIUM -->
+    <div class="podium" id="podium"></div>
+
+    <!-- FILTRES -->
+    <div class="filters" id="filters">
+      <button class="filter-chip active" data-sort="ratio">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+        </svg>
+        Rentabilité
+      </button>
+      <button class="filter-chip" data-sort="gain">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+        Gain/jour
+      </button>
+      <button class="filter-chip" data-sort="breakeven">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        Récupération
+      </button>
+      <button class="filter-chip" data-sort="cost">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+        </svg>
+        Accessibilité
+      </button>
+    </div>
+
+    <!-- LISTE -->
+    <div class="section-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+        <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+      </svg>
+      <span id="listTitle">Toutes les cultures</span>
+    </div>
+    <div class="rank-list" id="rankList">
+      <div class="sk-item">
+        <div class="sk-img"></div>
+        <div style="flex:1;">
+          <div class="sk-line w1"></div>
+          <div class="sk-line w2"></div>
+        </div>
+      </div>
+      <div class="sk-item">
+        <div class="sk-img"></div>
+        <div style="flex:1;">
+          <div class="sk-line w1"></div>
+          <div class="sk-line w2"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPLICATION -->
+    <div class="explain-banner">
+      <div class="eb-head">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+        Comment est calculé le classement ?
+      </div>
+      <p>
+        Chaque culture est notée selon sa <strong>rentabilité</strong> : le rapport entre le gain journalier et le montant d'activation. Plus ce ratio est élevé, plus vite tu récupères ton investissement et plus tu génères de bénéfices sur la durée.
+        <br><br>
+        Le <strong>temps de récupération</strong> indique le nombre de jours nécessaires pour rembourser ton activation. Utilise les filtres pour trier selon ton objectif : rentabilité maximale, gain quotidien élevé, ou coût d'entrée accessible.
+      </p>
+    </div>
+
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="lancer.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+        <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+      </svg>
+      Lancer
+    </a>
+    <a href="retirer.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+      </svg>
+      Retirer
+    </a>
+    <a href="travail.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+      </svg>
+      Travail
+    </a>
+    <a href="moi.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+      </svg>
+      Moi
+    </a>
+  </nav>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+    <div class="modal">
+      <button class="modal-close-floating" onclick="closeModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+      <div class="modal-handle"></div>
+      <div class="modal-hero">
+        <img id="mImg" src="" alt="">
+        <div class="m-title">
+          <span class="m-rank" id="mRank">—</span>
+          <h2 id="mName">—</h2>
+        </div>
+      </div>
+      <div class="modal-body" id="mBody"></div>
+    </div>
+  </div>
+
+<script>
+  // ================= SUPABASE =================
+  const SUPABASE_URL = 'https://ydwjvvlcnqsftciedpqm.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2p2dmxjbnFzZnRjaWVkcHFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMDQyNDAsImV4cCI6MjEwNTY4MDI0MH0.4uQwBGedMBjUZErd8lUM5YfA26gw96RvHdo_J-3PZCY';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  let ALL_PLANTS = [];
+  let RANKED = [];
+  let SORT = 'ratio';
+  const DUREE = 45; // jours de référence pour le calcul
+
+  // ================= INIT =================
+  (async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.replace('inscription.html'); return; }
+    await loadPlants();
+    setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
+  })();
+
+  // ================= CHARGER =================
+  async function loadPlants() {
+    const { data, error } = await sb.from('plantations')
+      .select('*').eq('actif', true);
+
+    if (error || !data) {
+      document.getElementById('rankList').innerHTML = `
+        <div style="text-align:center;padding:40px;color:#6b7280;">
+          Erreur de chargement
+        </div>`;
+      return;
+    }
+    ALL_PLANTS = data;
+    computeRanking();
+  }
+
+  // ================= CALCUL =================
+  function computeRanking() {
+    RANKED = ALL_PLANTS.map(p => {
+      const act = Number(p.montant_activation);
+      const gain = Number(p.gain_journalier);
+      const totalGains = gain * DUREE;
+      const profit = totalGains - act;
+      const ratio = gain / act;                 // rentabilité quotidienne
+      const breakeven = act / gain;             // jours pour récupérer
+      const roi = (profit / act) * 100;         // %
+      return { ...p, act, gain, totalGains, profit, ratio, breakeven, roi };
+    });
+
+    // Tri
+    switch (SORT) {
+      case 'gain':      RANKED.sort((a, b) => b.gain - a.gain); break;
+      case 'breakeven': RANKED.sort((a, b) => a.breakeven - b.breakeven); break;
+      case 'cost':      RANKED.sort((a, b) => a.act - b.act); break;
+      default:          RANKED.sort((a, b) => b.ratio - a.ratio);
+    }
+
+    renderPodium();
+    renderList();
+  }
+
+  // ================= PODIUM =================
+  function renderPodium() {
+    const podium = document.getElementById('podium');
+    // Ordre visuel : 2e — 1er — 3e
+    const top = [RANKED[1], RANKED[0], RANKED[2]].filter(Boolean);
+    const positions = ['rank-2', 'rank-1', 'rank-3'];
+    const medals = ['2', '1', '3'];
+
+    if (top.length === 0) { podium.style.display = 'none'; return; }
+    podium.style.display = 'flex';
+
+    podium.innerHTML = top.map((p, i) => {
+      const actualRank = medals[i];
+      return `
+        <div class="podium-item ${positions[i]}" style="animation-delay:${i * .12}s" onclick="openPlant('${p.id}')">
+          <div class="pi-photo">
+            <img src="${p.image_url}" alt="${escapeHtml(p.nom)}">
+            <div class="pi-medal">${actualRank}</div>
+          </div>
+          <div class="pi-name">${escapeHtml(p.nom)}</div>
+          <div class="pi-score">+${formatF(p.gain)}/j</div>
+          <div class="pi-base"></div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ================= LISTE =================
+  function renderList() {
+    const list = document.getElementById('rankList');
+    const title = document.getElementById('listTitle');
+
+    const titles = {
+      ratio: 'Toutes les cultures — par rentabilité',
+      gain: 'Toutes les cultures — par gain journalier',
+      breakeven: 'Toutes les cultures — récupération rapide',
+      cost: 'Toutes les cultures — accessibilité'
+    };
+    title.textContent = titles[SORT];
+
+    if (RANKED.length === 0) {
+      list.innerHTML = `<div style="text-align:center;padding:40px;color:#6b7280;">Aucune culture</div>`;
+      return;
+    }
+
+    list.innerHTML = RANKED.map((p, i) => {
+      const rank = i + 1;
+      const topClass = rank <= 3 ? 'top-' + rank : '';
+      let scoreVal, scoreLbl, star = '';
+
+      if (SORT === 'ratio') {
+        scoreVal = (p.ratio * 100).toFixed(1) + '%';
+        scoreLbl = 'Rentabilité/j';
+      } else if (SORT === 'gain') {
+        scoreVal = formatF(p.gain);
+        scoreLbl = 'Gain/jour';
+      } else if (SORT === 'breakeven') {
+        scoreVal = p.breakeven.toFixed(1) + 'j';
+        scoreLbl = 'Récupération';
+      } else {
+        scoreVal = formatF(p.act);
+        scoreLbl = 'Activation';
+      }
+
+      if (rank === 1) star = '<span class="star">★</span>';
+
+      return `
+        <div class="rank-item ${topClass}" style="animation-delay:${i * .04}s" onclick="openPlant('${p.id}')">
+          <div class="rank-badge">${rank}</div>
+          <img class="rank-photo" src="${p.image_url}" alt="${escapeHtml(p.nom)}">
+          <div class="rank-body">
+            <div class="rank-name">${star} ${escapeHtml(p.nom)}</div>
+            <div class="rank-meta">
+              <span class="green">+${formatF(p.gain)}/j</span>
+              <span class="dot">•</span>
+              <span>Activation ${formatF(p.act)}</span>
+            </div>
+          </div>
+          <div class="rank-score">
+            <div class="val">${scoreVal}</div>
+            <div class="lbl">${scoreLbl}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ================= FILTRES =================
+  document.getElementById('filters').addEventListener('click', (e) => {
+    const chip = e.target.closest('.filter-chip');
+    if (!chip) return;
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    SORT = chip.dataset.sort;
+    computeRanking();
+  });
+
+  // ================= MODAL =================
+  function openPlant(id) {
+    const p = RANKED.find(x => x.id === id);
+    if (!p) return;
+    const rank = RANKED.indexOf(p) + 1;
+    const rankLabel = rank <= 3
+      ? `Top ${rank} · ${['🥇','🥈','🥉'][rank-1]} Classement`
+      : `#${rank} du classement`;
+
+    document.getElementById('mImg').src = p.image_url;
+    document.getElementById('mName').textContent = p.nom;
+    document.getElementById('mRank').textContent = rankLabel;
+
+    document.getElementById('mBody').innerHTML = `
+      <div class="m-stats-grid">
+        <div class="m-stat orange">
+          <div class="k">Activation</div>
+          <div class="v orange">${formatF(p.act)}</div>
+        </div>
+        <div class="m-stat">
+          <div class="k">Gain journalier</div>
+          <div class="v green">+${formatF(p.gain)}</div>
+        </div>
+        <div class="m-stat gold">
+          <div class="k">Rentabilité / jour</div>
+          <div class="v">${(p.ratio * 100).toFixed(2)}%</div>
+        </div>
+        <div class="m-stat">
+          <div class="k">Récupération</div>
+          <div class="v">${p.breakeven.toFixed(1)} jours</div>
+        </div>
+      </div>
+
+      <div class="m-highlight">
+        <div class="h-row">
+          <span class="k">Investissement initial</span>
+          <span class="v">${formatF(p.act)}</span>
+        </div>
+        <div class="h-row">
+          <span class="k">Gains sur ${DUREE} jours</span>
+          <span class="v">${formatF(p.totalGains)}</span>
+        </div>
+        <div class="h-row total">
+          <span class="k">Bénéfice net</span>
+          <span class="v">+${formatF(p.profit)}</span>
+        </div>
+      </div>
+
+      <div class="m-block">
+        <h3>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          Pourquoi c'est intéressant ?
+        </h3>
+        <p>
+          La culture de <strong>${escapeHtml(p.nom)}</strong> génère <strong>${formatF(p.gain)}</strong> par jour pour une activation de <strong>${formatF(p.act)}</strong>.
+          Cela signifie que tu récupères ton investissement en seulement <strong>${p.breakeven.toFixed(1)} jours</strong>, puis tout le reste est du bénéfice net.
+          Sur ${DUREE} jours, tu encaisses <strong>${formatF(p.profit)}</strong> de bénéfice pur.
+        </p>
+      </div>
+
+      <div class="m-block">
+        <h3>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+          </svg>
+          Position dans le classement
+        </h3>
+        <p>
+          ${rank === 1
+            ? `<strong>${escapeHtml(p.nom)}</strong> occupe la <strong>première place</strong> du classement de rentabilité. C'est la culture la plus efficace pour transformer ton activation en bénéfices rapidement.`
+            : rank <= 3
+              ? `<strong>${escapeHtml(p.nom)}</strong> fait partie du <strong>top 3</strong> des cultures les plus performantes. Un excellent choix pour maximiser tes gains.`
+              : `<strong>${escapeHtml(p.nom)}</strong> est classée <strong>${rank}ᵉ</strong> du classement. Elle reste intéressante pour diversifier ton portefeuille de plantations.`
+          }
+        </p>
+      </div>
+
+      <button class="btn-cta" onclick="goToLancer('${p.id}')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+          <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+        </svg>
+        Activer cette culture
+      </button>
+    `;
+
+    document.getElementById('modalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function goToLancer(plantId) {
+    // Redirige vers la page lancer avec l'id de la plantation
+    window.location.href = 'travail.html';
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function closeModalOutside(e) {
+    if (e.target.id === 'modalOverlay') closeModal();
+  }
+
+  // ================= UTILITAIRES =================
+  function formatF(n) {
+    return Math.round(Number(n || 0)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F';
+  }
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function toggleMenu() {
+    document.getElementById('menu').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('open');
+  }
+  function go(page) { window.location.href = page; }
+  async function logout() {
+    if (!confirm('Veux-tu vraiment te déconnecter ?')) return;
+    await sb.auth.signOut();
+    window.location.replace('inscription.html');
+  }
+</script>
+</body>
+</html>
