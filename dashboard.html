@@ -21,12 +21,8 @@
   body {
     font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
     background: var(--bg); color: var(--text);
-    padding-bottom: 72px;
-    min-height: 100vh;
-    overflow-x: hidden;
+    padding-bottom: 72px; min-height: 100vh; overflow-x: hidden;
   }
-
-  /* ===== LOADER ===== */
   .loader {
     position: fixed; inset: 0; z-index: 9999;
     background: var(--wa-deep);
@@ -67,7 +63,6 @@
   .d3 { animation-delay: .2s; }
   .d4 { animation-delay: .28s; }
 
-  /* ===== HEADER ===== */
   .header {
     position: sticky; top: 0; z-index: 100;
     display: flex; align-items: center; justify-content: space-between;
@@ -86,7 +81,6 @@
   .logo { font-weight: 700; font-size: 18px; letter-spacing: .5px; }
   .logo span { color: var(--wa-green); }
 
-  /* ===== MENU ===== */
   .menu {
     position: fixed; top: 0; left: 0; height: 100%; width: 280px;
     background: #fff; z-index: 200;
@@ -123,9 +117,7 @@
     font-size: 14px; font-weight: 700;
     cursor: pointer; font-family: inherit;
     display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: background .2s, transform .15s;
   }
-  .btn-logout:active { transform: scale(.97); background: #fecaca; }
   .btn-logout svg { stroke: #b91c1c; }
 
   .overlay {
@@ -134,7 +126,6 @@
   }
   .overlay.open { opacity: 1; pointer-events: auto; }
 
-  /* ===== CONTENU ===== */
   .content { padding: 18px 16px; }
   .welcome {
     background: #fff; border-radius: 16px; padding: 18px;
@@ -144,9 +135,7 @@
     font-size: 19px; color: var(--wa-deep); margin-bottom: 4px;
     display: flex; align-items: center; gap: 8px;
   }
-  .welcome h2 .pseudo-badge {
-    color: var(--wa-green); font-weight: 800;
-  }
+  .welcome h2 .pseudo-badge { color: var(--wa-green); font-weight: 800; }
   .welcome p { font-size: 14px; color: var(--muted); }
 
   .solde {
@@ -165,25 +154,14 @@
   .solde .montant { font-size: 32px; font-weight: 700; margin: 6px 0; }
   .solde .sub { font-size: 12px; opacity: .85; }
 
-  /* ===== CARROUSEL AUTO ===== */
   .section-title {
     font-size: 15px; font-weight: 700; color: var(--wa-deep);
     margin: 22px 0 12px;
   }
-  .carousel-wrap {
-    overflow: hidden; border-radius: 16px; position: relative;
-  }
-  .carousel {
-    display: flex;
-    transition: transform .7s cubic-bezier(.4,0,.2,1);
-  }
-  .plant-card {
-    flex: 0 0 100%; background: #fff;
-    position: relative; height: 220px;
-  }
-  .plant-card img {
-    width: 100%; height: 100%; object-fit: cover; display: block;
-  }
+  .carousel-wrap { overflow: hidden; border-radius: 16px; position: relative; }
+  .carousel { display: flex; transition: transform .7s cubic-bezier(.4,0,.2,1); }
+  .plant-card { flex: 0 0 100%; background: #fff; position: relative; height: 220px; }
+  .plant-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .plant-card .overlay-grad {
     position: absolute; inset: 0;
     background: linear-gradient(to top, rgba(0,0,0,.75), transparent 60%);
@@ -204,45 +182,61 @@
     text-shadow: 0 1px 4px rgba(0,0,0,.5);
   }
   .plant-card .prix { font-size: 13px; opacity: .9; }
-  .dots {
-    display: flex; justify-content: center; gap: 6px;
-    margin-top: 12px;
-  }
+  .dots { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
   .dot {
     width: 7px; height: 7px; border-radius: 50%;
     background: #d1d5db; transition: all .3s;
   }
   .dot.active { background: var(--wa-green); width: 20px; border-radius: 4px; }
 
-  /* ===== 3 BOUTONS ===== */
+  /* ====== 4 BOUTONS (avec Accueil) ====== */
   .actions {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 10px; margin-top: 22px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 22px;
   }
   .action-btn {
     background: #fff; border-radius: 14px;
-    padding: 16px 8px;
+    padding: 18px 10px;
     display: flex; flex-direction: column; align-items: center;
-    gap: 8px; cursor: pointer;
+    gap: 10px; cursor: pointer;
     box-shadow: 0 2px 8px rgba(0,0,0,.06);
     transition: transform .2s, box-shadow .2s;
     border: 1px solid #f0f0f0;
+    position: relative;
   }
   .action-btn:active {
     transform: scale(.95);
     box-shadow: 0 1px 4px rgba(0,0,0,.1);
   }
   .action-btn .icon-circle {
-    width: 42px; height: 42px; border-radius: 50%;
+    width: 46px; height: 46px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
   }
-  .action-btn:nth-child(1) .icon-circle { background: rgba(255,106,0,.12); }
-  .action-btn:nth-child(1) svg { stroke: var(--alibaba); }
-  .action-btn:nth-child(2) .icon-circle { background: rgba(18,140,126,.12); }
-  .action-btn:nth-child(2) svg { stroke: var(--wa-dark); }
-  .action-btn:nth-child(3) .icon-circle { background: rgba(37,211,102,.15); }
-  .action-btn:nth-child(3) svg { stroke: var(--wa-green); }
-  .action-btn .label { font-size: 12px; font-weight: 600; color: #333; }
+  .action-btn .label {
+    font-size: 13px; font-weight: 700; color: #333;
+  }
+
+  /* Couleurs par bouton */
+  .action-btn.home .icon-circle { background: rgba(7,94,84,.1); }
+  .action-btn.home svg { stroke: var(--wa-deep); }
+  .action-btn.rank .icon-circle { background: rgba(255,106,0,.12); }
+  .action-btn.rank svg { stroke: var(--alibaba); }
+  .action-btn.ticket .icon-circle { background: rgba(18,140,126,.12); }
+  .action-btn.ticket svg { stroke: var(--wa-dark); }
+  .action-btn.news .icon-circle { background: rgba(37,211,102,.15); }
+  .action-btn.news svg { stroke: var(--wa-green); }
+
+  /* Badge "Actuel" pour Accueil */
+  .action-btn.current::before {
+    content: 'Actuel';
+    position: absolute; top: 8px; right: 8px;
+    background: var(--wa-green); color: #fff;
+    font-size: 9px; font-weight: 800;
+    padding: 2px 7px; border-radius: 10px;
+    text-transform: uppercase; letter-spacing: .3px;
+  }
 
   /* ===== BOTTOM NAV ===== */
   .bottom-nav {
@@ -267,13 +261,11 @@
 </head>
 <body>
 
-  <!-- LOADER -->
   <div class="loader" id="loader">
     <div class="loader-logo">Affinity<span> Network</span></div>
     <div class="spinner"></div>
   </div>
 
-  <!-- HEADER -->
   <header class="header">
     <div class="burger" onclick="toggleMenu()">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round">
@@ -286,7 +278,6 @@
     <div style="width:40px"></div>
   </header>
 
-  <!-- MENU -->
   <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
   <nav class="menu" id="menu">
     <div class="menu-header">
@@ -332,7 +323,6 @@
     </div>
   </nav>
 
-  <!-- CONTENU -->
   <main class="content">
     <div class="welcome anim d1">
       <h2>Bonjour <span class="pseudo-badge" id="userPseudo">...</span></h2>
@@ -416,9 +406,22 @@
     </div>
     <div class="dots" id="dots"></div>
 
-    <!-- 3 BOUTONS -->
+    <!-- ====== 4 BOUTONS ====== -->
     <div class="actions anim d4">
-      <div class="action-btn" onclick="go('classement.html')">
+
+      <!-- ACCUEIL (nouveau) -->
+      <div class="action-btn home current" onclick="go('dashboard.html')">
+        <div class="icon-circle">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </div>
+        <div class="label">Accueil</div>
+      </div>
+
+      <!-- CLASSEMENT -->
+      <div class="action-btn rank" onclick="go('classement.html')">
         <div class="icon-circle">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
@@ -431,7 +434,9 @@
         </div>
         <div class="label">Classement</div>
       </div>
-      <div class="action-btn" onclick="go('ticket.html')">
+
+      <!-- TICKET -->
+      <div class="action-btn ticket" onclick="go('ticket.html')">
         <div class="icon-circle">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
@@ -440,7 +445,9 @@
         </div>
         <div class="label">Ticket</div>
       </div>
-      <div class="action-btn" onclick="go('actualites.html')">
+
+      <!-- ACTUALITÉS -->
+      <div class="action-btn news" onclick="go('actualites.html')">
         <div class="icon-circle">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/>
@@ -449,12 +456,13 @@
         </div>
         <div class="label">Actualités</div>
       </div>
+
     </div>
   </main>
 
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
-    <a href="dashboard.html" class="nav-item active">
+    <a href="lancer.html" class="nav-item">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
         <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
@@ -482,63 +490,47 @@
   </nav>
 
 <script>
-  // ================= SUPABASE =================
   const SUPABASE_URL = 'https://ydwjvvlcnqsftciedpqm.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2p2dmxjbnFzZnRjaWVkcHFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMDQyNDAsImV4cCI6MjEwNTY4MDI0MH0.4uQwBGedMBjUZErd8lUM5YfA26gw96RvHdo_J-3PZCY';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-  // ================= PROTECTION + CHARGEMENT =================
   (async function init() {
     const { data: { session } } = await sb.auth.getSession();
-
-    // Pas connecté → redirection inscription
     if (!session) {
       window.location.replace('inscription.html');
       return;
     }
 
-    // Charger le profil depuis Supabase
     const { data: profile } = await sb
       .from('profiles')
       .select('nom, pseudo, solde')
       .eq('id', session.user.id)
       .maybeSingle();
 
-    // Afficher les infos
     const pseudo = profile?.pseudo || session.user.email.split('@')[0];
     const solde = profile?.solde ?? 0;
 
     document.getElementById('userPseudo').textContent = pseudo;
     document.getElementById('userSolde').textContent = formatF(solde);
 
-    // Cacher le loader
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 600);
   })();
 
-  // ================= FORMAT =================
   function formatF(n) {
-    return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' FCFA';
+    return Math.round(Number(n)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' FCFA';
   }
-
-  // ================= MENU =================
   function toggleMenu() {
     document.getElementById('menu').classList.toggle('open');
     document.getElementById('overlay').classList.toggle('open');
   }
-
-  // ================= NAVIGATION =================
-  function go(page) {
-    window.location.href = page;
-  }
-
-  // ================= DÉCONNEXION =================
+  function go(page) { window.location.href = page; }
   async function logout() {
     if (!confirm('Veux-tu vraiment te déconnecter ?')) return;
     await sb.auth.signOut();
     window.location.replace('inscription.html');
   }
 
-  // ================= CARROUSEL AUTO =================
+  // ===== CARROUSEL AUTO =====
   const carousel = document.getElementById('carousel');
   const total = carousel.children.length;
   const dotsContainer = document.getElementById('dots');
