@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Affinity Network — Ticket</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --wa-green: #25D366;
+    --wa-dark: #128C7E;
+    --wa-deep: #075E54;
+    --alibaba: #FF6A00;
+    --gold: #FFB800;
+    --bg: #f7f9f8;
+    --text: #1a1a1a;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+  }
+  body {
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    padding-bottom: 80px; min-height: 100vh; overflow-x: hidden;
+  }
+
+  /* LOADER */
+  .loader {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--wa-deep);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 22px;
+    transition: opacity .6s ease, visibility .6s ease;
+  }
+  .loader.hidden { opacity: 0; visibility: hidden; }
+  .loader-logo { font-size: 24px; font-weight: 700; color: #fff; }
+  .loader-logo span { color: var(--wa-green); }
+  .spinner {
+    width: 46px; height: 46px;
+    border: 4px solid rgba(255,255,255,.2);
+    border-top-color: var(--wa-green);
+    border-radius: 50%;
+    animation: spin .9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+  @keyframes ticketShine {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,184,0,.5); }
+    50% { box-shadow: 0 0 24px 4px rgba(255,184,0,.4); }
+  }
+  .anim { opacity: 0; animation: fadeInUp .5s ease forwards; }
+  .d1 { animation-delay: .05s; }
+  .d2 { animation-delay: .1s; }
+  .d3 { animation-delay: .15s; }
+
+  /* HEADER */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px;
+    background: var(--wa-deep); color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+  .burger {
+    cursor: pointer; width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: rgba(255,255,255,.12);
+  }
+  .burger svg { stroke: #fff; }
+  .logo { font-weight: 700; font-size: 18px; }
+  .logo span { color: var(--wa-green); }
+
+  /* MENU */
+  .menu {
+    position: fixed; top: 0; left: 0; height: 100%; width: 280px;
+    background: #fff; z-index: 200;
+    transform: translateX(-100%);
+    transition: transform .35s cubic-bezier(.4,0,.2,1);
+    box-shadow: 4px 0 20px rgba(0,0,0,.2);
+    padding-top: 18px;
+    display: flex; flex-direction: column;
+  }
+  .menu.open { transform: translateX(0); }
+  .menu-header {
+    padding: 8px 20px 18px; border-bottom: 1px solid #eee; margin-bottom: 10px;
+    font-weight: 700; color: var(--wa-deep); font-size: 17px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .menu-header svg { stroke: var(--wa-green); }
+  .menu-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 15px 22px; cursor: pointer; font-size: 15px;
+    color: #333;
+  }
+  .menu-item svg { stroke: var(--wa-dark); flex-shrink: 0; }
+  .menu-footer {
+    margin-top: auto; padding: 16px 20px 22px;
+    border-top: 1px solid #eee;
+  }
+  .btn-logout {
+    width: 100%; padding: 14px;
+    background: #fee2e2; color: #b91c1c;
+    border: none; border-radius: 12px;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-logout svg { stroke: #b91c1c; }
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.45);
+    z-index: 150; opacity: 0; pointer-events: none; transition: opacity .3s;
+  }
+  .overlay.open { opacity: 1; pointer-events: auto; }
+
+  /* CONTENU */
+  .content { padding: 18px 16px; }
+  .page-title {
+    font-size: 24px; font-weight: 800; color: var(--wa-deep);
+    margin-bottom: 4px;
+  }
+  .page-sub { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
+
+  /* SOLDE */
+  .solde-banner {
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    color: #fff; border-radius: 14px;
+    padding: 14px 18px; margin-bottom: 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 4px 14px rgba(18,140,126,.3);
+  }
+  .solde-banner .lbl {
+    font-size: 12px; opacity: .9; margin-bottom: 4px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .solde-banner .lbl svg { stroke: #fff; }
+  .solde-banner .val { font-size: 22px; font-weight: 800; }
+
+  /* LOTERIE CARD */
+  .lottery-card {
+    background: #fff; border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 6px 24px rgba(0,0,0,.08);
+    margin-bottom: 16px;
+    animation: fadeInUp .5s ease forwards; opacity: 0;
+    position: relative;
+  }
+  .lottery-card.terminated { opacity: .55; filter: grayscale(.4); }
+
+  .lc-hero {
+    height: 160px; position: relative; overflow: hidden;
+  }
+  .lc-hero img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .lc-hero::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.85) 10%, rgba(0,0,0,.3) 50%, transparent);
+  }
+  .lc-hero .lc-badge {
+    position: absolute; top: 12px; right: 12px;
+    background: var(--alibaba); color: #fff;
+    font-size: 10px; font-weight: 800;
+    padding: 5px 11px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: .5px;
+    z-index: 2;
+  }
+  .lc-hero .lc-badge.finished {
+    background: #6b7280;
+  }
+  .lc-hero .lc-jackpot {
+    position: absolute; bottom: 14px; left: 18px; right: 18px;
+    color: #fff; z-index: 2;
+  }
+  .lc-hero .lc-jackpot .lbl {
+    font-size: 11px; opacity: .9;
+    text-transform: uppercase; font-weight: 700;
+    letter-spacing: .5px; margin-bottom: 4px;
+  }
+  .lc-hero .lc-jackpot .val {
+    font-size: 26px; font-weight: 800;
+    color: var(--gold);
+    text-shadow: 0 2px 8px rgba(0,0,0,.5);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .lc-hero .lc-jackpot .val svg { stroke: var(--gold); }
+
+  .lc-body { padding: 16px 18px 18px; }
+  .lc-name {
+    font-size: 18px; font-weight: 800; color: var(--wa-deep);
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .lc-desc {
+    font-size: 13px; color: var(--muted);
+    line-height: 1.5; margin-bottom: 14px;
+  }
+
+  .lc-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 8px; margin-bottom: 14px;
+  }
+  .lc-stat {
+    background: #f7faf8; border-radius: 10px;
+    padding: 10px 6px; text-align: center;
+  }
+  .lc-stat .k {
+    font-size: 9.5px; color: var(--muted);
+    text-transform: uppercase; font-weight: 700;
+    letter-spacing: .3px; margin-bottom: 4px;
+  }
+  .lc-stat .v {
+    font-size: 13px; font-weight: 800; color: var(--text);
+  }
+  .lc-stat .v.green { color: var(--wa-dark); }
+  .lc-stat .v.orange { color: var(--alibaba); }
+
+  /* COUNTDOWN */
+  .countdown {
+    background: linear-gradient(135deg, rgba(255,106,0,.1), rgba(18,140,126,.1));
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    border: 1px dashed rgba(255,106,0,.35);
+  }
+  .countdown .cd-lbl {
+    font-size: 11px; color: var(--muted);
+    text-transform: uppercase; font-weight: 700;
+    letter-spacing: .3px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .countdown .cd-lbl svg { stroke: var(--alibaba); }
+  .countdown .cd-val {
+    font-family: 'Courier New', monospace;
+    font-size: 18px; font-weight: 800; color: var(--alibaba);
+    letter-spacing: 1px;
+  }
+
+  /* MES TICKETS */
+  .my-tickets {
+    background: linear-gradient(135deg, var(--wa-deep), var(--wa-dark));
+    color: #fff; border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: relative; overflow: hidden;
+  }
+  .my-tickets::before {
+    content: ''; position: absolute; right: -20px; top: -20px;
+    width: 80px; height: 80px; border-radius: 50%;
+    background: rgba(255,255,255,.08);
+  }
+  .my-tickets .mt-lbl {
+    font-size: 11px; opacity: .9;
+    text-transform: uppercase; font-weight: 700;
+    letter-spacing: .3px; margin-bottom: 3px;
+  }
+  .my-tickets .mt-val {
+    font-size: 20px; font-weight: 800;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .my-tickets .mt-val svg { stroke: var(--gold); }
+
+  /* BOUTON ACHETER */
+  .btn-buy {
+    width: 100%; border: none;
+    background: linear-gradient(135deg, var(--alibaba), #FF8A3D);
+    color: #fff; padding: 15px;
+    border-radius: 14px; font-size: 15px; font-weight: 800;
+    cursor: pointer; font-family: inherit;
+    box-shadow: 0 4px 14px rgba(255,106,0,.35);
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    transition: transform .15s;
+    position: relative;
+    animation: ticketShine 3s ease-in-out infinite;
+  }
+  .btn-buy:active { transform: scale(.97); }
+  .btn-buy svg { stroke: #fff; }
+  .btn-buy:disabled {
+    background: #d1d5db; cursor: not-allowed;
+    animation: none; box-shadow: none;
+  }
+  .btn-buy:disabled svg { stroke: #6b7280; }
+  .btn-buy .txt { color: inherit; }
+
+  /* GAGNANTS */
+  .section-title {
+    font-size: 15px; font-weight: 700; color: var(--wa-deep);
+    margin: 22px 0 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title svg { stroke: var(--wa-green); }
+
+  .winner-card {
+    background: linear-gradient(135deg, #fffef5, #fff);
+    border: 2px solid var(--gold);
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 4px 12px rgba(255,184,0,.15);
+    animation: fadeInUp .4s ease forwards; opacity: 0;
+  }
+  .winner-card .wc-medal {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), #FFD966);
+    color: #fff; font-size: 16px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(255,184,0,.4);
+  }
+  .winner-card .wc-body { flex: 1; min-width: 0; }
+  .winner-card .wc-name {
+    font-size: 14px; font-weight: 800; color: var(--wa-deep);
+    margin-bottom: 3px;
+  }
+  .winner-card .wc-meta {
+    font-size: 11px; color: var(--muted);
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap;
+  }
+  .winner-card .wc-meta .dot { color: #d1d5db; }
+  .winner-card .wc-amount {
+    font-size: 15px; font-weight: 800; color: var(--alibaba);
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* MES TICKETS LISTE */
+  .my-ticket {
+    background: #fff; border-radius: 12px;
+    padding: 12px 14px; margin-bottom: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px;
+  }
+  .my-ticket .mt-num {
+    font-family: 'Courier New', monospace;
+    font-size: 13px; font-weight: 700; color: var(--wa-deep);
+    letter-spacing: .5px;
+  }
+  .my-ticket .mt-info {
+    font-size: 10.5px; color: var(--muted);
+    display: flex; align-items: center; gap: 6px;
+    margin-top: 3px;
+  }
+  .my-ticket .mt-status {
+    font-size: 10px; font-weight: 800;
+    padding: 3px 8px; border-radius: 8px;
+    text-transform: uppercase; letter-spacing: .3px;
+    flex-shrink: 0;
+  }
+  .mt-status.perdu {
+    background: rgba(107,114,128,.15); color: #4b5563;
+  }
+  .mt-status.gagnant {
+    background: linear-gradient(135deg, var(--gold), #FFD966);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(255,184,0,.3);
+  }
+  .mt-status.en_attente {
+    background: rgba(37,211,102,.15); color: #166534;
+  }
+
+  /* SKELETON */
+  .sk-card {
+    background: #fff; border-radius: 20px;
+    overflow: hidden; margin-bottom: 16px;
+    box-shadow: 0 6px 24px rgba(0,0,0,.05);
+  }
+  .sk-img {
+    height: 160px;
+    background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+    background-size: 200% 100%; animation: shimmer 1.4s infinite;
+  }
+  .sk-body { padding: 16px; }
+  .sk-line {
+    height: 12px; border-radius: 6px;
+    background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+    background-size: 200% 100%; animation: shimmer 1.4s infinite;
+    margin-bottom: 8px;
+  }
+  .sk-line.w1 { width: 60%; height: 16px; }
+  .sk-line.w2 { width: 90%; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(0,0,0,.6);
+    display: flex; align-items: flex-end; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity .3s; backdrop-filter: blur(3px);
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: auto; }
+  .modal {
+    background: #fff; width: 100%; max-width: 500px;
+    border-radius: 24px 24px 0 0;
+    padding: 20px;
+    transform: translateY(100%);
+    transition: transform .4s cubic-bezier(.4,0,.2,1);
+    max-height: 92vh; overflow-y: auto;
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-handle {
+    width: 42px; height: 5px; border-radius: 5px;
+    background: #d1d5db; margin: 0 auto 16px;
+  }
+  .modal-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .modal-title {
+    font-size: 18px; font-weight: 800; color: var(--wa-deep);
+  }
+  .modal-close {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #f3f4f6; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal-close svg { stroke: var(--muted); }
+
+  .qty-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 10px; margin-bottom: 16px;
+  }
+  .qty-btn {
+    background: #fff; border: 2px solid var(--border);
+    border-radius: 14px; padding: 16px 8px;
+    cursor: pointer; font-family: inherit;
+    transition: all .2s;
+    text-align: center;
+    position: relative;
+  }
+  .qty-btn:active { transform: scale(.97); }
+  .qty-btn.selected {
+    border-color: var(--wa-green);
+    background: linear-gradient(135deg, rgba(18,140,126,.08), rgba(37,211,102,.12));
+    box-shadow: 0 4px 12px rgba(18,140,126,.2);
+  }
+  .qty-btn .q-qty {
+    font-size: 22px; font-weight: 800; color: var(--text);
+    line-height: 1;
+  }
+  .qty-btn .q-lbl {
+    font-size: 11px; color: var(--muted);
+    font-weight: 600; margin-top: 4px;
+    text-transform: uppercase;
+  }
+  .qty-btn .q-price {
+    font-size: 13px; font-weight: 800; color: var(--alibaba);
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+  }
+  .qty-btn .q-pop {
+    position: absolute; top: -8px; right: 6px;
+    background: var(--alibaba); color: #fff;
+    font-size: 9px; font-weight: 800;
+    padding: 3px 8px; border-radius: 10px;
+    text-transform: uppercase; letter-spacing: .3px;
+  }
+
+  .m-summary {
+    background: #f7faf8; border-radius: 12px;
+    padding: 14px 16px; margin-bottom: 16px;
+  }
+  .m-summary .sr {
+    display: flex; justify-content: space-between;
+    font-size: 13px; margin-bottom: 6px;
+  }
+  .m-summary .sr:last-child {
+    margin-bottom: 0; padding-top: 8px;
+    border-top: 1px solid var(--border);
+    font-size: 15px; font-weight: 800;
+  }
+  .m-summary .sr.total .k { color: var(--wa-deep); }
+  .m-summary .sr.total .v { color: var(--alibaba); font-size: 17px; }
+
+  .btn-confirm {
+    width: 100%; border: none;
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    color: #fff; padding: 16px;
+    border-radius: 14px; font-size: 16px; font-weight: 800;
+    cursor: pointer; font-family: inherit;
+    box-shadow: 0 4px 14px rgba(18,140,126,.35);
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    transition: transform .15s;
+  }
+  .btn-confirm:active { transform: scale(.97); }
+  .btn-confirm svg { stroke: #fff; }
+  .btn-confirm:disabled {
+    background: #d1d5db; box-shadow: none; cursor: not-allowed;
+  }
+  .btn-confirm .spin-small {
+    width: 18px; height: 18px;
+    border: 2.5px solid rgba(255,255,255,.4);
+    border-top-color: #fff; border-radius: 50%;
+    animation: spin .7s linear infinite;
+    display: none;
+  }
+  .btn-confirm.loading .spin-small { display: inline-block; }
+  .btn-confirm.loading .icon-check { display: none; }
+
+  /* EMPTY */
+  .empty {
+    text-align: center; padding: 30px 20px;
+    color: var(--muted); font-size: 13px;
+    background: #fff; border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  }
+  .empty svg { stroke: #d1d5db; margin-bottom: 10px; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    display: flex; background: #fff;
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 -2px 12px rgba(0,0,0,.06);
+    z-index: 100;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    padding: 9px 0 10px; cursor: pointer;
+    color: #9ca3af; font-size: 11px; gap: 4px;
+    text-decoration: none; font-weight: 500;
+  }
+  .nav-item svg { stroke: #9ca3af; }
+  .nav-item.active { color: var(--wa-dark); font-weight: 700; }
+  .nav-item.active svg { stroke: var(--wa-green); }
+
+  /* TOAST */
+  .toast {
+    position: fixed; left: 50%; bottom: 100px;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--wa-deep); color: #fff;
+    padding: 12px 22px; border-radius: 30px;
+    font-size: 14px; font-weight: 600;
+    box-shadow: 0 6px 20px rgba(0,0,0,.25);
+    opacity: 0; pointer-events: none;
+    transition: all .3s; z-index: 1000;
+    display: flex; align-items: center; gap: 8px;
+    max-width: 90%;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast svg { stroke: var(--wa-green); flex-shrink: 0; }
+  .toast.error { background: #b91c1c; }
+  .toast.error svg { stroke: #fff; }
+  .toast.win { background: linear-gradient(135deg, var(--gold), #FFD966); }
+  .toast.win svg { stroke: #fff; }
+</style>
+</head>
+<body>
+
+  <div class="loader" id="loader">
+    <div class="loader-logo">Affinity<span> Network</span></div>
+    <div class="spinner"></div>
+  </div>
+
+  <header class="header">
+    <div class="burger" onclick="toggleMenu()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </div>
+    <div class="logo">Affinity<span> Network</span></div>
+    <div style="width:40px"></div>
+  </header>
+
+  <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+  <nav class="menu" id="menu">
+    <div class="menu-header">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01"/>
+      </svg>
+      Affinity Network
+    </div>
+    <div class="menu-item" onclick="go('travail.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <rect x="2" y="7" width="20" height="14" rx="2"/>
+      </svg>
+      Travail
+    </div>
+    <div class="menu-item" onclick="go('support.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+      </svg>
+      Support
+    </div>
+    <div class="menu-item" onclick="go('faq.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10"/>
+      </svg>
+      FAQ
+    </div>
+    <div class="menu-item" onclick="go('entreprise.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M3 21h18M5 21V7l7-4 7 4v14"/>
+      </svg>
+      Notre entreprise
+    </div>
+    <div class="menu-footer">
+      <button class="btn-logout" onclick="logout()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Se déconnecter
+      </button>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1 class="page-title">Ticket Loterie</h1>
+    <p class="page-sub">Achète des tickets et tente de gagner le jackpot</p>
+
+    <div class="solde-banner anim d1">
+      <div>
+        <div class="lbl">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+          </svg>
+          Mon solde
+        </div>
+        <div class="val" id="userSolde">0 F</div>
+      </div>
+    </div>
+
+    <div id="lotteriesList">
+      <div class="sk-card">
+        <div class="sk-img"></div>
+        <div class="sk-body">
+          <div class="sk-line w1"></div>
+          <div class="sk-line w2"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+        <path d="M4 22h16"/>
+        <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+        <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+      </svg>
+      Derniers gagnants
+    </div>
+    <div id="winnersList"></div>
+
+    <div class="section-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
+      </svg>
+      Mes tickets récents
+    </div>
+    <div id="myTicketsList"></div>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="lancer.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+        <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+      </svg>
+      Lancer
+    </a>
+    <a href="retirer.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+      </svg>
+      Retirer
+    </a>
+    <a href="travail.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="7" width="20" height="14" rx="2"/>
+      </svg>
+      Travail
+    </a>
+    <a href="moi.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+      </svg>
+      Moi
+    </a>
+  </nav>
+
+  <!-- MODAL ACHAT -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-head">
+        <div class="modal-title" id="buyTitle">Acheter des tickets</div>
+        <button class="modal-close" onclick="closeModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+    <span id="toastText">—</span>
+  </div>
+
+<script>
+  // ================= SUPABASE =================
+  const SUPABASE_URL = 'https://ydwjvvlcnqsftciedpqm.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2p2dmxjbnFzZnRjaWVkcHFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMDQyNDAsImV4cCI6MjEwNTY4MDI0MH0.4uQwBGedMBjUZErd8lUM5YfA26gw96RvHdo_J-3PZCY';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  let CURRENT_USER = null;
+  let USER_SOLDE = 0;
+  let LOTTERIES = [];
+  let MY_TICKETS = [];
+  let SELECTED_LOTTERY = null;
+  let SELECTED_QTY = 1;
+  let countdownTimers = {};
+
+  // ================= INIT =================
+  (async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.replace('inscription.html'); return; }
+    CURRENT_USER = session.user;
+
+    await Promise.all([
+      loadProfile(),
+      loadLotteries(),
+      loadWinners(),
+      loadMyTickets()
+    ]);
+
+    setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
+  })();
+
+  // ================= PROFIL =================
+  async function loadProfile() {
+    const { data } = await sb.from('profiles')
+      .select('solde').eq('id', CURRENT_USER.id).maybeSingle();
+    USER_SOLDE = Number(data?.solde ?? 0);
+    document.getElementById('userSolde').textContent = formatF(USER_SOLDE);
+  }
+
+  // ================= LOTERIES =================
+  async function loadLotteries() {
+    const { data, error } = await sb.from('loteries')
+      .select('*').eq('actif', true)
+      .order('ordre', { ascending: true });
+    if (error || !data) return;
+    LOTTERIES = data;
+
+    // Compter mes tickets par loterie
+    const { data: myTix } = await sb.from('tickets_loterie')
+      .select('loterie_id').eq('user_id', CURRENT_USER.id);
+    const countMap = {};
+    (myTix || []).forEach(t => {
+      countMap[t.loterie_id] = (countMap[t.loterie_id] || 0) + 1;
+    });
+
+    renderLotteries(countMap);
+    startCountdowns();
+  }
+
+  function renderLotteries(countMap) {
+    const list = document.getElementById('lotteriesList');
+    if (LOTTERIES.length === 0) {
+      list.innerHTML = emptyBox('Aucune loterie active');
+      return;
+    }
+
+    list.innerHTML = LOTTERIES.map((l, i) => {
+      const myCount = countMap[l.id] || 0;
+      const isFinished = l.statut === 'termine' || new Date(l.date_tirage) < new Date();
+      return `
+        <div class="lottery-card ${isFinished ? 'terminated' : ''}" style="animation-delay:${i * .08}s">
+          <div class="lc-hero">
+            <img src="${l.image_url || defaultImg()}" alt="${escapeHtml(l.nom)}">
+            <span class="lc-badge ${isFinished ? 'finished' : ''}">
+              ${isFinished ? 'Terminé' : 'En cours'}
+            </span>
+            <div class="lc-jackpot">
+              <div class="lbl">Jackpot à gagner</div>
+              <div class="val">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                </svg>
+                ${formatF(l.montant_lot)}
+              </div>
+            </div>
+          </div>
+          <div class="lc-body">
+            <div class="lc-name">${escapeHtml(l.nom)}</div>
+            <div class="lc-desc">${escapeHtml(l.description || '')}</div>
+
+            <div class="lc-stats">
+              <div class="lc-stat">
+                <div class="k">Prix/ticket</div>
+                <div class="v orange">${formatF(l.prix_ticket)}</div>
+              </div>
+              <div class="lc-stat">
+                <div class="k">Gagnants</div>
+                <div class="v">${l.nombre_gagnants}</div>
+              </div>
+              <div class="lc-stat">
+                <div class="k">Mes tickets</div>
+                <div class="v green">${myCount}</div>
+              </div>
+            </div>
+
+            ${!isFinished ? `
+              <div class="countdown">
+                <div class="cd-lbl">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  Tirage dans
+                </div>
+                <div class="cd-val" id="cd-${l.id}">--:--:--</div>
+              </div>
+            ` : ''}
+
+            ${myCount > 0 ? `
+              <div class="my-tickets">
+                <div>
+                  <div class="mt-lbl">Mes chances</div>
+                  <div class="mt-val">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
+                    </svg>
+                    ${myCount} ticket${myCount > 1 ? 's' : ''}
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+
+            ${!isFinished ? `
+              <button class="btn-buy" onclick="openBuyModal('${l.id}')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
+                </svg>
+                Acheter des tickets
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ================= COUNTDOWN =================
+  function startCountdowns() {
+    Object.values(countdownTimers).forEach(clearInterval);
+    countdownTimers = {};
+
+    LOTTERIES.forEach(l => {
+      const el = document.getElementById('cd-' + l.id);
+      if (!el) return;
+      const target = new Date(l.date_tirage).getTime();
+      const tick = () => {
+        const now = Date.now();
+        const diff = target - now;
+        if (diff <= 0) {
+          el.textContent = 'Tirage imminent';
+          return;
+        }
+        const days = Math.floor(diff / 86400000);
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        el.textContent = days > 0
+          ? `${days}j ${pad(h)}:${pad(m)}:${pad(s)}`
+          : `${pad(h)}:${pad(m)}:${pad(s)}`;
+      };
+      tick();
+      countdownTimers[l.id] = setInterval(tick, 1000);
+    });
+  }
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  // ================= GAGNANTS =================
+  async function loadWinners() {
+    const { data, error } = await sb.from('gagnants_loterie')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(10);
+    if (error || !data || data.length === 0) {
+      document.getElementById('winnersList').innerHTML = emptyBox('Aucun gagnant pour le moment');
+      return;
+    }
+    document.getElementById('winnersList').innerHTML = data.map((w, i) => `
+      <div class="winner-card" style="animation-delay:${i * .05}s">
+        <div class="wc-medal">${w.position}</div>
+        <div class="wc-body">
+          <div class="wc-name">${escapeHtml(w.user_nom || w.user_pseudo || 'Anonyme')}</div>
+          <div class="wc-meta">
+            <span>${escapeHtml(w.loterie_nom || '')}</span>
+            <span class="dot">•</span>
+            <span>${escapeHtml(w.numero_ticket || '')}</span>
+            <span class="dot">•</span>
+            <span>${timeAgo(w.created_at)}</span>
+          </div>
+        </div>
+        <div class="wc-amount">+${formatF(w.montant_gagne)}</div>
+      </div>
+    `).join('');
+  }
+
+  // ================= MES TICKETS =================
+  async function loadMyTickets() {
+    const { data, error } = await sb.from('tickets_loterie')
+      .select('*, loteries(nom, date_tirage, statut)')
+      .eq('user_id', CURRENT_USER.id)
+      .order('created_at', { ascending: false })
+      .limit(15);
+    if (error || !data || data.length === 0) {
+      document.getElementById('myTicketsList').innerHTML = emptyBox('Tu n\'as pas encore de ticket');
+      return;
+    }
+    MY_TICKETS = data;
+    document.getElementById('myTicketsList').innerHTML = data.map(t => {
+      const drawDate = t.loteries?.date_tirage ? new Date(t.loteries.date_tirage) : null;
+      const drawn = drawDate && drawDate < new Date();
+      let statusClass, statusLabel;
+      if (t.gagnant) { statusClass = 'gagnant'; statusLabel = 'Gagnant'; }
+      else if (drawn) { statusClass = 'perdu'; statusLabel = 'Perdu'; }
+      else { statusClass = 'en_attente'; statusLabel = 'En attente'; }
+      return `
+        <div class="my-ticket">
+          <div>
+            <div class="mt-num">${escapeHtml(t.numero_ticket)}</div>
+            <div class="mt-info">
+              <span>${escapeHtml(t.loteries?.nom || '')}</span>
+              <span>•</span>
+              <span>${timeAgo(t.created_at)}</span>
+            </div>
+          </div>
+          <div class="mt-status ${statusClass}">${statusLabel}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ================= MODAL ACHAT =================
+  function openBuyModal(loterieId) {
+    const l = LOTTERIES.find(x => x.id === loterieId);
+    if (!l) return;
+    SELECTED_LOTTERY = l;
+    SELECTED_QTY = 1;
+
+    document.getElementById('buyTitle').textContent = l.nom;
+
+    const options = [
+      { qty: 1, pop: null },
+      { qty: 5, pop: '+1 gratuit', bonus: 1 },
+      { qty: 10, pop: '+3 gratuits', bonus: 3 },
+      { qty: 20, pop: '+8 gratuits', bonus: 8 }
+    ];
+
+    document.getElementById('modalContent').innerHTML = `
+      <div style="font-size:13px;color:var(--muted);margin-bottom:14px;text-align:center;">
+        Prix unitaire : <strong style="color:var(--alibaba);">${formatF(l.prix_ticket)}</strong>
+      </div>
+      <div class="qty-grid">
+        ${options.map(o => `
+          <div class="qty-btn ${o.qty === 1 ? 'selected' : ''}" data-qty="${o.qty}" data-bonus="${o.bonus || 0}" onclick="selectQty(this, ${o.qty}, ${o.bonus || 0})">
+            ${o.pop ? `<div class="q-pop">${o.pop}</div>` : ''}
+            <div class="q-qty">${o.qty}</div>
+            <div class="q-lbl">${o.qty === 1 ? 'ticket' : 'tickets'}</div>
+            <div class="q-price">${formatF(l.prix_ticket * o.qty)}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="m-summary" id="buySummary"></div>
+      <button class="btn-confirm" id="btnConfirm" onclick="confirmBuy()">
+        <span class="spin-small"></span>
+        <svg class="icon-check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span class="txt" id="btnConfirmText">Confirmer l'achat</span>
+      </button>
+    `;
+
+    updateBuySummary();
+    document.getElementById('modalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function selectQty(el, qty, bonus) {
+    SELECTED_QTY = qty;
+    document.querySelectorAll('.qty-btn').forEach(x => x.classList.remove('selected'));
+    el.classList.add('selected');
+    updateBuySummary();
+  }
+
+  function updateBuySummary() {
+    const total = SELECTED_LOTTERY.prix_ticket * SELECTED_QTY;
+    const sufficient = USER_SOLDE >= total;
+
+    document.getElementById('buySummary').innerHTML = `
+      <div class="sr"><span class="k">Prix unitaire</span><span>${formatF(SELECTED_LOTTERY.prix_ticket)}</span></div>
+      <div class="sr"><span class="k">Quantité</span><span>${SELECTED_QTY} ticket${SELECTED_QTY > 1 ? 's' : ''}</span></div>
+      <div class="sr total">
+        <span class="k">Total à payer</span>
+        <span class="v">${formatF(total)}</span>
+      </div>
+    `;
+
+    const btn = document.getElementById('btnConfirm');
+    if (!sufficient) {
+      btn.disabled = true;
+      document.getElementById('btnConfirmText').textContent = 'Solde insuffisant';
+    } else {
+      btn.disabled = false;
+      document.getElementById('btnConfirmText').textContent = 'Confirmer l\'achat';
+    }
+  }
+
+  async function confirmBuy() {
+    const btn = document.getElementById('btnConfirm');
+    btn.classList.add('loading');
+    document.getElementById('btnConfirmText').textContent = 'Achat...';
+
+    const { data, error } = await sb.rpc('acheter_tickets', {
+      p_loterie_id: SELECTED_LOTTERY.id,
+      p_quantite: SELECTED_QTY
+    });
+
+    btn.classList.remove('loading');
+
+    if (error) {
+      let msg = error.message || 'Erreur';
+      if (msg.includes('insuffisant')) msg = 'Solde insuffisant';
+      showToast(msg, true);
+      document.getElementById('btnConfirmText').textContent = 'Confirmer l\'achat';
+      await loadProfile();
+      updateBuySummary();
+      return;
+    }
+
+    USER_SOLDE = Number(data.nouveau_solde ?? USER_SOLDE);
+    document.getElementById('userSolde').textContent = formatF(USER_SOLDE);
+
+    closeModal();
+    showToast(`${SELECTED_QTY} ticket${SELECTED_QTY > 1 ? 's' : ''} acheté${SELECTED_QTY > 1 ? 's' : ''} ! Bonne chance 🎉`);
+    await Promise.all([loadLotteries(), loadMyTickets()]);
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function closeModalOutside(e) {
+    if (e.target.id === 'modalOverlay') closeModal();
+  }
+
+  // ================= UTILITAIRES =================
+  function formatF(n) {
+    return Math.round(Number(n || 0)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F';
+  }
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function defaultImg() {
+    return 'https://images.unsplash.com/photo-1607083206968-13611e3d76db?w=800';
+  }
+  function emptyBox(msg) {
+    return `<div class="empty">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+      </svg>
+      <div>${msg}</div>
+    </div>`;
+  }
+  function timeAgo(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+    if (diff < 60) return 'À l\'instant';
+    if (diff < 3600) return `Il y a ${Math.floor(diff/60)} min`;
+    if (diff < 86400) return `Il y a ${Math.floor(diff/3600)} h`;
+    if (diff < 604800) return `Il y a ${Math.floor(diff/86400)} j`;
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+  }
+  function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastText').textContent = msg;
+    t.className = 'toast show' + (isError ? ' error' : '');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+  function toggleMenu() {
+    document.getElementById('menu').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('open');
+  }
+  function go(page) { window.location.href = page; }
+  async function logout() {
+    if (!confirm('Veux-tu vraiment te déconnecter ?')) return;
+    await sb.auth.signOut();
+    window.location.replace('inscription.html');
+  }
+</script>
+</body>
+</html>
