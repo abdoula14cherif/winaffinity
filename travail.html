@@ -17,6 +17,7 @@
     --text: #1a1a1a;
     --muted: #6b7280;
     --border: #e5e7eb;
+    --danger: #dc2626;
   }
   body {
     font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -128,7 +129,24 @@
     font-size: 22px; font-weight: 700; color: var(--wa-deep);
     margin-bottom: 4px;
   }
-  .page-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+  .page-sub { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+
+  /* BANNIÈRE SOLDE */
+  .solde-banner {
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    color: #fff; border-radius: 14px;
+    padding: 14px 18px; margin-bottom: 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 4px 14px rgba(18,140,126,.3);
+  }
+  .solde-banner .lbl {
+    font-size: 12px; opacity: .9;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .solde-banner .lbl svg { stroke: #fff; }
+  .solde-banner .val {
+    font-size: 22px; font-weight: 800;
+  }
 
   /* SKELETON */
   .skeleton {
@@ -174,7 +192,6 @@
     width: 100%; height: 100%; object-fit: cover; display: block;
     transition: transform .4s;
   }
-  .plant-card:hover .photo img { transform: scale(1.05); }
   .plant-card .photo::after {
     content: ''; position: absolute; inset: 0;
     background: linear-gradient(to top, rgba(0,0,0,.55), transparent 60%);
@@ -227,9 +244,7 @@
     text-align: center; padding: 60px 20px;
     color: var(--muted); font-size: 14px;
   }
-  .empty svg {
-    stroke: #d1d5db; margin-bottom: 12px;
-  }
+  .empty svg { stroke: #d1d5db; margin-bottom: 12px; }
 
   /* MODAL */
   .modal-overlay {
@@ -284,6 +299,30 @@
     z-index: 2; display: flex; align-items: center; gap: 8px;
   }
   .modal-photo .tag-plant svg { stroke: #fff; }
+
+  /* SOLDE UTILISATEUR DANS MODAL */
+  .user-solde-box {
+    background: linear-gradient(135deg, rgba(18,140,126,.1), rgba(37,211,102,.14));
+    border-radius: 12px; padding: 12px 16px;
+    margin-bottom: 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    border: 1px solid rgba(18,140,126,.2);
+  }
+  .user-solde-box .lbl {
+    font-size: 12px; font-weight: 600; color: var(--wa-deep);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .user-solde-box .lbl svg { stroke: var(--wa-dark); }
+  .user-solde-box .val {
+    font-size: 17px; font-weight: 800; color: var(--wa-dark);
+  }
+  .user-solde-box.insufficient {
+    background: linear-gradient(135deg, rgba(220,38,38,.08), rgba(220,38,38,.14));
+    border-color: rgba(220,38,38,.3);
+  }
+  .user-solde-box.insufficient .lbl { color: var(--danger); }
+  .user-solde-box.insufficient .lbl svg { stroke: var(--danger); }
+  .user-solde-box.insufficient .val { color: var(--danger); }
 
   .details {
     background: #f7faf8; border-radius: 14px;
@@ -354,13 +393,19 @@
     border-radius: 14px; font-size: 16px; font-weight: 700;
     cursor: pointer; font-family: inherit;
     box-shadow: 0 4px 14px rgba(18,140,126,.35);
-    transition: transform .15s, box-shadow .2s;
+    transition: transform .15s, box-shadow .2s, background .2s;
     display: flex; align-items: center; justify-content: center;
     gap: 8px;
   }
   .btn-activate:active { transform: scale(.97); }
   .btn-activate svg { stroke: #fff; }
-  .btn-activate.loading { opacity: .8; pointer-events: none; }
+  .btn-activate:disabled {
+    background: #d1d5db; cursor: not-allowed;
+    box-shadow: none; opacity: .9;
+  }
+  .btn-activate:disabled svg { stroke: #6b7280; }
+  .btn-activate:disabled .txt { color: #4b5563; }
+  .btn-activate.loading { opacity: .85; pointer-events: none; }
   .btn-activate .spin-small {
     width: 18px; height: 18px;
     border: 2.5px solid rgba(255,255,255,.4);
@@ -478,35 +523,29 @@
     <h1 class="page-title">Travail</h1>
     <p class="page-sub">Active une plantation et gagne chaque jour</p>
 
+    <!-- BANNIÈRE SOLDE -->
+    <div class="solde-banner anim">
+      <div class="lbl">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+        </svg>
+        Solde disponible
+      </div>
+      <div class="val" id="userSolde">0 F</div>
+    </div>
+
     <div id="plantsList">
-      <!-- Skeletons -->
       <div class="skeleton">
         <div class="sk-img"></div>
         <div class="sk-body">
-          <div>
-            <div class="sk-line w1"></div>
-            <div class="sk-line w2"></div>
-          </div>
+          <div><div class="sk-line w1"></div><div class="sk-line w2"></div></div>
           <div class="sk-btn"></div>
         </div>
       </div>
       <div class="skeleton">
         <div class="sk-img"></div>
         <div class="sk-body">
-          <div>
-            <div class="sk-line w1"></div>
-            <div class="sk-line w2"></div>
-          </div>
-          <div class="sk-btn"></div>
-        </div>
-      </div>
-      <div class="skeleton">
-        <div class="sk-img"></div>
-        <div class="sk-body">
-          <div>
-            <div class="sk-line w1"></div>
-            <div class="sk-line w2"></div>
-          </div>
+          <div><div class="sk-line w1"></div><div class="sk-line w2"></div></div>
           <div class="sk-btn"></div>
         </div>
       </div>
@@ -560,6 +599,17 @@
         </button>
       </div>
 
+      <!-- SOLDE UTILISATEUR -->
+      <div class="user-solde-box" id="userSoldeBox">
+        <div class="lbl">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+          </svg>
+          Mon solde
+        </div>
+        <div class="val" id="modalUserSolde">0 F</div>
+      </div>
+
       <div class="modal-photo">
         <img id="modalImg" src="" alt="">
         <div class="tag-plant">
@@ -594,26 +644,22 @@
       <div class="period-title">Période d'activation</div>
       <div class="periods" id="periods">
         <button class="period-btn active" data-days="1" onclick="selectPeriod(this,1)">
-          <div class="num">1</div>
-          <div class="unit">jour</div>
+          <div class="num">1</div><div class="unit">jour</div>
         </button>
         <button class="period-btn" data-days="7" onclick="selectPeriod(this,7)">
-          <div class="num">7</div>
-          <div class="unit">jours</div>
+          <div class="num">7</div><div class="unit">jours</div>
         </button>
         <button class="period-btn" data-days="14" onclick="selectPeriod(this,14)">
-          <div class="num">14</div>
-          <div class="unit">jours</div>
+          <div class="num">14</div><div class="unit">jours</div>
         </button>
         <button class="period-btn" data-days="28" onclick="selectPeriod(this,28)">
-          <div class="num">28</div>
-          <div class="unit">jours</div>
+          <div class="num">28</div><div class="unit">jours</div>
         </button>
       </div>
 
       <div class="calc-box">
         <div class="calc-row">
-          <span class="k">Activation</span>
+          <span class="k">Activation (débitée)</span>
           <span class="v" id="calcActivation">—</span>
         </div>
         <div class="calc-row">
@@ -650,13 +696,13 @@
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
   let CURRENT_USER = null;
+  let USER_SOLDE = 0;
   let PLANTS = [];
   let currentPlant = null;
   let currentDays = 1;
 
   // ================= INIT =================
   (async function init() {
-    // Protection
     const { data: { session } } = await sb.auth.getSession();
     if (!session) {
       window.location.replace('inscription.html');
@@ -664,12 +710,27 @@
     }
     CURRENT_USER = session.user;
 
-    // Charger les plantations
-    await loadPlantations();
+    await Promise.all([loadProfile(), loadPlantations()]);
 
-    // Cacher loader
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
   })();
+
+  // ================= CHARGER PROFIL =================
+  async function loadProfile() {
+    const { data, error } = await sb
+      .from('profiles')
+      .select('solde')
+      .eq('id', CURRENT_USER.id)
+      .maybeSingle();
+
+    if (error) {
+      console.warn('Erreur profil:', error);
+      return;
+    }
+
+    USER_SOLDE = Number(data?.solde ?? 0);
+    document.getElementById('userSolde').textContent = formatF(USER_SOLDE);
+  }
 
   // ================= CHARGER PLANTATIONS =================
   async function loadPlantations() {
@@ -688,7 +749,6 @@
             <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
           <div>Erreur de chargement</div>
-          <div style="font-size:12px;margin-top:6px;">${error.message}</div>
         </div>`;
       return;
     }
@@ -697,7 +757,7 @@
       list.innerHTML = `
         <div class="empty">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
-            <path d="M7 20h10M10 20c5.5-2.5.8-6.4 3-10M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/>
+            <path d="M7 20h10M10 20c5.5-2.5.8-6.4 3-10"/>
           </svg>
           <div>Aucune plantation disponible</div>
         </div>`;
@@ -743,7 +803,6 @@
       list.appendChild(card);
     });
 
-    // Attacher les events
     document.querySelectorAll('.btn-voir').forEach(btn => {
       btn.addEventListener('click', () => openModal(btn.dataset.id));
     });
@@ -762,6 +821,7 @@
     document.getElementById('modalImg').src = p.image_url;
     document.getElementById('detailActivation').textContent = formatF(p.montant_activation);
     document.getElementById('detailGain').textContent = formatF(p.gain_journalier);
+    document.getElementById('modalUserSolde').textContent = formatF(USER_SOLDE);
 
     document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
     document.querySelector('.period-btn[data-days="1"]').classList.add('active');
@@ -787,8 +847,10 @@
     updateCalc();
   }
 
+  // ================= CALCUL + VÉRIF SOLDE =================
   function updateCalc() {
     if (!currentPlant) return;
+
     const act = Number(currentPlant.montant_activation);
     const gain = Number(currentPlant.gain_journalier);
     const gainsTotal = gain * currentDays;
@@ -798,45 +860,64 @@
     document.getElementById('calcGains').textContent = formatF(gainsTotal);
     document.getElementById('calcDaysLabel').textContent = currentDays + (currentDays === 1 ? ' jour' : ' jours');
     document.getElementById('calcTotal').textContent = formatF(total);
+
+    // === VÉRIFICATION DU SOLDE ===
+    const box = document.getElementById('userSoldeBox');
+    const btn = document.getElementById('btnActivate');
+    const btnText = document.getElementById('btnActivateText');
+
+    if (USER_SOLDE < act) {
+      box.classList.add('insufficient');
+      btn.disabled = true;
+      btnText.textContent = 'Solde insuffisant';
+    } else {
+      box.classList.remove('insufficient');
+      btn.disabled = false;
+      btnText.textContent = 'Activer maintenant';
+    }
   }
 
-  // ================= ACTIVER =================
+  // ================= ACTIVER (RPC) =================
   async function activate() {
     if (!currentPlant || !CURRENT_USER) return;
+
+    const act = Number(currentPlant.montant_activation);
+
+    // Double vérification côté client
+    if (USER_SOLDE < act) {
+      showToast('Solde insuffisant', true);
+      return;
+    }
 
     const btn = document.getElementById('btnActivate');
     btn.classList.add('loading');
     document.getElementById('btnActivateText').textContent = 'Activation...';
 
-    const act = Number(currentPlant.montant_activation);
-    const gain = Number(currentPlant.gain_journalier);
-    const gainsTotal = gain * currentDays;
-    const total = act + gainsTotal;
-
-    const dateDebut = new Date();
-    const dateFin = new Date(dateDebut.getTime() + currentDays * 24 * 60 * 60 * 1000);
-
-    const { error } = await sb.from('activations').insert({
-      user_id: CURRENT_USER.id,
-      plantation_id: currentPlant.id,
-      plantation_nom: currentPlant.nom,
-      montant_activation: act,
-      gain_journalier: gain,
-      periode_jours: currentDays,
-      gains_totaux: gainsTotal,
-      total_a_percevoir: total,
-      statut: 'active',
-      date_debut: dateDebut.toISOString(),
-      date_fin: dateFin.toISOString()
+    // === Appel de la fonction Postgres atomique ===
+    const { data, error } = await sb.rpc('activer_plantation', {
+      p_plantation_id: currentPlant.id,
+      p_periode_jours: currentDays
     });
 
     btn.classList.remove('loading');
-    document.getElementById('btnActivateText').textContent = 'Activer maintenant';
 
     if (error) {
-      showToast('Erreur : ' + error.message, true);
+      // Extraire un message propre
+      let msg = error.message || 'Erreur inconnue';
+      if (msg.includes('Solde insuffisant')) {
+        msg = 'Solde insuffisant pour cette activation.';
+      }
+      showToast(msg, true);
+      document.getElementById('btnActivateText').textContent = 'Activer maintenant';
+      // Rafraîchir le solde au cas où
+      await loadProfile();
+      updateCalc();
       return;
     }
+
+    // Succès
+    USER_SOLDE = Number(data.nouveau_solde ?? USER_SOLDE - act);
+    document.getElementById('userSolde').textContent = formatF(USER_SOLDE);
 
     closeModal();
     showToast(`${currentPlant.nom} activé pour ${currentDays} jour${currentDays > 1 ? 's' : ''} !`);
@@ -853,7 +934,7 @@
     const t = document.getElementById('toast');
     document.getElementById('toastText').textContent = msg;
     t.className = 'toast show' + (isError ? ' error' : '');
-    setTimeout(() => t.classList.remove('show'), 2600);
+    setTimeout(() => t.classList.remove('show'), 2800);
   }
   function toggleMenu() {
     document.getElementById('menu').classList.toggle('open');
