@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Affinity Network — Moi</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --wa-green: #25D366;
+    --wa-dark: #128C7E;
+    --wa-deep: #075E54;
+    --alibaba: #FF6A00;
+    --white: #ffffff;
+    --bg: #f7f9f8;
+    --text: #1a1a1a;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --danger: #dc2626;
+  }
+  body {
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    padding-bottom: 80px; min-height: 100vh; overflow-x: hidden;
+  }
+
+  /* LOADER */
+  .loader {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--wa-deep);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 22px;
+    transition: opacity .6s ease, visibility .6s ease;
+  }
+  .loader.hidden { opacity: 0; visibility: hidden; }
+  .loader-logo {
+    font-size: 24px; font-weight: 700; color: #fff;
+    letter-spacing: 1px; animation: fadeUp .8s ease;
+  }
+  .loader-logo span { color: var(--wa-green); }
+  .spinner {
+    width: 46px; height: 46px;
+    border: 4px solid rgba(255,255,255,.2);
+    border-top-color: var(--wa-green);
+    border-radius: 50%;
+    animation: spin .9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .anim { opacity: 0; animation: fadeInUp .5s ease forwards; }
+  .d1 { animation-delay: .05s; }
+  .d2 { animation-delay: .1s; }
+  .d3 { animation-delay: .15s; }
+  .d4 { animation-delay: .2s; }
+
+  /* HEADER */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px;
+    background: var(--wa-deep); color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+  .burger {
+    cursor: pointer; width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: rgba(255,255,255,.12);
+    transition: background .2s, transform .2s;
+  }
+  .burger:active { background: rgba(255,255,255,.25); transform: scale(.92); }
+  .burger svg { stroke: #fff; }
+  .logo { font-weight: 700; font-size: 18px; letter-spacing: .5px; }
+  .logo span { color: var(--wa-green); }
+
+  /* MENU */
+  .menu {
+    position: fixed; top: 0; left: 0; height: 100%; width: 280px;
+    background: #fff; z-index: 200;
+    transform: translateX(-100%);
+    transition: transform .35s cubic-bezier(.4,0,.2,1);
+    box-shadow: 4px 0 20px rgba(0,0,0,.2);
+    padding-top: 18px;
+    display: flex; flex-direction: column;
+  }
+  .menu.open { transform: translateX(0); }
+  .menu-header {
+    padding: 8px 20px 18px; border-bottom: 1px solid #eee; margin-bottom: 10px;
+    font-weight: 700; color: var(--wa-deep); font-size: 17px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .menu-header svg { stroke: var(--wa-green); }
+  .menu-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 15px 22px; cursor: pointer; font-size: 15px;
+    color: #333; transition: background .2s, padding-left .2s;
+  }
+  .menu-item:active { background: #e7f9ee; padding-left: 26px; }
+  .menu-item svg { stroke: var(--wa-dark); flex-shrink: 0; }
+  .menu-item.active { background: #e7f9ee; color: var(--wa-deep); font-weight: 700; }
+  .menu-footer {
+    margin-top: auto; padding: 16px 20px 22px;
+    border-top: 1px solid #eee;
+  }
+  .btn-logout {
+    width: 100%; padding: 14px;
+    background: #fee2e2; color: #b91c1c;
+    border: none; border-radius: 12px;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background .2s, transform .15s;
+  }
+  .btn-logout:active { transform: scale(.97); }
+  .btn-logout svg { stroke: #b91c1c; }
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.45);
+    z-index: 150; opacity: 0; pointer-events: none; transition: opacity .3s;
+  }
+  .overlay.open { opacity: 1; pointer-events: auto; }
+
+  /* CONTENU */
+  .content { padding: 18px 16px; }
+
+  /* CARTE PROFIL */
+  .profile-card {
+    background: linear-gradient(135deg, var(--wa-deep), var(--wa-dark));
+    color: #fff; border-radius: 20px;
+    padding: 24px 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 6px 20px rgba(7,94,84,.3);
+    position: relative; overflow: hidden;
+    text-align: center;
+  }
+  .profile-card::before {
+    content: ''; position: absolute; right: -40px; top: -40px;
+    width: 180px; height: 180px; border-radius: 50%;
+    background: rgba(255,255,255,.06);
+  }
+  .profile-card::after {
+    content: ''; position: absolute; left: -60px; bottom: -60px;
+    width: 160px; height: 160px; border-radius: 50%;
+    background: rgba(37,211,102,.12);
+  }
+  .avatar {
+    width: 84px; height: 84px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--wa-green), var(--wa-dark));
+    margin: 0 auto 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 34px; font-weight: 800; color: #fff;
+    border: 4px solid rgba(255,255,255,.25);
+    position: relative; z-index: 2;
+    box-shadow: 0 6px 20px rgba(0,0,0,.25);
+  }
+  .profile-name {
+    font-size: 20px; font-weight: 700;
+    margin-bottom: 4px; position: relative; z-index: 2;
+  }
+  .profile-pseudo {
+    font-size: 14px; opacity: .8;
+    margin-bottom: 10px; position: relative; z-index: 2;
+  }
+  .profile-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--alibaba);
+    color: #fff; font-size: 11px; font-weight: 700;
+    padding: 5px 12px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: .5px;
+    position: relative; z-index: 2;
+  }
+  .profile-badge svg { stroke: #fff; }
+
+  /* SOLDE */
+  .solde-card {
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    color: #fff; border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 14px rgba(18,140,126,.35);
+    display: flex; align-items: center; justify-content: space-between;
+    position: relative; overflow: hidden;
+  }
+  .solde-card::after {
+    content: ''; position: absolute; right: -20px; top: -20px;
+    width: 110px; height: 110px; border-radius: 50%;
+    background: rgba(255,255,255,.1);
+  }
+  .solde-card .left { position: relative; z-index: 2; }
+  .solde-card .label {
+    font-size: 12px; opacity: .9; margin-bottom: 4px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .solde-card .label svg { stroke: #fff; }
+  .solde-card .montant { font-size: 26px; font-weight: 800; }
+  .solde-card .icon-wallet {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: rgba(255,255,255,.15);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; z-index: 2;
+  }
+  .solde-card .icon-wallet svg { stroke: #fff; }
+
+  /* STATS */
+  .section-title {
+    font-size: 15px; font-weight: 700; color: var(--wa-deep);
+    margin: 22px 0 12px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .section-title .count-badge {
+    background: rgba(18,140,126,.12); color: var(--wa-dark);
+    font-size: 11px; padding: 3px 10px; border-radius: 10px;
+    font-weight: 700;
+  }
+  .stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 10px; margin-bottom: 6px;
+  }
+  .stat-card {
+    background: #fff; border-radius: 14px;
+    padding: 14px 8px; text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  }
+  .stat-card .ico {
+    width: 34px; height: 34px; border-radius: 50%;
+    margin: 0 auto 8px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .stat-card:nth-child(1) .ico { background: rgba(18,140,126,.12); }
+  .stat-card:nth-child(1) .ico svg { stroke: var(--wa-dark); }
+  .stat-card:nth-child(2) .ico { background: rgba(255,106,0,.12); }
+  .stat-card:nth-child(2) .ico svg { stroke: var(--alibaba); }
+  .stat-card:nth-child(3) .ico { background: rgba(37,211,102,.15); }
+  .stat-card:nth-child(3) .ico svg { stroke: var(--wa-green); }
+  .stat-card .val {
+    font-size: 17px; font-weight: 800; color: var(--text);
+    line-height: 1.2; margin-bottom: 2px;
+  }
+  .stat-card .lbl {
+    font-size: 10px; color: var(--muted);
+    text-transform: uppercase; font-weight: 600;
+    letter-spacing: .3px;
+  }
+
+  /* INFO LIST */
+  .info-list {
+    background: #fff; border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.05);
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+  .info-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 15px 18px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-row .ico {
+    width: 38px; height: 38px; border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .info-row .ico svg { stroke: currentColor; }
+  .info-row:nth-child(1) .ico { background: rgba(18,140,126,.1); color: var(--wa-dark); }
+  .info-row:nth-child(2) .ico { background: rgba(255,106,0,.1); color: var(--alibaba); }
+  .info-row:nth-child(3) .ico { background: rgba(37,211,102,.12); color: var(--wa-green); }
+  .info-row:nth-child(4) .ico { background: rgba(18,140,126,.1); color: var(--wa-dark); }
+  .info-row .body {
+    flex: 1; display: flex; flex-direction: column; gap: 2px;
+    min-width: 0;
+  }
+  .info-row .k {
+    font-size: 11px; color: var(--muted);
+    text-transform: uppercase; font-weight: 600;
+    letter-spacing: .4px;
+  }
+  .info-row .v {
+    font-size: 14px; font-weight: 600; color: var(--text);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  /* HISTORIQUE */
+  .hist-item {
+    background: #fff; border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    display: flex; align-items: center; gap: 12px;
+    animation: fadeInUp .4s ease forwards;
+    opacity: 0;
+  }
+  .hist-item .hist-img {
+    width: 52px; height: 52px; border-radius: 12px;
+    object-fit: cover; flex-shrink: 0;
+    background: #f3f4f6;
+  }
+  .hist-item .hist-body {
+    flex: 1; min-width: 0;
+  }
+  .hist-item .hist-top {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; margin-bottom: 3px;
+  }
+  .hist-item .hist-nom {
+    font-size: 14px; font-weight: 700; color: var(--text);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .hist-item .hist-status {
+    font-size: 10px; font-weight: 700; padding: 3px 8px;
+    border-radius: 10px; text-transform: uppercase;
+    letter-spacing: .3px; flex-shrink: 0;
+  }
+  .hist-item .hist-status.active {
+    background: rgba(37,211,102,.15); color: #166534;
+  }
+  .hist-item .hist-status.termine {
+    background: rgba(107,114,128,.15); color: #4b5563;
+  }
+  .hist-item .hist-meta {
+    font-size: 11px; color: var(--muted);
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap;
+  }
+  .hist-item .hist-meta svg { stroke: var(--muted); }
+  .hist-item .hist-gain {
+    font-size: 14px; font-weight: 800; color: var(--wa-dark);
+    text-align: right; flex-shrink: 0;
+  }
+  .hist-item .hist-gain small {
+    display: block; font-size: 10px;
+    color: var(--muted); font-weight: 500;
+  }
+
+  /* EMPTY */
+  .empty {
+    text-align: center; padding: 40px 20px;
+    color: var(--muted); font-size: 13px;
+    background: #fff; border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  }
+  .empty svg { stroke: #d1d5db; margin-bottom: 10px; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    display: flex; background: #fff;
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 -2px 12px rgba(0,0,0,.06);
+    z-index: 100;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    padding: 9px 0 10px; cursor: pointer;
+    color: #9ca3af; font-size: 11px; gap: 4px;
+    transition: color .2s, transform .2s; font-weight: 500;
+    text-decoration: none;
+  }
+  .nav-item svg { stroke: #9ca3af; transition: stroke .2s, transform .2s; }
+  .nav-item:active { transform: scale(.92); }
+  .nav-item.active { color: var(--wa-dark); font-weight: 700; }
+  .nav-item.active svg { stroke: var(--wa-green); transform: translateY(-1px); }
+
+  /* TOAST */
+  .toast {
+    position: fixed; left: 50%; bottom: 100px;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--wa-deep); color: #fff;
+    padding: 12px 22px; border-radius: 30px;
+    font-size: 14px; font-weight: 600;
+    box-shadow: 0 6px 20px rgba(0,0,0,.25);
+    opacity: 0; pointer-events: none;
+    transition: all .3s; z-index: 1000;
+    display: flex; align-items: center; gap: 8px;
+    max-width: 90%;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast svg { stroke: var(--wa-green); flex-shrink: 0; }
+  .toast.error { background: #b91c1c; }
+  .toast.error svg { stroke: #fff; }
+</style>
+</head>
+<body>
+
+  <div class="loader" id="loader">
+    <div class="loader-logo">Affinity<span> Network</span></div>
+    <div class="spinner"></div>
+  </div>
+
+  <header class="header">
+    <div class="burger" onclick="toggleMenu()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </div>
+    <div class="logo">Affinity<span> Network</span></div>
+    <div style="width:40px"></div>
+  </header>
+
+  <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+  <nav class="menu" id="menu">
+    <div class="menu-header">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01"/>
+      </svg>
+      Affinity Network
+    </div>
+    <div class="menu-item" onclick="go('travail.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+      </svg>
+      Travail
+    </div>
+    <div class="menu-item" onclick="go('support.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+      </svg>
+      Support
+    </div>
+    <div class="menu-item" onclick="go('faq.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      FAQ
+    </div>
+    <div class="menu-item" onclick="go('entreprise.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M3 21h18M5 21V7l7-4 7 4v14M10 9h4M10 13h4"/>
+      </svg>
+      Notre entreprise
+    </div>
+
+    <div class="menu-footer">
+      <button class="btn-logout" onclick="logout()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Se déconnecter
+      </button>
+    </div>
+  </nav>
+
+  <main class="content">
+
+    <!-- PROFIL -->
+    <div class="profile-card anim d1">
+      <div class="avatar" id="avatar">?</div>
+      <div class="profile-name" id="profileNom">...</div>
+      <div class="profile-pseudo" id="profilePseudo">@...</div>
+      <div class="profile-badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Membre actif
+      </div>
+    </div>
+
+    <!-- SOLDE -->
+    <div class="solde-card anim d1">
+      <div class="left">
+        <div class="label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+          </svg>
+          Solde disponible
+        </div>
+        <div class="montant" id="profileSolde">0 F</div>
+      </div>
+      <div class="icon-wallet">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="section-title anim d2">Statistiques</div>
+    <div class="stats anim d2">
+      <div class="stat-card">
+        <div class="ico">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
+        </div>
+        <div class="val" id="statTotal">0</div>
+        <div class="lbl">Total</div>
+      </div>
+      <div class="stat-card">
+        <div class="ico">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div class="val" id="statActive">0</div>
+        <div class="lbl">Actives</div>
+      </div>
+      <div class="stat-card">
+        <div class="ico">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <div class="val" id="statGains">0 F</div>
+        <div class="lbl">Gains</div>
+      </div>
+    </div>
+
+    <!-- INFORMATIONS -->
+    <div class="section-title anim d3">Informations personnelles</div>
+    <div class="info-list anim d3">
+      <div class="info-row">
+        <div class="ico">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+          </svg>
+        </div>
+        <div class="body">
+          <div class="k">Nom complet</div>
+          <div class="v" id="infoNom">—</div>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="ico">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <div class="body">
+          <div class="k">Pseudo</div>
+          <div class="v" id="infoPseudo">—</div>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="ico">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/>
+          </svg>
+        </div>
+        <div class="body">
+          <div class="k">Email</div>
+          <div class="v" id="infoEmail">—</div>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="ico">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <div class="body">
+          <div class="k">Membre depuis</div>
+          <div class="v" id="infoDate">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORIQUE -->
+    <div class="section-title anim d4">
+      Historique des activations
+      <span class="count-badge" id="histCount">0</span>
+    </div>
+    <div id="histList" class="anim d4">
+      <div class="empty">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <div>Chargement...</div>
+      </div>
+    </div>
+
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="dashboard.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+        <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+      </svg>
+      Lancer
+    </a>
+    <a href="retirer.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/>
+      </svg>
+      Retirer
+    </a>
+    <a href="travail.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+      </svg>
+      Travail
+    </a>
+    <a href="moi.html" class="nav-item active">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+      </svg>
+      Moi
+    </a>
+  </nav>
+
+  <div class="toast" id="toast">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+    <span id="toastText">—</span>
+  </div>
+
+<script>
+  // ================= SUPABASE =================
+  const SUPABASE_URL = 'https://ydwjvvlcnqsftciedpqm.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2p2dmxjbnFzZnRjaWVkcHFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMDQyNDAsImV4cCI6MjEwNTY4MDI0MH0.4uQwBGedMBjUZErd8lUM5YfA26gw96RvHdo_J-3PZCY';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  let CURRENT_USER = null;
+
+  // ================= INIT =================
+  (async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) {
+      window.location.replace('inscription.html');
+      return;
+    }
+    CURRENT_USER = session.user;
+
+    await Promise.all([
+      loadProfile(),
+      loadHistory()
+    ]);
+
+    setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
+  })();
+
+  // ================= CHARGER PROFIL =================
+  async function loadProfile() {
+    const { data, error } = await sb
+      .from('profiles')
+      .select('nom, pseudo, email, solde, created_at')
+      .eq('id', CURRENT_USER.id)
+      .maybeSingle();
+
+    if (error) {
+      console.warn('Erreur profil:', error);
+      return;
+    }
+
+    const nom = data?.nom || 'Utilisateur';
+    const pseudo = data?.pseudo || CURRENT_USER.email.split('@')[0];
+    const email = data?.email || CURRENT_USER.email;
+    const solde = Number(data?.solde ?? 0);
+    const dateInscription = data?.created_at || CURRENT_USER.created_at;
+
+    // Avatar (initiales)
+    const initiales = nom.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+    document.getElementById('avatar').textContent = initiales || '?';
+
+    // Profil
+    document.getElementById('profileNom').textContent = nom;
+    document.getElementById('profilePseudo').textContent = '@' + pseudo;
+    document.getElementById('profileSolde').textContent = formatF(solde);
+
+    // Infos
+    document.getElementById('infoNom').textContent = nom;
+    document.getElementById('infoPseudo').textContent = '@' + pseudo;
+    document.getElementById('infoEmail').textContent = email;
+    document.getElementById('infoDate').textContent = formatDate(dateInscription);
+  }
+
+  // ================= CHARGER HISTORIQUE =================
+  async function loadHistory() {
+    const list = document.getElementById('histList');
+    const countBadge = document.getElementById('histCount');
+
+    const { data, error } = await sb
+      .from('activations')
+      .select(`
+        id, plantation_nom, montant_activation, gain_journalier,
+        periode_jours, gains_totaux, total_a_percevoir,
+        statut, date_debut, date_fin, created_at,
+        plantations (image_url)
+      `)
+      .eq('user_id', CURRENT_USER.id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.warn('Erreur historique:', error);
+      list.innerHTML = `
+        <div class="empty">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <div>Erreur de chargement</div>
+        </div>`;
+      return;
+    }
+
+    // Stats
+    const total = data.length;
+    const actives = data.filter(a => {
+      const fin = a.date_fin ? new Date(a.date_fin) : null;
+      return a.statut === 'active' && (!fin || fin > new Date());
+    }).length;
+    const gainsTotal = data.reduce((sum, a) => sum + Number(a.gains_totaux || 0), 0);
+
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statActive').textContent = actives;
+    document.getElementById('statGains').textContent = formatF(gainsTotal);
+    countBadge.textContent = total;
+
+    // Liste
+    if (total === 0) {
+      list.innerHTML = `
+        <div class="empty">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+            <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
+          <div>Aucune activation pour le moment</div>
+          <div style="font-size:12px;margin-top:6px;opacity:.7">Va dans Travail pour activer ta première plantation</div>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = '';
+    data.forEach((a, i) => {
+      const img = a.plantations?.image_url || 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=200';
+      const fin = a.date_fin ? new Date(a.date_fin) : null;
+      const estActive = a.statut === 'active' && (!fin || fin > new Date());
+      const statutLabel = estActive ? 'Active' : 'Terminé';
+      const statutClass = estActive ? 'active' : 'termine';
+
+      const item = document.createElement('div');
+      item.className = 'hist-item';
+      item.style.animationDelay = (i * 0.05) + 's';
+      item.innerHTML = `
+        <img class="hist-img" src="${img}" alt="${escapeHtml(a.plantation_nom)}">
+        <div class="hist-body">
+          <div class="hist-top">
+            <div class="hist-nom">${escapeHtml(a.plantation_nom)}</div>
+            <div class="hist-status ${statutClass}">${statutLabel}</div>
+          </div>
+          <div class="hist-meta">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            ${a.periode_jours} j · ${formatDate(a.created_at, true)}
+          </div>
+        </div>
+        <div class="hist-gain">
+          +${formatF(a.gains_totaux)}
+          <small>débité ${formatF(a.montant_activation)}</small>
+        </div>
+      `;
+      list.appendChild(item);
+    });
+  }
+
+  // ================= UTILITAIRES =================
+  function formatF(n) {
+    return Math.round(Number(n)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F';
+  }
+  function formatDate(iso, short = false) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    const options = short
+      ? { day: '2-digit', month: 'short', year: 'numeric' }
+      : { day: '2-digit', month: 'long', year: 'numeric' };
+    return d.toLocaleDateString('fr-FR', options);
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+  function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastText').textContent = msg;
+    t.className = 'toast show' + (isError ? ' error' : '');
+    setTimeout(() => t.classList.remove('show'), 2600);
+  }
+  function toggleMenu() {
+    document.getElementById('menu').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('open');
+  }
+  function go(page) { window.location.href = page; }
+  async function logout() {
+    if (!confirm('Veux-tu vraiment te déconnecter ?')) return;
+    await sb.auth.signOut();
+    window.location.replace('inscription.html');
+  }
+</script>
+</body>
+</html>
