@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Affinity Network — Accueil</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --wa-green: #25D366;
+    --wa-dark: #128C7E;
+    --wa-deep: #075E54;
+    --alibaba: #FF6A00;
+    --white: #ffffff;
+    --bg: #f7f9f8;
+    --text: #1a1a1a;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+  }
+  body {
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    padding-bottom: 72px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== LOADER ===== */
+  .loader {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--wa-deep);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 22px;
+    transition: opacity .6s ease, visibility .6s ease;
+  }
+  .loader.hidden { opacity: 0; visibility: hidden; }
+  .loader-logo {
+    font-size: 24px; font-weight: 700; color: #fff;
+    letter-spacing: 1px; animation: fadeUp .8s ease;
+  }
+  .loader-logo span { color: var(--wa-green); }
+  .spinner {
+    width: 46px; height: 46px;
+    border: 4px solid rgba(255,255,255,.2);
+    border-top-color: var(--wa-green);
+    border-radius: 50%;
+    animation: spin .9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0%,100% { transform: scale(1); opacity: .8; }
+    50% { transform: scale(1.15); opacity: 1; }
+  }
+  .anim { opacity: 0; animation: fadeInUp .5s ease forwards; }
+  .d1 { animation-delay: .05s; }
+  .d2 { animation-delay: .12s; }
+  .d3 { animation-delay: .2s; }
+  .d4 { animation-delay: .28s; }
+
+  /* ===== HEADER ===== */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px;
+    background: var(--wa-deep); color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+  .burger {
+    cursor: pointer; width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: rgba(255,255,255,.12);
+    transition: background .2s, transform .2s;
+  }
+  .burger:active { background: rgba(255,255,255,.25); transform: scale(.92); }
+  .burger svg { stroke: #fff; }
+  .logo { font-weight: 700; font-size: 18px; letter-spacing: .5px; }
+  .logo span { color: var(--wa-green); }
+
+  /* ===== MENU ===== */
+  .menu {
+    position: fixed; top: 0; left: 0; height: 100%; width: 280px;
+    background: #fff; z-index: 200;
+    transform: translateX(-100%);
+    transition: transform .35s cubic-bezier(.4,0,.2,1);
+    box-shadow: 4px 0 20px rgba(0,0,0,.2);
+    padding-top: 18px;
+    display: flex; flex-direction: column;
+  }
+  .menu.open { transform: translateX(0); }
+  .menu-header {
+    padding: 8px 20px 18px; border-bottom: 1px solid #eee; margin-bottom: 10px;
+    font-weight: 700; color: var(--wa-deep); font-size: 17px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .menu-header svg { stroke: var(--wa-green); }
+  .menu-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 15px 22px; cursor: pointer; font-size: 15px;
+    color: #333; transition: background .2s, padding-left .2s;
+  }
+  .menu-item:active { background: #e7f9ee; padding-left: 26px; }
+  .menu-item svg { stroke: var(--wa-dark); flex-shrink: 0; }
+  .menu-item.active { background: #e7f9ee; color: var(--wa-deep); font-weight: 700; }
+
+  .menu-footer {
+    margin-top: auto; padding: 16px 20px 22px;
+    border-top: 1px solid #eee;
+  }
+  .btn-logout {
+    width: 100%; padding: 14px;
+    background: #fee2e2; color: #b91c1c;
+    border: none; border-radius: 12px;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background .2s, transform .15s;
+  }
+  .btn-logout:active { transform: scale(.97); background: #fecaca; }
+  .btn-logout svg { stroke: #b91c1c; }
+
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.45);
+    z-index: 150; opacity: 0; pointer-events: none; transition: opacity .3s;
+  }
+  .overlay.open { opacity: 1; pointer-events: auto; }
+
+  /* ===== CONTENU ===== */
+  .content { padding: 18px 16px; }
+  .welcome {
+    background: #fff; border-radius: 16px; padding: 18px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.06); margin-bottom: 16px;
+  }
+  .welcome h2 {
+    font-size: 19px; color: var(--wa-deep); margin-bottom: 4px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .welcome h2 .pseudo-badge {
+    color: var(--wa-green); font-weight: 800;
+  }
+  .welcome p { font-size: 14px; color: var(--muted); }
+
+  .solde {
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    color: #fff; border-radius: 16px; padding: 22px 20px;
+    margin-bottom: 20px; box-shadow: 0 4px 14px rgba(18,140,126,.35);
+    position: relative; overflow: hidden;
+  }
+  .solde::after {
+    content: ''; position: absolute; right: -30px; top: -30px;
+    width: 140px; height: 140px; border-radius: 50%;
+    background: rgba(255,255,255,.08);
+    animation: pulse 3s ease-in-out infinite;
+  }
+  .solde .label { font-size: 13px; opacity: .9; }
+  .solde .montant { font-size: 32px; font-weight: 700; margin: 6px 0; }
+  .solde .sub { font-size: 12px; opacity: .85; }
+
+  /* ===== CARROUSEL AUTO ===== */
+  .section-title {
+    font-size: 15px; font-weight: 700; color: var(--wa-deep);
+    margin: 22px 0 12px;
+  }
+  .carousel-wrap {
+    overflow: hidden; border-radius: 16px; position: relative;
+  }
+  .carousel {
+    display: flex;
+    transition: transform .7s cubic-bezier(.4,0,.2,1);
+  }
+  .plant-card {
+    flex: 0 0 100%; background: #fff;
+    position: relative; height: 220px;
+  }
+  .plant-card img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  .plant-card .overlay-grad {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.75), transparent 60%);
+  }
+  .plant-card .tag {
+    position: absolute; top: 12px; right: 12px;
+    background: var(--alibaba); color: #fff;
+    font-size: 12px; font-weight: 700;
+    padding: 5px 12px; border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(255,106,0,.4);
+  }
+  .plant-card .info {
+    position: absolute; bottom: 14px; left: 16px; right: 16px;
+    color: #fff;
+  }
+  .plant-card .nom {
+    font-size: 20px; font-weight: 700; margin-bottom: 2px;
+    text-shadow: 0 1px 4px rgba(0,0,0,.5);
+  }
+  .plant-card .prix { font-size: 13px; opacity: .9; }
+  .dots {
+    display: flex; justify-content: center; gap: 6px;
+    margin-top: 12px;
+  }
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #d1d5db; transition: all .3s;
+  }
+  .dot.active { background: var(--wa-green); width: 20px; border-radius: 4px; }
+
+  /* ===== 3 BOUTONS ===== */
+  .actions {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 10px; margin-top: 22px;
+  }
+  .action-btn {
+    background: #fff; border-radius: 14px;
+    padding: 16px 8px;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 8px; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    transition: transform .2s, box-shadow .2s;
+    border: 1px solid #f0f0f0;
+  }
+  .action-btn:active {
+    transform: scale(.95);
+    box-shadow: 0 1px 4px rgba(0,0,0,.1);
+  }
+  .action-btn .icon-circle {
+    width: 42px; height: 42px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .action-btn:nth-child(1) .icon-circle { background: rgba(255,106,0,.12); }
+  .action-btn:nth-child(1) svg { stroke: var(--alibaba); }
+  .action-btn:nth-child(2) .icon-circle { background: rgba(18,140,126,.12); }
+  .action-btn:nth-child(2) svg { stroke: var(--wa-dark); }
+  .action-btn:nth-child(3) .icon-circle { background: rgba(37,211,102,.15); }
+  .action-btn:nth-child(3) svg { stroke: var(--wa-green); }
+  .action-btn .label { font-size: 12px; font-weight: 600; color: #333; }
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    display: flex; background: #fff;
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 -2px 12px rgba(0,0,0,.06);
+    z-index: 100;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    padding: 9px 0 10px; cursor: pointer;
+    color: #9ca3af; font-size: 11px; gap: 4px;
+    transition: color .2s, transform .2s; font-weight: 500;
+    text-decoration: none;
+  }
+  .nav-item svg { stroke: #9ca3af; transition: stroke .2s, transform .2s; }
+  .nav-item:active { transform: scale(.92); }
+  .nav-item.active { color: var(--wa-dark); font-weight: 700; }
+  .nav-item.active svg { stroke: var(--wa-green); transform: translateY(-1px); }
+</style>
+</head>
+<body>
+
+  <!-- LOADER -->
+  <div class="loader" id="loader">
+    <div class="loader-logo">Affinity<span> Network</span></div>
+    <div class="spinner"></div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="burger" onclick="toggleMenu()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </div>
+    <div class="logo">Affinity<span> Network</span></div>
+    <div style="width:40px"></div>
+  </header>
+
+  <!-- MENU -->
+  <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+  <nav class="menu" id="menu">
+    <div class="menu-header">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01"/>
+      </svg>
+      Affinity Network
+    </div>
+    <div class="menu-item active" onclick="go('travail.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+      </svg>
+      Travail
+    </div>
+    <div class="menu-item" onclick="go('support.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+      </svg>
+      Support
+    </div>
+    <div class="menu-item" onclick="go('faq.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      FAQ
+    </div>
+    <div class="menu-item" onclick="go('entreprise.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M3 21h18M5 21V7l7-4 7 4v14M10 9h4M10 13h4"/>
+      </svg>
+      Notre entreprise
+    </div>
+
+    <div class="menu-footer">
+      <button class="btn-logout" onclick="logout()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Se déconnecter
+      </button>
+    </div>
+  </nav>
+
+  <!-- CONTENU -->
+  <main class="content">
+    <div class="welcome anim d1">
+      <h2>Bonjour <span class="pseudo-badge" id="userPseudo">...</span></h2>
+      <p>Prêt à accomplir des tâches et gagner aujourd'hui ?</p>
+    </div>
+
+    <div class="solde anim d2">
+      <div class="label">Solde disponible</div>
+      <div class="montant" id="userSolde">0 FCFA</div>
+      <div class="sub">Retirez dès 1 000 FCFA</div>
+    </div>
+
+    <!-- CARROUSEL -->
+    <div class="section-title anim d3">Plantations & cultures</div>
+    <div class="carousel-wrap anim d3">
+      <div class="carousel" id="carousel">
+        <div class="plant-card">
+          <img src="https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=600" alt="Maïs">
+          <div class="overlay-grad"></div>
+          <span class="tag">+250 F</span>
+          <div class="info">
+            <div class="nom">Maïs</div>
+            <div class="prix">Disponible maintenant</div>
+          </div>
+        </div>
+        <div class="plant-card">
+          <img src="https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=600" alt="Cacao">
+          <div class="overlay-grad"></div>
+          <span class="tag">+600 F</span>
+          <div class="info">
+            <div class="nom">Cacao</div>
+            <div class="prix">Disponible maintenant</div>
+          </div>
+        </div>
+        <div class="plant-card">
+          <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=600" alt="Café">
+          <div class="overlay-grad"></div>
+          <span class="tag">+1 250 F</span>
+          <div class="info">
+            <div class="nom">Café</div>
+            <div class="prix">Disponible maintenant</div>
+          </div>
+        </div>
+        <div class="plant-card">
+          <img src="https://images.unsplash.com/photo-1591892150205-4a5d4a2a0e8c?w=600" alt="Palmier">
+          <div class="overlay-grad"></div>
+          <span class="tag">+1 700 F</span>
+          <div class="info">
+            <div class="nom">Palmier à huile</div>
+            <div class="prix">Disponible maintenant</div>
+          </div>
+        </div>
+        <div class="plant-card">
+          <img src="https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=600" alt="Banane">
+          <div class="overlay-grad"></div>
+          <span class="tag">+2 200 F</span>
+          <div class="info">
+            <div class="nom">Banane</div>
+            <div class="prix">Disponible maintenant</div>
+          </div>
+        </div>
+        <div class="plant-card">
+          <img src="https://images.unsplash.com/photo-1508747703725-719777637510?w=600" alt="Arachide">
+          <div class="overlay-grad"></div>
+          <span class="tag">+3 200 F</span>
+          <div class="info">
+            <div class="nom">Arachide</div>
+            <div class="prix">Disponible maintenant</div>
+          </div>
+        </div>
+        <div class="plant-card">
+          <img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600" alt="Riz">
+          <div class="overlay-grad"></div>
+          <span class="tag">+5 200 F</span>
+          <div class="info">
+            <div class="nom">Riz</div>
+            <div class="prix">Disponible maintenant</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dots" id="dots"></div>
+
+    <!-- 3 BOUTONS -->
+    <div class="actions anim d4">
+      <div class="action-btn" onclick="go('classement.html')">
+        <div class="icon-circle">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+            <path d="M4 22h16"/>
+            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+          </svg>
+        </div>
+        <div class="label">Classement</div>
+      </div>
+      <div class="action-btn" onclick="go('ticket.html')">
+        <div class="icon-circle">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
+            <path d="M13 5v14"/>
+          </svg>
+        </div>
+        <div class="label">Ticket</div>
+      </div>
+      <div class="action-btn" onclick="go('actualites.html')">
+        <div class="icon-circle">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/>
+            <path d="M18 14h-8M15 18h-5M10 6h8v4h-8V6Z"/>
+          </svg>
+        </div>
+        <div class="label">Actualités</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <a href="dashboard.html" class="nav-item active">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+        <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+      </svg>
+      Lancer
+    </a>
+    <a href="retirer.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/>
+      </svg>
+      Retirer
+    </a>
+    <a href="travail.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+      </svg>
+      Travail
+    </a>
+    <a href="moi.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+      </svg>
+      Moi
+    </a>
+  </nav>
+
+<script>
+  // ================= SUPABASE =================
+  const SUPABASE_URL = 'https://ydwjvvlcnqsftciedpqm.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2p2dmxjbnFzZnRjaWVkcHFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMDQyNDAsImV4cCI6MjEwNTY4MDI0MH0.4uQwBGedMBjUZErd8lUM5YfA26gw96RvHdo_J-3PZCY';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  // ================= PROTECTION + CHARGEMENT =================
+  (async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+
+    // Pas connecté → redirection inscription
+    if (!session) {
+      window.location.replace('inscription.html');
+      return;
+    }
+
+    // Charger le profil depuis Supabase
+    const { data: profile } = await sb
+      .from('profiles')
+      .select('nom, pseudo, solde')
+      .eq('id', session.user.id)
+      .maybeSingle();
+
+    // Afficher les infos
+    const pseudo = profile?.pseudo || session.user.email.split('@')[0];
+    const solde = profile?.solde ?? 0;
+
+    document.getElementById('userPseudo').textContent = pseudo;
+    document.getElementById('userSolde').textContent = formatF(solde);
+
+    // Cacher le loader
+    setTimeout(() => document.getElementById('loader').classList.add('hidden'), 600);
+  })();
+
+  // ================= FORMAT =================
+  function formatF(n) {
+    return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' FCFA';
+  }
+
+  // ================= MENU =================
+  function toggleMenu() {
+    document.getElementById('menu').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('open');
+  }
+
+  // ================= NAVIGATION =================
+  function go(page) {
+    window.location.href = page;
+  }
+
+  // ================= DÉCONNEXION =================
+  async function logout() {
+    if (!confirm('Veux-tu vraiment te déconnecter ?')) return;
+    await sb.auth.signOut();
+    window.location.replace('inscription.html');
+  }
+
+  // ================= CARROUSEL AUTO =================
+  const carousel = document.getElementById('carousel');
+  const total = carousel.children.length;
+  const dotsContainer = document.getElementById('dots');
+  let index = 0;
+
+  for (let i = 0; i < total; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dotsContainer.appendChild(dot);
+  }
+  const dots = dotsContainer.children;
+
+  function goTo(i) {
+    index = (i + total) % total;
+    carousel.style.transform = `translateX(-${index * 100}%)`;
+    for (let d = 0; d < total; d++) {
+      dots[d].classList.toggle('active', d === index);
+    }
+  }
+
+  let auto = setInterval(() => goTo(index + 1), 3500);
+
+  let startX = 0;
+  carousel.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+  carousel.addEventListener('touchend', e => {
+    const diff = startX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) {
+      clearInterval(auto);
+      goTo(index + (diff > 0 ? 1 : -1));
+      auto = setInterval(() => goTo(index + 1), 3500);
+    }
+  });
+</script>
+</body>
+</html>
