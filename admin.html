@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Affinity Network — Admin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --wa-green: #25D366;
+    --wa-dark: #128C7E;
+    --wa-deep: #075E54;
+    --alibaba: #FF6A00;
+    --bg: #f7f9f8;
+    --text: #1a1a1a;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --danger: #dc2626;
+    --warn: #f59e0b;
+  }
+  body {
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    padding-bottom: 90px; min-height: 100vh; overflow-x: hidden;
+  }
+
+  /* LOADER */
+  .loader {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--wa-deep);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 22px;
+    transition: opacity .6s ease, visibility .6s ease;
+  }
+  .loader.hidden { opacity: 0; visibility: hidden; }
+  .loader-logo { font-size: 24px; font-weight: 700; color: #fff; }
+  .loader-logo span { color: var(--wa-green); }
+  .spinner {
+    width: 46px; height: 46px;
+    border: 4px solid rgba(255,255,255,.2);
+    border-top-color: var(--wa-green);
+    border-radius: 50%;
+    animation: spin .9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+  .anim { opacity: 0; animation: fadeInUp .4s ease forwards; }
+
+  /* HEADER */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #1a1a1a, var(--wa-deep));
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,.2);
+  }
+  .logo {
+    font-weight: 700; font-size: 17px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .logo .badge-admin {
+    background: var(--alibaba); color: #fff;
+    font-size: 9px; padding: 2px 8px; border-radius: 8px;
+    text-transform: uppercase; letter-spacing: .5px; font-weight: 800;
+  }
+  .btn-exit {
+    background: rgba(255,255,255,.15); border: none;
+    width: 36px; height: 36px; border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn-exit svg { stroke: #fff; }
+
+  /* TABS */
+  .tabs {
+    background: #fff; padding: 8px 10px;
+    display: flex; gap: 6px; overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 64px; z-index: 99;
+    -ms-overflow-style: none; scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    padding: 10px 16px; border-radius: 12px;
+    font-size: 13px; font-weight: 700;
+    background: #f7faf8; color: var(--muted);
+    border: none; cursor: pointer; font-family: inherit;
+    white-space: nowrap;
+    display: flex; align-items: center; gap: 6px;
+    transition: all .2s;
+  }
+  .tab svg { stroke: currentColor; }
+  .tab.active {
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(18,140,126,.3);
+  }
+
+  /* CONTENU */
+  .content { padding: 16px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* STATS */
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 10px; margin-bottom: 20px;
+  }
+  .stat-box {
+    background: #fff; border-radius: 14px; padding: 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.05);
+    border-left: 4px solid var(--wa-green);
+    animation: fadeInUp .4s ease forwards; opacity: 0;
+  }
+  .stat-box:nth-child(2) { border-color: var(--alibaba); }
+  .stat-box:nth-child(3) { border-color: var(--wa-dark); }
+  .stat-box:nth-child(4) { border-color: #3b82f6; }
+  .stat-box:nth-child(5) { border-color: var(--warn); }
+  .stat-box:nth-child(6) { border-color: var(--danger); }
+  .stat-box .lbl {
+    font-size: 10.5px; color: var(--muted);
+    text-transform: uppercase; font-weight: 700;
+    letter-spacing: .3px; margin-bottom: 6px;
+  }
+  .stat-box .val {
+    font-size: 20px; font-weight: 800; color: var(--text);
+  }
+
+  /* LISTE ADMIN */
+  .admin-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px; gap: 10px;
+  }
+  .admin-toolbar h2 {
+    font-size: 17px; font-weight: 800; color: var(--wa-deep);
+  }
+  .btn-add {
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    color: #fff; border: none;
+    padding: 10px 16px; border-radius: 10px;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; gap: 6px;
+    box-shadow: 0 3px 10px rgba(18,140,126,.3);
+    transition: transform .15s;
+  }
+  .btn-add:active { transform: scale(.95); }
+  .btn-add svg { stroke: #fff; }
+
+  /* ITEM */
+  .item-card {
+    background: #fff; border-radius: 14px;
+    padding: 14px; margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    display: flex; align-items: center; gap: 12px;
+    animation: fadeInUp .35s ease forwards; opacity: 0;
+  }
+  .item-card .ic-img {
+    width: 52px; height: 52px; border-radius: 12px;
+    object-fit: cover; flex-shrink: 0;
+    background: #f3f4f6;
+  }
+  .item-card .ic-body { flex: 1; min-width: 0; }
+  .item-card .ic-name {
+    font-size: 14px; font-weight: 800; color: var(--text);
+    margin-bottom: 4px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .item-card .ic-meta {
+    font-size: 11.5px; color: var(--muted);
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap;
+  }
+  .item-card .ic-meta .dot { color: #d1d5db; }
+  .item-card .ic-actions {
+    display: flex; gap: 4px; flex-shrink: 0;
+  }
+  .icon-btn {
+    width: 32px; height: 32px; border-radius: 9px;
+    background: #f7faf8; border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s, transform .15s;
+  }
+  .icon-btn:active { transform: scale(.9); }
+  .icon-btn.edit svg { stroke: var(--wa-dark); }
+  .icon-btn.edit:hover { background: rgba(18,140,126,.1); }
+  .icon-btn.delete svg { stroke: var(--danger); }
+  .icon-btn.delete:hover { background: rgba(220,38,38,.1); }
+  .icon-btn.view svg { stroke: var(--alibaba); }
+  .icon-btn.view:hover { background: rgba(255,106,0,.1); }
+
+  /* BADGE */
+  .badge {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 9.5px; font-weight: 800;
+    padding: 3px 8px; border-radius: 8px;
+    text-transform: uppercase; letter-spacing: .3px;
+  }
+  .badge.green { background: rgba(37,211,102,.15); color: #166534; }
+  .badge.orange { background: rgba(255,106,0,.15); color: var(--alibaba); }
+  .badge.red { background: rgba(220,38,38,.15); color: var(--danger); }
+  .badge.blue { background: rgba(59,130,246,.15); color: #2563eb; }
+  .badge.gray { background: rgba(107,114,128,.15); color: #4b5563; }
+
+  /* EMPTY */
+  .empty {
+    text-align: center; padding: 40px 20px;
+    color: var(--muted); font-size: 13px;
+    background: #fff; border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  }
+  .empty svg { stroke: #d1d5db; margin-bottom: 10px; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(0,0,0,.6);
+    display: flex; align-items: flex-end; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity .3s; backdrop-filter: blur(3px);
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: auto; }
+  .modal {
+    background: #fff; width: 100%; max-width: 520px;
+    border-radius: 24px 24px 0 0;
+    padding: 20px 20px 28px;
+    transform: translateY(100%);
+    transition: transform .4s cubic-bezier(.4,0,.2,1);
+    max-height: 92vh; overflow-y: auto;
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-handle {
+    width: 42px; height: 5px; border-radius: 5px;
+    background: #d1d5db; margin: 0 auto 16px;
+  }
+  .modal-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .modal-title {
+    font-size: 18px; font-weight: 800; color: var(--wa-deep);
+  }
+  .modal-close {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #f3f4f6; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal-close svg { stroke: var(--muted); }
+
+  /* FORM */
+  .form-group { margin-bottom: 14px; }
+  .form-group label {
+    display: block; font-size: 12.5px; font-weight: 700;
+    color: var(--wa-deep); margin-bottom: 6px;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%; padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px; font-family: inherit;
+    background: #f7faf8;
+    outline: none;
+    transition: border-color .2s, background .2s;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--wa-green);
+    background: #fff;
+  }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+  .form-row {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .form-check {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 0;
+  }
+  .form-check input { width: auto; }
+  .form-check label {
+    margin: 0; font-size: 13px; font-weight: 600;
+  }
+
+  .btn-primary, .btn-danger, .btn-warn {
+    width: 100%; padding: 14px;
+    border-radius: 12px; border: none;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    transition: transform .15s;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    color: #fff; box-shadow: 0 4px 14px rgba(18,140,126,.3);
+  }
+  .btn-primary:active { transform: scale(.97); }
+  .btn-primary svg { stroke: #fff; }
+  .btn-primary:disabled {
+    background: #d1d5db; box-shadow: none; cursor: not-allowed;
+  }
+  .btn-danger {
+    background: linear-gradient(135deg, #b91c1c, #dc2626);
+    color: #fff; box-shadow: 0 4px 14px rgba(185,28,28,.3);
+  }
+  .btn-warn {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    color: #fff; box-shadow: 0 4px 14px rgba(217,119,6,.3);
+  }
+
+  .btn-row { display: flex; gap: 8px; margin-top: 8px; }
+  .btn-row .btn-primary,
+  .btn-row .btn-danger,
+  .btn-row .btn-warn { flex: 1; }
+
+  /* SKELETON */
+  .sk-item {
+    background: #fff; border-radius: 14px;
+    padding: 14px; margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  }
+  .sk-line {
+    height: 12px; border-radius: 6px;
+    background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+    background-size: 200% 100%; animation: shimmer 1.4s infinite;
+    margin-bottom: 8px;
+  }
+  .sk-line.w1 { width: 40%; height: 16px; }
+  .sk-line.w2 { width: 70%; }
+
+  /* TOAST */
+  .toast {
+    position: fixed; left: 50%; bottom: 100px;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--wa-deep); color: #fff;
+    padding: 12px 22px; border-radius: 30px;
+    font-size: 14px; font-weight: 600;
+    box-shadow: 0 6px 20px rgba(0,0,0,.25);
+    opacity: 0; pointer-events: none;
+    transition: all .3s; z-index: 1000;
+    display: flex; align-items: center; gap: 8px;
+    max-width: 90%;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast svg { stroke: var(--wa-green); flex-shrink: 0; }
+  .toast.error { background: #b91c1c; }
+  .toast.error svg { stroke: #fff; }
+</style>
+</head>
+<body>
+
+  <div class="loader" id="loader">
+    <div class="loader-logo">Affinity<span> Admin</span></div>
+    <div class="spinner"></div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">
+      Affinity <span class="badge-admin">Admin</span>
+    </div>
+    <button class="btn-exit" onclick="go('dashboard.html')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- TABS -->
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-tab="stats">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+      Stats
+    </button>
+    <button class="tab" data-tab="retraits">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+      </svg>
+      Retraits
+    </button>
+    <button class="tab" data-tab="users">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+      </svg>
+      Utilisateurs
+    </button>
+    <button class="tab" data-tab="plans">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+      </svg>
+      Plans
+    </button>
+    <button class="tab" data-tab="plantations">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M7 20h10M10 20c5.5-2.5.8-6.4 3-10"/>
+      </svg>
+      Plantations
+    </button>
+    <button class="tab" data-tab="actualites">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Z"/>
+      </svg>
+      Actualités
+    </button>
+    <button class="tab" data-tab="pays">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+      </svg>
+      Pays
+    </button>
+  </nav>
+
+  <main class="content">
+
+    <!-- STATS -->
+    <div class="panel active" id="panel-stats">
+      <div class="stats-grid" id="statsGrid">
+        <div class="sk-item"><div class="sk-line w1"></div><div class="sk-line w2"></div></div>
+        <div class="sk-item"><div class="sk-line w1"></div><div class="sk-line w2"></div></div>
+      </div>
+    </div>
+
+    <!-- RETRAITS -->
+    <div class="panel" id="panel-retraits">
+      <div class="admin-toolbar">
+        <h2>Retraits</h2>
+        <span class="badge orange" id="retraitsPendingBadge">— en attente</span>
+      </div>
+      <div id="retraitsList"></div>
+    </div>
+
+    <!-- USERS -->
+    <div class="panel" id="panel-users">
+      <div class="admin-toolbar">
+        <h2>Utilisateurs</h2>
+        <input type="text" placeholder="Rechercher..." style="padding:8px 12px;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:13px;max-width:160px;" id="userSearch" oninput="renderUsers()">
+      </div>
+      <div id="usersList"></div>
+    </div>
+
+    <!-- PLANS -->
+    <div class="panel" id="panel-plans">
+      <div class="admin-toolbar">
+        <h2>Plans d'investissement</h2>
+        <button class="btn-add" onclick="openPlanModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Ajouter
+        </button>
+      </div>
+      <div id="plansList"></div>
+    </div>
+
+    <!-- PLANTATIONS -->
+    <div class="panel" id="panel-plantations">
+      <div class="admin-toolbar">
+        <h2>Plantations</h2>
+        <button class="btn-add" onclick="openPlantationModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Ajouter
+        </button>
+      </div>
+      <div id="plantationsList"></div>
+    </div>
+
+    <!-- ACTUALITES -->
+    <div class="panel" id="panel-actualites">
+      <div class="admin-toolbar">
+        <h2>Actualités</h2>
+        <button class="btn-add" onclick="openActualiteModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Publier
+        </button>
+      </div>
+      <div id="actualitesList"></div>
+    </div>
+
+    <!-- PAYS -->
+    <div class="panel" id="panel-pays">
+      <div class="admin-toolbar">
+        <h2>Pays & Opérateurs</h2>
+      </div>
+      <div id="paysList"></div>
+    </div>
+
+  </main>
+
+  <!-- MODAL GÉNÉRIQUE -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+    <div class="modal" id="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-head">
+        <div class="modal-title" id="modalTitle">Titre</div>
+        <button class="modal-close" onclick="closeModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+    <span id="toastText">—</span>
+  </div>
+
+<script>
+  // ================= SUPABASE =================
+  const SUPABASE_URL = 'https://ydwjvvlcnqsftciedpqm.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2p2dmxjbnFzZnRjaWVkcHFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMDQyNDAsImV4cCI6MjEwNTY4MDI0MH0.4uQwBGedMBjUZErd8lUM5YfA26gw96RvHdo_J-3PZCY';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  let CURRENT_USER = null;
+  let DATA = { retraits: [], users: [], plans: [], plantations: [], actualites: [], pays: [] };
+
+  // ================= INIT =================
+  (async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) {
+      window.location.replace('inscription.html');
+      return;
+    }
+    CURRENT_USER = session.user;
+
+    // Vérifier admin
+    const { data: profile } = await sb.from('profiles')
+      .select('is_admin').eq('id', session.user.id).maybeSingle();
+
+    if (!profile?.is_admin) {
+      document.body.innerHTML = `
+        <div style="padding:80px 30px;text-align:center;font-family:sans-serif;">
+          <h1 style="color:#dc2626;margin-bottom:12px;">Accès refusé</h1>
+          <p style="color:#666;">Tu n'es pas administrateur.</p>
+          <button onclick="window.location.replace('dashboard.html')"
+            style="margin-top:24px;padding:12px 24px;background:#25D366;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;">
+            Retour
+          </button>
+        </div>`;
+      return;
+    }
+
+    await Promise.all([
+      loadStats(),
+      loadRetraits(),
+      loadUsers(),
+      loadPlans(),
+      loadPlantations(),
+      loadActualites(),
+      loadPays()
+    ]);
+
+    setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
+  })();
+
+  // ================= TABS =================
+  document.getElementById('tabs').addEventListener('click', (e) => {
+    const t = e.target.closest('.tab');
+    if (!t) return;
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('panel-' + t.dataset.tab).classList.add('active');
+  });
+
+  // ================= STATS =================
+  async function loadStats() {
+    const { data, error } = await sb.from('admin_stats').select('*').maybeSingle();
+    if (error || !data) return;
+
+    const grid = document.getElementById('statsGrid');
+    const stats = [
+      { lbl: 'Utilisateurs totaux', val: data.total_users },
+      { lbl: 'Nouveaux (7j)', val: data.users_7j },
+      { lbl: 'Plans actifs', val: data.plans_actifs },
+      { lbl: 'Retraits en attente', val: data.retraits_attente },
+      { lbl: 'Solde total plateforme', val: formatF(data.solde_total) },
+      { lbl: 'Total payé', val: formatF(data.total_paye) }
+    ];
+    grid.innerHTML = stats.map((s, i) => `
+      <div class="stat-box" style="animation-delay:${i * .06}s">
+        <div class="lbl">${s.lbl}</div>
+        <div class="val">${s.val}</div>
+      </div>
+    `).join('');
+  }
+
+  // ================= RETRAITS =================
+  async function loadRetraits() {
+    const { data } = await sb.from('retraits')
+      .select('*').order('created_at', { ascending: false }).limit(100);
+    DATA.retraits = data || [];
+    const pending = DATA.retraits.filter(r => r.statut === 'en_attente').length;
+    document.getElementById('retraitsPendingBadge').textContent = pending + ' en attente';
+    renderRetraits();
+  }
+
+  function renderRetraits() {
+    const list = document.getElementById('retraitsList');
+    if (DATA.retraits.length === 0) {
+      list.innerHTML = emptyBox('Aucun retrait');
+      return;
+    }
+    list.innerHTML = DATA.retraits.map((r, i) => {
+      const statusLabel = { en_attente: 'En attente', valide: 'Validé', paye: 'Payé', rejete: 'Rejeté' }[r.statut] || r.statut;
+      const statusClass = { en_attente: 'orange', valide: 'blue', paye: 'green', rejete: 'red' }[r.statut] || 'gray';
+      return `
+        <div class="item-card" style="animation-delay:${i * .04}s">
+          <div class="ic-body">
+            <div class="ic-name">${formatF(r.montant)} <span class="badge ${statusClass}" style="margin-left:6px;">${statusLabel}</span></div>
+            <div class="ic-meta">
+              <span>${escapeHtml(r.pays_nom || '')}</span>
+              <span class="dot">•</span>
+              <span>${escapeHtml(r.operateur_nom || '')}</span>
+              <span class="dot">•</span>
+              <span>${escapeHtml(r.numero || '')}</span>
+            </div>
+          </div>
+          <div class="ic-actions">
+            ${r.statut === 'en_attente' ? `
+              <button class="icon-btn edit" onclick="payRetrait('${r.id}')" title="Marquer payé">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </button>
+              <button class="icon-btn delete" onclick="rejectRetrait('${r.id}')" title="Rejeter">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function payRetrait(id) {
+    const note = prompt('Note (optionnelle) :', '');
+    if (note === null) return;
+    const { error } = await sb.rpc('marquer_retrait_paye', { p_retrait_id: id, p_note: note || null });
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('Retrait marqué payé');
+    await loadRetraits();
+    await loadStats();
+  }
+
+  async function rejectRetrait(id) {
+    const note = prompt('Motif du rejet :', '');
+    if (note === null) return;
+    if (!note.trim()) return showToast('Motif requis', true);
+    const { error } = await sb.rpc('rejeter_retrait', { p_retrait_id: id, p_note: note });
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('Retrait rejeté et remboursé');
+    await loadRetraits();
+    await loadStats();
+  }
+
+  // ================= USERS =================
+  async function loadUsers() {
+    const { data } = await sb.from('profiles')
+      .select('id, nom, pseudo, email, solde, is_admin, created_at')
+      .order('created_at', { ascending: false }).limit(200);
+    DATA.users = data || [];
+    renderUsers();
+  }
+
+  function renderUsers() {
+    const q = (document.getElementById('userSearch')?.value || '').toLowerCase();
+    const list = document.getElementById('usersList');
+    const filtered = q
+      ? DATA.users.filter(u => u.nom?.toLowerCase().includes(q) || u.pseudo?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q))
+      : DATA.users;
+
+    if (filtered.length === 0) {
+      list.innerHTML = emptyBox('Aucun utilisateur');
+      return;
+    }
+    list.innerHTML = filtered.map((u, i) => `
+      <div class="item-card" style="animation-delay:${i * .03}s">
+        <div class="ic-body">
+          <div class="ic-name">
+            ${escapeHtml(u.nom || '—')}
+            ${u.is_admin ? '<span class="badge orange" style="margin-left:6px;">Admin</span>' : ''}
+          </div>
+          <div class="ic-meta">
+            <span>@${escapeHtml(u.pseudo || '—')}</span>
+            <span class="dot">•</span>
+            <span>${escapeHtml(u.email)}</span>
+            <span class="dot">•</span>
+            <span style="color:var(--wa-dark);font-weight:800;">${formatF(u.solde)}</span>
+          </div>
+        </div>
+        <div class="ic-actions">
+          <button class="icon-btn edit" onclick="adjustUserBalance('${u.id}', '${escapeHtml(u.nom || u.pseudo)}', ${u.solde})" title="Ajuster solde">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function adjustUserBalance(userId, name, currentSolde) {
+    openModal(`Solde de ${name}`, `
+      <div class="form-group">
+        <label>Solde actuel</label>
+        <input type="text" value="${formatF(currentSolde)}" disabled style="background:#f3f4f6;">
+      </div>
+      <div class="form-group">
+        <label>Montant à ajouter (négatif pour retirer)</label>
+        <input type="number" id="adjAmount" placeholder="Ex: 5000 ou -2000">
+      </div>
+      <button class="btn-primary" onclick="applyAdj('${userId}')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Appliquer
+      </button>
+    `);
+  }
+
+  async function applyAdj(userId) {
+    const m = Number(document.getElementById('adjAmount').value);
+    if (!m) return showToast('Montant requis', true);
+    const { error } = await sb.rpc('ajuster_solde_user', {
+      p_user_id: userId, p_montant: m, p_note: null
+    });
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('Solde ajusté');
+    closeModal();
+    await loadUsers();
+    await loadStats();
+  }
+
+  // ================= PLANS =================
+  async function loadPlans() {
+    const { data } = await sb.from('plans').select('*').order('ordre');
+    DATA.plans = data || [];
+    renderPlans();
+  }
+
+  function renderPlans() {
+    const list = document.getElementById('plansList');
+    if (DATA.plans.length === 0) return list.innerHTML = emptyBox('Aucun plan');
+    list.innerHTML = DATA.plans.map((p, i) => `
+      <div class="item-card" style="animation-delay:${i * .04}s">
+        <img class="ic-img" src="${p.image_url || ''}" alt="">
+        <div class="ic-body">
+          <div class="ic-name">${escapeHtml(p.nom)} ${p.actif ? '' : '<span class="badge red" style="margin-left:6px;">Inactif</span>'}</div>
+          <div class="ic-meta">
+            <span>${formatF(p.montant_activation)}</span>
+            <span class="dot">•</span>
+            <span style="color:var(--wa-dark);font-weight:700;">+${formatF(p.gain_journalier)}/j</span>
+            <span class="dot">•</span>
+            <span>${p.duree_jours} j</span>
+          </div>
+        </div>
+        <div class="ic-actions">
+          <button class="icon-btn edit" onclick="openPlanModal('${p.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+          </button>
+          <button class="icon-btn delete" onclick="deletePlan('${p.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function openPlanModal(id = null) {
+    const p = id ? DATA.plans.find(x => x.id === id) : null;
+    openModal(p ? 'Modifier le plan' : 'Nouveau plan', `
+      <div class="form-group">
+        <label>Nom</label>
+        <input id="fNom" value="${p ? escapeHtml(p.nom) : ''}" placeholder="Ex: Starter">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Activation (F)</label>
+          <input id="fAct" type="number" value="${p ? p.montant_activation : ''}">
+        </div>
+        <div class="form-group">
+          <label>Gain/jour (F)</label>
+          <input id="fGain" type="number" value="${p ? p.gain_journalier : ''}">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Durée (jours)</label>
+          <input id="fDuree" type="number" value="${p ? p.duree_jours : 45}">
+        </div>
+        <div class="form-group">
+          <label>Ordre</label>
+          <input id="fOrdre" type="number" value="${p ? p.ordre : 0}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Image (URL)</label>
+        <input id="fImg" value="${p ? escapeHtml(p.image_url || '') : ''}" placeholder="https://...">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="fDesc" placeholder="Description du plan...">${p ? escapeHtml(p.description || '') : ''}</textarea>
+      </div>
+      <div class="form-check">
+        <input type="checkbox" id="fActif" ${!p || p.actif ? 'checked' : ''}>
+        <label for="fActif">Actif</label>
+      </div>
+      <button class="btn-primary" onclick="savePlan('${id || ''}')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        ${p ? 'Mettre à jour' : 'Créer le plan'}
+      </button>
+    `);
+  }
+
+  async function savePlan(id) {
+    const payload = {
+      nom: document.getElementById('fNom').value.trim(),
+      montant_activation: Number(document.getElementById('fAct').value),
+      gain_journalier: Number(document.getElementById('fGain').value),
+      duree_jours: Number(document.getElementById('fDuree').value),
+      ordre: Number(document.getElementById('fOrdre').value),
+      image_url: document.getElementById('fImg').value.trim() || null,
+      description: document.getElementById('fDesc').value.trim() || null,
+      actif: document.getElementById('fActif').checked
+    };
+    if (!payload.nom || !payload.montant_activation || !payload.gain_journalier) {
+      return showToast('Champs requis manquants', true);
+    }
+    const { error } = id
+      ? await sb.from('plans').update(payload).eq('id', id)
+      : await sb.from('plans').insert(payload);
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast(id ? 'Plan mis à jour' : 'Plan créé');
+    closeModal();
+    await loadPlans();
+  }
+
+  async function deletePlan(id) {
+    if (!confirm('Supprimer ce plan ?')) return;
+    const { error } = await sb.from('plans').delete().eq('id', id);
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('Plan supprimé');
+    await loadPlans();
+  }
+
+  // ================= PLANTATIONS =================
+  async function loadPlantations() {
+    const { data } = await sb.from('plantations').select('*').order('ordre');
+    DATA.plantations = data || [];
+    renderPlantations();
+  }
+
+  function renderPlantations() {
+    const list = document.getElementById('plantationsList');
+    if (DATA.plantations.length === 0) return list.innerHTML = emptyBox('Aucune plantation');
+    list.innerHTML = DATA.plantations.map((p, i) => `
+      <div class="item-card" style="animation-delay:${i * .04}s">
+        <img class="ic-img" src="${p.image_url}" alt="">
+        <div class="ic-body">
+          <div class="ic-name">${escapeHtml(p.nom)} ${p.actif ? '' : '<span class="badge red" style="margin-left:6px;">Inactif</span>'}</div>
+          <div class="ic-meta">
+            <span>${formatF(p.montant_activation)}</span>
+            <span class="dot">•</span>
+            <span style="color:var(--wa-dark);font-weight:700;">+${formatF(p.gain_journalier)}/j</span>
+          </div>
+        </div>
+        <div class="ic-actions">
+          <button class="icon-btn edit" onclick="openPlantationModal('${p.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+          </button>
+          <button class="icon-btn delete" onclick="deletePlantation('${p.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function openPlantationModal(id = null) {
+    const p = id ? DATA.plantations.find(x => x.id === id) : null;
+    openModal(p ? 'Modifier la plantation' : 'Nouvelle plantation', `
+      <div class="form-group">
+        <label>Nom</label>
+        <input id="pfNom" value="${p ? escapeHtml(p.nom) : ''}">
+      </div>
+      <div class="form-group">
+        <label>Slug (unique, minuscules)</label>
+        <input id="pfSlug" value="${p ? escapeHtml(p.slug) : ''}" placeholder="Ex: mais">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Activation (F)</label>
+          <input id="pfAct" type="number" value="${p ? p.montant_activation : ''}">
+        </div>
+        <div class="form-group">
+          <label>Gain/jour (F)</label>
+          <input id="pfGain" type="number" value="${p ? p.gain_journalier : ''}">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Ordre</label>
+          <input id="pfOrdre" type="number" value="${p ? p.ordre : 0}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Image (URL)</label>
+        <input id="pfImg" value="${p ? escapeHtml(p.image_url) : ''}">
+      </div>
+      <div class="form-check">
+        <input type="checkbox" id="pfActif" ${!p || p.actif ? 'checked' : ''}>
+        <label for="pfActif">Actif</label>
+      </div>
+      <button class="btn-primary" onclick="savePlantation('${id || ''}')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        ${p ? 'Mettre à jour' : 'Créer'}
+      </button>
+    `);
+  }
+
+  async function savePlantation(id) {
+    const payload = {
+      nom: document.getElementById('pfNom').value.trim(),
+      slug: document.getElementById('pfSlug').value.trim().toLowerCase(),
+      montant_activation: Number(document.getElementById('pfAct').value),
+      gain_journalier: Number(document.getElementById('pfGain').value),
+      ordre: Number(document.getElementById('pfOrdre').value),
+      image_url: document.getElementById('pfImg').value.trim(),
+      actif: document.getElementById('pfActif').checked
+    };
+    if (!payload.nom || !payload.slug || !payload.image_url) {
+      return showToast('Champs requis manquants', true);
+    }
+    const { error } = id
+      ? await sb.from('plantations').update(payload).eq('id', id)
+      : await sb.from('plantations').insert(payload);
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast(id ? 'Plantation mise à jour' : 'Plantation créée');
+    closeModal();
+    await loadPlantations();
+  }
+
+  async function deletePlantation(id) {
+    if (!confirm('Supprimer cette plantation ?')) return;
+    const { error } = await sb.from('plantations').delete().eq('id', id);
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('Plantation supprimée');
+    await loadPlantations();
+  }
+
+  // ================= ACTUALITES =================
+  async function loadActualites() {
+    const { data } = await sb.from('actualites').select('*').order('created_at', { ascending: false });
+    DATA.actualites = data || [];
+    renderActualites();
+  }
+
+  function renderActualites() {
+    const list = document.getElementById('actualitesList');
+    if (DATA.actualites.length === 0) return list.innerHTML = emptyBox('Aucune actualité');
+    list.innerHTML = DATA.actualites.map((a, i) => `
+      <div class="item-card" style="animation-delay:${i * .04}s">
+        <img class="ic-img" src="${a.image_url || ''}" alt="">
+        <div class="ic-body">
+          <div class="ic-name">${escapeHtml(a.titre)}</div>
+          <div class="ic-meta">
+            <span class="badge green">${escapeHtml(a.categorie || 'Info')}</span>
+            ${a.epingle ? '<span class="badge orange">Épinglé</span>' : ''}
+            ${a.publie ? '' : '<span class="badge gray">Brouillon</span>'}
+          </div>
+        </div>
+        <div class="ic-actions">
+          <button class="icon-btn edit" onclick="openActualiteModal('${a.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+          </button>
+          <button class="icon-btn delete" onclick="deleteActualite('${a.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function openActualiteModal(id = null) {
+    const a = id ? DATA.actualites.find(x => x.id === id) : null;
+    openModal(a ? 'Modifier l\'actualité' : 'Publier une actualité', `
+      <div class="form-group">
+        <label>Titre</label>
+        <input id="afTitre" value="${a ? escapeHtml(a.titre) : ''}">
+      </div>
+      <div class="form-group">
+        <label>Contenu</label>
+        <textarea id="afContenu" style="min-height:120px;">${a ? escapeHtml(a.contenu) : ''}</textarea>
+      </div>
+      <div class="form-group">
+        <label>Image (URL)</label>
+        <input id="afImg" value="${a ? escapeHtml(a.image_url || '') : ''}" placeholder="https://...">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Catégorie</label>
+          <select id="afCat">
+            ${['Marché','Innovation','Export','Prix','Météo','Info'].map(c =>
+              `<option ${a && a.categorie === c ? 'selected' : ''}>${c}</option>`
+            ).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Auteur</label>
+          <input id="afAuteur" value="${a ? escapeHtml(a.auteur || '') : 'Affinity Network'}">
+        </div>
+      </div>
+      <div class="form-check">
+        <input type="checkbox" id="afEping" ${a && a.epingle ? 'checked' : ''}>
+        <label for="afEping">Épingler (à la une)</label>
+      </div>
+      <div class="form-check">
+        <input type="checkbox" id="afPub" ${!a || a.publie ? 'checked' : ''}>
+        <label for="afPub">Publié</label>
+      </div>
+      <button class="btn-primary" onclick="saveActualite('${id || ''}')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        ${a ? 'Mettre à jour' : 'Publier'}
+      </button>
+    `);
+  }
+
+  async function saveActualite(id) {
+    const payload = {
+      titre: document.getElementById('afTitre').value.trim(),
+      contenu: document.getElementById('afContenu').value.trim(),
+      image_url: document.getElementById('afImg').value.trim() || null,
+      categorie: document.getElementById('afCat').value,
+      auteur: document.getElementById('afAuteur').value.trim() || 'Affinity Network',
+      epingle: document.getElementById('afEping').checked,
+      publie: document.getElementById('afPub').checked
+    };
+    if (!payload.titre || !payload.contenu) return showToast('Titre et contenu requis', true);
+    const { error } = id
+      ? await sb.from('actualites').update(payload).eq('id', id)
+      : await sb.from('actualites').insert(payload);
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast(id ? 'Actualité mise à jour' : 'Actualité publiée');
+    closeModal();
+    await loadActualites();
+  }
+
+  async function deleteActualite(id) {
+    if (!confirm('Supprimer cette actualité ?')) return;
+    const { error } = await sb.from('actualites').delete().eq('id', id);
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('Actualité supprimée');
+    await loadActualites();
+  }
+
+  // ================= PAYS =================
+  async function loadPays() {
+    const { data } = await sb.from('pays_retrait').select('*').order('ordre');
+    DATA.pays = data || [];
+    renderPays();
+  }
+
+  function renderPays() {
+    const list = document.getElementById('paysList');
+    if (DATA.pays.length === 0) return list.innerHTML = emptyBox('Aucun pays');
+    list.innerHTML = DATA.pays.map((p, i) => `
+      <div class="item-card" style="animation-delay:${i * .02}s">
+        <img class="ic-img" style="width:40px;height:28px;border-radius:4px;" src="https://flagcdn.com/w80/${p.code.toLowerCase()}.png" alt="">
+        <div class="ic-body">
+          <div class="ic-name">${escapeHtml(p.nom)}</div>
+          <div class="ic-meta">
+            <span class="badge ${p.mode === 'mobile_money' ? 'green' : 'orange'}">
+              ${p.mode === 'mobile_money' ? 'Mobile Money' : 'Crypto'}
+            </span>
+            <span class="dot">•</span>
+            <span>Min: ${formatF(p.minimum_retrait)}</span>
+          </div>
+        </div>
+        <div class="ic-actions">
+          <button class="icon-btn edit" onclick="openPaysModal('${p.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function openPaysModal(id) {
+    const p = DATA.pays.find(x => x.id === id);
+    if (!p) return;
+    openModal('Modifier ' + p.nom, `
+      <div class="form-group">
+        <label>Nom</label>
+        <input id="pyNom" value="${escapeHtml(p.nom)}">
+      </div>
+      <div class="form-group">
+        <label>Mode de retrait</label>
+        <select id="pyMode">
+          <option value="mobile_money" ${p.mode === 'mobile_money' ? 'selected' : ''}>Mobile Money</option>
+          <option value="crypto" ${p.mode === 'crypto' ? 'selected' : ''}>Crypto</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Minimum de retrait (F)</label>
+        <input id="pyMin" type="number" value="${p.minimum_retrait}">
+      </div>
+      <div class="form-group">
+        <label>Ordre</label>
+        <input id="pyOrdre" type="number" value="${p.ordre}">
+      </div>
+      <div class="form-check">
+        <input type="checkbox" id="pyActif" ${p.actif ? 'checked' : ''}>
+        <label for="pyActif">Actif</label>
+      </div>
+      <button class="btn-primary" onclick="savePays('${id}')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Mettre à jour
+      </button>
+    `);
+  }
+
+  async function savePays(id) {
+    const payload = {
+      nom: document.getElementById('pyNom').value.trim(),
+      mode: document.getElementById('pyMode').value,
+      minimum_retrait: Number(document.getElementById('pyMin').value),
+      ordre: Number(document.getElementById('pyOrdre').value),
+      actif: document.getElementById('pyActif').checked
+    };
+    const { error } = await sb.from('pays_retrait').update(payload).eq('id', id);
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('Pays mis à jour');
+    closeModal();
+    await loadPays();
+  }
+
+  // ================= MODAL =================
+  function openModal(title, html) {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalContent').innerHTML = html;
+    document.getElementById('modalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function closeModalOutside(e) {
+    if (e.target.id === 'modalOverlay') closeModal();
+  }
+
+  // ================= UTILITAIRES =================
+  function formatF(n) {
+    return Math.round(Number(n || 0)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F';
+  }
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function emptyBox(msg) {
+    return `<div class="empty">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+      </svg>
+      <div>${msg}</div>
+    </div>`;
+  }
+  function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastText').textContent = msg;
+    t.className = 'toast show' + (isError ? ' error' : '');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+  function go(page) { window.location.href = page; }
+</script>
+</body>
+</html>
