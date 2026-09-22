@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Affinity Network — Actualités</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --wa-green: #25D366;
+    --wa-dark: #128C7E;
+    --wa-deep: #075E54;
+    --alibaba: #FF6A00;
+    --white: #ffffff;
+    --bg: #f7f9f8;
+    --text: #1a1a1a;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+  }
+  body {
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    padding-bottom: 80px; min-height: 100vh; overflow-x: hidden;
+  }
+
+  /* LOADER */
+  .loader {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--wa-deep);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 22px;
+    transition: opacity .6s ease, visibility .6s ease;
+  }
+  .loader.hidden { opacity: 0; visibility: hidden; }
+  .loader-logo {
+    font-size: 24px; font-weight: 700; color: #fff;
+    letter-spacing: 1px; animation: fadeUp .8s ease;
+  }
+  .loader-logo span { color: var(--wa-green); }
+  .spinner {
+    width: 46px; height: 46px;
+    border: 4px solid rgba(255,255,255,.2);
+    border-top-color: var(--wa-green);
+    border-radius: 50%;
+    animation: spin .9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+  @keyframes pulse {
+    0%,100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: .6; }
+  }
+  .anim { opacity: 0; animation: fadeInUp .5s ease forwards; }
+
+  /* HEADER */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px;
+    background: var(--wa-deep); color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+  .burger {
+    cursor: pointer; width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: rgba(255,255,255,.12);
+    transition: background .2s, transform .2s;
+  }
+  .burger:active { background: rgba(255,255,255,.25); transform: scale(.92); }
+  .burger svg { stroke: #fff; }
+  .logo { font-weight: 700; font-size: 18px; letter-spacing: .5px; }
+  .logo span { color: var(--wa-green); }
+
+  /* MENU */
+  .menu {
+    position: fixed; top: 0; left: 0; height: 100%; width: 280px;
+    background: #fff; z-index: 200;
+    transform: translateX(-100%);
+    transition: transform .35s cubic-bezier(.4,0,.2,1);
+    box-shadow: 4px 0 20px rgba(0,0,0,.2);
+    padding-top: 18px;
+    display: flex; flex-direction: column;
+  }
+  .menu.open { transform: translateX(0); }
+  .menu-header {
+    padding: 8px 20px 18px; border-bottom: 1px solid #eee; margin-bottom: 10px;
+    font-weight: 700; color: var(--wa-deep); font-size: 17px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .menu-header svg { stroke: var(--wa-green); }
+  .menu-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 15px 22px; cursor: pointer; font-size: 15px;
+    color: #333; transition: background .2s, padding-left .2s;
+  }
+  .menu-item:active { background: #e7f9ee; padding-left: 26px; }
+  .menu-item svg { stroke: var(--wa-dark); flex-shrink: 0; }
+  .menu-item.active { background: #e7f9ee; color: var(--wa-deep); font-weight: 700; }
+  .menu-footer {
+    margin-top: auto; padding: 16px 20px 22px;
+    border-top: 1px solid #eee;
+  }
+  .btn-logout {
+    width: 100%; padding: 14px;
+    background: #fee2e2; color: #b91c1c;
+    border: none; border-radius: 12px;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background .2s, transform .15s;
+  }
+  .btn-logout:active { transform: scale(.97); }
+  .btn-logout svg { stroke: #b91c1c; }
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.45);
+    z-index: 150; opacity: 0; pointer-events: none; transition: opacity .3s;
+  }
+  .overlay.open { opacity: 1; pointer-events: auto; }
+
+  /* CONTENU */
+  .content { padding: 18px 16px; }
+
+  /* EN-TÊTE PAGE */
+  .page-head {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 18px; gap: 12px;
+  }
+  .page-head h1 {
+    font-size: 24px; font-weight: 800; color: var(--wa-deep);
+    margin-bottom: 4px;
+  }
+  .page-head p { font-size: 13px; color: var(--muted); }
+  .live-badge {
+    display: flex; align-items: center; gap: 6px;
+    background: #fee2e2; color: #dc2626;
+    padding: 6px 12px; border-radius: 20px;
+    font-size: 11px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: .5px;
+    flex-shrink: 0;
+  }
+  .live-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #dc2626;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  /* FILTRES */
+  .filters {
+    display: flex; gap: 8px; overflow-x: auto;
+    margin-bottom: 18px; padding-bottom: 4px;
+    -ms-overflow-style: none; scrollbar-width: none;
+  }
+  .filters::-webkit-scrollbar { display: none; }
+  .filter-chip {
+    background: #fff; color: var(--muted);
+    border: 1.5px solid var(--border);
+    padding: 8px 16px; border-radius: 20px;
+    font-size: 12px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    white-space: nowrap;
+    transition: all .2s;
+  }
+  .filter-chip:active { transform: scale(.95); }
+  .filter-chip.active {
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    color: #fff; border-color: transparent;
+    box-shadow: 0 3px 10px rgba(18,140,126,.3);
+  }
+
+  /* SKELETON */
+  .sk-card {
+    background: #fff; border-radius: 16px; overflow: hidden;
+    margin-bottom: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.05);
+  }
+  .sk-card .sk-img {
+    height: 180px;
+    background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+    background-size: 200% 100%; animation: shimmer 1.4s infinite;
+  }
+  .sk-card .sk-body { padding: 16px; }
+  .sk-card .sk-line {
+    height: 12px; border-radius: 6px;
+    background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+    background-size: 200% 100%; animation: shimmer 1.4s infinite;
+    margin-bottom: 8px;
+  }
+  .sk-card .sk-line.w1 { width: 80%; height: 16px; }
+  .sk-card .sk-line.w2 { width: 100%; }
+  .sk-card .sk-line.w3 { width: 60%; }
+
+  /* CARTE À LA UNE */
+  .featured {
+    background: #fff; border-radius: 18px;
+    overflow: hidden; margin-bottom: 18px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.08);
+    cursor: pointer;
+    animation: fadeInUp .5s ease forwards;
+    opacity: 0;
+    position: relative;
+  }
+  .featured:active { transform: scale(.99); }
+  .featured .feat-img {
+    height: 200px; position: relative; overflow: hidden;
+  }
+  .featured .feat-img img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform .5s;
+  }
+  .featured:hover .feat-img img { transform: scale(1.05); }
+  .featured .feat-img::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.7), transparent 55%);
+  }
+  .featured .pin-badge {
+    position: absolute; top: 12px; left: 12px;
+    background: var(--alibaba); color: #fff;
+    font-size: 10px; font-weight: 800;
+    padding: 5px 10px; border-radius: 20px;
+    display: flex; align-items: center; gap: 4px;
+    text-transform: uppercase; letter-spacing: .4px;
+    z-index: 2;
+  }
+  .featured .pin-badge svg { stroke: #fff; }
+  .featured .feat-cat {
+    position: absolute; top: 12px; right: 12px;
+    background: rgba(255,255,255,.95); color: var(--wa-deep);
+    font-size: 10px; font-weight: 800;
+    padding: 5px 10px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: .4px;
+    z-index: 2;
+  }
+  .featured .feat-title {
+    position: absolute; bottom: 14px; left: 16px; right: 16px;
+    color: #fff; font-size: 17px; font-weight: 800;
+    line-height: 1.35; z-index: 2;
+    text-shadow: 0 1px 6px rgba(0,0,0,.5);
+  }
+  .featured .feat-body {
+    padding: 16px;
+  }
+  .featured .feat-excerpt {
+    font-size: 13.5px; color: #4b5563;
+    line-height: 1.55;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .featured .feat-meta {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 12px; padding-top: 12px;
+    border-top: 1px solid #f3f4f6;
+    font-size: 11.5px; color: var(--muted);
+  }
+  .featured .feat-meta svg { stroke: var(--muted); }
+  .featured .feat-meta .sep { color: #d1d5db; }
+
+  /* LISTE ACTUS */
+  .news-card {
+    background: #fff; border-radius: 16px;
+    overflow: hidden; margin-bottom: 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.05);
+    cursor: pointer;
+    animation: fadeInUp .5s ease forwards;
+    opacity: 0;
+    display: flex; gap: 0;
+    transition: transform .2s;
+  }
+  .news-card:active { transform: scale(.99); }
+  .news-card .nc-img {
+    width: 110px; height: 110px;
+    object-fit: cover; flex-shrink: 0;
+    background: #f3f4f6;
+  }
+  .news-card .nc-body {
+    flex: 1; padding: 12px 14px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    min-width: 0;
+  }
+  .news-card .nc-cat {
+    display: inline-block;
+    background: rgba(18,140,126,.1); color: var(--wa-dark);
+    font-size: 9.5px; font-weight: 800;
+    padding: 3px 8px; border-radius: 10px;
+    text-transform: uppercase; letter-spacing: .4px;
+    margin-bottom: 6px;
+    align-self: flex-start;
+  }
+  .news-card .nc-title {
+    font-size: 14px; font-weight: 700; color: var(--text);
+    line-height: 1.35; margin-bottom: 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .news-card .nc-meta {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--muted);
+  }
+  .news-card .nc-meta svg { stroke: var(--muted); }
+
+  /* EMPTY */
+  .empty {
+    text-align: center; padding: 50px 20px;
+    color: var(--muted); font-size: 13px;
+    background: #fff; border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  }
+  .empty svg { stroke: #d1d5db; margin-bottom: 10px; }
+
+  /* MODAL DÉTAIL */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(0,0,0,.6);
+    display: flex; align-items: flex-end; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity .3s; backdrop-filter: blur(3px);
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: auto; }
+  .modal {
+    background: #fff; width: 100%; max-width: 500px;
+    border-radius: 24px 24px 0 0;
+    transform: translateY(100%);
+    transition: transform .4s cubic-bezier(.4,0,.2,1);
+    max-height: 92vh; overflow-y: auto;
+    position: relative;
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+
+  .modal-close-floating {
+    position: absolute; top: 14px; right: 14px;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(0,0,0,.55); color: #fff;
+    border: none; cursor: pointer; z-index: 10;
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(6px);
+    transition: background .2s;
+  }
+  .modal-close-floating:active { background: rgba(0,0,0,.75); }
+  .modal-close-floating svg { stroke: #fff; }
+
+  .modal-hero {
+    height: 240px; position: relative; overflow: hidden;
+    border-radius: 24px 24px 0 0;
+  }
+  .modal-hero img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .modal-hero::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.6), transparent 60%);
+  }
+  .modal-hero .m-cat {
+    position: absolute; bottom: 16px; left: 18px;
+    background: var(--alibaba); color: #fff;
+    font-size: 10px; font-weight: 800;
+    padding: 6px 12px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: .5px;
+    z-index: 2;
+  }
+  .modal-body { padding: 20px 22px 32px; }
+  .modal-body h2 {
+    font-size: 21px; font-weight: 800; color: var(--wa-deep);
+    line-height: 1.35; margin-bottom: 12px;
+  }
+  .modal-meta {
+    display: flex; align-items: center; gap: 12px;
+    padding-bottom: 16px; margin-bottom: 16px;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 12px; color: var(--muted);
+  }
+  .modal-meta .m-item {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .modal-meta svg { stroke: var(--muted); }
+  .modal-content {
+    font-size: 15px; line-height: 1.75;
+    color: #374151;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    display: flex; background: #fff;
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 -2px 12px rgba(0,0,0,.06);
+    z-index: 100;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    padding: 9px 0 10px; cursor: pointer;
+    color: #9ca3af; font-size: 11px; gap: 4px;
+    transition: color .2s, transform .2s; font-weight: 500;
+    text-decoration: none;
+  }
+  .nav-item svg { stroke: #9ca3af; transition: stroke .2s, transform .2s; }
+  .nav-item:active { transform: scale(.92); }
+  .nav-item.active { color: var(--wa-dark); font-weight: 700; }
+  .nav-item.active svg { stroke: var(--wa-green); transform: translateY(-1px); }
+</style>
+</head>
+<body>
+
+  <div class="loader" id="loader">
+    <div class="loader-logo">Affinity<span> Network</span></div>
+    <div class="spinner"></div>
+  </div>
+
+  <header class="header">
+    <div class="burger" onclick="toggleMenu()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </div>
+    <div class="logo">Affinity<span> Network</span></div>
+    <div style="width:40px"></div>
+  </header>
+
+  <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+  <nav class="menu" id="menu">
+    <div class="menu-header">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01"/>
+      </svg>
+      Affinity Network
+    </div>
+    <div class="menu-item" onclick="go('travail.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+      </svg>
+      Travail
+    </div>
+    <div class="menu-item" onclick="go('support.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+      </svg>
+      Support
+    </div>
+    <div class="menu-item" onclick="go('faq.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      FAQ
+    </div>
+    <div class="menu-item" onclick="go('entreprise.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M3 21h18M5 21V7l7-4 7 4v14M10 9h4M10 13h4"/>
+      </svg>
+      Notre entreprise
+    </div>
+
+    <div class="menu-footer">
+      <button class="btn-logout" onclick="logout()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Se déconnecter
+      </button>
+    </div>
+  </nav>
+
+  <main class="content">
+
+    <div class="page-head anim">
+      <div>
+        <h1>Actualités</h1>
+        <p>Le marché agricole en temps réel</p>
+      </div>
+      <div class="live-badge">
+        <span class="live-dot"></span>
+        Live
+      </div>
+    </div>
+
+    <div class="filters anim" id="filters">
+      <button class="filter-chip active" data-cat="all">Tout</button>
+      <button class="filter-chip" data-cat="Marché">Marché</button>
+      <button class="filter-chip" data-cat="Innovation">Innovation</button>
+      <button class="filter-chip" data-cat="Export">Export</button>
+      <button class="filter-chip" data-cat="Prix">Prix</button>
+      <button class="filter-chip" data-cat="Météo">Météo</button>
+    </div>
+
+    <div id="newsContainer">
+      <!-- Skeletons -->
+      <div class="sk-card">
+        <div class="sk-img"></div>
+        <div class="sk-body">
+          <div class="sk-line w1"></div>
+          <div class="sk-line w2"></div>
+          <div class="sk-line w3"></div>
+        </div>
+      </div>
+      <div class="sk-card">
+        <div class="sk-img"></div>
+        <div class="sk-body">
+          <div class="sk-line w1"></div>
+          <div class="sk-line w2"></div>
+          <div class="sk-line w3"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="dashboard.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+        <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+      </svg>
+      Lancer
+    </a>
+    <a href="retirer.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/>
+      </svg>
+      Retirer
+    </a>
+    <a href="travail.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+      </svg>
+      Travail
+    </a>
+    <a href="moi.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+      </svg>
+      Moi
+    </a>
+  </nav>
+
+  <!-- MODAL DÉTAIL -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+    <div class="modal" id="modal">
+      <button class="modal-close-floating" onclick="closeModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+      <div class="modal-hero">
+        <img id="modalImg" src="" alt="">
+        <div class="m-cat" id="modalCat">—</div>
+      </div>
+      <div class="modal-body">
+        <h2 id="modalTitre">—</h2>
+        <div class="modal-meta">
+          <div class="m-item">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+            </svg>
+            <span id="modalAuteur">—</span>
+          </div>
+          <div class="m-item">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span id="modalDate">—</span>
+          </div>
+        </div>
+        <div class="modal-content" id="modalContenu">—</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ================= SUPABASE =================
+  const SUPABASE_URL = 'https://ydwjvvlcnqsftciedpqm.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2p2dmxjbnFzZnRjaWVkcHFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMDQyNDAsImV4cCI6MjEwNTY4MDI0MH0.4uQwBGedMBjUZErd8lUM5YfA26gw96RvHdo_J-3PZCY';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  let ALL_NEWS = [];
+  let CURRENT_CAT = 'all';
+  let refreshInterval = null;
+
+  // ================= INIT =================
+  (async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) {
+      window.location.replace('inscription.html');
+      return;
+    }
+
+    await loadNews();
+    setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
+
+    // Recharger automatiquement toutes les 60s (live)
+    refreshInterval = setInterval(() => {
+      loadNews(true);
+    }, 60000);
+  })();
+
+  // ================= CHARGER LES ACTUS =================
+  async function loadNews(silent = false) {
+    const container = document.getElementById('newsContainer');
+
+    const { data, error } = await sb
+      .from('actualites')
+      .select('*')
+      .eq('publie', true)
+      .order('epingle', { ascending: false })
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      if (!silent) {
+        container.innerHTML = `
+          <div class="empty">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <div>Erreur de chargement</div>
+          </div>`;
+      }
+      return;
+    }
+
+    ALL_NEWS = data || [];
+    render();
+  }
+
+  // ================= RENDU =================
+  function render() {
+    const container = document.getElementById('newsContainer');
+    const filtered = CURRENT_CAT === 'all'
+      ? ALL_NEWS
+      : ALL_NEWS.filter(n => n.categorie === CURRENT_CAT);
+
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div class="empty">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+            <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/>
+          </svg>
+          <div>Aucune actualité dans cette catégorie</div>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = '';
+
+    // Séparer les épinglés (à la une) des autres
+    const featured = filtered.filter(n => n.epingle);
+    const rest = filtered.filter(n => !n.epingle);
+
+    // Cartes à la une
+    featured.forEach((n, i) => {
+      const card = document.createElement('div');
+      card.className = 'featured';
+      card.style.animationDelay = (i * 0.06) + 's';
+      card.innerHTML = `
+        <div class="feat-img">
+          <img src="${n.image_url || defaultImg()}" alt="${escapeHtml(n.titre)}" loading="lazy">
+          <span class="pin-badge">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 17v5M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>
+            </svg>
+            À la une
+          </span>
+          <span class="feat-cat">${escapeHtml(n.categorie || 'Info')}</span>
+          <div class="feat-title">${escapeHtml(n.titre)}</div>
+        </div>
+        <div class="feat-body">
+          <div class="feat-excerpt">${escapeHtml(n.contenu)}</div>
+          <div class="feat-meta">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+            </svg>
+            ${escapeHtml(n.auteur || 'Affinity Network')}
+            <span class="sep">•</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            ${timeAgo(n.created_at)}
+          </div>
+        </div>
+      `;
+      card.addEventListener('click', () => openModal(n));
+      container.appendChild(card);
+    });
+
+    // Cartes normales
+    rest.forEach((n, i) => {
+      const card = document.createElement('div');
+      card.className = 'news-card';
+      card.style.animationDelay = ((featured.length + i) * 0.05) + 's';
+      card.innerHTML = `
+        <img class="nc-img" src="${n.image_url || defaultImg()}" alt="${escapeHtml(n.titre)}" loading="lazy">
+        <div class="nc-body">
+          <div>
+            <span class="nc-cat">${escapeHtml(n.categorie || 'Info')}</span>
+            <div class="nc-title">${escapeHtml(n.titre)}</div>
+          </div>
+          <div class="nc-meta">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            ${timeAgo(n.created_at)}
+          </div>
+        </div>
+      `;
+      card.addEventListener('click', () => openModal(n));
+      container.appendChild(card);
+    });
+  }
+
+  // ================= FILTRES =================
+  document.getElementById('filters').addEventListener('click', (e) => {
+    const chip = e.target.closest('.filter-chip');
+    if (!chip) return;
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    CURRENT_CAT = chip.dataset.cat;
+    render();
+  });
+
+  // ================= MODAL =================
+  function openModal(n) {
+    document.getElementById('modalImg').src = n.image_url || defaultImg();
+    document.getElementById('modalCat').textContent = n.categorie || 'Info';
+    document.getElementById('modalTitre').textContent = n.titre;
+    document.getElementById('modalAuteur').textContent = n.auteur || 'Affinity Network';
+    document.getElementById('modalDate').textContent = formatDate(n.created_at);
+    document.getElementById('modalContenu').textContent = n.contenu;
+
+    document.getElementById('modalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function closeModalOutside(e) {
+    if (e.target.id === 'modalOverlay') closeModal();
+  }
+
+  // ================= UTILITAIRES =================
+  function defaultImg() {
+    return 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=800';
+  }
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+  function formatDate(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('fr-FR', {
+      day: '2-digit', month: 'long', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+  }
+  function timeAgo(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+    if (diff < 60) return 'À l\'instant';
+    if (diff < 3600) return `Il y a ${Math.floor(diff / 60)} min`;
+    if (diff < 86400) return `Il y a ${Math.floor(diff / 3600)} h`;
+    if (diff < 604800) return `Il y a ${Math.floor(diff / 86400)} j`;
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+  }
+  function toggleMenu() {
+    document.getElementById('menu').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('open');
+  }
+  function go(page) { window.location.href = page; }
+  async function logout() {
+    if (!confirm('Veux-tu vraiment te déconnecter ?')) return;
+    await sb.auth.signOut();
+    window.location.replace('inscription.html');
+  }
+</script>
+</body>
+</html>
