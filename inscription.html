@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Affinity Network — Inscription</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --wa-green: #25D366;
+    --wa-dark: #128C7E;
+    --wa-deep: #075E54;
+    --alibaba: #FF6A00;
+    --white: #ffffff;
+    --bg: #f7f9f8;
+    --text: #1a1a1a;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+  }
+  body {
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; overflow-x: hidden;
+  }
+
+  /* LOADER */
+  .loader {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--wa-deep);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 22px;
+    transition: opacity .6s ease, visibility .6s ease;
+  }
+  .loader.hidden { opacity: 0; visibility: hidden; }
+  .loader-logo {
+    font-size: 24px; font-weight: 700; color: #fff;
+    letter-spacing: 1px; animation: fadeUp .8s ease;
+  }
+  .loader-logo span { color: var(--wa-green); }
+  .spinner {
+    width: 46px; height: 46px;
+    border: 4px solid rgba(255,255,255,.2);
+    border-top-color: var(--wa-green);
+    border-radius: 50%;
+    animation: spin .9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+  .anim { opacity: 0; animation: fadeInUp .5s ease forwards; }
+  .d1 { animation-delay: .05s; }
+  .d2 { animation-delay: .12s; }
+  .d3 { animation-delay: .20s; }
+  .d4 { animation-delay: .28s; }
+  .d5 { animation-delay: .36s; }
+  .d6 { animation-delay: .44s; }
+  .d7 { animation-delay: .52s; }
+
+  /* PAGE */
+  .page {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    padding: 30px 22px;
+    max-width: 460px; margin: 0 auto;
+  }
+
+  /* BRAND */
+  .brand {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; margin-bottom: 26px;
+  }
+  .brand-icon {
+    width: 46px; height: 46px; border-radius: 14px;
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(18,140,126,.3);
+  }
+  .brand-icon svg { stroke: #fff; }
+  .brand-name { font-size: 20px; font-weight: 700; color: var(--wa-deep); }
+  .brand-name span { color: var(--wa-green); }
+
+  /* TITRE */
+  .title {
+    font-size: 26px; font-weight: 700; color: var(--wa-deep);
+    text-align: center; margin-bottom: 6px;
+  }
+  .subtitle {
+    font-size: 14px; color: var(--muted);
+    text-align: center; margin-bottom: 26px;
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex; background: #eef2f0;
+    border-radius: 14px; padding: 5px;
+    margin-bottom: 22px; position: relative;
+  }
+  .tab {
+    flex: 1; text-align: center;
+    padding: 12px 0; cursor: pointer;
+    font-size: 14px; font-weight: 600;
+    color: var(--muted); z-index: 2;
+    transition: color .3s; position: relative;
+  }
+  .tab.active { color: #fff; }
+  .tab-indicator {
+    position: absolute; top: 5px; bottom: 5px;
+    width: calc(50% - 5px); left: 5px;
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    border-radius: 10px;
+    transition: transform .35s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 2px 8px rgba(18,140,126,.3);
+  }
+  .tab-indicator.right { transform: translateX(100%); }
+
+  /* FORM */
+  .form { display: flex; flex-direction: column; gap: 14px; }
+  .field { position: relative; }
+  .field label {
+    display: block; font-size: 13px; font-weight: 600;
+    color: var(--wa-deep); margin-bottom: 6px;
+  }
+  .field .input-wrap {
+    display: flex; align-items: center;
+    background: #fff; border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 0 14px;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .field .input-wrap:focus-within {
+    border-color: var(--wa-green);
+    box-shadow: 0 0 0 3px rgba(37,211,102,.15);
+  }
+  .field .input-wrap svg {
+    stroke: var(--muted); flex-shrink: 0;
+    transition: stroke .2s;
+  }
+  .field .input-wrap:focus-within svg { stroke: var(--wa-dark); }
+  .field input {
+    flex: 1; border: none; outline: none;
+    padding: 14px 10px; font-size: 15px;
+    background: transparent; color: var(--text);
+    font-family: inherit;
+  }
+  .field input::placeholder { color: #b0b7be; }
+
+  .toggle-pass {
+    cursor: pointer; padding: 6px;
+    display: flex; align-items: center;
+  }
+  .toggle-pass svg { stroke: var(--muted); }
+
+  /* BOUTON */
+  .btn-primary {
+    margin-top: 8px;
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    color: #fff; border: none;
+    padding: 16px; border-radius: 14px;
+    font-size: 16px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    box-shadow: 0 4px 14px rgba(18,140,126,.35);
+    transition: transform .15s, box-shadow .2s;
+    position: relative;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-primary:active { transform: scale(.97); }
+  .btn-primary:disabled { opacity: .7; cursor: not-allowed; }
+  .btn-primary .btn-loader {
+    display: none; width: 18px; height: 18px;
+    border: 2.5px solid rgba(255,255,255,.4);
+    border-top-color: #fff; border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+  .btn-primary.loading .btn-loader { display: inline-block; }
+  .btn-primary.loading .btn-text { opacity: .85; }
+
+  /* SWITCH */
+  .switch-line {
+    text-align: center; font-size: 14px;
+    color: var(--muted); margin-top: 22px;
+  }
+  .switch-line b {
+    color: var(--wa-dark); cursor: pointer;
+    font-weight: 700;
+  }
+
+  /* TERMS */
+  .terms {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 12px; color: var(--muted);
+    margin-top: 4px; line-height: 1.5;
+  }
+  .terms input { margin-top: 2px; accent-color: var(--wa-green); }
+  .terms a { color: var(--alibaba); text-decoration: none; font-weight: 600; }
+
+  /* MESSAGE */
+  .msg {
+    padding: 12px 14px; border-radius: 10px;
+    font-size: 13px; font-weight: 500;
+    display: none;
+  }
+  .msg.show { display: block; animation: shake .4s ease; }
+  .msg.error { background: #fee2e2; color: #b91c1c; }
+  .msg.success { background: #dcfce7; color: #166534; animation: fadeInUp .4s ease; }
+
+  /* DÉCOR */
+  .bg-shape {
+    position: fixed; border-radius: 50%;
+    z-index: -1; filter: blur(60px); opacity: .25;
+  }
+  .bg-shape.a {
+    width: 260px; height: 260px; background: var(--wa-green);
+    top: -80px; right: -80px;
+    animation: float 8s ease-in-out infinite;
+  }
+  .bg-shape.b {
+    width: 220px; height: 220px; background: var(--alibaba);
+    bottom: -60px; left: -80px;
+    animation: float 10s ease-in-out infinite reverse;
+  }
+  @keyframes float {
+    0%,100% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(20px,-20px) scale(1.1); }
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+  <div class="loader" id="loader">
+    <div class="loader-logo">Affinity<span> Network</span></div>
+    <div class="spinner"></div>
+  </div>
+
+  <div class="bg-shape a"></div>
+  <div class="bg-shape b"></div>
+
+  <div class="page">
+
+    <div class="brand anim d1">
+      <div class="brand-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2v6M12 22v-4M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M22 12h-4M4.93 19.07l4.24-4.24M14.83 9.17l4.24-4.24"/>
+        </svg>
+      </div>
+      <div class="brand-name">Affinity<span> Network</span></div>
+    </div>
+
+    <div class="title anim d2" id="mainTitle">Créer un compte</div>
+    <div class="subtitle anim d2" id="mainSubtitle">Rejoins la communauté et commence à gagner</div>
+
+    <div class="tabs anim d3">
+      <div class="tab-indicator" id="tabIndicator"></div>
+      <div class="tab active" id="tabSignup" onclick="switchTab('signup')">Inscription</div>
+      <div class="tab" id="tabLogin" onclick="switchTab('login')">Connexion</div>
+    </div>
+
+    <div class="msg" id="msgBox"></div>
+
+    <form class="form" id="authForm" onsubmit="return handleSubmit(event)">
+
+      <div class="field anim d4" id="fieldNom">
+        <label>Nom complet</label>
+        <div class="input-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+          </svg>
+          <input type="text" id="nom" placeholder="Ex: Jean Kamga" autocomplete="name">
+        </div>
+      </div>
+
+      <div class="field anim d5" id="fieldPseudo">
+        <label>Pseudo</label>
+        <div class="input-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <input type="text" id="pseudo" placeholder="Ex: jeankamga" autocomplete="username">
+        </div>
+      </div>
+
+      <div class="field anim d6">
+        <label>Email</label>
+        <div class="input-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <path d="m22 7-10 6L2 7"/>
+          </svg>
+          <input type="email" id="email" placeholder="ton@email.com" autocomplete="email">
+        </div>
+      </div>
+
+      <div class="field anim d6">
+        <label>Mot de passe</label>
+        <div class="input-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+          <div class="toggle-pass" onclick="togglePassword()">
+            <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="terms anim d7" id="fieldTerms">
+        <input type="checkbox" id="terms">
+        <label for="terms">
+          J'accepte les <a href="#">conditions d'utilisation</a> et la <a href="#">politique de confidentialité</a> d'Affinity Network.
+        </label>
+      </div>
+
+      <button type="submit" class="btn-primary anim d7" id="submitBtn">
+        <span class="btn-loader"></span>
+        <span class="btn-text" id="btnText">S'inscrire</span>
+      </button>
+    </form>
+
+    <div class="switch-line anim d7" id="switchLine">
+      Déjà un compte ? <b onclick="switchTab('login')">Se connecter</b>
+    </div>
+
+  </div>
+
+<script>
+  // ================= SUPABASE =================
+  const SUPABASE_URL = 'https://ydwjvvlcnqsftciedpqm.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2p2dmxjbnFzZnRjaWVkcHFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMDQyNDAsImV4cCI6MjEwNTY4MDI0MH0.4uQwBGedMBjUZErd8lUM5YfA26gw96RvHdo_J-3PZCY';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  // ================= LOADER =================
+  window.addEventListener('load', async () => {
+    // Vérifier si l'utilisateur est déjà connecté
+    const { data: { session } } = await sb.auth.getSession();
+    setTimeout(() => {
+      document.getElementById('loader').classList.add('hidden');
+      if (session) {
+        // Rediriger directement au dashboard si déjà connecté
+        window.location.href = 'dashboard.html';
+      }
+    }, 1200);
+  });
+
+  // ================= MODE =================
+  let mode = 'signup';
+
+  function switchTab(m) {
+    mode = m;
+    const indicator = document.getElementById('tabIndicator');
+    const tabSignup = document.getElementById('tabSignup');
+    const tabLogin = document.getElementById('tabLogin');
+    const title = document.getElementById('mainTitle');
+    const subtitle = document.getElementById('mainSubtitle');
+    const fieldNom = document.getElementById('fieldNom');
+    const fieldPseudo = document.getElementById('fieldPseudo');
+    const fieldTerms = document.getElementById('fieldTerms');
+    const btnText = document.getElementById('btnText');
+    const switchLine = document.getElementById('switchLine');
+    const password = document.getElementById('password');
+    const emailInput = document.getElementById('email');
+
+    if (m === 'signup') {
+      indicator.classList.remove('right');
+      tabSignup.classList.add('active');
+      tabLogin.classList.remove('active');
+      title.textContent = 'Créer un compte';
+      subtitle.textContent = 'Rejoins la communauté et commence à gagner';
+      fieldNom.classList.remove('hidden');
+      fieldTerms.classList.remove('hidden');
+      btnText.textContent = "S'inscrire";
+      switchLine.innerHTML = 'Déjà un compte ? <b onclick="switchTab(\'login\')">Se connecter</b>';
+      password.autocomplete = 'new-password';
+      emailInput.autocomplete = 'email';
+    } else {
+      indicator.classList.add('right');
+      tabLogin.classList.add('active');
+      tabSignup.classList.remove('active');
+      title.textContent = 'Bon retour';
+      subtitle.textContent = 'Connecte-toi pour continuer à gagner';
+      fieldNom.classList.add('hidden');
+      fieldTerms.classList.add('hidden');
+      btnText.textContent = 'Se connecter';
+      switchLine.innerHTML = 'Pas encore de compte ? <b onclick="switchTab(\'signup\')">S\'inscrire</b>';
+      password.autocomplete = 'current-password';
+      emailInput.autocomplete = 'email';
+    }
+    hideMsg();
+  }
+
+  // ================= PASSWORD =================
+  function togglePassword() {
+    const p = document.getElementById('password');
+    const icon = document.getElementById('eyeIcon');
+    if (p.type === 'password') {
+      p.type = 'text';
+      icon.innerHTML = '<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/>';
+    } else {
+      p.type = 'password';
+      icon.innerHTML = '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>';
+    }
+  }
+
+  // ================= MESSAGES =================
+  function showMsg(text, type = 'error') {
+    const e = document.getElementById('msgBox');
+    e.textContent = text;
+    e.className = 'msg show ' + type;
+  }
+  function hideMsg() {
+    document.getElementById('msgBox').className = 'msg';
+  }
+
+  // ================= SOUMISSION =================
+  async function handleSubmit(e) {
+    e.preventDefault();
+    hideMsg();
+
+    const nom = document.getElementById('nom').value.trim();
+    const pseudo = document.getElementById('pseudo').value.trim().toLowerCase();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const terms = document.getElementById('terms').checked;
+    const btn = document.getElementById('submitBtn');
+
+    // === Validation ===
+    if (mode === 'signup') {
+      if (nom.length < 3) return showMsg('Entre ton nom complet (3 caractères min).'), false;
+      if (pseudo.length < 3) return showMsg('Le pseudo doit contenir au moins 3 caractères.'), false;
+      if (!/^[a-z0-9._-]+$/.test(pseudo)) return showMsg('Pseudo : lettres minuscules, chiffres, . _ - seulement.'), false;
+    } else {
+      if (!email) return showMsg('Entre ton email.'), false;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showMsg('Entre un email valide.'), false;
+    if (password.length < 6) return showMsg('Le mot de passe doit contenir au moins 6 caractères.'), false;
+    if (mode === 'signup' && !terms) return showMsg('Tu dois accepter les conditions.'), false;
+
+    // === Chargement ===
+    btn.classList.add('loading');
+    btn.disabled = true;
+    document.getElementById('btnText').textContent = mode === 'signup' ? 'Inscription...' : 'Connexion...';
+
+    try {
+      if (mode === 'signup') {
+        await signUp(nom, pseudo, email, password);
+      } else {
+        await signIn(email, password);
+      }
+    } catch (err) {
+      showMsg(err.message || 'Une erreur est survenue.');
+      btn.classList.remove('loading');
+      btn.disabled = false;
+      document.getElementById('btnText').textContent = mode === 'signup' ? "S'inscrire" : 'Se connecter';
+    }
+
+    return false;
+  }
+
+  // ================= INSCRIPTION =================
+  async function signUp(nom, pseudo, email, password) {
+    // 1. Vérifier si le pseudo est déjà utilisé
+    const { data: existing } = await sb
+      .from('profiles')
+      .select('pseudo')
+      .eq('pseudo', pseudo)
+      .maybeSingle();
+
+    if (existing) {
+      throw new Error('Ce pseudo est déjà pris. Choisis-en un autre.');
+    }
+
+    // 2. Créer le compte Supabase Auth
+    const { data, error } = await sb.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: { nom, pseudo } // metadata
+      }
+    });
+
+    if (error) throw new Error(traduireErreur(error.message));
+
+    // 3. Cas : confirmation email activée → pas de session
+    if (!data.session) {
+      showMsg('✅ Compte créé ! Vérifie ta boîte mail pour confirmer ton adresse.', 'success');
+      setTimeout(() => {
+        switchTab('login');
+        document.getElementById('btnText').textContent = 'Se connecter';
+      }, 3000);
+      return;
+    }
+
+    // 4. Insérer le profil dans la table
+    const { error: profileError } = await sb
+      .from('profiles')
+      .insert({
+        id: data.user.id,
+        nom: nom,
+        pseudo: pseudo,
+        email: email,
+        solde: 0
+      });
+
+    if (profileError) {
+      console.warn('Erreur insertion profil:', profileError);
+      // On ne bloque pas, le compte existe déjà
+    }
+
+    // 5. Redirection
+    showMsg('✅ Inscription réussie ! Redirection...', 'success');
+    setTimeout(() => window.location.href = 'dashboard.html', 1200);
+  }
+
+  // ================= CONNEXION =================
+  async function signIn(email, password) {
+    const { data, error } = await sb.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
+
+    if (error) throw new Error(traduireErreur(error.message));
+
+    showMsg('✅ Connexion réussie ! Redirection...', 'success');
+    setTimeout(() => window.location.href = 'dashboard.html', 900);
+  }
+
+  // ================= TRADUCTION ERREURS =================
+  function traduireErreur(msg) {
+    const m = msg.toLowerCase();
+    if (m.includes('invalid login')) return 'Email ou mot de passe incorrect.';
+    if (m.includes('email not confirmed')) return 'Confirme ton email avant de te connecter.';
+    if (m.includes('user already registered')) return 'Cet email est déjà utilisé.';
+    if (m.includes('password should be')) return 'Le mot de passe est trop court (6 caractères min).';
+    if (m.includes('unable to validate email')) return 'Adresse email invalide.';
+    if (m.includes('rate limit')) return 'Trop de tentatives. Réessaie dans quelques minutes.';
+    return msg;
+  }
+</script>
+</body>
+</html>
