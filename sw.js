@@ -1,27 +1,26 @@
 // ===================== SERVICE WORKER =====================
-const CACHE_NAME = 'affinity-v2';
+const CACHE_NAME = 'affinity-v3';
 const LOGO_URL = 'https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png';
 
-// Pages de l'application à pré-cacher
 const OFFLINE_URLS = [
   '/',
-  '/index.html',
-  '/dashboard.html',
-  '/travail.html',
-  '/lancer.html',
-  '/retirer.html',
-  '/parrainage.html',
-  '/missions.html',
-  '/moi.html',
-  '/ticket.html',
-  '/classement.html',
-  '/actualites.html',
-  '/entreprise.html',
-  '/faq.html',
-  '/support.html',
-  '/roue.html',
-  '/notifications.html',
-  '/inscription.html',
+  '/index',
+  '/dashboard',
+  '/travail',
+  '/lancer',
+  '/retirer',
+  '/parrainage',
+  '/missions',
+  '/moi',
+  '/ticket',
+  '/classement',
+  '/actualites',
+  '/entreprise',
+  '/faq',
+  '/support',
+  '/roue',
+  '/notifications',
+  '/inscription',
   '/manifest.json',
   LOGO_URL
 ];
@@ -30,7 +29,6 @@ const OFFLINE_URLS = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      console.log('[SW] Pré-cache en cours...');
       return cache.addAll(OFFLINE_URLS).catch(err => {
         console.warn('[SW] Certaines URLs non cachées :', err);
       });
@@ -44,10 +42,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => {
-          console.log('[SW] Suppression ancien cache :', k);
-          return caches.delete(k);
-        })
+        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
       )
     )
   );
@@ -59,13 +54,10 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // 1. Ne pas intercepter les requêtes non-GET
   if (request.method !== 'GET') return;
-
-  // 2. Ignorer Supabase et autres APIs (toujours en réseau)
   if (url.hostname.includes('supabase')) return;
 
-  // 3. Le logo ImgBB : cache-first (toujours dispo)
+  // Logo ImgBB : cache-first
   if (request.url === LOGO_URL) {
     event.respondWith(
       caches.match(request).then(cached => {
@@ -80,7 +72,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 4. Ressources externes (unsplash, flagcdn, etc.) : network-first avec cache
+  // Externe : network-first
   if (url.origin !== location.origin) {
     event.respondWith(
       fetch(request).then(response => {
@@ -94,38 +86,39 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 5. Ressources locales : cache-first avec mise à jour en arrière-plan
-  event.respondWith(
-    caches.match(request).then(cached => {
-      const fetchPromise = fetch(request).then(response => {
-        if (response && response.status === 200) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
-        }
+  // Local : network-first pour HTML, cache-first pour le reste
+  const isHTML = request.headers.get('accept')?.includes('text/html');
+  
+  if (isHTML) {
+    event.respondWith(
+      fetch(request).then(response => {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
         return response;
-      }).catch(() => cached);
-      return cached || fetchPromise;
-    })
-  );
+      }).catch(() => caches.match(request).then(cached => cached || caches.match('/index')))
+    );
+  } else {
+    event.respondWith(
+      caches.match(request).then(cached => {
+        const fetchPromise = fetch(request).then(response => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+          }
+          return response;
+        }).catch(() => cached);
+        return cached || fetchPromise;
+      })
+    );
+  }
 });
 
-// ===================== PUSH NOTIFICATIONS =====================
+// ===================== PUSH =====================
 self.addEventListener('push', (event) => {
-  let data = { 
-    title: 'Affinity Network', 
-    body: 'Nouvelle notification !',
-    icon: LOGO_URL,
-    badge: LOGO_URL
-  };
-  
+  let data = { title: 'Affinity Network', body: 'Nouvelle notification !', icon: LOGO_URL, badge: LOGO_URL };
   if (event.data) {
-    try { 
-      data = { ...data, ...event.data.json() }; 
-    } catch(e) { 
-      data.body = event.data.text(); 
-    }
+    try { data = { ...data, ...event.data.json() }; } catch(e) { data.body = event.data.text(); }
   }
-  
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
@@ -138,16 +131,14 @@ self.addEventListener('push', (event) => {
   );
 });
 
-// ===================== CLIC NOTIFICATION =====================
+// ===================== CLIC NOTIF =====================
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const url = event.notification.data || '/dashboard';
   event.waitUntil(
     clients.matchAll({ type: 'window' }).then(windowClients => {
       for (const client of windowClients) {
-        if (client.url.includes(url) && 'focus' in client) {
-          return client.focus();
-        }
+        if (client.url.includes(url) && 'focus' in client) return client.focus();
       }
       if (clients.openWindow) return clients.openWindow(url);
     })
