@@ -32,54 +32,36 @@
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root {
     --wa-green: #25D366; --wa-dark: #128C7E; --wa-deep: #075E54;
-    --alibaba: #FF6A00; --gold: #FFB800;
+    --alibaba: #FF6A00; --gold: #FFB800; --vip: #9333EA;
     --bg: #f7f9f8; --text: #1a1a1a; --muted: #6b7280; --border: #e5e7eb;
     --danger: #dc2626;
   }
   body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 84px; min-height: 100vh; overflow-x: hidden; -webkit-user-select: none; user-select: none; }
   input, textarea, select { -webkit-user-select: text; user-select: text; }
 
-  /* ============ LOADER ============ */
-  .loader {
-    position: fixed; inset: 0; z-index: 9999;
-    background: linear-gradient(135deg, var(--wa-deep) 0%, var(--wa-dark) 100%);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 22px; transition: opacity .6s ease, visibility .6s ease;
-  }
+  .loader { position: fixed; inset: 0; z-index: 9999; background: linear-gradient(135deg, var(--wa-deep) 0%, var(--wa-dark) 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; transition: opacity .6s ease, visibility .6s ease; }
   .loader.hidden { opacity: 0; visibility: hidden; }
   .loader-logo-img { width: 90px; height: 90px; object-fit: contain; filter: drop-shadow(0 8px 24px rgba(0,0,0,.3)); }
   .loader-logo-txt { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: 1.5px; }
   .loader-logo-txt span { color: var(--wa-green); }
   .spinner { width: 44px; height: 44px; border: 4px solid rgba(255,255,255,.2); border-top-color: var(--wa-green); border-radius: 50%; animation: spin .9s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
   @keyframes fadeInUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: .9; } }
+  @keyframes pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: .85; } }
   .anim { opacity: 0; animation: fadeInUp .5s ease forwards; }
-  .d1 { animation-delay: .05s; } .d2 { animation-delay: .12s; } .d3 { animation-delay: .2s; }
-  .d4 { animation-delay: .28s; } .d5 { animation-delay: .34s; }
+  .d1 { animation-delay: .05s; } .d2 { animation-delay: .12s; } .d3 { animation-delay: .2s; } .d4 { animation-delay: .28s; }
 
-  /* ============ HEADER ============ */
-  .header {
-    position: sticky; top: 0; z-index: 100;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 16px;
-    background: linear-gradient(135deg, var(--wa-deep), var(--wa-dark));
-    color: #fff;
-    box-shadow: 0 4px 20px rgba(7,94,84,.2);
-    padding-top: max(12px, env(safe-area-inset-top));
-  }
+  .header { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: linear-gradient(135deg, var(--wa-deep), var(--wa-dark)); color: #fff; box-shadow: 0 4px 20px rgba(7,94,84,.2); padding-top: max(12px, env(safe-area-inset-top)); }
   .burger { cursor: pointer; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 14px; background: rgba(255,255,255,.12); }
   .burger svg { stroke: #fff; }
   .header-logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 17px; }
   .header-logo img { width: 34px; height: 34px; border-radius: 10px; background: #fff; padding: 3px; object-fit: contain; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
   .header-logo span { color: var(--wa-green); }
 
-  /* ============ MENU ============ */
   .menu { position: fixed; top: 0; left: 0; height: 100%; width: 300px; background: #fff; z-index: 200; transform: translateX(-100%); transition: transform .35s cubic-bezier(.4,0,.2,1); box-shadow: 8px 0 32px rgba(0,0,0,.15); display: flex; flex-direction: column; overflow-y: auto; padding-top: max(18px, env(safe-area-inset-top)); }
   .menu.open { transform: translateX(0); }
   .menu-header { padding: 12px 22px 20px; border-bottom: 1px solid #f0f4f2; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
-  .menu-header img { width: 44px; height: 44px; border-radius: 12px; background: #fff; padding: 4px; box-shadow: 0 4px 12px rgba(7,94,84,.12); object-fit: contain; }
+  .menu-header img { width: 44px; height: 44px; border-radius: 12px; background: #fff; padding: 4px; object-fit: contain; }
   .menu-header-info { flex: 1; }
   .menu-header-name { font-size: 16px; font-weight: 800; color: var(--wa-deep); }
   .menu-header-name span { color: var(--wa-green); }
@@ -92,11 +74,9 @@
   .menu-item.recharge .mi-icon { background: rgba(37,211,102,.15); }
   .menu-item.recharge svg { stroke: var(--wa-green); }
   .menu-item.roue .mi-icon { background: rgba(147,51,234,.12); }
-  .menu-item.roue svg { stroke: #9333EA; }
+  .menu-item.roue svg { stroke: var(--vip); }
   .menu-item.missions .mi-icon { background: rgba(255,184,0,.15); }
   .menu-item.missions svg { stroke: var(--gold); }
-  .menu-item.notifs .mi-icon { background: rgba(220,38,38,.12); }
-  .menu-item.notifs svg { stroke: #DC2626; }
   .menu-item.travail .mi-icon { background: rgba(18,140,126,.12); }
   .menu-item.travail svg { stroke: var(--wa-dark); }
   .menu-item.partenaires .mi-icon { background: rgba(37,211,102,.15); }
@@ -105,8 +85,6 @@
   .menu-item.support svg { stroke: #2563eb; }
   .menu-item.faq .mi-icon { background: rgba(168,85,247,.12); }
   .menu-item.faq svg { stroke: #A855F7; }
-  .menu-item.entreprise .mi-icon { background: rgba(245,158,11,.12); }
-  .menu-item.entreprise svg { stroke: #f59e0b; }
   .menu-item.active { background: #e7f9ee; }
   .menu-item.active .mi-icon { background: rgba(37,211,102,.2); }
   .menu-item.active svg { stroke: var(--wa-green); }
@@ -116,146 +94,201 @@
   .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 150; opacity: 0; pointer-events: none; transition: opacity .3s; backdrop-filter: blur(2px); }
   .overlay.open { opacity: 1; pointer-events: auto; }
 
-  /* ============ CONTENU ============ */
   .content { padding: 0 0 20px; }
-
-  /* HERO */
-  .hero {
-    background: linear-gradient(135deg, var(--wa-deep) 0%, var(--wa-dark) 55%, var(--wa-green) 130%);
-    color: #fff;
-    padding: 32px 20px 40px;
-    position: relative;
-    overflow: hidden;
-  }
+  .hero { background: linear-gradient(135deg, var(--wa-deep) 0%, var(--wa-dark) 55%, var(--wa-green) 130%); color: #fff; padding: 32px 20px 40px; position: relative; overflow: hidden; }
   .hero::before { content: ''; position: absolute; width: 280px; height: 280px; border-radius: 50%; background: rgba(37,211,102,.15); top: -100px; right: -80px; filter: blur(40px); }
-  .hero::after { content: ''; position: absolute; width: 220px; height: 220px; border-radius: 50%; background: rgba(255,106,0,.12); bottom: -80px; left: -60px; filter: blur(40px); }
   .hero-content { position: relative; z-index: 2; text-align: center; }
-  .hero-icon {
-    width: 80px; height: 80px; border-radius: 24px;
-    background: rgba(255,255,255,.2);
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 18px;
-    border: 2px solid rgba(255,255,255,.35);
-    backdrop-filter: blur(10px);
-    animation: pulse 2s ease-in-out infinite;
-  }
+  .hero-icon { width: 80px; height: 80px; border-radius: 24px; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; border: 2px solid rgba(255,255,255,.35); backdrop-filter: blur(10px); animation: pulse 2s ease-in-out infinite; }
   .hero-icon svg { stroke: #fff; }
   .hero h1 { font-size: 28px; font-weight: 800; margin-bottom: 10px; line-height: 1.2; letter-spacing: -.5px; }
   .hero p { font-size: 14.5px; opacity: .92; line-height: 1.6; max-width: 420px; margin: 0 auto; }
 
-  /* SECTION */
   .section { padding: 0 16px; }
-  .section-title {
-    font-size: 16px; font-weight: 800; color: var(--wa-deep);
-    margin: 26px 0 14px;
-    display: flex; align-items: center; gap: 9px;
-  }
+  .section-title { font-size: 16px; font-weight: 800; color: var(--wa-deep); margin: 26px 0 14px; display: flex; align-items: center; gap: 9px; }
   .section-title svg { stroke: var(--wa-green); }
 
-  /* PROFILS PARTENAIRES */
-  .partner-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .partner-card {
+  /* TYPES DE PARTENAIRES */
+  .types-list { display: flex; flex-direction: column; gap: 14px; }
+  .type-card {
     background: #fff;
-    border-radius: 20px;
-    padding: 18px 14px;
-    text-align: center;
-    box-shadow: 0 4px 16px rgba(0,0,0,.06);
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0,0,0,.06);
     border: 1.5px solid #f3f6f4;
-    transition: transform .2s;
+    transition: transform .2s, box-shadow .2s;
     cursor: pointer;
     animation: fadeInUp .5s ease forwards;
     opacity: 0;
+    position: relative;
   }
-  .partner-card:active { transform: scale(.97); }
-  .partner-card .pc-icon {
-    width: 54px; height: 54px; border-radius: 16px;
+  .type-card:active { transform: scale(.98); box-shadow: 0 3px 12px rgba(0,0,0,.08); }
+  .tc-header {
+    padding: 18px 18px 14px;
+    display: flex; align-items: center; gap: 14px;
+    border-bottom: 1px solid #f3f6f4;
+    position: relative;
+  }
+  .tc-icon {
+    width: 56px; height: 56px;
+    border-radius: 16px;
     display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 12px;
-    font-size: 26px;
-  }
-  .partner-card:nth-child(1) .pc-icon { background: rgba(37,211,102,.12); }
-  .partner-card:nth-child(2) .pc-icon { background: rgba(255,106,0,.12); }
-  .partner-card:nth-child(3) .pc-icon { background: rgba(255,184,0,.15); }
-  .partner-card:nth-child(4) .pc-icon { background: rgba(18,140,126,.12); }
-  .partner-card .pc-icon svg { stroke: currentColor; }
-  .partner-card:nth-child(1) .pc-icon svg { stroke: var(--wa-green); }
-  .partner-card:nth-child(2) .pc-icon svg { stroke: var(--alibaba); }
-  .partner-card:nth-child(3) .pc-icon svg { stroke: var(--gold); }
-  .partner-card:nth-child(4) .pc-icon svg { stroke: var(--wa-dark); }
-  .partner-card h3 { font-size: 14px; font-weight: 800; color: var(--wa-deep); margin-bottom: 5px; }
-  .partner-card p { font-size: 11.5px; color: var(--muted); line-height: 1.5; }
-
-  /* AVANTAGES */
-  .advantages { display: flex; flex-direction: column; gap: 12px; }
-  .advantage {
-    background: #fff;
-    border-radius: 18px;
-    padding: 16px;
-    box-shadow: 0 4px 16px rgba(0,0,0,.05);
-    display: flex; gap: 14px; align-items: flex-start;
-    border-left: 4px solid var(--wa-green);
-    animation: fadeInUp .5s ease forwards;
-    opacity: 0;
-  }
-  .advantage:nth-child(2) { border-left-color: var(--alibaba); }
-  .advantage:nth-child(3) { border-left-color: var(--gold); }
-  .advantage:nth-child(4) { border-left-color: var(--wa-dark); }
-  .advantage .adv-icon {
-    width: 44px; height: 44px; border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
     flex-shrink: 0;
+    background: linear-gradient(135deg, rgba(37,211,102,.12), rgba(18,140,126,.15));
   }
-  .advantage:nth-child(1) .adv-icon { background: rgba(37,211,102,.12); }
-  .advantage:nth-child(2) .adv-icon { background: rgba(255,106,0,.12); }
-  .advantage:nth-child(3) .adv-icon { background: rgba(255,184,0,.15); }
-  .advantage:nth-child(4) .adv-icon { background: rgba(18,140,126,.12); }
-  .advantage:nth-child(1) .adv-icon svg { stroke: var(--wa-green); }
-  .advantage:nth-child(2) .adv-icon svg { stroke: var(--alibaba); }
-  .advantage:nth-child(3) .adv-icon svg { stroke: var(--gold); }
-  .advantage:nth-child(4) .adv-icon svg { stroke: var(--wa-dark); }
-  .advantage .adv-body { flex: 1; }
-  .advantage h4 { font-size: 14px; font-weight: 800; color: var(--wa-deep); margin-bottom: 4px; }
-  .advantage p { font-size: 12.5px; color: #4b5563; line-height: 1.55; }
-
-  /* STATS BAND */
-  .stats-band {
-    background: linear-gradient(135deg, var(--wa-deep), var(--wa-dark));
-    border-radius: 20px;
-    padding: 24px 20px;
-    margin: 22px 16px;
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    box-shadow: 0 8px 24px rgba(7,94,84,.25);
-    position: relative; overflow: hidden;
+  .type-card[data-code="promoteur"] .tc-icon { background: linear-gradient(135deg, rgba(37,211,102,.15), rgba(18,140,126,.2)); }
+  .type-card[data-code="manager"] .tc-icon { background: linear-gradient(135deg, rgba(59,130,246,.12), rgba(37,99,235,.15)); }
+  .type-card[data-code="pp"] .tc-icon { background: linear-gradient(135deg, rgba(147,51,234,.12), rgba(217,70,239,.15)); }
+  .type-card[data-code="autre"] .tc-icon { background: linear-gradient(135deg, rgba(255,184,0,.15), rgba(255,106,0,.12)); }
+  .tc-info { flex: 1; min-width: 0; }
+  .tc-name {
+    font-size: 18px; font-weight: 800; color: var(--wa-deep);
+    margin-bottom: 4px;
+    letter-spacing: -.2px;
   }
-  .stats-band::before { content: ''; position: absolute; width: 200px; height: 200px; border-radius: 50%; background: rgba(37,211,102,.15); top: -80px; right: -80px; }
-  .stat-item { text-align: center; position: relative; z-index: 2; }
-  .stat-item .num { font-size: 24px; font-weight: 800; color: var(--wa-green); margin-bottom: 4px; letter-spacing: -.5px; }
-  .stat-item .num small { font-size: 14px; color: #fff; font-weight: 700; }
-  .stat-item .lbl { font-size: 10.5px; color: #fff; opacity: .85; text-transform: uppercase; font-weight: 700; letter-spacing: .5px; line-height: 1.3; }
+  .tc-desc { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
 
-  /* FORMULAIRE */
-  .form-card {
+  .tc-rewards {
+    display: flex; gap: 8px;
+    padding: 12px 18px;
+    background: linear-gradient(135deg, rgba(255,184,0,.06), rgba(255,106,0,.06));
+    border-bottom: 1px solid #f3f6f4;
+  }
+  .reward-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 12px; border-radius: 20px;
+    font-size: 12px; font-weight: 800;
+    letter-spacing: .3px;
+  }
+  .reward-pill.fcfa {
+    background: linear-gradient(135deg, var(--gold), #FFD966);
+    color: #1a1a1a;
+    box-shadow: 0 2px 8px rgba(255,184,0,.3);
+  }
+  .reward-pill.fcfa svg { stroke: #1a1a1a; }
+  .reward-pill.vip {
+    background: linear-gradient(135deg, var(--vip), #D946EF);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(147,51,234,.3);
+  }
+  .reward-pill.vip svg { stroke: #fff; }
+
+  .tc-criteres { padding: 14px 18px 16px; }
+  .tc-critere-title {
+    font-size: 11px; color: var(--muted);
+    text-transform: uppercase; font-weight: 800;
+    letter-spacing: .5px; margin-bottom: 10px;
+  }
+  .tc-critere {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-size: 12.5px; color: #374151;
+    line-height: 1.5; margin-bottom: 7px;
+    font-weight: 500;
+  }
+  .tc-critere:last-child { margin-bottom: 0; }
+  .tc-critere .check {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: rgba(37,211,102,.15);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .tc-critere .check svg { stroke: var(--wa-green); }
+  .tc-critere b { color: var(--wa-deep); font-weight: 800; }
+
+  .btn-postuler {
+    margin: 0 18px 18px;
+    width: calc(100% - 36px);
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    color: #fff;
+    font-size: 14.5px; font-weight: 800;
+    cursor: pointer; font-family: inherit;
+    box-shadow: 0 6px 18px rgba(18,140,126,.3);
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    transition: transform .15s;
+    letter-spacing: .3px;
+  }
+  .btn-postuler:active { transform: scale(.97); }
+  .btn-postuler svg { stroke: #fff; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(0,0,0,.6);
+    display: flex; align-items: flex-end; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity .3s;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: auto; }
+  .modal {
     background: #fff;
-    border-radius: 24px;
-    padding: 24px 20px;
-    box-shadow: 0 8px 32px rgba(7,94,84,.1);
-    margin: 0 16px;
+    width: 100%; max-width: 500px;
+    border-radius: 28px 28px 0 0;
+    transform: translateY(100%);
+    transition: transform .4s cubic-bezier(.4,0,.2,1);
+    max-height: 92vh;
+    overflow-y: auto;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+    position: relative;
   }
-  .form-header { text-align: center; margin-bottom: 22px; }
-  .form-header .fh-icon {
-    width: 56px; height: 56px; border-radius: 18px;
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-handle {
+    width: 42px; height: 5px; border-radius: 5px;
+    background: #d1d5db;
+    margin: 12px auto 4px;
+  }
+  .modal-hero {
+    padding: 16px 22px 20px;
+    text-align: center;
+    border-bottom: 1px solid #f3f6f4;
+    position: relative;
+  }
+  .modal-close-floating {
+    position: absolute; top: 12px; right: 16px;
+    width: 34px; height: 34px;
+    border-radius: 12px;
+    background: #f3f4f6;
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal-close-floating svg { stroke: var(--muted); }
+  .modal-hero-icon {
+    width: 68px; height: 68px;
+    border-radius: 20px;
     background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
     display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 12px;
-    box-shadow: 0 6px 18px rgba(18,140,126,.35);
+    margin: 0 auto 14px;
+    box-shadow: 0 8px 22px rgba(18,140,126,.3);
   }
-  .form-header .fh-icon svg { stroke: #fff; }
-  .form-header h3 { font-size: 18px; font-weight: 800; color: var(--wa-deep); margin-bottom: 5px; }
-  .form-header p { font-size: 13px; color: var(--muted); }
+  .modal-hero-icon img { width: 90%; height: 90%; object-fit: contain; }
+  .modal-hero-title {
+    font-size: 20px; font-weight: 800;
+    color: var(--wa-deep);
+    margin-bottom: 6px;
+    letter-spacing: -.2px;
+  }
+  .modal-hero-sub {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .modal-body { padding: 18px 20px 8px; }
 
   .field { margin-bottom: 14px; }
-  .field label { display: block; font-size: 12.5px; font-weight: 700; color: var(--wa-deep); margin-bottom: 7px; letter-spacing: .2px; }
+  .field label {
+    display: block; font-size: 12.5px; font-weight: 700;
+    color: var(--wa-deep); margin-bottom: 7px;
+    letter-spacing: .2px;
+  }
+  .field label .opt {
+    color: var(--muted); font-weight: 500;
+    font-size: 11px;
+  }
   .field .input-wrap {
     display: flex; align-items: center;
     background: #f7faf8; border: 1.5px solid #eef2f0;
@@ -269,25 +302,39 @@
   }
   .field .input-wrap svg { stroke: var(--muted); flex-shrink: 0; transition: stroke .2s; }
   .field .input-wrap:focus-within svg { stroke: var(--wa-dark); }
-  .field input, .field select, .field textarea {
+  .field input, .field textarea, .field select {
     flex: 1; border: none; outline: none;
-    padding: 13px 10px; font-size: 15px;
+    padding: 13px 10px;
+    font-size: 15px;
     background: transparent; color: var(--text);
     font-family: inherit; font-weight: 500;
     width: 100%;
   }
   .field input::placeholder, .field textarea::placeholder { color: #b0b7be; font-weight: 400; }
   .field textarea { resize: vertical; min-height: 90px; padding: 14px 10px; }
-  .field select { cursor: pointer; -webkit-appearance: none; appearance: none; }
+
+  .form-section-title {
+    font-size: 11.5px;
+    font-weight: 800;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    margin: 22px 0 12px;
+    padding-top: 18px;
+    border-top: 1px dashed #eef2f0;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .form-section-title svg { stroke: var(--wa-green); }
 
   .btn-submit {
     width: 100%; border: none;
     background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
-    color: #fff; padding: 17px;
-    border-radius: 16px; font-size: 16px; font-weight: 800;
+    color: #fff;
+    padding: 17px;
+    border-radius: 16px;
+    font-size: 16px; font-weight: 800;
     cursor: pointer; font-family: inherit;
     box-shadow: 0 8px 24px rgba(18,140,126,.35);
-    transition: transform .15s;
     display: flex; align-items: center; justify-content: center;
     gap: 10px; margin-top: 8px;
     letter-spacing: .3px;
@@ -300,43 +347,6 @@
   .btn-submit.loading .spin-small { display: inline-block; }
   .btn-submit.loading .icon-default { display: none; }
 
-  /* CTA CONTACT */
-  .contact-cta {
-    margin: 22px 16px;
-    background: linear-gradient(135deg, var(--wa-deep), var(--wa-dark));
-    color: #fff;
-    border-radius: 22px;
-    padding: 26px 22px;
-    text-align: center;
-    position: relative; overflow: hidden;
-    box-shadow: 0 10px 30px rgba(7,94,84,.25);
-  }
-  .contact-cta::before { content: ''; position: absolute; width: 180px; height: 180px; border-radius: 50%; background: rgba(37,211,102,.15); top: -80px; right: -60px; }
-  .contact-cta::after { content: ''; position: absolute; width: 140px; height: 140px; border-radius: 50%; background: rgba(255,106,0,.1); bottom: -60px; left: -50px; }
-  .contact-cta .cc-icon {
-    width: 60px; height: 60px; border-radius: 50%;
-    background: rgba(37,211,102,.2);
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 14px;
-    position: relative; z-index: 2;
-  }
-  .contact-cta .cc-icon svg { stroke: var(--wa-green); }
-  .contact-cta h3 { font-size: 18px; font-weight: 800; margin-bottom: 8px; position: relative; z-index: 2; }
-  .contact-cta p { font-size: 13.5px; opacity: .9; line-height: 1.6; margin-bottom: 20px; position: relative; z-index: 2; }
-  .contact-btn {
-    background: var(--wa-green); color: #fff;
-    border: none; padding: 14px 28px;
-    border-radius: 30px; font-size: 14px; font-weight: 800;
-    cursor: pointer; font-family: inherit;
-    box-shadow: 0 6px 18px rgba(37,211,102,.4);
-    display: inline-flex; align-items: center; gap: 8px;
-    position: relative; z-index: 2;
-    transition: transform .15s;
-  }
-  .contact-btn:active { transform: scale(.96); }
-  .contact-btn svg { stroke: #fff; }
-
-  /* BOTTOM NAV */
   .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: #fff; border-top: 1px solid #eef2f0; box-shadow: 0 -4px 20px rgba(0,0,0,.06); z-index: 100; padding-bottom: env(safe-area-inset-bottom); padding-top: 6px; }
   .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 6px 0 10px; cursor: pointer; color: #9ca3af; font-size: 10.5px; gap: 4px; font-weight: 600; text-decoration: none; }
   .nav-item .nav-icon { width: 44px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: background .2s; }
@@ -345,12 +355,15 @@
   .nav-item.active .nav-icon { background: rgba(37,211,102,.12); }
   .nav-item.active svg { stroke: var(--wa-green); }
 
-  /* TOAST */
   .toast { position: fixed; left: 50%; bottom: 100px; transform: translateX(-50%) translateY(20px); background: var(--wa-deep); color: #fff; padding: 14px 24px; border-radius: 32px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,.3); opacity: 0; pointer-events: none; transition: all .3s; z-index: 1000; display: flex; align-items: center; gap: 10px; max-width: 90%; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast svg { stroke: var(--wa-green); flex-shrink: 0; }
+  .toast.success { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); }
+  .toast.success svg { stroke: #fff; }
   .toast.error { background: #b91c1c; }
   .toast.error svg { stroke: #fff; }
+
+  .empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; background: #fff; border-radius: 18px; box-shadow: 0 4px 16px rgba(0,0,0,.05); }
 </style>
 </head>
 <body>
@@ -411,13 +424,11 @@
     <div class="menu-item missions" onclick="go('missions')">
       <div class="mi-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-          <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-          <path d="M4 22h16"/>
-          <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+          <path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
         </svg>
       </div>
-      Missions du mois
+      Missions
     </div>
     <div class="menu-item travail" onclick="go('travail')">
       <div class="mi-icon">
@@ -467,7 +478,6 @@
 
   <main class="content">
 
-    <!-- HERO -->
     <div class="hero">
       <div class="hero-content">
         <div class="hero-icon">
@@ -479,263 +489,21 @@
           </svg>
         </div>
         <h1>Devenir partenaire</h1>
-        <p>Rejoins le réseau Affinity et développe ton activité avec nous. Agriculteurs, distributeurs, investisseurs ou ambassadeurs — il y a une place pour toi.</p>
+        <p>Rejoins le programme Affinity et débloque des récompenses exclusives selon ton profil.</p>
       </div>
     </div>
 
-    <!-- PROFILS -->
     <div class="section">
       <div class="section-title anim d1">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 7h-9M14 17H5"/>
-          <circle cx="17" cy="17" r="3"/>
-          <circle cx="7" cy="7" r="3"/>
+          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+          <path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
         </svg>
-        Qui peut devenir partenaire ?
+        Choisis ton profil
       </div>
-      <div class="partner-cards">
-        <div class="partner-card anim d1">
-          <div class="pc-icon">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M7 20h10M10 20c5.5-2.5.8-6.4 3-10M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/>
-            </svg>
-          </div>
-          <h3>Agriculteurs</h3>
-          <p>Producteurs de cacao, café, maïs, palmier...</p>
-        </div>
-        <div class="partner-card anim d2">
-          <div class="pc-icon">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 3h18v4H3zM5 7v13h14V7"/>
-              <path d="M9 11h6M9 15h6"/>
-            </svg>
-          </div>
-          <h3>Distributeurs</h3>
-          <p>Commerçants et revendeurs de produits agricoles</p>
-        </div>
-        <div class="partner-card anim d3">
-          <div class="pc-icon">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="1" x2="12" y2="23"/>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-            </svg>
-          </div>
-          <h3>Investisseurs</h3>
-          <p>Financement de projets agricoles</p>
-        </div>
-        <div class="partner-card anim d4">
-          <div class="pc-icon">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2v6M12 22v-4M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24"/>
-              <path d="M2 12h6M22 12h-4"/>
-            </svg>
-          </div>
-          <h3>Ambassadeurs</h3>
-          <p>Représentants de la marque par région</p>
-        </div>
+      <div class="types-list" id="typesList">
+        <div class="empty">Chargement des types...</div>
       </div>
-    </div>
-
-    <!-- AVANTAGES -->
-    <div class="section">
-      <div class="section-title anim d2">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-          <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-          <path d="M4 22h16"/>
-          <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
-        </svg>
-        Tes avantages
-      </div>
-      <div class="advantages">
-        <div class="advantage anim d2">
-          <div class="adv-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="1" x2="12" y2="23"/>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-            </svg>
-          </div>
-          <div class="adv-body">
-            <h4>Revenus supplémentaires</h4>
-            <p>Gagne des commissions sur chaque transaction liée à ton activité. Paiement mensuel garanti.</p>
-          </div>
-        </div>
-        <div class="advantage anim d3">
-          <div class="adv-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-              <polyline points="17 6 23 6 23 12"/>
-            </svg>
-          </div>
-          <div class="adv-body">
-            <h4>Visibilité accrue</h4>
-            <p>Ton activité est mise en avant auprès de milliers de membres sur notre plateforme.</p>
-          </div>
-        </div>
-        <div class="advantage anim d4">
-          <div class="adv-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-            </svg>
-          </div>
-          <div class="adv-body">
-            <h4>Accompagnement dédié</h4>
-            <p>Un conseiller partenaire t'accompagne dans toutes tes démarches et négociations.</p>
-          </div>
-        </div>
-        <div class="advantage anim d5">
-          <div class="adv-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-          </div>
-          <div class="adv-body">
-            <h4>Outils professionnels</h4>
-            <p>Tableaux de bord, statistiques, contrats types et support juridique inclus.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- STATS -->
-    <div class="stats-band">
-      <div class="stat-item">
-        <div class="num">120<small>+</small></div>
-        <div class="lbl">Partenaires actifs</div>
-      </div>
-      <div class="stat-item">
-        <div class="num">8</div>
-        <div class="lbl">Régions couvertes</div>
-      </div>
-      <div class="stat-item">
-        <div class="num">450<small>M</small></div>
-        <div class="lbl">FCFA redistribués</div>
-      </div>
-    </div>
-
-    <!-- FORMULAIRE -->
-    <div class="section-title" style="padding: 0 16px;">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-        <polyline points="14 2 14 8 20 8"/>
-      </svg>
-      Candidature
-    </div>
-
-    <div class="form-card anim d3">
-      <div class="form-header">
-        <div class="fh-icon">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-            <line x1="23" y1="11" x2="17" y2="11"/>
-            <line x1="20" y1="8" x2="20" y2="14"/>
-          </svg>
-        </div>
-        <h3>Rejoins le réseau</h3>
-        <p>Remplis le formulaire et on te recontacte sous 48h</p>
-      </div>
-
-      <div class="field">
-        <label>Nom complet</label>
-        <div class="input-wrap">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
-          </svg>
-          <input type="text" id="pNom" placeholder="Ex: Jean Kamga">
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Téléphone / WhatsApp</label>
-        <div class="input-wrap">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="5" y="2" width="14" height="20" rx="2"/>
-            <line x1="12" y1="18" x2="12.01" y2="18"/>
-          </svg>
-          <input type="tel" id="pTel" placeholder="Ex: +237 6 55 00 00 00">
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Email</label>
-        <div class="input-wrap">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="4" width="20" height="16" rx="2"/>
-            <path d="m22 7-10 6L2 7"/>
-          </svg>
-          <input type="email" id="pEmail" placeholder="ton@email.com">
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Type de partenariat</label>
-        <div class="input-wrap">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 7h-9M14 17H5"/>
-            <circle cx="17" cy="17" r="3"/>
-            <circle cx="7" cy="7" r="3"/>
-          </svg>
-          <select id="pType">
-            <option value="">Choisis un type</option>
-            <option value="Agriculteur">🌾 Agriculteur / Producteur</option>
-            <option value="Distributeur">📦 Distributeur / Revendeur</option>
-            <option value="Investisseur">💰 Investisseur</option>
-            <option value="Ambassadeur">🌟 Ambassadeur régional</option>
-            <option value="Autre">Autre</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Pays / Région</label>
-        <div class="input-wrap">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="2" y1="12" x2="22" y2="12"/>
-          </svg>
-          <input type="text" id="pPays" placeholder="Ex: Douala, Cameroun">
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Message / Présentation</label>
-        <div class="input-wrap">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-          <textarea id="pMessage" placeholder="Parle-nous de ton activité et de ce que tu recherches..."></textarea>
-        </div>
-      </div>
-
-      <button class="btn-submit" id="btnSubmit" onclick="submitCandidature()">
-        <span class="spin-small"></span>
-        <svg class="icon-default" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="22" y1="2" x2="11" y2="13"/>
-          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-        </svg>
-        <span class="txt" id="btnSubmitText">Envoyer ma candidature</span>
-      </button>
-    </div>
-
-    <!-- CTA CONTACT -->
-    <div class="contact-cta">
-      <div class="cc-icon">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
-          <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
-        </svg>
-      </div>
-      <h3>Une question ?</h3>
-      <p>Tu préfères discuter directement avec notre équipe avant de postuler ? On est là pour ça.</p>
-      <button class="contact-btn" onclick="go('support')">
-        Nous contacter
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="5" y1="12" x2="19" y2="12"/>
-          <polyline points="12 5 19 12 12 19"/>
-        </svg>
-      </button>
     </div>
 
   </main>
@@ -775,6 +543,28 @@
     </a>
   </nav>
 
+  <!-- MODAL CANDIDATURE -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+    <div class="modal" id="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-hero">
+        <button class="modal-close-floating" onclick="closeModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+        <div class="modal-hero-icon">
+          <img src="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png" alt="">
+        </div>
+        <div class="modal-hero-title" id="modalTitle">Postuler</div>
+        <div class="modal-hero-sub" id="modalSub">Remplis le formulaire pour soumettre ta candidature</div>
+      </div>
+      <div class="modal-body">
+        <div id="modalFormContent"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <polyline points="20 6 9 17 4 12"/>
@@ -788,6 +578,9 @@
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
   let CURRENT_USER = null;
+  let PROFILE = null;
+  let TYPES = [];
+  let CURRENT_TYPE = null;
 
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 
@@ -796,31 +589,297 @@
     if (!session) { window.location.replace('inscription'); return; }
     CURRENT_USER = session.user;
 
-    // Pré-remplir avec les infos de l'utilisateur
     const { data: profile } = await sb.from('profiles')
       .select('nom, email').eq('id', session.user.id).maybeSingle();
-    if (profile) {
-      document.getElementById('pNom').value = profile.nom || '';
-      document.getElementById('pEmail').value = profile.email || session.user.email || '';
-    }
+    PROFILE = profile || { nom: '', email: session.user.email };
+
+    await loadTypes();
 
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
   })();
 
+  // ================= CHARGER LES TYPES =================
+  async function loadTypes() {
+    const list = document.getElementById('typesList');
+    const { data, error } = await sb.from('types_partenaires')
+      .select('*')
+      .eq('actif', true)
+      .order('ordre', { ascending: true });
+
+    if (error || !data || data.length === 0) {
+      list.innerHTML = `<div class="empty">Aucun type de partenariat disponible</div>`;
+      return;
+    }
+
+    TYPES = data;
+    list.innerHTML = '';
+
+    data.forEach((type, i) => {
+      const criteres = type.criteres || [];
+      const card = document.createElement('div');
+      card.className = 'type-card';
+      card.setAttribute('data-code', type.code);
+      card.style.animationDelay = (i * 0.08) + 's';
+
+      // Construire la liste des critères
+      const criteresHTML = criteres.length > 0 
+        ? criteres.map(c => {
+            let txt = c.label;
+            if (c.min) txt += ` — minimum <b>${c.min}</b>`;
+            if (c.required && !c.min) txt += '';
+            return `
+              <div class="tc-critere">
+                <span class="check">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </span>
+                <span>${txt}</span>
+              </div>
+            `;
+          }).join('')
+        : '';
+
+      const rewardFcfaHTML = type.recompense_fcfa > 0 
+        ? `<div class="reward-pill fcfa">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+            +${formatF(type.recompense_fcfa)}
+          </div>`
+        : '';
+
+      const rewardVipHTML = type.niveau_vip > 0
+        ? `<div class="reward-pill vip">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+              <path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+            </svg>
+            VIP ${type.niveau_vip}
+          </div>`
+        : '';
+
+      card.innerHTML = `
+        <div class="tc-header">
+          <div class="tc-icon">${type.icone || '🌟'}</div>
+          <div class="tc-info">
+            <div class="tc-name">${escapeHtml(type.nom)}</div>
+            <div class="tc-desc">${escapeHtml(type.description || '')}</div>
+          </div>
+        </div>
+
+        ${(rewardFcfaHTML || rewardVipHTML) ? `
+          <div class="tc-rewards">
+            ${rewardFcfaHTML}
+            ${rewardVipHTML}
+          </div>
+        ` : ''}
+
+        ${criteresHTML ? `
+          <div class="tc-criteres">
+            <div class="tc-critere-title">Conditions requises</div>
+            ${criteresHTML}
+          </div>
+        ` : ''}
+
+        <button class="btn-postuler" data-id="${type.id}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+          Postuler pour ce type
+        </button>
+      `;
+
+      list.appendChild(card);
+    });
+
+    document.querySelectorAll('.btn-postuler').forEach(btn => {
+      btn.addEventListener('click', () => openModal(btn.dataset.id));
+    });
+  }
+
+  // ================= MODAL =================
+  function openModal(typeId) {
+    const type = TYPES.find(t => t.id === typeId);
+    if (!type) return;
+    CURRENT_TYPE = type;
+
+    document.getElementById('modalTitle').textContent = type.nom;
+    document.getElementById('modalSub').textContent = `Complète les informations pour valider ta candidature`;
+
+    const criteres = type.criteres || [];
+
+    // Générer les champs dynamiques
+    const criteresHTML = criteres.map(c => {
+      const required = c.required === true;
+      const minAttr = c.min ? `min="${c.min}"` : '';
+      const requiredAttr = required ? 'required' : '';
+      const placeholder = c.placeholder || '';
+
+      if (c.type === 'textarea') {
+        return `
+          <div class="field">
+            <label>${escapeHtml(c.label)} ${required ? '' : '<span class="opt">(optionnel)</span>'}</label>
+            <div class="input-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              <textarea id="crit_${c.key}" placeholder="${escapeHtml(placeholder)}" ${requiredAttr}></textarea>
+            </div>
+          </div>
+        `;
+      }
+
+      const icon = c.type === 'url' 
+        ? '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>'
+        : c.type === 'number'
+          ? '<line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>'
+          : '<circle cx="12" cy="12" r="10"/>';
+
+      const inputType = c.type === 'number' ? 'number' : c.type === 'url' ? 'url' : 'text';
+
+      return `
+        <div class="field">
+          <label>${escapeHtml(c.label)} ${required ? '' : '<span class="opt">(optionnel)</span>'}</label>
+          <div class="input-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              ${icon}
+            </svg>
+            <input type="${inputType}" id="crit_${c.key}" placeholder="${escapeHtml(placeholder)}" ${minAttr} ${requiredAttr}>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    document.getElementById('modalFormContent').innerHTML = `
+      <div class="form-section-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+        </svg>
+        Informations personnelles
+      </div>
+      <div class="field">
+        <label>Nom complet</label>
+        <div class="input-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+          </svg>
+          <input type="text" id="cNom" value="${escapeHtml(PROFILE.nom || '')}" placeholder="Ex: Jean Kamga" required>
+        </div>
+      </div>
+      <div class="field">
+        <label>Téléphone / WhatsApp</label>
+        <div class="input-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5" y="2" width="14" height="20" rx="2"/>
+            <line x1="12" y1="18" x2="12.01" y2="18"/>
+          </svg>
+          <input type="tel" id="cTel" placeholder="+237 6 55 00 00 00" required>
+        </div>
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <div class="input-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <path d="m22 7-10 6L2 7"/>
+          </svg>
+          <input type="email" id="cEmail" value="${escapeHtml(PROFILE.email || '')}" placeholder="ton@email.com" required>
+        </div>
+      </div>
+      <div class="field">
+        <label>Pays / Région</label>
+        <div class="input-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+          </svg>
+          <input type="text" id="cPays" placeholder="Ex: Douala, Cameroun" required>
+        </div>
+      </div>
+
+      ${criteresHTML ? `
+        <div class="form-section-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Conditions requises
+        </div>
+        ${criteresHTML}
+      ` : ''}
+
+      <div class="field">
+        <label>Message complémentaire <span class="opt">(optionnel)</span></label>
+        <div class="input-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <textarea id="cMessage" placeholder="Ajoute des informations utiles à ta candidature..."></textarea>
+        </div>
+      </div>
+
+      <button class="btn-submit" id="btnSubmit" onclick="submitCandidature()">
+        <span class="spin-small"></span>
+        <svg class="icon-default" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+        <span class="txt" id="btnSubmitText">Envoyer ma candidature</span>
+      </button>
+    `;
+
+    document.getElementById('modalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+    CURRENT_TYPE = null;
+  }
+  function closeModalOutside(e) {
+    if (e.target.id === 'modalOverlay') closeModal();
+  }
+
+  // ================= SOUMISSION =================
   async function submitCandidature() {
-    const nom = document.getElementById('pNom').value.trim();
-    const tel = document.getElementById('pTel').value.trim();
-    const email = document.getElementById('pEmail').value.trim();
-    const type = document.getElementById('pType').value;
-    const pays = document.getElementById('pPays').value.trim();
-    const message = document.getElementById('pMessage').value.trim();
+    if (!CURRENT_TYPE) return;
+
+    const nom = document.getElementById('cNom').value.trim();
+    const tel = document.getElementById('cTel').value.trim();
+    const email = document.getElementById('cEmail').value.trim();
+    const pays = document.getElementById('cPays').value.trim();
+    const message = document.getElementById('cMessage').value.trim();
 
     if (nom.length < 3) return showToast('Nom requis', true);
     if (tel.length < 6) return showToast('Téléphone requis', true);
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showToast('Email invalide', true);
-    if (!type) return showToast('Choisis un type de partenariat', true);
     if (pays.length < 2) return showToast('Pays / Région requis', true);
-    if (message.length < 20) return showToast('Message trop court (20 caractères min)', true);
+
+    // Construire les réponses aux critères
+    const criteres = CURRENT_TYPE.criteres || [];
+    const reponses = {};
+
+    for (const c of criteres) {
+      const el = document.getElementById('crit_' + c.key);
+      if (!el) continue;
+
+      let value = el.value.trim();
+
+      if (c.type === 'number') {
+        value = Number(value || 0);
+        if (c.min && value < c.min) {
+          return showToast(`${c.label} : minimum ${c.min} requis`, true);
+        }
+      }
+
+      if (c.required && !value) {
+        return showToast(`${c.label} est requis`, true);
+      }
+
+      reponses[c.key] = value;
+    }
 
     const btn = document.getElementById('btnSubmit');
     btn.classList.add('loading');
@@ -828,48 +887,56 @@
 
     const { error } = await sb.from('partenaires_candidatures').insert({
       user_id: CURRENT_USER.id,
+      type_id: CURRENT_TYPE.id,
+      type_code: CURRENT_TYPE.code,
+      type_nom: CURRENT_TYPE.nom,
       nom,
       telephone: tel,
       email,
-      type_partenariat: type,
       pays_region: pays,
-      message,
+      message: message || null,
+      reponses: reponses,
+      recompense_attendue: CURRENT_TYPE.recompense_fcfa,
+      niveau_vip_attendu: CURRENT_TYPE.niveau_vip,
       statut: 'nouveau'
-    }).catch(() => ({ error: { message: 'Table non configurée' } }));
+    });
 
     btn.classList.remove('loading');
     document.getElementById('btnSubmitText').textContent = 'Envoyer ma candidature';
 
     if (error) {
-      // Crée un ticket support si la table partenaires n'existe pas
-      console.warn('Fallback: création ticket support');
-      await sb.from('support_tickets').insert({
-        user_id: CURRENT_USER.id,
-        sujet: `Candidature partenaire - ${type}`,
-        message: `Nom: ${nom}\nTel: ${tel}\nEmail: ${email}\nType: ${type}\nRégion: ${pays}\n\n${message}`,
-        statut: 'ouvert'
-      }).catch(() => {});
+      console.warn(error);
+      showToast('Erreur : ' + (error.message || 'Réessaie'), true);
+      return;
     }
 
-    showToast('✅ Candidature envoyée ! On te recontacte sous 48h');
-    
-    // Reset
-    document.getElementById('pTel').value = '';
-    document.getElementById('pType').value = '';
-    document.getElementById('pPays').value = '';
-    document.getElementById('pMessage').value = '';
+    closeModal();
+    showToast(`✅ Candidature ${CURRENT_TYPE.nom} envoyée ! Réponse sous 48h`, 'success');
 
-    // Redirection vers support après 2s
-    setTimeout(() => go('support'), 2000);
+    // Reset formulaire après 2s
+    setTimeout(() => {
+      const form = document.getElementById('modalFormContent');
+      if (form) form.innerHTML = '';
+    }, 2000);
   }
 
+  // ================= UTILITAIRES =================
+  function formatF(n) {
+    return Math.round(Number(n || 0)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F';
+  }
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
   function showToast(msg, isError = false) {
     const t = document.getElementById('toast');
     document.getElementById('toastText').textContent = msg;
-    t.className = 'toast show' + (isError ? ' error' : '');
-    setTimeout(() => t.classList.remove('show'), 3500);
+    t.className = 'toast show' + (isError ? ' error' : (msg.includes('✅') ? ' success' : ''));
+    setTimeout(() => t.classList.remove('show'), 4000);
   }
-  function toggleMenu() { document.getElementById('menu').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
+  function toggleMenu() {
+    document.getElementById('menu').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('open');
+  }
   function go(page) {
     const cleanPage = page.replace(/\.html$/, '');
     window.location.href = cleanPage;
