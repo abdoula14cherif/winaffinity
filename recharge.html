@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Affinity Network — Recharger</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#075E54">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="icon" type="image/png" href="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png">
+<link rel="apple-touch-icon" href="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  (function() {
+    document.addEventListener('click', function(e) {
+      const link = e.target.closest('a');
+      if (!link) return;
+      let href = link.getAttribute('href');
+      if (!href) return;
+      if (href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) return;
+      if (href.endsWith('.html')) {
+        e.preventDefault();
+        window.location.href = href.replace(/\.html$/, '');
+      }
+    }, true);
+    if (window.location.pathname.endsWith('.html')) {
+      window.history.replaceState(null, '', window.location.pathname.replace(/\.html$/, '') + window.location.search);
+    }
+  })();
+</script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --wa-green: #25D366; --wa-dark: #128C7E; --wa-deep: #075E54;
+    --alibaba: #FF6A00; --gold: #FFB800;
+    --bg: #f7f9f8; --text: #1a1a1a; --muted: #6b7280; --border: #e5e7eb;
+    --danger: #dc2626;
+  }
+  body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 84px; min-height: 100vh; overflow-x: hidden; -webkit-user-select: none; user-select: none; }
+  input { -webkit-user-select: text; user-select: text; }
+
+  .loader { position: fixed; inset: 0; z-index: 9999; background: linear-gradient(135deg, var(--wa-deep) 0%, var(--wa-dark) 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; transition: opacity .6s ease, visibility .6s ease; }
+  .loader.hidden { opacity: 0; visibility: hidden; }
+  .loader-logo-img { width: 90px; height: 90px; object-fit: contain; filter: drop-shadow(0 8px 24px rgba(0,0,0,.3)); }
+  .loader-logo-txt { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: 1.5px; }
+  .loader-logo-txt span { color: var(--wa-green); }
+  .spinner { width: 44px; height: 44px; border: 4px solid rgba(255,255,255,.2); border-top-color: var(--wa-green); border-radius: 50%; animation: spin .9s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: .85; } }
+  .anim { opacity: 0; animation: fadeInUp .5s ease forwards; }
+  .d1 { animation-delay: .05s; } .d2 { animation-delay: .12s; } .d3 { animation-delay: .2s; }
+
+  .header { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: linear-gradient(135deg, var(--wa-deep), var(--wa-dark)); color: #fff; box-shadow: 0 4px 20px rgba(7,94,84,.2); padding-top: max(12px, env(safe-area-inset-top)); }
+  .burger { cursor: pointer; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 14px; background: rgba(255,255,255,.12); }
+  .burger svg { stroke: #fff; }
+  .header-logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 17px; }
+  .header-logo img { width: 34px; height: 34px; border-radius: 10px; background: #fff; padding: 3px; object-fit: contain; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+  .header-logo span { color: var(--wa-green); }
+
+  .menu { position: fixed; top: 0; left: 0; height: 100%; width: 300px; background: #fff; z-index: 200; transform: translateX(-100%); transition: transform .35s cubic-bezier(.4,0,.2,1); box-shadow: 8px 0 32px rgba(0,0,0,.15); display: flex; flex-direction: column; overflow-y: auto; padding-top: max(18px, env(safe-area-inset-top)); }
+  .menu.open { transform: translateX(0); }
+  .menu-header { padding: 12px 22px 20px; border-bottom: 1px solid #f0f4f2; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+  .menu-header img { width: 44px; height: 44px; border-radius: 12px; background: #fff; padding: 4px; object-fit: contain; }
+  .menu-header-info { flex: 1; }
+  .menu-header-name { font-size: 16px; font-weight: 800; color: var(--wa-deep); }
+  .menu-header-name span { color: var(--wa-green); }
+  .menu-header-sub { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+  .menu-item { display: flex; align-items: center; gap: 14px; padding: 14px 22px; cursor: pointer; font-size: 15px; color: #333; font-weight: 500; }
+  .menu-item:active { background: #e7f9ee; padding-left: 26px; }
+  .menu-item .mi-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .menu-item.invite .mi-icon { background: rgba(255,106,0,.12); }
+  .menu-item.invite svg { stroke: var(--alibaba); }
+  .menu-item.recharge .mi-icon { background: rgba(37,211,102,.15); }
+  .menu-item.recharge svg { stroke: var(--wa-green); }
+  .menu-item.roue .mi-icon { background: rgba(147,51,234,.12); }
+  .menu-item.roue svg { stroke: #9333EA; }
+  .menu-item.missions .mi-icon { background: rgba(255,184,0,.15); }
+  .menu-item.missions svg { stroke: var(--gold); }
+  .menu-item.travail .mi-icon { background: rgba(18,140,126,.12); }
+  .menu-item.travail svg { stroke: var(--wa-dark); }
+  .menu-item.partenaires .mi-icon { background: rgba(37,211,102,.15); }
+  .menu-item.partenaires svg { stroke: var(--wa-green); }
+  .menu-item.support .mi-icon { background: rgba(59,130,246,.12); }
+  .menu-item.support svg { stroke: #2563eb; }
+  .menu-item.faq .mi-icon { background: rgba(168,85,247,.12); }
+  .menu-item.faq svg { stroke: #A855F7; }
+  .menu-item.active { background: #e7f9ee; }
+  .menu-item.active .mi-icon { background: rgba(37,211,102,.2); }
+  .menu-item.active svg { stroke: var(--wa-green); }
+  .menu-footer { margin-top: auto; padding: 16px 22px 22px; border-top: 1px solid #f0f4f2; padding-bottom: max(22px, env(safe-area-inset-bottom)); }
+  .btn-logout { width: 100%; padding: 14px; background: #fee2e2; color: #b91c1c; border: none; border-radius: 14px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-logout svg { stroke: #b91c1c; }
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 150; opacity: 0; pointer-events: none; transition: opacity .3s; backdrop-filter: blur(2px); }
+  .overlay.open { opacity: 1; pointer-events: auto; }
+
+  .content { padding: 18px 16px; }
+  .page-title { font-size: 24px; font-weight: 800; color: var(--wa-deep); margin-bottom: 4px; }
+  .page-sub { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
+
+  .solde-card { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; border-radius: 20px; padding: 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 8px 24px rgba(18,140,126,.28); position: relative; overflow: hidden; }
+  .solde-card::after { content: ''; position: absolute; right: -30px; top: -30px; width: 130px; height: 130px; border-radius: 50%; background: rgba(255,255,255,.1); }
+  .solde-card .lbl { font-size: 12px; opacity: .9; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+  .solde-card .lbl svg { stroke: #fff; }
+  .solde-card .val { font-size: 26px; font-weight: 800; }
+  .solde-card .ic-w { width: 52px; height: 52px; border-radius: 16px; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; position: relative; z-index: 2; }
+  .solde-card .ic-w svg { stroke: #fff; }
+
+  .form-card { background: #fff; border-radius: 24px; padding: 22px 20px; margin-bottom: 20px; box-shadow: 0 8px 32px rgba(7,94,84,.08); }
+
+  .pay-hero { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 20px; padding: 22px 20px; margin-bottom: 18px; color: #fff; position: relative; overflow: hidden; }
+  .pay-hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; border-radius: 50%; background: radial-gradient(circle, rgba(255,106,0,.35), transparent 70%); }
+  .pay-hero-top { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; position: relative; z-index: 2; }
+  .pay-hero-ic { width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(135deg, var(--alibaba), #ff8c33); display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 18px rgba(255,106,0,.4); }
+  .pay-hero-ic svg { stroke: #fff; }
+  .pay-hero-title { font-size: 16px; font-weight: 800; }
+  .pay-hero-sub { font-size: 11.5px; opacity: .7; margin-top: 2px; }
+  .pay-hero-label { font-size: 11px; opacity: .7; margin-bottom: 6px; position: relative; z-index: 2; text-transform: uppercase; letter-spacing: .5px; font-weight: 700; }
+  .pay-hero-amount { font-size: 32px; font-weight: 900; letter-spacing: -.5px; position: relative; z-index: 2; }
+  .pay-hero-amount small { font-size: 15px; font-weight: 700; opacity: .7; margin-left: 4px; }
+
+  .field { margin-bottom: 16px; position: relative; }
+  .field label { display: block; font-size: 13px; font-weight: 700; color: var(--wa-deep); margin-bottom: 8px; }
+  .field .input-wrap { display: flex; align-items: center; background: #f7faf8; border: 1.5px solid #eef2f0; border-radius: 14px; padding: 0 14px; transition: border-color .2s, box-shadow .2s, background .2s; }
+  .field .input-wrap:focus-within { border-color: var(--wa-green); box-shadow: 0 0 0 4px rgba(37,211,102,.12); background: #fff; }
+  .field .input-wrap svg.lead { stroke: var(--muted); flex-shrink: 0; }
+  .field input { flex: 1; border: none; outline: none; padding: 14px 10px; font-size: 15px; background: transparent; color: var(--text); font-family: inherit; width: 100%; font-weight: 600; }
+  .field input::placeholder { color: #b0b7be; font-weight: 400; }
+
+  .hint { font-size: 11px; color: var(--muted); margin-top: 6px; display: flex; align-items: center; gap: 5px; line-height: 1.4; }
+  .hint svg { stroke: var(--muted); flex-shrink: 0; }
+  .hint.min-warn { color: var(--danger); }
+  .hint.min-warn svg { stroke: var(--danger); }
+
+  .amount-quick { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .quick-btn { background: #f7faf8; border: 1.5px solid var(--border); border-radius: 10px; padding: 8px 14px; font-size: 12.5px; font-weight: 700; color: var(--text); cursor: pointer; font-family: inherit; transition: all .2s; }
+  .quick-btn:active { transform: scale(.95); }
+  .quick-btn.selected { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; border-color: transparent; }
+
+  .info-box {
+    background: linear-gradient(135deg, rgba(255,184,0,.1), rgba(255,106,0,.1));
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex; gap: 10px; align-items: flex-start;
+    margin-bottom: 16px;
+    border: 1px solid rgba(255,184,0,.3);
+    font-size: 12.5px;
+    color: #92400e;
+    line-height: 1.55;
+    font-weight: 500;
+  }
+  .info-box svg { stroke: var(--alibaba); flex-shrink: 0; margin-top: 1px; }
+  .info-box b { color: var(--wa-deep); }
+
+  .btn-pay { width: 100%; border: none; background: linear-gradient(135deg, var(--alibaba), #ff8c33); color: #fff; padding: 18px; border-radius: 16px; font-size: 16px; font-weight: 800; cursor: pointer; font-family: inherit; box-shadow: 0 10px 26px rgba(255,106,0,.4); display: flex; align-items: center; justify-content: center; gap: 10px; transition: transform .15s; margin-top: 6px; }
+  .btn-pay:active { transform: scale(.97); }
+  .btn-pay svg { stroke: #fff; }
+  .btn-pay:disabled { background: #d1d5db; box-shadow: none; cursor: not-allowed; }
+  .btn-pay:disabled svg { stroke: #6b7280; }
+  .btn-pay .spin-small { width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; display: none; }
+  .btn-pay.loading .spin-small { display: inline-block; }
+  .btn-pay.loading .icon-default { display: none; }
+
+  .secure-note { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 11px; color: var(--muted); margin-top: 12px; font-weight: 600; }
+  .secure-note svg { stroke: var(--wa-dark); }
+
+  .section-title { font-size: 15px; font-weight: 800; color: var(--wa-deep); margin: 22px 0 12px; display: flex; align-items: center; justify-content: space-between; }
+  .section-title .badge-count { background: rgba(18,140,126,.12); color: var(--wa-dark); font-size: 11px; padding: 4px 11px; border-radius: 12px; font-weight: 800; }
+
+  .hist-item { background: #fff; border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; box-shadow: 0 4px 16px rgba(0,0,0,.05); animation: fadeInUp .4s ease forwards; opacity: 0; }
+  .hist-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .hist-amount { font-size: 16px; font-weight: 800; color: var(--text); }
+  .hist-status { font-size: 10px; font-weight: 800; padding: 4px 9px; border-radius: 10px; text-transform: uppercase; letter-spacing: .3px; }
+  .hist-status.en_attente { background: rgba(255,106,0,.15); color: var(--alibaba); }
+  .hist-status.valide { background: rgba(37,211,102,.15); color: #166534; }
+  .hist-status.paye { background: rgba(18,140,126,.15); color: var(--wa-dark); }
+  .hist-status.rejete { background: rgba(220,38,38,.15); color: var(--danger); }
+  .hist-meta { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--muted); flex-wrap: wrap; }
+
+  .empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; background: #fff; border-radius: 18px; box-shadow: 0 4px 16px rgba(0,0,0,.05); }
+  .empty svg { stroke: #d1d5db; margin-bottom: 10px; }
+
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: #fff; border-top: 1px solid #eef2f0; box-shadow: 0 -4px 20px rgba(0,0,0,.06); z-index: 100; padding-bottom: env(safe-area-inset-bottom); padding-top: 6px; }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 6px 0 10px; cursor: pointer; color: #9ca3af; font-size: 10.5px; gap: 4px; font-weight: 600; text-decoration: none; }
+  .nav-item .nav-icon { width: 44px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: background .2s; }
+  .nav-item svg { stroke: #9ca3af; transition: stroke .2s; }
+  .nav-item.active { color: var(--wa-dark); }
+  .nav-item.active .nav-icon { background: rgba(37,211,102,.12); }
+  .nav-item.active svg { stroke: var(--wa-green); }
+
+  .toast { position: fixed; left: 50%; bottom: 100px; transform: translateX(-50%) translateY(20px); background: var(--wa-deep); color: #fff; padding: 14px 24px; border-radius: 32px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,.3); opacity: 0; pointer-events: none; transition: all .3s; z-index: 1000; display: flex; align-items: center; gap: 10px; max-width: 90%; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast svg { stroke: var(--wa-green); flex-shrink: 0; }
+  .toast.success { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); }
+  .toast.success svg { stroke: #fff; }
+  .toast.error { background: #b91c1c; }
+  .toast.error svg { stroke: #fff; }
+</style>
+</head>
+<body>
+
+  <div class="loader" id="loader">
+    <img src="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png" alt="" class="loader-logo-img">
+    <div class="loader-logo-txt">Affinity<span> Network</span></div>
+    <div class="spinner"></div>
+  </div>
+
+  <header class="header">
+    <div class="burger" onclick="toggleMenu()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </div>
+    <div class="header-logo">
+      <img src="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png" alt="">
+      Affinity<span> Network</span>
+    </div>
+    <div style="width:42px"></div>
+  </header>
+
+  <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+  <nav class="menu" id="menu">
+    <div class="menu-header">
+      <img src="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png" alt="">
+      <div class="menu-header-info">
+        <div class="menu-header-name">Affinity<span> Network</span></div>
+        <div class="menu-header-sub">Recharger mon solde</div>
+      </div>
+    </div>
+    <div class="menu-item invite" onclick="go('parrainage')">
+      <div class="mi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/>
+          <line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>
+        </svg>
+      </div>
+      Inviter un ami
+    </div>
+    <div class="menu-item recharge active" onclick="go('recharge')">
+      <div class="mi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </div>
+      Recharger mon solde
+    </div>
+    <div class="menu-item roue" onclick="go('roue')">
+      <div class="mi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+        </svg>
+      </div>
+      Roue de la fortune
+    </div>
+    <div class="menu-item missions" onclick="go('missions')">
+      <div class="mi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+          <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+          <path d="M4 22h16"/>
+          <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+        </svg>
+      </div>
+      Missions
+    </div>
+    <div class="menu-item travail" onclick="go('travail')">
+      <div class="mi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2"/>
+        </svg>
+      </div>
+      Travail
+    </div>
+    <div class="menu-item partenaires" onclick="go('partenaires')">
+      <div class="mi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        </svg>
+      </div>
+      Devenir partenaire
+    </div>
+    <div class="menu-item support" onclick="go('support')">
+      <div class="mi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+        </svg>
+      </div>
+      Support
+    </div>
+    <div class="menu-item faq" onclick="go('faq')">
+      <div class="mi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+        </svg>
+      </div>
+      FAQ
+    </div>
+    <div class="menu-footer">
+      <button class="btn-logout" onclick="logout()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Se déconnecter
+      </button>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1 class="page-title">Recharger</h1>
+    <p class="page-sub">Ajoute du solde en quelques secondes</p>
+
+    <div class="solde-card anim d1">
+      <div>
+        <div class="lbl">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+          </svg>
+          Solde actuel
+        </div>
+        <div class="val" id="userSolde">0 F</div>
+      </div>
+      <div class="ic-w">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="form-card anim d2">
+
+      <div class="pay-hero" id="payHero">
+        <div class="pay-hero-top">
+          <div class="pay-hero-ic">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="5" width="20" height="14" rx="2"/>
+              <line x1="2" y1="10" x2="22" y2="10"/>
+            </svg>
+          </div>
+          <div>
+            <div class="pay-hero-title">Paiement sécurisé</div>
+            <div class="pay-hero-sub">Via notre passerelle partenaire</div>
+          </div>
+        </div>
+        <div class="pay-hero-label">Montant à recharger</div>
+        <div class="pay-hero-amount" id="heroAmount">0<small>FCFA</small></div>
+      </div>
+
+      <div class="info-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+        <span>Choisis ton montant puis clique sur <b>Payer maintenant</b>. Tu seras redirigé vers la page de paiement sécurisée. Ton solde sera <b>crédité automatiquement</b> après validation du paiement.</span>
+      </div>
+
+      <div class="field">
+        <label>Montant à recharger</label>
+        <div class="input-wrap">
+          <svg class="lead" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+          <input type="number" id="amountInput" placeholder="Ex: 10000" inputmode="numeric" oninput="onAmountChange()">
+          <span style="font-size:14px;font-weight:700;color:var(--muted);">FCFA</span>
+        </div>
+        <div class="hint" id="minHint">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <span id="minHintText">Minimum : 1 000 FCFA</span>
+        </div>
+        <div class="amount-quick" id="quickAmounts">
+          <button class="quick-btn" onclick="setAmount(1000)">1 000</button>
+          <button class="quick-btn" onclick="setAmount(2000)">2 000</button>
+          <button class="quick-btn" onclick="setAmount(5000)">5 000</button>
+          <button class="quick-btn" onclick="setAmount(10000)">10 000</button>
+          <button class="quick-btn" onclick="setAmount(25000)">25 000</button>
+          <button class="quick-btn" onclick="setAmount(50000)">50 000</button>
+        </div>
+      </div>
+
+      <button class="btn-pay" id="btnPay" onclick="payer()">
+        <span class="spin-small"></span>
+        <svg class="icon-default" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="5" width="20" height="14" rx="2"/>
+          <line x1="2" y1="10" x2="22" y2="10"/>
+        </svg>
+        <span id="btnPayText">Payer maintenant</span>
+      </button>
+
+      <div class="secure-note">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        Transaction chiffrée et 100% sécurisée
+      </div>
+    </div>
+
+    <div class="section-title anim d3">
+      Historique des recharges
+      <span class="badge-count" id="histCount">0</span>
+    </div>
+    <div id="histList" class="anim d3">
+      <div class="empty">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <div>Chargement...</div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="lancer" class="nav-item">
+      <div class="nav-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+        </svg>
+      </div>
+      Lancer
+    </a>
+    <a href="retirer" class="nav-item">
+      <div class="nav-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+        </svg>
+      </div>
+      Retirer
+    </a>
+    <a href="travail" class="nav-item">
+      <div class="nav-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2"/>
+        </svg>
+      </div>
+      Travail
+    </a>
+    <a href="moi" class="nav-item">
+      <div class="nav-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+        </svg>
+      </div>
+      Moi
+    </a>
+  </nav>
+
+  <div class="toast" id="toast">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+    <span id="toastText">—</span>
+  </div>
+
+<script>
+  const SUPABASE_URL = 'https://ydwjvvlcnqsftciedpqm.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2p2dmxjbnFzZnRjaWVkcHFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMDQyNDAsImV4cCI6MjEwNTY4MDI0MH0.4uQwBGedMBjUZErd8lUM5YfA26gw96RvHdo_J-3PZCY';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  let CURRENT_USER = null;
+  let USER_SOLDE = 0;
+  let HIST = [];
+  const MIN_RECHARGE = 1000;
+
+  // Lien par défaut (utilisé si la table parametres n'est pas disponible)
+  const DEFAULT_PAYMENT_LINK = 'https://pay.soleaspay.com/link/V7X4WHCQL8';
+  let PAYMENT_LINK = DEFAULT_PAYMENT_LINK;
+
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+
+  (async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.replace('inscription'); return; }
+    CURRENT_USER = session.user;
+    await Promise.all([loadProfile(), loadPaymentLink(), loadHistory()]);
+    setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
+  })();
+
+  async function loadProfile() {
+    const { data } = await sb.from('profiles').select('solde').eq('id', CURRENT_USER.id).maybeSingle();
+    USER_SOLDE = Number(data?.solde ?? 0);
+    document.getElementById('userSolde').textContent = formatF(USER_SOLDE);
+  }
+
+  // ⬇️ Charge le lien depuis la table parametres (modifiable depuis l'admin)
+  async function loadPaymentLink() {
+    try {
+      const { data, error } = await sb
+        .from('parametres')
+        .select('valeur')
+        .eq('cle', 'lien_paiement')
+        .maybeSingle();
+      if (!error && data && data.valeur && /^https?:\/\//.test(data.valeur)) {
+        PAYMENT_LINK = data.valeur.trim();
+      }
+    } catch (e) {
+      console.warn('Lien de paiement non chargé, utilisation par défaut', e);
+    }
+  }
+
+  function setAmount(n) {
+    document.getElementById('amountInput').value = n;
+    onAmountChange();
+    document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('selected'));
+    // Marquer le bouton sélectionné
+    event?.target?.classList?.add('selected');
+  }
+
+  function onAmountChange() {
+    const v = Number(document.getElementById('amountInput').value || 0);
+    const hint = document.getElementById('minHint');
+    const hintText = document.getElementById('minHintText');
+    if (v > 0 && v < MIN_RECHARGE) {
+      hint.classList.add('min-warn');
+      hintText.textContent = `Minimum requis : ${formatF(MIN_RECHARGE)}`;
+    } else {
+      hint.classList.remove('min-warn');
+      hintText.textContent = `Minimum : ${formatF(MIN_RECHARGE)}`;
+    }
+    // Mise à jour du hero
+    const heroAmount = document.getElementById('heroAmount');
+    heroAmount.innerHTML = `${Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}<small>FCFA</small>`;
+  }
+
+  async function payer() {
+    const montant = Number(document.getElementById('amountInput').value || 0);
+    if (!montant || montant < MIN_RECHARGE) return showToast(`Minimum ${formatF(MIN_RECHARGE)}`, true);
+    if (!PAYMENT_LINK) return showToast('Lien de paiement indisponible', true);
+
+    const btn = document.getElementById('btnPay');
+    btn.classList.add('loading');
+    document.getElementById('btnPayText').textContent = 'Redirection...';
+
+    // 1️⃣ Enregistrer l'intention de recharge (admin la validera après réception du paiement)
+    try {
+      await sb.from('recharges').insert({
+        user_id: CURRENT_USER.id,
+        mode: 'lien',
+        montant: montant,
+        numero: '-',
+        pays_nom: 'Paiement en ligne',
+        operateur_nom: 'Soleaspay',
+        statut: 'en_attente'
+      });
+    } catch (e) {
+      console.warn('Enregistrement recharge échoué :', e);
+    }
+
+    // 2️⃣ Ouvrir le lien de paiement dans un nouvel onglet
+    const url = PAYMENT_LINK;
+    const w = window.open(url, '_blank', 'noopener,noreferrer');
+
+    btn.classList.remove('loading');
+    document.getElementById('btnPayText').textContent = 'Payer maintenant';
+
+    if (!w) {
+      // Popup bloqué → fallback
+      window.location.href = url;
+      return;
+    }
+
+    showToast('Redirection vers le paiement sécurisé…', 'success');
+    document.getElementById('amountInput').value = '';
+    onAmountChange();
+    await loadHistory();
+  }
+
+  async function loadHistory() {
+    const { data } = await sb.from('recharges').select('*').eq('user_id', CURRENT_USER.id).order('created_at', { ascending: false });
+    HIST = data || [];
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const list = document.getElementById('histList');
+    const badge = document.getElementById('histCount');
+    badge.textContent = HIST.length;
+    if (HIST.length === 0) {
+      list.innerHTML = `<div class="empty">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        <div>Aucune recharge pour le moment</div>
+      </div>`;
+      return;
+    }
+    const statusLabels = { en_attente: 'En attente', valide: 'Validé', paye: 'Crédité', rejete: 'Rejeté' };
+    list.innerHTML = HIST.map((h, i) => `
+      <div class="hist-item" style="animation-delay:${i * 0.04}s">
+        <div class="hist-top">
+          <div class="hist-amount">+${formatF(h.montant)}</div>
+          <div class="hist-status ${h.statut}">${statusLabels[h.statut] || h.statut}</div>
+        </div>
+        <div class="hist-meta">
+          <span>💳 Paiement en ligne</span><span>·</span>
+          <span>${timeAgo(h.created_at)}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function formatF(n) { return Math.round(Number(n || 0)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F'; }
+  function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function timeAgo(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+    if (diff < 60) return 'À l\'instant';
+    if (diff < 3600) return `Il y a ${Math.floor(diff/60)} min`;
+    if (diff < 86400) return `Il y a ${Math.floor(diff/3600)} h`;
+    if (diff < 604800) return `Il y a ${Math.floor(diff/86400)} j`;
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+  }
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    document.getElementById('toastText').textContent = msg;
+    t.className = 'toast show' + (type ? ' ' + type : '');
+    setTimeout(() => t.classList.remove('show'), 3500);
+  }
+  function toggleMenu() { document.getElementById('menu').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
+  function go(page) { window.location.href = page.replace(/\.html$/, ''); }
+  async function logout() {
+    if (!confirm('Veux-tu vraiment te déconnecter ?')) return;
+    await sb.auth.signOut();
+    window.location.replace('inscription');
+  }
+</script>
+</body>
+</html>
