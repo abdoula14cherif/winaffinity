@@ -372,12 +372,12 @@
           <span id="minHintText">Minimum : 1 000 FCFA</span>
         </div>
         <div class="amount-quick" id="quickAmounts">
-          <button class="quick-btn" onclick="setAmount(1000)">1 000</button>
-          <button class="quick-btn" onclick="setAmount(2000)">2 000</button>
-          <button class="quick-btn" onclick="setAmount(5000)">5 000</button>
-          <button class="quick-btn" onclick="setAmount(10000)">10 000</button>
-          <button class="quick-btn" onclick="setAmount(25000)">25 000</button>
-          <button class="quick-btn" onclick="setAmount(50000)">50 000</button>
+          <button class="quick-btn" onclick="setAmount(1000, event)">1 000</button>
+          <button class="quick-btn" onclick="setAmount(2000, event)">2 000</button>
+          <button class="quick-btn" onclick="setAmount(5000, event)">5 000</button>
+          <button class="quick-btn" onclick="setAmount(10000, event)">10 000</button>
+          <button class="quick-btn" onclick="setAmount(25000, event)">25 000</button>
+          <button class="quick-btn" onclick="setAmount(50000, event)">50 000</button>
         </div>
       </div>
 
@@ -460,11 +460,11 @@
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
   let CURRENT_USER = null;
+  let USER_PROFILE = null;
   let USER_SOLDE = 0;
   let HIST = [];
   const MIN_RECHARGE = 1000;
 
-  // Lien par défaut (utilisé si la table parametres n'est pas disponible)
   const DEFAULT_PAYMENT_LINK = 'https://pay.soleaspay.com/link/V7X4WHCQL8';
   let PAYMENT_LINK = DEFAULT_PAYMENT_LINK;
 
@@ -478,13 +478,18 @@
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
   })();
 
+  // ⬇️ Charge le profil complet (nom, pseudo, email, solde)
   async function loadProfile() {
-    const { data } = await sb.from('profiles').select('solde').eq('id', CURRENT_USER.id).maybeSingle();
+    const { data } = await sb
+      .from('profiles')
+      .select('nom, pseudo, email, solde')
+      .eq('id', CURRENT_USER.id)
+      .maybeSingle();
+    USER_PROFILE = data || null;
     USER_SOLDE = Number(data?.solde ?? 0);
     document.getElementById('userSolde').textContent = formatF(USER_SOLDE);
   }
 
-  // ⬇️ Charge le lien depuis la table parametres (modifiable depuis l'admin)
   async function loadPaymentLink() {
     try {
       const { data, error } = await sb
@@ -500,12 +505,11 @@
     }
   }
 
-  function setAmount(n) {
+  function setAmount(n, e) {
     document.getElementById('amountInput').value = n;
     onAmountChange();
     document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('selected'));
-    // Marquer le bouton sélectionné
-    event?.target?.classList?.add('selected');
+    if (e && e.target) e.target.classList.add('selected');
   }
 
   function onAmountChange() {
@@ -519,7 +523,6 @@
       hint.classList.remove('min-warn');
       hintText.textContent = `Minimum : ${formatF(MIN_RECHARGE)}`;
     }
-    // Mise à jour du hero
     const heroAmount = document.getElementById('heroAmount');
     heroAmount.innerHTML = `${Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')}<small>FCFA</small>`;
   }
@@ -533,22 +536,26 @@
     btn.classList.add('loading');
     document.getElementById('btnPayText').textContent = 'Redirection...';
 
-    // 1️⃣ Enregistrer l'intention de recharge (admin la validera après réception du paiement)
+    // ⬇️ Insertion avec user_nom / user_pseudo / user_email (dénormalisé)
     try {
-      await sb.from('recharges').insert({
+      const { error } = await sb.from('recharges').insert({
         user_id: CURRENT_USER.id,
         mode: 'lien',
         montant: montant,
         numero: '-',
         pays_nom: 'Paiement en ligne',
         operateur_nom: 'Soleaspay',
-        statut: 'en_attente'
+        statut: 'en_attente',
+        user_nom: USER_PROFILE?.nom || '',
+        user_pseudo: USER_PROFILE?.pseudo || '',
+        user_email: USER_PROFILE?.email || CURRENT_USER.email || ''
       });
+      if (error) console.warn('Erreur insertion recharge:', error);
     } catch (e) {
       console.warn('Enregistrement recharge échoué :', e);
     }
 
-    // 2️⃣ Ouvrir le lien de paiement dans un nouvel onglet
+    // Ouvrir le lien de paiement
     const url = PAYMENT_LINK;
     const w = window.open(url, '_blank', 'noopener,noreferrer');
 
@@ -556,7 +563,6 @@
     document.getElementById('btnPayText').textContent = 'Payer maintenant';
 
     if (!w) {
-      // Popup bloqué → fallback
       window.location.href = url;
       return;
     }
@@ -568,7 +574,11 @@
   }
 
   async function loadHistory() {
-    const { data } = await sb.from('recharges').select('*').eq('user_id', CURRENT_USER.id).order('created_at', { ascending: false });
+    const { data } = await sb
+      .from('recharges')
+      .select('*')
+      .eq('user_id', CURRENT_USER.id)
+      .order('created_at', { ascending: false });
     HIST = data || [];
     renderHistory();
   }
