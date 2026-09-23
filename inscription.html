@@ -60,6 +60,10 @@
     25% { transform: translateX(-6px); }
     75% { transform: translateX(6px); }
   }
+  @keyframes glow {
+    0%,100% { box-shadow: 0 0 0 0 rgba(37,211,102,.4); }
+    50% { box-shadow: 0 0 0 6px rgba(37,211,102,0); }
+  }
   .anim { opacity: 0; animation: fadeInUp .5s ease forwards; }
   .d1 { animation-delay: .05s; }
   .d2 { animation-delay: .12s; }
@@ -68,6 +72,7 @@
   .d5 { animation-delay: .36s; }
   .d6 { animation-delay: .44s; }
   .d7 { animation-delay: .52s; }
+  .d8 { animation-delay: .60s; }
 
   /* PAGE */
   .page {
@@ -143,11 +148,17 @@
     border-color: var(--wa-green);
     box-shadow: 0 0 0 3px rgba(37,211,102,.15);
   }
+  .field .input-wrap.prefilled {
+    background: linear-gradient(135deg, rgba(37,211,102,.08), rgba(18,140,126,.1));
+    border-color: var(--wa-green);
+    animation: glow 2s ease-in-out infinite;
+  }
   .field .input-wrap svg {
     stroke: var(--muted); flex-shrink: 0;
     transition: stroke .2s;
   }
   .field .input-wrap:focus-within svg { stroke: var(--wa-dark); }
+  .field .input-wrap.prefilled svg { stroke: var(--wa-green); }
   .field input {
     flex: 1; border: none; outline: none;
     padding: 14px 10px; font-size: 15px;
@@ -155,12 +166,41 @@
     font-family: inherit;
   }
   .field input::placeholder { color: #b0b7be; }
+  .field input.uppercase { text-transform: uppercase; letter-spacing: 1px; }
 
   .toggle-pass {
     cursor: pointer; padding: 6px;
     display: flex; align-items: center;
   }
   .toggle-pass svg { stroke: var(--muted); }
+
+  /* BADGE PARRAINAGE */
+  .ref-badge {
+    position: absolute; right: 12px; top: 50%;
+    transform: translateY(-50%);
+    background: var(--wa-green); color: #fff;
+    font-size: 10px; font-weight: 800;
+    padding: 3px 8px; border-radius: 10px;
+    text-transform: uppercase; letter-spacing: .3px;
+    display: none;
+    pointer-events: none;
+  }
+  .ref-badge.show { display: inline-block; }
+
+  /* INFO PARRAINAGE */
+  .ref-info {
+    background: linear-gradient(135deg, rgba(37,211,102,.08), rgba(18,140,126,.1));
+    border: 1px solid rgba(37,211,102,.3);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; color: var(--wa-deep);
+    line-height: 1.4;
+    margin-top: -4px;
+    display: none;
+  }
+  .ref-info.show { display: flex; animation: fadeInUp .4s ease; }
+  .ref-info svg { stroke: var(--wa-green); flex-shrink: 0; }
 
   /* BOUTON */
   .btn-primary {
@@ -321,20 +361,40 @@
         </div>
       </div>
 
-      <div class="terms anim d7" id="fieldTerms">
+      <!-- CHAMP CODE PARRAINAGE -->
+      <div class="field anim d7" id="fieldParrainage">
+        <label>Code de parrainage (optionnel)</label>
+        <div class="input-wrap" id="wrapParrainage">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <input type="text" id="codeParrainage" placeholder="Ex: AFF123ABC" class="uppercase" maxlength="20" oninput="onRefInput()">
+          <span class="ref-badge" id="refBadge">Détecté</span>
+        </div>
+        <div class="ref-info" id="refInfo">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span>Tu as été invité par un parrain. Active un plan et fais-lui gagner <b>20%</b> de commission.</span>
+        </div>
+      </div>
+
+      <div class="terms anim d8" id="fieldTerms">
         <input type="checkbox" id="terms">
         <label for="terms">
           J'accepte les <a href="#">conditions d'utilisation</a> et la <a href="#">politique de confidentialité</a> d'Affinity Network.
         </label>
       </div>
 
-      <button type="submit" class="btn-primary anim d7" id="submitBtn">
+      <button type="submit" class="btn-primary anim d8" id="submitBtn">
         <span class="btn-loader"></span>
         <span class="btn-text" id="btnText">S'inscrire</span>
       </button>
     </form>
 
-    <div class="switch-line anim d7" id="switchLine">
+    <div class="switch-line anim d8" id="switchLine">
       Déjà un compte ? <b onclick="switchTab('login')">Se connecter</b>
     </div>
 
@@ -346,15 +406,54 @@
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2p2dmxjbnFzZnRjaWVkcHFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMDQyNDAsImV4cCI6MjEwNTY4MDI0MH0.4uQwBGedMBjUZErd8lUM5YfA26gw96RvHdo_J-3PZCY';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-  // ================= LOADER =================
+  // ================= CAPTURE CODE PARRAINAGE =================
+  const urlParams = new URLSearchParams(window.location.search);
+  const refFromURL = (urlParams.get('ref') || '').trim().toUpperCase();
+
+  function applyRefFromURL() {
+    if (!refFromURL) return;
+    const input = document.getElementById('codeParrainage');
+    const wrap = document.getElementById('wrapParrainage');
+    const badge = document.getElementById('refBadge');
+    const info = document.getElementById('refInfo');
+
+    if (input) {
+      input.value = refFromURL;
+      wrap.classList.add('prefilled');
+      badge.classList.add('show');
+      info.classList.add('show');
+    }
+  }
+
+  function onRefInput() {
+    const input = document.getElementById('codeParrainage');
+    const wrap = document.getElementById('wrapParrainage');
+    const badge = document.getElementById('refBadge');
+    const info = document.getElementById('refInfo');
+
+    // Force majuscules
+    input.value = input.value.toUpperCase();
+
+    if (input.value.length >= 6) {
+      wrap.classList.add('prefilled');
+      badge.classList.add('show');
+      info.classList.add('show');
+    } else {
+      wrap.classList.remove('prefilled');
+      badge.classList.remove('show');
+      info.classList.remove('show');
+    }
+  }
+
+  // ================= LOADER + SESSION =================
   window.addEventListener('load', async () => {
-    // Vérifier si l'utilisateur est déjà connecté
+    applyRefFromURL();
+
     const { data: { session } } = await sb.auth.getSession();
     setTimeout(() => {
       document.getElementById('loader').classList.add('hidden');
       if (session) {
-        // Rediriger directement au dashboard si déjà connecté
-        window.location.href = 'dashboard.html';
+        window.location.replace('dashboard.html');
       }
     }, 1200);
   });
@@ -370,12 +469,11 @@
     const title = document.getElementById('mainTitle');
     const subtitle = document.getElementById('mainSubtitle');
     const fieldNom = document.getElementById('fieldNom');
-    const fieldPseudo = document.getElementById('fieldPseudo');
+    const fieldParrainage = document.getElementById('fieldParrainage');
     const fieldTerms = document.getElementById('fieldTerms');
     const btnText = document.getElementById('btnText');
     const switchLine = document.getElementById('switchLine');
     const password = document.getElementById('password');
-    const emailInput = document.getElementById('email');
 
     if (m === 'signup') {
       indicator.classList.remove('right');
@@ -384,11 +482,11 @@
       title.textContent = 'Créer un compte';
       subtitle.textContent = 'Rejoins la communauté et commence à gagner';
       fieldNom.classList.remove('hidden');
+      fieldParrainage.classList.remove('hidden');
       fieldTerms.classList.remove('hidden');
       btnText.textContent = "S'inscrire";
       switchLine.innerHTML = 'Déjà un compte ? <b onclick="switchTab(\'login\')">Se connecter</b>';
       password.autocomplete = 'new-password';
-      emailInput.autocomplete = 'email';
     } else {
       indicator.classList.add('right');
       tabLogin.classList.add('active');
@@ -396,11 +494,11 @@
       title.textContent = 'Bon retour';
       subtitle.textContent = 'Connecte-toi pour continuer à gagner';
       fieldNom.classList.add('hidden');
+      fieldParrainage.classList.add('hidden');
       fieldTerms.classList.add('hidden');
       btnText.textContent = 'Se connecter';
       switchLine.innerHTML = 'Pas encore de compte ? <b onclick="switchTab(\'signup\')">S\'inscrire</b>';
       password.autocomplete = 'current-password';
-      emailInput.autocomplete = 'email';
     }
     hideMsg();
   }
@@ -438,9 +536,9 @@
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     const terms = document.getElementById('terms').checked;
+    const codeRef = document.getElementById('codeParrainage').value.trim().toUpperCase();
     const btn = document.getElementById('submitBtn');
 
-    // === Validation ===
     if (mode === 'signup') {
       if (nom.length < 3) return showMsg('Entre ton nom complet (3 caractères min).'), false;
       if (pseudo.length < 3) return showMsg('Le pseudo doit contenir au moins 3 caractères.'), false;
@@ -452,14 +550,13 @@
     if (password.length < 6) return showMsg('Le mot de passe doit contenir au moins 6 caractères.'), false;
     if (mode === 'signup' && !terms) return showMsg('Tu dois accepter les conditions.'), false;
 
-    // === Chargement ===
     btn.classList.add('loading');
     btn.disabled = true;
     document.getElementById('btnText').textContent = mode === 'signup' ? 'Inscription...' : 'Connexion...';
 
     try {
       if (mode === 'signup') {
-        await signUp(nom, pseudo, email, password);
+        await signUp(nom, pseudo, email, password, codeRef);
       } else {
         await signIn(email, password);
       }
@@ -474,30 +571,36 @@
   }
 
   // ================= INSCRIPTION =================
-  async function signUp(nom, pseudo, email, password) {
-    // 1. Vérifier si le pseudo est déjà utilisé
+  async function signUp(nom, pseudo, email, password, codeRef) {
+    // 1. Vérifier le pseudo
     const { data: existing } = await sb
-      .from('profiles')
-      .select('pseudo')
-      .eq('pseudo', pseudo)
-      .maybeSingle();
+      .from('profiles').select('pseudo').eq('pseudo', pseudo).maybeSingle();
+    if (existing) throw new Error('Ce pseudo est déjà pris. Choisis-en un autre.');
 
-    if (existing) {
-      throw new Error('Ce pseudo est déjà pris. Choisis-en un autre.');
+    // 2. Résoudre le code de parrainage si fourni
+    let parrainId = null;
+    if (codeRef && codeRef.length > 0) {
+      const { data: pid, error: refErr } = await sb.rpc('resoudre_code_parrainage', { p_code: codeRef });
+      if (refErr) {
+        console.warn('Erreur résolution code:', refErr);
+      }
+      if (!pid) {
+        throw new Error('Code de parrainage invalide ou inexistant.');
+      }
+      parrainId = pid;
     }
 
-    // 2. Créer le compte Supabase Auth
+    // 3. Créer le compte Supabase Auth
     const { data, error } = await sb.auth.signUp({
       email: email,
       password: password,
       options: {
-        data: { nom, pseudo } // metadata
+        data: { nom, pseudo }
       }
     });
 
     if (error) throw new Error(traduireErreur(error.message));
 
-    // 3. Cas : confirmation email activée → pas de session
     if (!data.session) {
       showMsg('✅ Compte créé ! Vérifie ta boîte mail pour confirmer ton adresse.', 'success');
       setTimeout(() => {
@@ -507,7 +610,7 @@
       return;
     }
 
-    // 4. Insérer le profil dans la table
+    // 4. Insérer le profil (avec parrain_id si code valide)
     const { error: profileError } = await sb
       .from('profiles')
       .insert({
@@ -515,12 +618,12 @@
         nom: nom,
         pseudo: pseudo,
         email: email,
-        solde: 0
+        solde: 0,
+        parrain_id: parrainId
       });
 
     if (profileError) {
       console.warn('Erreur insertion profil:', profileError);
-      // On ne bloque pas, le compte existe déjà
     }
 
     // 5. Redirection
@@ -531,17 +634,14 @@
   // ================= CONNEXION =================
   async function signIn(email, password) {
     const { data, error } = await sb.auth.signInWithPassword({
-      email: email,
-      password: password
+      email: email, password: password
     });
-
     if (error) throw new Error(traduireErreur(error.message));
-
     showMsg('✅ Connexion réussie ! Redirection...', 'success');
     setTimeout(() => window.location.href = 'dashboard.html', 900);
   }
 
-  // ================= TRADUCTION ERREURS =================
+  // ================= TRADUCTION =================
   function traduireErreur(msg) {
     const m = msg.toLowerCase();
     if (m.includes('invalid login')) return 'Email ou mot de passe incorrect.';
