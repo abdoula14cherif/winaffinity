@@ -7,7 +7,27 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#075E54">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="icon" type="image/png" href="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // ⬇️ Redirection auto .html → URL propre
+  (function() {
+    document.addEventListener('click', function(e) {
+      const link = e.target.closest('a');
+      if (!link) return;
+      let href = link.getAttribute('href');
+      if (!href) return;
+      if (href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) return;
+      if (href.endsWith('.html')) {
+        e.preventDefault();
+        window.location.href = href.replace(/\.html$/, '');
+      }
+    }, true);
+    if (window.location.pathname.endsWith('.html')) {
+      window.history.replaceState(null, '', window.location.pathname.replace(/\.html$/, '') + window.location.search);
+    }
+  })();
+</script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root { --wa-green: #25D366; --wa-dark: #128C7E; --wa-deep: #075E54; --alibaba: #FF6A00; --gold: #FFB800; --bg: #f7f9f8; --text: #1a1a1a; --muted: #6b7280; --border: #e5e7eb; --danger: #dc2626; }
@@ -30,7 +50,7 @@
   .logo { font-weight: 700; font-size: 18px; }
   .logo span { color: var(--wa-green); }
 
-  .menu { position: fixed; top: 0; left: 0; height: 100%; width: 280px; background: #fff; z-index: 200; transform: translateX(-100%); transition: transform .35s cubic-bezier(.4,0,.2,1); box-shadow: 4px 0 20px rgba(0,0,0,.2); padding-top: 18px; display: flex; flex-direction: column; overflow-y: auto; padding-top: max(18px, env(safe-area-inset-top)); }
+  .menu { position: fixed; top: 0; left: 0; height: 100%; width: 280px; background: #fff; z-index: 200; transform: translateX(-100%); transition: transform .35s cubic-bezier(.4,0,.2,1); box-shadow: 4px 0 20px rgba(0,0,0,.2); display: flex; flex-direction: column; overflow-y: auto; padding-top: max(18px, env(safe-area-inset-top)); }
   .menu.open { transform: translateX(0); }
   .menu-header { padding: 8px 20px 18px; border-bottom: 1px solid #eee; margin-bottom: 10px; font-weight: 700; color: var(--wa-deep); font-size: 17px; display: flex; align-items: center; gap: 10px; }
   .menu-header svg { stroke: var(--wa-green); }
@@ -142,51 +162,51 @@
       </svg>
       Affinity Network
     </div>
-    <div class="menu-item" onclick="go('parrainage.html')">
+    <div class="menu-item" onclick="go('parrainage')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
       </svg>
       Inviter un ami
     </div>
-    <div class="menu-item" onclick="go('recharge.html')">
+    <div class="menu-item" onclick="go('recharge')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
         <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
       </svg>
       Recharger mon solde
     </div>
-    <div class="menu-item" onclick="go('roue.html')">
+    <div class="menu-item" onclick="go('roue')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
         <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
       </svg>
       Roue de la fortune
     </div>
-    <div class="menu-item" onclick="go('missions.html')">
+    <div class="menu-item" onclick="go('missions')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
         <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
         <path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
       </svg>
       Missions
     </div>
-    <div class="menu-item" onclick="go('notifications.html')">
+    <div class="menu-item" onclick="go('notifications')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
         <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
       </svg>
       Notifications
     </div>
-    <div class="menu-item" onclick="go('travail.html')">
+    <div class="menu-item" onclick="go('travail')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
         <rect x="2" y="7" width="20" height="14" rx="2"/>
       </svg>
       Travail
     </div>
-    <div class="menu-item active" onclick="go('support.html')">
+    <div class="menu-item active" onclick="go('support')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
         <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
       </svg>
       Support
     </div>
-    <div class="menu-item" onclick="go('faq.html')">
+    <div class="menu-item" onclick="go('faq')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
         <circle cx="12" cy="12" r="10"/>
       </svg>
@@ -235,7 +255,7 @@
         </div>
         <div class="qc-lbl">Email</div>
       </div>
-      <div class="qc-card" onclick="go('faq.html')">
+      <div class="qc-card" onclick="go('faq')">
         <div class="qc-ico">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/>
@@ -299,25 +319,25 @@
   </main>
 
   <nav class="bottom-nav">
-    <a href="lancer.html" class="nav-item">
+    <a href="lancer" class="nav-item">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
       </svg>
       Lancer
     </a>
-    <a href="retirer.html" class="nav-item">
+    <a href="retirer" class="nav-item">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
       </svg>
       Retirer
     </a>
-    <a href="travail.html" class="nav-item">
+    <a href="travail" class="nav-item">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="2" y="7" width="20" height="14" rx="2"/>
       </svg>
       Travail
     </a>
-    <a href="moi.html" class="nav-item">
+    <a href="moi" class="nav-item">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
       </svg>
@@ -343,7 +363,7 @@
 
   (async function init() {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) { window.location.replace('inscription.html'); return; }
+    if (!session) { window.location.replace('inscription'); return; }
     CURRENT_USER = session.user;
     await loadHist();
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
@@ -351,7 +371,14 @@
 
   async function loadHist() {
     const list = document.getElementById('histList');
-    const { data, error } = await sb.from('support_tickets').select('*').eq('user_id', CURRENT_USER.id).order('created_at', { ascending: false }).limit(10).catch(() => ({ data: null, error: true }));
+    // ⬇️ Plus de .catch() — on destructure simplement error
+    const { data, error } = await sb
+      .from('support_tickets')
+      .select('*')
+      .eq('user_id', CURRENT_USER.id)
+      .order('created_at', { ascending: false })
+      .limit(10);
+
     if (error || !data || data.length === 0) {
       list.innerHTML = `<div class="empty">
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
@@ -361,6 +388,7 @@
       </div>`;
       return;
     }
+
     const labels = { ouvert: 'Ouvert', en_cours: 'En cours', resolu: 'Résolu' };
     list.innerHTML = data.map((t, i) => `
       <div class="hist-item" style="animation-delay:${i * .05}s">
@@ -384,18 +412,28 @@
     const message = document.getElementById('message').value.trim();
     if (!sujet) return showToast('Choisis un sujet', true);
     if (message.length < 10) return showToast('Message trop court (10 caractères min)', true);
+
     const btn = document.getElementById('btnSubmit');
     btn.classList.add('loading');
     document.getElementById('btnSubmitText').textContent = 'Envoi...';
+
+    // ⬇️ Plus de .catch() — on destructure error
     const { error } = await sb.from('support_tickets').insert({
-      user_id: CURRENT_USER.id, sujet, message, statut: 'ouvert'
-    }).catch(() => ({ error: { message: 'Table non configurée' } }));
+      user_id: CURRENT_USER.id,
+      sujet,
+      message,
+      statut: 'ouvert'
+    });
+
     btn.classList.remove('loading');
     document.getElementById('btnSubmitText').textContent = 'Envoyer';
+
     if (error) {
+      console.error('Erreur ticket:', error);
       showToast('Erreur d\'envoi. Contacte-nous par WhatsApp.', true);
       return;
     }
+
     showToast('✅ Ticket envoyé ! Réponse sous 24h');
     document.getElementById('sujet').value = '';
     document.getElementById('message').value = '';
@@ -427,11 +465,14 @@
     setTimeout(() => t.classList.remove('show'), 3000);
   }
   function toggleMenu() { document.getElementById('menu').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
-  function go(page) { window.location.href = page; }
+  function go(page) {
+    // ⬇️ Strip .html si jamais présent
+    window.location.href = page.replace(/\.html$/, '');
+  }
   async function logout() {
     if (!confirm('Veux-tu vraiment te déconnecter ?')) return;
     await sb.auth.signOut();
-    window.location.replace('inscription.html');
+    window.location.replace('inscription');
   }
 </script>
 </body>
