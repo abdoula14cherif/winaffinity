@@ -57,12 +57,17 @@
     0%,100% { transform: scale(1); opacity: .8; }
     50% { transform: scale(1.15); opacity: 1; }
   }
+  @keyframes shineBtn {
+    0%,100% { box-shadow: 0 4px 12px rgba(255,255,255,.15); }
+    50% { box-shadow: 0 4px 20px rgba(255,255,255,.35); }
+  }
   .anim { opacity: 0; animation: fadeInUp .5s ease forwards; }
   .d1 { animation-delay: .05s; }
   .d2 { animation-delay: .12s; }
   .d3 { animation-delay: .2s; }
   .d4 { animation-delay: .28s; }
 
+  /* HEADER */
   .header {
     position: sticky; top: 0; z-index: 100;
     display: flex; align-items: center; justify-content: space-between;
@@ -81,6 +86,7 @@
   .logo { font-weight: 700; font-size: 18px; letter-spacing: .5px; }
   .logo span { color: var(--wa-green); }
 
+  /* MENU */
   .menu {
     position: fixed; top: 0; left: 0; height: 100%; width: 280px;
     background: #fff; z-index: 200;
@@ -126,6 +132,7 @@
   }
   .overlay.open { opacity: 1; pointer-events: auto; }
 
+  /* CONTENU */
   .content { padding: 18px 16px; }
   .welcome {
     background: #fff; border-radius: 16px; padding: 18px;
@@ -138,26 +145,89 @@
   .welcome h2 .pseudo-badge { color: var(--wa-green); font-weight: 800; }
   .welcome p { font-size: 14px; color: var(--muted); }
 
+  /* ========== CARTE SOLDE AMÉLIORÉE ========== */
   .solde {
     background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
-    color: #fff; border-radius: 16px; padding: 22px 20px;
-    margin-bottom: 20px; box-shadow: 0 4px 14px rgba(18,140,126,.35);
+    color: #fff; border-radius: 20px;
+    padding: 18px 18px 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 24px rgba(18,140,126,.4);
     position: relative; overflow: hidden;
   }
   .solde::after {
-    content: ''; position: absolute; right: -30px; top: -30px;
-    width: 140px; height: 140px; border-radius: 50%;
+    content: ''; position: absolute; right: -30px; top: 30px;
+    width: 160px; height: 160px; border-radius: 50%;
     background: rgba(255,255,255,.08);
     animation: pulse 3s ease-in-out infinite;
+    pointer-events: none;
   }
-  .solde .label { font-size: 13px; opacity: .9; }
-  .solde .montant { font-size: 32px; font-weight: 700; margin: 6px 0; }
-  .solde .sub { font-size: 12px; opacity: .85; }
 
+  /* Bouton Inviter en haut */
+  .btn-inviter {
+    position: relative; z-index: 2;
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,.2);
+    border: 1px solid rgba(255,255,255,.35);
+    color: #fff;
+    padding: 6px 12px; border-radius: 20px;
+    font-size: 11.5px; font-weight: 800;
+    cursor: pointer; font-family: inherit;
+    backdrop-filter: blur(6px);
+    transition: background .2s, transform .15s;
+    margin-bottom: 14px;
+    text-transform: uppercase; letter-spacing: .5px;
+  }
+  .btn-inviter:active { transform: scale(.95); background: rgba(255,255,255,.3); }
+  .btn-inviter svg { stroke: #fff; }
+
+  /* Montant */
+  .solde .label {
+    font-size: 12.5px; opacity: .9;
+    position: relative; z-index: 2;
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 4px;
+  }
+  .solde .label svg { stroke: #fff; }
+  .solde .montant {
+    font-size: 34px; font-weight: 800;
+    margin: 4px 0 6px;
+    position: relative; z-index: 2;
+    letter-spacing: -.5px;
+  }
+  .solde .sub {
+    font-size: 11.5px; opacity: .85;
+    position: relative; z-index: 2;
+    margin-bottom: 16px;
+  }
+
+  /* Bouton Recharge en bas */
+  .btn-recharge {
+    position: relative; z-index: 2;
+    width: 100%;
+    background: #fff;
+    color: var(--wa-dark);
+    border: none;
+    padding: 13px;
+    border-radius: 14px;
+    font-size: 14.5px; font-weight: 800;
+    cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 4px 14px rgba(0,0,0,.15);
+    transition: transform .15s, box-shadow .2s;
+    animation: shineBtn 3s ease-in-out infinite;
+  }
+  .btn-recharge:active { transform: scale(.97); box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+  .btn-recharge svg { stroke: var(--wa-dark); }
+
+  /* ========== FIN CARTE SOLDE ========== */
+
+  /* SECTION */
   .section-title {
     font-size: 15px; font-weight: 700; color: var(--wa-deep);
     margin: 22px 0 12px;
   }
+
+  /* CARROUSEL */
   .carousel-wrap { overflow: hidden; border-radius: 16px; position: relative; }
   .carousel { display: flex; transition: transform .7s cubic-bezier(.4,0,.2,1); }
   .plant-card { flex: 0 0 100%; background: #fff; position: relative; height: 220px; }
@@ -189,7 +259,7 @@
   }
   .dot.active { background: var(--wa-green); width: 20px; border-radius: 4px; }
 
-  /* ====== 4 BOUTONS (avec Accueil) ====== */
+  /* 4 BOUTONS */
   .actions {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -217,8 +287,6 @@
   .action-btn .label {
     font-size: 13px; font-weight: 700; color: #333;
   }
-
-  /* Couleurs par bouton */
   .action-btn.home .icon-circle { background: rgba(7,94,84,.1); }
   .action-btn.home svg { stroke: var(--wa-deep); }
   .action-btn.rank .icon-circle { background: rgba(255,106,0,.12); }
@@ -228,7 +296,6 @@
   .action-btn.news .icon-circle { background: rgba(37,211,102,.15); }
   .action-btn.news svg { stroke: var(--wa-green); }
 
-  /* Badge "Actuel" pour Accueil */
   .action-btn.current::before {
     content: 'Actuel';
     position: absolute; top: 8px; right: 8px;
@@ -238,7 +305,7 @@
     text-transform: uppercase; letter-spacing: .3px;
   }
 
-  /* ===== BOTTOM NAV ===== */
+  /* BOTTOM NAV */
   .bottom-nav {
     position: fixed; bottom: 0; left: 0; right: 0;
     display: flex; background: #fff;
@@ -257,6 +324,21 @@
   .nav-item:active { transform: scale(.92); }
   .nav-item.active { color: var(--wa-dark); font-weight: 700; }
   .nav-item.active svg { stroke: var(--wa-green); transform: translateY(-1px); }
+
+  /* TOAST */
+  .toast {
+    position: fixed; left: 50%; bottom: 100px;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--wa-deep); color: #fff;
+    padding: 12px 22px; border-radius: 30px;
+    font-size: 14px; font-weight: 600;
+    box-shadow: 0 6px 20px rgba(0,0,0,.25);
+    opacity: 0; pointer-events: none;
+    transition: all .3s; z-index: 1000;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast svg { stroke: var(--wa-green); }
 </style>
 </head>
 <body>
@@ -292,9 +374,16 @@
       </svg>
       Travail
     </div>
+    <div class="menu-item" onclick="go('parrainage.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+      </svg>
+      Parrainage
+    </div>
     <div class="menu-item" onclick="go('support.html')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+        <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
       </svg>
       Support
     </div>
@@ -329,11 +418,41 @@
       <p>Prêt à accomplir des tâches et gagner aujourd'hui ?</p>
     </div>
 
+    <!-- ========== CARTE SOLDE AVEC BOUTONS ========== -->
     <div class="solde anim d2">
-      <div class="label">Solde disponible</div>
+
+      <!-- BOUTON INVITER (haut) -->
+      <button class="btn-inviter" onclick="go('parrainage.html')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="8.5" cy="7" r="4"/>
+          <line x1="20" y1="8" x2="20" y2="14"/>
+          <line x1="23" y1="11" x2="17" y2="11"/>
+        </svg>
+        Inviter un ami
+      </button>
+
+      <!-- MONTANT -->
+      <div class="label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+        </svg>
+        Solde disponible
+      </div>
       <div class="montant" id="userSolde">0 FCFA</div>
       <div class="sub">Retirez dès 1 000 FCFA</div>
+
+      <!-- BOUTON RECHARGE (bas) -->
+      <button class="btn-recharge" onclick="go('recharge.html')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Recharger mon solde
+      </button>
+
     </div>
+    <!-- ========== FIN CARTE SOLDE ========== -->
 
     <!-- CARROUSEL -->
     <div class="section-title anim d3">Plantations & cultures</div>
@@ -406,10 +525,9 @@
     </div>
     <div class="dots" id="dots"></div>
 
-    <!-- ====== 4 BOUTONS ====== -->
+    <!-- 4 BOUTONS -->
     <div class="actions anim d4">
 
-      <!-- ACCUEIL (nouveau) -->
       <div class="action-btn home current" onclick="go('dashboard.html')">
         <div class="icon-circle">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -420,7 +538,6 @@
         <div class="label">Accueil</div>
       </div>
 
-      <!-- CLASSEMENT -->
       <div class="action-btn rank" onclick="go('classement.html')">
         <div class="icon-circle">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -435,7 +552,6 @@
         <div class="label">Classement</div>
       </div>
 
-      <!-- TICKET -->
       <div class="action-btn ticket" onclick="go('ticket.html')">
         <div class="icon-circle">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -446,7 +562,6 @@
         <div class="label">Ticket</div>
       </div>
 
-      <!-- ACTUALITÉS -->
       <div class="action-btn news" onclick="go('actualites.html')">
         <div class="icon-circle">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -489,6 +604,13 @@
     </a>
   </nav>
 
+  <div class="toast" id="toast">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+    <span id="toastText">—</span>
+  </div>
+
 <script>
   const SUPABASE_URL = 'https://ydwjvvlcnqsftciedpqm.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2p2dmxjbnFzZnRjaWVkcHFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMDQyNDAsImV4cCI6MjEwNTY4MDI0MH0.4uQwBGedMBjUZErd8lUM5YfA26gw96RvHdo_J-3PZCY';
@@ -501,8 +623,7 @@
       return;
     }
 
-    const { data: profile } = await sb
-      .from('profiles')
+    const { data: profile } = await sb.from('profiles')
       .select('nom, pseudo, solde')
       .eq('id', session.user.id)
       .maybeSingle();
@@ -530,7 +651,7 @@
     window.location.replace('inscription.html');
   }
 
-  // ===== CARROUSEL AUTO =====
+  // Carrousel auto
   const carousel = document.getElementById('carousel');
   const total = carousel.children.length;
   const dotsContainer = document.getElementById('dots');
@@ -552,7 +673,6 @@
   }
 
   let auto = setInterval(() => goTo(index + 1), 3500);
-
   let startX = 0;
   carousel.addEventListener('touchstart', e => startX = e.touches[0].clientX);
   carousel.addEventListener('touchend', e => {
