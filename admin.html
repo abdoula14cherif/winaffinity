@@ -636,7 +636,6 @@
     if (!valeur) return showToast('Lien vide', true);
     if (!/^https?:\/\//i.test(valeur)) return showToast('Le lien doit commencer par http:// ou https://', true);
 
-    // Upsert : insère si absent, met à jour sinon
     const { error } = await sb
       .from('parametres')
       .upsert({ cle: 'lien_paiement', valeur, updated_at: new Date().toISOString() }, { onConflict: 'cle' });
@@ -647,12 +646,20 @@
 
   // ================= RECHARGES =================
   async function loadRecharges() {
+    // ⬇️ Plus de JOIN — les infos utilisateur sont directement dans la table
     const { data, error } = await sb
       .from('recharges')
-      .select('*, profiles(nom, pseudo, email)')
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(200);
-    if (error) { console.warn('Recharges:', error); return; }
+
+    if (error) {
+      console.warn('Erreur recharges:', error);
+      document.getElementById('rechargesList').innerHTML =
+        `<div class="empty"><div>Erreur : ${escapeHtml(error.message)}</div></div>`;
+      return;
+    }
+
     DATA.recharges = data || [];
 
     const pending = DATA.recharges.filter(r => r.statut === 'en_attente').length;
@@ -689,13 +696,14 @@
 
     list.innerHTML = filtered.map((r, i) => {
       const info = statusInfo[r.statut] || { label: r.statut, classe: 'gray' };
-      const userName = r.profiles?.nom || r.profiles?.pseudo || 'Utilisateur';
-      const userEmail = r.profiles?.email || '';
+      // ⬇️ Lecture directe depuis les colonnes dénormalisées
+      const userName = r.user_nom || r.user_pseudo || 'Utilisateur';
+      const userEmail = r.user_email || '';
       const noteHTML = r.note_admin ? `<div class="ic-desc">📝 ${escapeHtml(r.note_admin)}</div>` : '';
 
       return `
         <div class="item-card" style="animation-delay:${i * .025}s">
-          <div class="ic-img">${r.mode === 'lien' ? '💳' : (r.mode === 'crypto' ? '₿' : '📱')}</div>
+          <div class="ic-img">${r.mode === 'lien' ? '💳' : (r.mode === 'crypto' ? '₿' : (r.mode === 'manuel' ? '✍️' : '📱'))}</div>
           <div class="ic-body">
             <div class="ic-name">
               +${formatF(r.montant)}
@@ -707,7 +715,8 @@
             </div>
             <div class="ic-meta">
               ${r.mode === 'lien' ? '<span>💳 Paiement en ligne</span>' : ''}
-              ${r.mode !== 'lien' && r.pays_nom ? `<span>${escapeHtml(r.pays_nom)}</span>` : ''}
+              ${r.mode === 'manuel' ? '<span>✍️ Crédit manuel</span>' : ''}
+              ${r.mode !== 'lien' && r.mode !== 'manuel' && r.pays_nom ? `<span>${escapeHtml(r.pays_nom)}</span>` : ''}
               ${r.operateur_nom ? `<span class="dot">•</span><span>${escapeHtml(r.operateur_nom)}</span>` : ''}
               <span class="dot">•</span>
               <span>${timeAgo(r.created_at)}</span>
@@ -754,10 +763,10 @@
     const note = prompt('Note interne (optionnel) :', '');
     if (note === null) return;
 
-    const userName = r.profiles?.nom || r.profiles?.pseudo || 'cet utilisateur';
+    const userName = r.user_nom || r.user_pseudo || 'cet utilisateur';
     if (!confirm(`Créditer ${formatF(r.montant)} à ${userName} ?`)) return;
 
-    // 1️⃣ Créditer le solde (utilise la RPC existante)
+    // 1️⃣ Créditer le solde
     const { error: errSolde } = await sb.rpc('ajuster_solde_user', {
       p_user_id: r.user_id,
       p_montant: Number(r.montant),
@@ -765,7 +774,7 @@
     });
     if (errSolde) return showToast('Erreur crédit : ' + errSolde.message, true);
 
-    // 2️⃣ Mettre à jour le statut de la recharge
+    // 2️⃣ Mettre à jour le statut
     const { error: errUpdate } = await sb.from('recharges').update({
       statut: 'paye',
       note_admin: note || null
@@ -855,7 +864,7 @@
     const u = DATA.users.find(x => x.id === userId);
     const userName = u?.nom || u?.pseudo || 'utilisateur';
 
-    // 1️⃣ Créer la recharge (déjà payée)
+    // 1️⃣ Créer la recharge (avec infos user dénormalisées)
     const { error: errInsert } = await sb.from('recharges').insert({
       user_id: userId,
       mode: 'manuel',
@@ -864,7 +873,10 @@
       pays_nom: 'Crédit admin',
       operateur_nom: 'Manuel',
       statut: 'paye',
-      note_admin: note || 'Crédit manuel admin'
+      note_admin: note || 'Crédit manuel admin',
+      user_nom: u?.nom || '',
+      user_pseudo: u?.pseudo || '',
+      user_email: u?.email || ''
     });
     if (errInsert) return showToast('Erreur création : ' + errInsert.message, true);
 
