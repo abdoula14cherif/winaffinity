@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Affinity Network — Support</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#075E54">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root { --wa-green: #25D366; --wa-dark: #128C7E; --wa-deep: #075E54; --alibaba: #FF6A00; --gold: #FFB800; --bg: #f7f9f8; --text: #1a1a1a; --muted: #6b7280; --border: #e5e7eb; --danger: #dc2626; }
+  body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 80px; min-height: 100vh; overflow-x: hidden; -webkit-user-select: none; user-select: none; }
+  input, textarea, select { -webkit-user-select: text; user-select: text; }
+
+  .loader { position: fixed; inset: 0; z-index: 9999; background: var(--wa-deep); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; transition: opacity .6s ease, visibility .6s ease; }
+  .loader.hidden { opacity: 0; visibility: hidden; }
+  .loader-logo { font-size: 24px; font-weight: 700; color: #fff; }
+  .loader-logo span { color: var(--wa-green); }
+  .spinner { width: 46px; height: 46px; border: 4px solid rgba(255,255,255,.2); border-top-color: var(--wa-green); border-radius: 50%; animation: spin .9s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+  .anim { opacity: 0; animation: fadeInUp .5s ease forwards; }
+  .d1 { animation-delay: .05s; } .d2 { animation-delay: .1s; } .d3 { animation-delay: .15s; }
+
+  .header { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--wa-deep); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.15); padding-top: max(14px, env(safe-area-inset-top)); }
+  .burger { cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,.12); }
+  .burger svg { stroke: #fff; }
+  .logo { font-weight: 700; font-size: 18px; }
+  .logo span { color: var(--wa-green); }
+
+  .menu { position: fixed; top: 0; left: 0; height: 100%; width: 280px; background: #fff; z-index: 200; transform: translateX(-100%); transition: transform .35s cubic-bezier(.4,0,.2,1); box-shadow: 4px 0 20px rgba(0,0,0,.2); padding-top: 18px; display: flex; flex-direction: column; overflow-y: auto; padding-top: max(18px, env(safe-area-inset-top)); }
+  .menu.open { transform: translateX(0); }
+  .menu-header { padding: 8px 20px 18px; border-bottom: 1px solid #eee; margin-bottom: 10px; font-weight: 700; color: var(--wa-deep); font-size: 17px; display: flex; align-items: center; gap: 10px; }
+  .menu-header svg { stroke: var(--wa-green); }
+  .menu-item { display: flex; align-items: center; gap: 14px; padding: 15px 22px; cursor: pointer; font-size: 15px; color: #333; }
+  .menu-item svg { stroke: var(--wa-dark); flex-shrink: 0; }
+  .menu-item.active { background: #e7f9ee; color: var(--wa-deep); font-weight: 700; }
+  .menu-footer { margin-top: auto; padding: 16px 20px 22px; border-top: 1px solid #eee; padding-bottom: max(22px, env(safe-area-inset-bottom)); }
+  .btn-logout { width: 100%; padding: 14px; background: #fee2e2; color: #b91c1c; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-logout svg { stroke: #b91c1c; }
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 150; opacity: 0; pointer-events: none; transition: opacity .3s; }
+  .overlay.open { opacity: 1; pointer-events: auto; }
+
+  .content { padding: 0 0 20px; }
+
+  .hero { background: linear-gradient(135deg, var(--wa-deep), var(--wa-dark)); color: #fff; padding: 32px 20px 40px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; width: 240px; height: 240px; border-radius: 50%; background: rgba(37,211,102,.15); top: -100px; right: -80px; }
+  .hero::after { content: ''; position: absolute; width: 180px; height: 180px; border-radius: 50%; background: rgba(255,106,0,.1); bottom: -90px; left: -60px; }
+  .hero-content { position: relative; z-index: 2; }
+  .hero-icon { width: 58px; height: 58px; border-radius: 18px; background: rgba(37,211,102,.2); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+  .hero-icon svg { stroke: var(--wa-green); }
+  .hero h1 { font-size: 26px; font-weight: 800; margin-bottom: 8px; line-height: 1.2; }
+  .hero p { font-size: 14px; opacity: .9; line-height: 1.6; max-width: 380px; }
+
+  .quick-contacts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: -22px 20px 20px; position: relative; z-index: 3; }
+  .qc-card { background: #fff; border-radius: 14px; padding: 14px 8px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,.12); cursor: pointer; transition: transform .15s; }
+  .qc-card:active { transform: scale(.96); }
+  .qc-card .qc-ico { width: 42px; height: 42px; border-radius: 50%; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; }
+  .qc-card:nth-child(1) .qc-ico { background: rgba(37,211,102,.15); }
+  .qc-card:nth-child(1) .qc-ico svg { stroke: var(--wa-green); }
+  .qc-card:nth-child(2) .qc-ico { background: rgba(18,140,126,.15); }
+  .qc-card:nth-child(2) .qc-ico svg { stroke: var(--wa-dark); }
+  .qc-card:nth-child(3) .qc-ico { background: rgba(255,106,0,.15); }
+  .qc-card:nth-child(3) .qc-ico svg { stroke: var(--alibaba); }
+  .qc-card .qc-lbl { font-size: 11.5px; font-weight: 700; color: var(--text); }
+
+  .section-title { padding: 0 20px; font-size: 15px; font-weight: 700; color: var(--wa-deep); margin: 22px 0 12px; display: flex; align-items: center; gap: 8px; }
+  .section-title svg { stroke: var(--wa-green); }
+
+  .form-card { margin: 0 20px; background: #fff; border-radius: 18px; padding: 20px; box-shadow: 0 3px 14px rgba(0,0,0,.07); animation: fadeInUp .5s ease forwards; opacity: 0; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 13px; font-weight: 700; color: var(--wa-deep); margin-bottom: 7px; }
+  .field .input-wrap { display: flex; align-items: center; background: #f7faf8; border: 1.5px solid var(--border); border-radius: 12px; padding: 0 14px; transition: border-color .2s, box-shadow .2s; }
+  .field .input-wrap:focus-within { border-color: var(--wa-green); box-shadow: 0 0 0 3px rgba(37,211,102,.15); background: #fff; }
+  .field .input-wrap svg { stroke: var(--muted); flex-shrink: 0; }
+  .field .input-wrap:focus-within svg { stroke: var(--wa-dark); }
+  .field input, .field select, .field textarea { flex: 1; border: none; outline: none; padding: 13px 10px; font-size: 15px; background: transparent; color: var(--text); font-family: inherit; width: 100%; }
+  .field input::placeholder, .field textarea::placeholder { color: #b0b7be; }
+  .field textarea { resize: vertical; min-height: 110px; }
+  .field .input-wrap.full { padding: 4px 14px; }
+  .field select { cursor: pointer; -webkit-appearance: none; appearance: none; }
+
+  .btn-submit { width: 100%; border: none; background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; box-shadow: 0 4px 14px rgba(18,140,126,.35); display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 6px; transition: transform .15s; }
+  .btn-submit:active { transform: scale(.97); }
+  .btn-submit svg { stroke: #fff; }
+  .btn-submit:disabled { background: #d1d5db; box-shadow: none; cursor: not-allowed; }
+  .btn-submit:disabled svg { stroke: #6b7280; }
+  .btn-submit .spin-small { width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; display: none; }
+  .btn-submit.loading .spin-small { display: inline-block; }
+  .btn-submit.loading .icon-default { display: none; }
+
+  .hist-item { margin: 0 20px 10px; background: #fff; border-radius: 14px; padding: 14px; box-shadow: 0 2px 8px rgba(0,0,0,.05); animation: fadeInUp .4s ease forwards; opacity: 0; }
+  .hist-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .hist-subject { font-size: 14px; font-weight: 800; color: var(--text); flex: 1; margin-right: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hist-status { font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 10px; text-transform: uppercase; letter-spacing: .3px; flex-shrink: 0; }
+  .hist-status.ouvert { background: rgba(255,106,0,.15); color: var(--alibaba); }
+  .hist-status.en_cours { background: rgba(59,130,246,.15); color: #2563eb; }
+  .hist-status.resolu { background: rgba(37,211,102,.15); color: #166534; }
+  .hist-message { font-size: 12.5px; color: #4b5563; line-height: 1.5; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .hist-meta { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+
+  .empty { margin: 0 20px; text-align: center; padding: 30px 20px; color: var(--muted); font-size: 13px; background: #fff; border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+  .empty svg { stroke: #d1d5db; margin-bottom: 10px; }
+
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: #fff; border-top: 1px solid #e5e7eb; box-shadow: 0 -2px 12px rgba(0,0,0,.06); z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 9px 0 10px; cursor: pointer; color: #9ca3af; font-size: 11px; gap: 4px; text-decoration: none; font-weight: 500; }
+  .nav-item svg { stroke: #9ca3af; }
+  .nav-item.active { color: var(--wa-dark); font-weight: 700; }
+  .nav-item.active svg { stroke: var(--wa-green); }
+
+  .toast { position: fixed; left: 50%; bottom: 100px; transform: translateX(-50%) translateY(20px); background: var(--wa-deep); color: #fff; padding: 12px 22px; border-radius: 30px; font-size: 14px; font-weight: 600; box-shadow: 0 6px 20px rgba(0,0,0,.25); opacity: 0; pointer-events: none; transition: all .3s; z-index: 1000; display: flex; align-items: center; gap: 8px; max-width: 90%; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast svg { stroke: var(--wa-green); flex-shrink: 0; }
+  .toast.error { background: #b91c1c; }
+  .toast.error svg { stroke: #fff; }
+</style>
+</head>
+<body>
+
+  <div class="loader" id="loader">
+    <div class="loader-logo">Affinity<span> Network</span></div>
+    <div class="spinner"></div>
+  </div>
+
+  <header class="header">
+    <div class="burger" onclick="toggleMenu()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </div>
+    <div class="logo">Affinity<span> Network</span></div>
+    <div style="width:40px"></div>
+  </header>
+
+  <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+  <nav class="menu" id="menu">
+    <div class="menu-header">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M3 21h18M5 21V7l7-4 7 4v14"/>
+      </svg>
+      Affinity Network
+    </div>
+    <div class="menu-item" onclick="go('parrainage.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+      </svg>
+      Inviter un ami
+    </div>
+    <div class="menu-item" onclick="go('recharge.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Recharger mon solde
+    </div>
+    <div class="menu-item" onclick="go('roue.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+      </svg>
+      Roue de la fortune
+    </div>
+    <div class="menu-item" onclick="go('missions.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+        <path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+      </svg>
+      Missions
+    </div>
+    <div class="menu-item" onclick="go('notifications.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      Notifications
+    </div>
+    <div class="menu-item" onclick="go('travail.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <rect x="2" y="7" width="20" height="14" rx="2"/>
+      </svg>
+      Travail
+    </div>
+    <div class="menu-item active" onclick="go('support.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+      </svg>
+      Support
+    </div>
+    <div class="menu-item" onclick="go('faq.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10"/>
+      </svg>
+      FAQ
+    </div>
+    <div class="menu-footer">
+      <button class="btn-logout" onclick="logout()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Se déconnecter
+      </button>
+    </div>
+  </nav>
+
+  <main class="content">
+    <div class="hero">
+      <div class="hero-content">
+        <div class="hero-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+            <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+          </svg>
+        </div>
+        <h1>Support</h1>
+        <p>Notre équipe est là pour t'aider 7j/7. Réponse sous 24h maximum.</p>
+      </div>
+    </div>
+
+    <div class="quick-contacts anim d1">
+      <div class="qc-card" onclick="openWhatsApp()">
+        <div class="qc-ico">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+          </svg>
+        </div>
+        <div class="qc-lbl">WhatsApp</div>
+      </div>
+      <div class="qc-card" onclick="sendEmail()">
+        <div class="qc-ico">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/>
+          </svg>
+        </div>
+        <div class="qc-lbl">Email</div>
+      </div>
+      <div class="qc-card" onclick="go('faq.html')">
+        <div class="qc-ico">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+        <div class="qc-lbl">FAQ</div>
+      </div>
+    </div>
+
+    <div class="section-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+      Envoyer un message
+    </div>
+
+    <div class="form-card">
+      <div class="field">
+        <label>Sujet</label>
+        <div class="input-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <select id="sujet">
+            <option value="">Choisis un sujet</option>
+            <option value="Problème de retrait">Problème de retrait</option>
+            <option value="Problème d'activation">Problème d'activation</option>
+            <option value="Question sur le parrainage">Question sur le parrainage</option>
+            <option value="Problème de connexion">Problème de connexion</option>
+            <option value="Autre">Autre</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Message</label>
+        <div class="input-wrap full">
+          <textarea id="message" placeholder="Décris ton problème en détail..." rows="5"></textarea>
+        </div>
+      </div>
+      <button class="btn-submit" id="btnSubmit" onclick="sendMessage()">
+        <span class="spin-small"></span>
+        <svg class="icon-default" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+        <span class="txt" id="btnSubmitText">Envoyer</span>
+      </button>
+    </div>
+
+    <div class="section-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+      </svg>
+      Mes tickets récents
+    </div>
+    <div id="histList">
+      <div class="empty"><div>Chargement...</div></div>
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="lancer.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+      </svg>
+      Lancer
+    </a>
+    <a href="retirer.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+      </svg>
+      Retirer
+    </a>
+    <a href="travail.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="7" width="20" height="14" rx="2"/>
+      </svg>
+      Travail
+    </a>
+    <a href="moi.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+      </svg>
+      Moi
+    </a>
+  </nav>
+
+  <div class="toast" id="toast">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+    <span id="toastText">—</span>
+  </div>
+
+<script>
+  const SUPABASE_URL = 'https://ydwjvvlcnqsftciedpqm.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2p2dmxjbnFzZnRjaWVkcHFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMDQyNDAsImV4cCI6MjEwNTY4MDI0MH0.4uQwBGedMBjUZErd8lUM5YfA26gw96RvHdo_J-3PZCY';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  let CURRENT_USER = null;
+
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+
+  (async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.replace('inscription.html'); return; }
+    CURRENT_USER = session.user;
+    await loadHist();
+    setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
+  })();
+
+  async function loadHist() {
+    const list = document.getElementById('histList');
+    const { data, error } = await sb.from('support_tickets').select('*').eq('user_id', CURRENT_USER.id).order('created_at', { ascending: false }).limit(10).catch(() => ({ data: null, error: true }));
+    if (error || !data || data.length === 0) {
+      list.innerHTML = `<div class="empty">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+          <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+        </svg>
+        <div>Aucun ticket pour le moment</div>
+      </div>`;
+      return;
+    }
+    const labels = { ouvert: 'Ouvert', en_cours: 'En cours', resolu: 'Résolu' };
+    list.innerHTML = data.map((t, i) => `
+      <div class="hist-item" style="animation-delay:${i * .05}s">
+        <div class="hist-top">
+          <div class="hist-subject">${escapeHtml(t.sujet)}</div>
+          <div class="hist-status ${t.statut}">${labels[t.statut] || t.statut}</div>
+        </div>
+        <div class="hist-message">${escapeHtml(t.message)}</div>
+        <div class="hist-meta">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+          ${timeAgo(t.created_at)}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function sendMessage() {
+    const sujet = document.getElementById('sujet').value;
+    const message = document.getElementById('message').value.trim();
+    if (!sujet) return showToast('Choisis un sujet', true);
+    if (message.length < 10) return showToast('Message trop court (10 caractères min)', true);
+    const btn = document.getElementById('btnSubmit');
+    btn.classList.add('loading');
+    document.getElementById('btnSubmitText').textContent = 'Envoi...';
+    const { error } = await sb.from('support_tickets').insert({
+      user_id: CURRENT_USER.id, sujet, message, statut: 'ouvert'
+    }).catch(() => ({ error: { message: 'Table non configurée' } }));
+    btn.classList.remove('loading');
+    document.getElementById('btnSubmitText').textContent = 'Envoyer';
+    if (error) {
+      showToast('Erreur d\'envoi. Contacte-nous par WhatsApp.', true);
+      return;
+    }
+    showToast('✅ Ticket envoyé ! Réponse sous 24h');
+    document.getElementById('sujet').value = '';
+    document.getElementById('message').value = '';
+    await loadHist();
+  }
+
+  function openWhatsApp() {
+    window.open('https://wa.me/237000000000?text=Bonjour%20Affinity%20Network%2C%20j%27ai%20besoin%20d%27aide', '_blank');
+  }
+  function sendEmail() {
+    window.location.href = 'mailto:support@affinitynetwork.com?subject=Aide%20Affinity%20Network';
+  }
+
+  function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function timeAgo(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+    if (diff < 60) return 'À l\'instant';
+    if (diff < 3600) return `Il y a ${Math.floor(diff/60)} min`;
+    if (diff < 86400) return `Il y a ${Math.floor(diff/3600)} h`;
+    if (diff < 604800) return `Il y a ${Math.floor(diff/86400)} j`;
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+  }
+  function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastText').textContent = msg;
+    t.className = 'toast show' + (isError ? ' error' : '');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+  function toggleMenu() { document.getElementById('menu').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
+  function go(page) { window.location.href = page; }
+  async function logout() {
+    if (!confirm('Veux-tu vraiment te déconnecter ?')) return;
+    await sb.auth.signOut();
+    window.location.replace('inscription.html');
+  }
+</script>
+</body>
+</html>
