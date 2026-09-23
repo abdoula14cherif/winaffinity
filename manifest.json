@@ -1,0 +1,46 @@
+{
+  "name": "Affinity Network",
+  "short_name": "Affinity",
+  "description": "Accomplis des tâches, gagne de l'argent et grandis avec ton réseau.",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#075E54",
+  "theme_color": "#075E54",
+  "lang": "fr",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "https://ui-avatars.com/api/?name=AN&size=192&background=075E54&color=25D366&bold=true",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://ui-avatars.com/api/?name=AN&size=512&background=075E54&color=25D366&bold=true",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Roue de la fortune",
+      "short_name": "Roue",
+      "url": "/roue",
+      "description": "Tourne la roue gratuitement"
+    },
+    {
+      "name": "Travail",
+      "short_name": "Travail",
+      "url": "/travail",
+      "description": "Active des plantations"
+    },
+    {
+      "name": "Parrainage",
+      "short_name": "Parrainage",
+      "url": "/parrainage",
+      "description": "Invite tes amis"
+    }
+  ]
+}
