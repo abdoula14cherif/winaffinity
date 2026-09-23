@@ -4,182 +4,71 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Affinity Network — Admin</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#075E54">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root {
-    --wa-green: #25D366;
-    --wa-dark: #128C7E;
-    --wa-deep: #075E54;
-    --alibaba: #FF6A00;
-    --bg: #f7f9f8;
-    --text: #1a1a1a;
-    --muted: #6b7280;
-    --border: #e5e7eb;
-    --danger: #dc2626;
-    --warn: #f59e0b;
+    --wa-green: #25D366; --wa-dark: #128C7E; --wa-deep: #075E54;
+    --alibaba: #FF6A00; --gold: #FFB800;
+    --bg: #f7f9f8; --text: #1a1a1a; --muted: #6b7280; --border: #e5e7eb;
+    --danger: #dc2626; --warn: #f59e0b;
   }
-  body {
-    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
-    background: var(--bg); color: var(--text);
-    padding-bottom: 30px; min-height: 100vh; overflow-x: hidden;
-  }
-  .loader {
-    position: fixed; inset: 0; z-index: 9999;
-    background: var(--wa-deep);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 22px;
-    transition: opacity .6s ease, visibility .6s ease;
-  }
+  body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 30px; min-height: 100vh; overflow-x: hidden; -webkit-user-select: none; user-select: none; }
+  input, textarea, select { -webkit-user-select: text; user-select: text; }
+
+  .loader { position: fixed; inset: 0; z-index: 9999; background: var(--wa-deep); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; transition: opacity .6s ease, visibility .6s ease; }
   .loader.hidden { opacity: 0; visibility: hidden; }
   .loader-logo { font-size: 24px; font-weight: 700; color: #fff; }
   .loader-logo span { color: var(--wa-green); }
-  .spinner {
-    width: 46px; height: 46px;
-    border: 4px solid rgba(255,255,255,.2);
-    border-top-color: var(--wa-green);
-    border-radius: 50%;
-    animation: spin .9s linear infinite;
-  }
+  .spinner { width: 46px; height: 46px; border: 4px solid rgba(255,255,255,.2); border-top-color: var(--wa-green); border-radius: 50%; animation: spin .9s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(18px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes shimmer { to { background-position: -200% 0; } }
   .anim { opacity: 0; animation: fadeInUp .4s ease forwards; }
 
-  .header {
-    position: sticky; top: 0; z-index: 100;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 18px;
-    background: linear-gradient(135deg, #1a1a1a, var(--wa-deep));
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,.2);
-  }
-  .logo {
-    font-weight: 700; font-size: 17px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .logo .badge-admin {
-    background: var(--alibaba); color: #fff;
-    font-size: 9px; padding: 2px 8px; border-radius: 8px;
-    text-transform: uppercase; letter-spacing: .5px; font-weight: 800;
-  }
-  .btn-exit {
-    background: rgba(255,255,255,.15); border: none;
-    width: 36px; height: 36px; border-radius: 50%;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-  }
+  .header { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: linear-gradient(135deg, #1a1a1a, var(--wa-deep)); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.2); padding-top: max(14px, env(safe-area-inset-top)); }
+  .logo { font-weight: 700; font-size: 17px; display: flex; align-items: center; gap: 8px; }
+  .logo .badge-admin { background: var(--alibaba); color: #fff; font-size: 9px; padding: 2px 8px; border-radius: 8px; text-transform: uppercase; letter-spacing: .5px; font-weight: 800; }
+  .btn-exit { background: rgba(255,255,255,.15); border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
   .btn-exit svg { stroke: #fff; }
 
-  .tabs {
-    background: #fff; padding: 8px 10px;
-    display: flex; gap: 6px; overflow-x: auto;
-    border-bottom: 1px solid var(--border);
-    position: sticky; top: 64px; z-index: 99;
-    -ms-overflow-style: none; scrollbar-width: none;
-  }
+  .tabs { background: #fff; padding: 8px 10px; display: flex; gap: 6px; overflow-x: auto; border-bottom: 1px solid var(--border); position: sticky; top: 64px; z-index: 99; -ms-overflow-style: none; scrollbar-width: none; }
   .tabs::-webkit-scrollbar { display: none; }
-  .tab {
-    padding: 10px 16px; border-radius: 12px;
-    font-size: 13px; font-weight: 700;
-    background: #f7faf8; color: var(--muted);
-    border: none; cursor: pointer; font-family: inherit;
-    white-space: nowrap;
-    display: flex; align-items: center; gap: 6px;
-    transition: all .2s;
-  }
+  .tab { padding: 10px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; background: #f7faf8; color: var(--muted); border: none; cursor: pointer; font-family: inherit; white-space: nowrap; display: flex; align-items: center; gap: 6px; transition: all .2s; }
   .tab svg { stroke: currentColor; }
-  .tab.active {
-    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
-    color: #fff;
-    box-shadow: 0 3px 10px rgba(18,140,126,.3);
-  }
+  .tab.active { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; box-shadow: 0 3px 10px rgba(18,140,126,.3); }
 
   .content { padding: 16px; }
   .panel { display: none; }
   .panel.active { display: block; }
 
-  .stats-grid {
-    display: grid; grid-template-columns: repeat(2, 1fr);
-    gap: 10px; margin-bottom: 20px;
-  }
-  .stat-box {
-    background: #fff; border-radius: 14px; padding: 14px;
-    box-shadow: 0 2px 10px rgba(0,0,0,.05);
-    border-left: 4px solid var(--wa-green);
-    animation: fadeInUp .4s ease forwards; opacity: 0;
-  }
+  .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+  .stat-box { background: #fff; border-radius: 14px; padding: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.05); border-left: 4px solid var(--wa-green); animation: fadeInUp .4s ease forwards; opacity: 0; }
   .stat-box:nth-child(2) { border-color: var(--alibaba); }
   .stat-box:nth-child(3) { border-color: var(--wa-dark); }
   .stat-box:nth-child(4) { border-color: #3b82f6; }
   .stat-box:nth-child(5) { border-color: var(--warn); }
   .stat-box:nth-child(6) { border-color: var(--danger); }
-  .stat-box .lbl {
-    font-size: 10.5px; color: var(--muted);
-    text-transform: uppercase; font-weight: 700;
-    letter-spacing: .3px; margin-bottom: 6px;
-  }
-  .stat-box .val {
-    font-size: 20px; font-weight: 800; color: var(--text);
-  }
+  .stat-box .lbl { font-size: 10.5px; color: var(--muted); text-transform: uppercase; font-weight: 700; letter-spacing: .3px; margin-bottom: 6px; }
+  .stat-box .val { font-size: 20px; font-weight: 800; color: var(--text); }
 
-  .admin-toolbar {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 14px; gap: 10px;
-  }
-  .admin-toolbar h2 {
-    font-size: 17px; font-weight: 800; color: var(--wa-deep);
-  }
-  .btn-add {
-    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
-    color: #fff; border: none;
-    padding: 10px 16px; border-radius: 10px;
-    font-size: 13px; font-weight: 700;
-    cursor: pointer; font-family: inherit;
-    display: flex; align-items: center; gap: 6px;
-    box-shadow: 0 3px 10px rgba(18,140,126,.3);
-    transition: transform .15s;
-  }
+  .admin-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 10px; flex-wrap: wrap; }
+  .admin-toolbar h2 { font-size: 17px; font-weight: 800; color: var(--wa-deep); }
+  .btn-add { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; border: none; padding: 10px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 6px; box-shadow: 0 3px 10px rgba(18,140,126,.3); transition: transform .15s; }
   .btn-add:active { transform: scale(.95); }
   .btn-add svg { stroke: #fff; }
 
-  .item-card {
-    background: #fff; border-radius: 14px;
-    padding: 14px; margin-bottom: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.05);
-    display: flex; align-items: center; gap: 12px;
-    animation: fadeInUp .35s ease forwards; opacity: 0;
-  }
-  .item-card .ic-img {
-    width: 52px; height: 52px; border-radius: 12px;
-    object-fit: cover; flex-shrink: 0;
-    background: #f3f4f6;
-  }
+  .item-card { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.05); display: flex; align-items: center; gap: 12px; animation: fadeInUp .35s ease forwards; opacity: 0; }
+  .item-card .ic-img { width: 52px; height: 52px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #f3f4f6; }
   .item-card .ic-body { flex: 1; min-width: 0; }
-  .item-card .ic-name {
-    font-size: 14px; font-weight: 800; color: var(--text);
-    margin-bottom: 4px;
-    display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
-  }
-  .item-card .ic-meta {
-    font-size: 11.5px; color: var(--muted);
-    display: flex; align-items: center; gap: 8px;
-    flex-wrap: wrap;
-  }
+  .item-card .ic-name { font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 4px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+  .item-card .ic-meta { font-size: 11.5px; color: var(--muted); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .item-card .ic-meta .dot { color: #d1d5db; }
-  .item-card .ic-actions {
-    display: flex; gap: 4px; flex-shrink: 0;
-  }
-  .icon-btn {
-    width: 32px; height: 32px; border-radius: 9px;
-    background: #f7faf8; border: none;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: background .2s, transform .15s;
-  }
+  .item-card .ic-actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .icon-btn { width: 32px; height: 32px; border-radius: 9px; background: #f7faf8; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s, transform .15s; }
   .icon-btn:active { transform: scale(.9); }
   .icon-btn.edit svg { stroke: var(--wa-dark); }
   .icon-btn.edit:hover { background: rgba(18,140,126,.1); }
@@ -188,165 +77,75 @@
   .icon-btn.view svg { stroke: var(--alibaba); }
   .icon-btn.view:hover { background: rgba(255,106,0,.1); }
 
-  .badge {
-    display: inline-flex; align-items: center; gap: 3px;
-    font-size: 9.5px; font-weight: 800;
-    padding: 3px 8px; border-radius: 8px;
-    text-transform: uppercase; letter-spacing: .3px;
-  }
+  .badge { display: inline-flex; align-items: center; gap: 3px; font-size: 9.5px; font-weight: 800; padding: 3px 8px; border-radius: 8px; text-transform: uppercase; letter-spacing: .3px; }
   .badge.green { background: rgba(37,211,102,.15); color: #166534; }
   .badge.orange { background: rgba(255,106,0,.15); color: var(--alibaba); }
   .badge.red { background: rgba(220,38,38,.15); color: var(--danger); }
   .badge.blue { background: rgba(59,130,246,.15); color: #2563eb; }
   .badge.gray { background: rgba(107,114,128,.15); color: #4b5563; }
+  .badge.gold { background: rgba(255,184,0,.15); color: #B45309; }
 
-  .empty {
-    text-align: center; padding: 40px 20px;
-    color: var(--muted); font-size: 13px;
-    background: #fff; border-radius: 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.05);
-  }
+  .empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; background: #fff; border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
   .empty svg { stroke: #d1d5db; margin-bottom: 10px; }
 
-  .modal-overlay {
-    position: fixed; inset: 0; z-index: 500;
-    background: rgba(0,0,0,.6);
-    display: flex; align-items: flex-end; justify-content: center;
-    opacity: 0; pointer-events: none;
-    transition: opacity .3s; backdrop-filter: blur(3px);
-  }
+  .modal-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,.6); display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .3s; backdrop-filter: blur(3px); }
   .modal-overlay.open { opacity: 1; pointer-events: auto; }
-  .modal {
-    background: #fff; width: 100%; max-width: 520px;
-    border-radius: 24px 24px 0 0;
-    padding: 20px 20px 28px;
-    transform: translateY(100%);
-    transition: transform .4s cubic-bezier(.4,0,.2,1);
-    max-height: 92vh; overflow-y: auto;
-  }
+  .modal { background: #fff; width: 100%; max-width: 520px; border-radius: 24px 24px 0 0; padding: 20px 20px 28px; transform: translateY(100%); transition: transform .4s cubic-bezier(.4,0,.2,1); max-height: 92vh; overflow-y: auto; padding-bottom: max(28px, env(safe-area-inset-bottom)); }
   .modal-overlay.open .modal { transform: translateY(0); }
-  .modal-handle {
-    width: 42px; height: 5px; border-radius: 5px;
-    background: #d1d5db; margin: 0 auto 16px;
-  }
-  .modal-head {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 18px;
-  }
-  .modal-title {
-    font-size: 18px; font-weight: 800; color: var(--wa-deep);
-  }
-  .modal-close {
-    width: 34px; height: 34px; border-radius: 50%;
-    background: #f3f4f6; border: none; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-  }
+  .modal-handle { width: 42px; height: 5px; border-radius: 5px; background: #d1d5db; margin: 0 auto 16px; }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .modal-title { font-size: 18px; font-weight: 800; color: var(--wa-deep); }
+  .modal-close { width: 34px; height: 34px; border-radius: 50%; background: #f3f4f6; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
   .modal-close svg { stroke: var(--muted); }
 
   .form-group { margin-bottom: 14px; }
-  .form-group label {
-    display: block; font-size: 12.5px; font-weight: 700;
-    color: var(--wa-deep); margin-bottom: 6px;
-  }
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    width: 100%; padding: 12px 14px;
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    font-size: 14px; font-family: inherit;
-    background: #f7faf8;
-    outline: none;
-    transition: border-color .2s, background .2s;
-  }
-  .form-group input:focus,
-  .form-group select:focus,
-  .form-group textarea:focus {
-    border-color: var(--wa-green);
-    background: #fff;
-  }
+  .form-group label { display: block; font-size: 12.5px; font-weight: 700; color: var(--wa-deep); margin-bottom: 6px; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; font-family: inherit; background: #f7faf8; outline: none; transition: border-color .2s, background .2s; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--wa-green); background: #fff; }
   .form-group textarea { resize: vertical; min-height: 80px; }
-  .form-row {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  .form-check {
-    display: flex; align-items: center; gap: 8px;
-    padding: 10px 0;
-  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .form-check { display: flex; align-items: center; gap: 8px; padding: 10px 0; }
   .form-check input { width: auto; }
-  .form-check label {
-    margin: 0; font-size: 13px; font-weight: 600;
-  }
+  .form-check label { margin: 0; font-size: 13px; font-weight: 600; }
 
-  .btn-primary, .btn-danger, .btn-warn {
-    width: 100%; padding: 14px;
-    border-radius: 12px; border: none;
-    font-size: 15px; font-weight: 700;
-    cursor: pointer; font-family: inherit;
-    display: flex; align-items: center; justify-content: center;
-    gap: 8px;
-    transition: transform .15s;
-  }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
-    color: #fff; box-shadow: 0 4px 14px rgba(18,140,126,.3);
-  }
+  .btn-primary, .btn-danger, .btn-warn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform .15s; }
+  .btn-primary { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; box-shadow: 0 4px 14px rgba(18,140,126,.3); }
   .btn-primary:active { transform: scale(.97); }
   .btn-primary svg { stroke: #fff; }
-  .btn-primary:disabled {
-    background: #d1d5db; box-shadow: none; cursor: not-allowed;
-  }
-  .btn-danger {
-    background: linear-gradient(135deg, #b91c1c, #dc2626);
-    color: #fff; box-shadow: 0 4px 14px rgba(185,28,28,.3);
-  }
+  .btn-primary:disabled { background: #d1d5db; box-shadow: none; cursor: not-allowed; }
+  .btn-danger { background: linear-gradient(135deg, #b91c1c, #dc2626); color: #fff; box-shadow: 0 4px 14px rgba(185,28,28,.3); }
   .btn-danger:active { transform: scale(.97); }
   .btn-danger svg { stroke: #fff; }
-  .btn-warn {
-    background: #f3f4f6; color: #374151;
-    border: none; padding: 14px;
-    border-radius: 12px; font-size: 15px; font-weight: 700;
-    cursor: pointer; font-family: inherit;
-    transition: transform .15s;
-  }
+  .btn-warn { background: #f3f4f6; color: #374151; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: transform .15s; }
   .btn-warn:active { transform: scale(.97); }
-
   .btn-row { display: flex; gap: 8px; margin-top: 8px; }
-  .btn-row .btn-primary,
-  .btn-row .btn-danger,
-  .btn-row .btn-warn { flex: 1; }
+  .btn-row .btn-primary, .btn-row .btn-danger, .btn-row .btn-warn { flex: 1; }
 
-  .sk-item {
-    background: #fff; border-radius: 14px;
-    padding: 14px; margin-bottom: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.05);
-  }
-  .sk-line {
-    height: 12px; border-radius: 6px;
-    background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
-    background-size: 200% 100%; animation: shimmer 1.4s infinite;
-    margin-bottom: 8px;
-  }
+  .sk-item { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+  .sk-line { height: 12px; border-radius: 6px; background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; margin-bottom: 8px; }
   .sk-line.w1 { width: 40%; height: 16px; }
   .sk-line.w2 { width: 70%; }
 
-  .toast {
-    position: fixed; left: 50%; bottom: 40px;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--wa-deep); color: #fff;
-    padding: 12px 22px; border-radius: 30px;
-    font-size: 14px; font-weight: 600;
-    box-shadow: 0 6px 20px rgba(0,0,0,.25);
-    opacity: 0; pointer-events: none;
-    transition: all .3s; z-index: 1000;
-    display: flex; align-items: center; gap: 8px;
-    max-width: 90%;
-  }
+  .toast { position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px); background: var(--wa-deep); color: #fff; padding: 12px 22px; border-radius: 30px; font-size: 14px; font-weight: 600; box-shadow: 0 6px 20px rgba(0,0,0,.25); opacity: 0; pointer-events: none; transition: all .3s; z-index: 1000; display: flex; align-items: center; gap: 8px; max-width: 90%; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast svg { stroke: var(--wa-green); flex-shrink: 0; }
   .toast.error { background: #b91c1c; }
   .toast.error svg { stroke: #fff; }
+
+  .config-group { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+  .config-group-title { font-size: 12.5px; font-weight: 800; color: var(--wa-deep); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 12px; }
+  .config-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
+  .config-row:last-child { border-bottom: none; }
+  .config-row .cr-info { flex: 1; min-width: 0; }
+  .config-row .cr-label { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .config-row .cr-cle { font-size: 10.5px; color: var(--muted); font-family: monospace; }
+  .config-row input { width: 100px; padding: 9px 10px; border: 1.5px solid var(--border); border-radius: 9px; font-size: 14px; font-weight: 700; text-align: right; font-family: inherit; outline: none; background: #f7faf8; }
+  .config-row input:focus { border-color: var(--wa-green); background: #fff; }
+
+  .search-input { padding: 8px 12px; border-radius: 8px; border: 1.5px solid var(--border); font-family: inherit; font-size: 13px; max-width: 180px; outline: none; }
+  .search-input:focus { border-color: var(--wa-green); }
+
+  .rank-medal { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; background: #f7faf8; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -416,10 +215,26 @@
       </svg>
       Pays
     </button>
+    <button class="tab" data-tab="bonus">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+      </svg>
+      Bonus
+    </button>
+    <button class="tab" data-tab="top">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+        <path d="M4 22h16"/>
+        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+      </svg>
+      Top du mois
+    </button>
   </nav>
 
   <main class="content">
 
+    <!-- STATS -->
     <div class="panel active" id="panel-stats">
       <div class="stats-grid" id="statsGrid">
         <div class="sk-item"><div class="sk-line w1"></div><div class="sk-line w2"></div></div>
@@ -427,6 +242,7 @@
       </div>
     </div>
 
+    <!-- RETRAITS -->
     <div class="panel" id="panel-retraits">
       <div class="admin-toolbar">
         <h2>Retraits</h2>
@@ -435,14 +251,16 @@
       <div id="retraitsList"></div>
     </div>
 
+    <!-- USERS -->
     <div class="panel" id="panel-users">
       <div class="admin-toolbar">
         <h2>Utilisateurs</h2>
-        <input type="text" placeholder="Rechercher..." style="padding:8px 12px;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:13px;max-width:160px;" id="userSearch" oninput="renderUsers()">
+        <input type="text" placeholder="Rechercher..." class="search-input" id="userSearch" oninput="renderUsers()">
       </div>
       <div id="usersList"></div>
     </div>
 
+    <!-- PLANS -->
     <div class="panel" id="panel-plans">
       <div class="admin-toolbar">
         <h2>Plans d'investissement</h2>
@@ -456,6 +274,7 @@
       <div id="plansList"></div>
     </div>
 
+    <!-- PLANTATIONS -->
     <div class="panel" id="panel-plantations">
       <div class="admin-toolbar">
         <h2>Plantations</h2>
@@ -469,6 +288,7 @@
       <div id="plantationsList"></div>
     </div>
 
+    <!-- ACTUALITES -->
     <div class="panel" id="panel-actualites">
       <div class="admin-toolbar">
         <h2>Actualités</h2>
@@ -482,6 +302,7 @@
       <div id="actualitesList"></div>
     </div>
 
+    <!-- LOTERIES -->
     <div class="panel" id="panel-loteries">
       <div class="admin-toolbar">
         <h2>Tirages Loterie</h2>
@@ -495,11 +316,71 @@
       <div id="loteriesList"></div>
     </div>
 
+    <!-- PAYS -->
     <div class="panel" id="panel-pays">
       <div class="admin-toolbar">
-        <h2>Pays & Opérateurs</h2>
+        <h2>Pays &amp; Opérateurs</h2>
       </div>
       <div id="paysList"></div>
+    </div>
+
+    <!-- BONUS CONFIG -->
+    <div class="panel" id="panel-bonus">
+      <div class="admin-toolbar">
+        <h2>Configuration des bonus</h2>
+        <button class="btn-add" onclick="saveAllBonusConfig()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Enregistrer tout
+        </button>
+      </div>
+      <div id="bonusConfigList"></div>
+
+      <div class="admin-toolbar" style="margin-top:24px;">
+        <h2>Derniers bonus distribués</h2>
+        <span class="badge orange" id="bonusTotalBadge">— F</span>
+      </div>
+      <div id="bonusHistoryList"></div>
+    </div>
+
+    <!-- TOP DU MOIS -->
+    <div class="panel" id="panel-top">
+      <div class="admin-toolbar">
+        <h2>Configuration Top</h2>
+        <button class="btn-add" onclick="saveTopConfig()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Enregistrer
+        </button>
+      </div>
+      <div id="topConfigList" style="margin-bottom:20px;"></div>
+
+      <div class="admin-toolbar">
+        <h2>Calculer le top du mois</h2>
+      </div>
+      <div style="background:#fff;border-radius:14px;padding:18px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.05);">
+        <div style="font-size:13px;line-height:1.6;color:var(--muted);margin-bottom:14px;">
+          Cette action va <b style="color:#dc2626;">désigner les gagnants</b>, créditer leurs soldes et enregistrer les résultats. Une seule fois par mois.
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:12.5px;font-weight:700;color:var(--wa-deep);margin-bottom:6px;">Mois à calculer</label>
+          <input type="month" id="topMoisInput" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;outline:none;background:#f7faf8;">
+          <div style="font-size:11px;color:var(--muted);margin-top:6px;">Par défaut : mois précédent.</div>
+        </div>
+        <button class="btn-add" onclick="lancerCalculTop()" style="width:100%;padding:14px;justify-content:center;font-size:14px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v6M12 22v-4M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M22 12h-4"/>
+          </svg>
+          Lancer le calcul
+        </button>
+      </div>
+
+      <div class="admin-toolbar">
+        <h2>Historique des tops</h2>
+      </div>
+      <div id="topHistoryList"></div>
     </div>
 
   </main>
@@ -527,33 +408,28 @@
   </div>
 
 <script>
-  // ================= SUPABASE =================
   const SUPABASE_URL = 'https://ydwjvvlcnqsftciedpqm.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2p2dmxjbnFzZnRjaWVkcHFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMDQyNDAsImV4cCI6MjEwNTY4MDI0MH0.4uQwBGedMBjUZErd8lUM5YfA26gw96RvHdo_J-3PZCY';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
   let CURRENT_USER = null;
-  let DATA = { retraits: [], users: [], plans: [], plantations: [], actualites: [], pays: [], loteries: [] };
+  let DATA = { retraits: [], users: [], plans: [], plantations: [], actualites: [], pays: [], loteries: [], bonusConfig: [], bonusHistory: [], topConfig: [], topHistory: [] };
+
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 
   // ================= INIT =================
   (async function init() {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) {
-      window.location.replace('inscription.html');
-      return;
-    }
+    if (!session) { window.location.replace('inscription.html'); return; }
     CURRENT_USER = session.user;
 
-    const { data: profile } = await sb.from('profiles')
-      .select('is_admin').eq('id', session.user.id).maybeSingle();
-
+    const { data: profile } = await sb.from('profiles').select('is_admin').eq('id', session.user.id).maybeSingle();
     if (!profile?.is_admin) {
       document.body.innerHTML = `
         <div style="padding:80px 30px;text-align:center;font-family:sans-serif;">
           <h1 style="color:#dc2626;margin-bottom:12px;">Accès refusé</h1>
           <p style="color:#666;">Tu n'es pas administrateur.</p>
-          <button onclick="window.location.replace('dashboard.html')"
-            style="margin-top:24px;padding:12px 24px;background:#25D366;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;">
+          <button onclick="window.location.replace('dashboard.html')" style="margin-top:24px;padding:12px 24px;background:#25D366;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;">
             Retour
           </button>
         </div>`;
@@ -561,14 +437,9 @@
     }
 
     await Promise.all([
-      loadStats(),
-      loadRetraits(),
-      loadUsers(),
-      loadPlans(),
-      loadPlantations(),
-      loadActualites(),
-      loadLoteries(),
-      loadPays()
+      loadStats(), loadRetraits(), loadUsers(), loadPlans(), loadPlantations(),
+      loadActualites(), loadLoteries(), loadPays(), loadBonusConfig(), loadBonusHistory(),
+      loadTopConfig(), loadTopHistory()
     ]);
 
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
@@ -588,7 +459,6 @@
   async function loadStats() {
     const { data, error } = await sb.from('admin_stats').select('*').maybeSingle();
     if (error || !data) return;
-
     const grid = document.getElementById('statsGrid');
     const stats = [
       { lbl: 'Utilisateurs totaux', val: data.total_users },
@@ -608,8 +478,7 @@
 
   // ================= RETRAITS =================
   async function loadRetraits() {
-    const { data } = await sb.from('retraits')
-      .select('*').order('created_at', { ascending: false }).limit(100);
+    const { data } = await sb.from('retraits').select('*').order('created_at', { ascending: false }).limit(100);
     DATA.retraits = data || [];
     const pending = DATA.retraits.filter(r => r.statut === 'en_attente').length;
     document.getElementById('retraitsPendingBadge').textContent = pending + ' en attente';
@@ -618,10 +487,7 @@
 
   function renderRetraits() {
     const list = document.getElementById('retraitsList');
-    if (DATA.retraits.length === 0) {
-      list.innerHTML = emptyBox('Aucun retrait');
-      return;
-    }
+    if (DATA.retraits.length === 0) { list.innerHTML = emptyBox('Aucun retrait'); return; }
     list.innerHTML = DATA.retraits.map((r, i) => {
       const statusLabel = { en_attente: 'En attente', valide: 'Validé', paye: 'Payé', rejete: 'Rejeté' }[r.statut] || r.statut;
       const statusClass = { en_attente: 'orange', valide: 'blue', paye: 'green', rejete: 'red' }[r.statut] || 'gray';
@@ -679,9 +545,7 @@
 
   // ================= USERS =================
   async function loadUsers() {
-    const { data } = await sb.from('profiles')
-      .select('id, nom, pseudo, email, solde, is_admin, created_at')
-      .order('created_at', { ascending: false }).limit(200);
+    const { data } = await sb.from('profiles').select('id, nom, pseudo, email, solde, is_admin, created_at').order('created_at', { ascending: false }).limit(200);
     DATA.users = data || [];
     renderUsers();
   }
@@ -689,14 +553,8 @@
   function renderUsers() {
     const q = (document.getElementById('userSearch')?.value || '').toLowerCase();
     const list = document.getElementById('usersList');
-    const filtered = q
-      ? DATA.users.filter(u => u.nom?.toLowerCase().includes(q) || u.pseudo?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q))
-      : DATA.users;
-
-    if (filtered.length === 0) {
-      list.innerHTML = emptyBox('Aucun utilisateur');
-      return;
-    }
+    const filtered = q ? DATA.users.filter(u => u.nom?.toLowerCase().includes(q) || u.pseudo?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q)) : DATA.users;
+    if (filtered.length === 0) { list.innerHTML = emptyBox('Aucun utilisateur'); return; }
     list.innerHTML = filtered.map((u, i) => `
       <div class="item-card" style="animation-delay:${i * .03}s">
         <div class="ic-body">
@@ -758,16 +616,12 @@
     `);
   }
 
-  function setAdjAmount(v) {
-    document.getElementById('adjAmount').value = v;
-  }
+  function setAdjAmount(v) { document.getElementById('adjAmount').value = v; }
 
   async function applyAdj(userId) {
     const m = Number(document.getElementById('adjAmount').value);
     if (!m) return showToast('Montant requis', true);
-    const { error } = await sb.rpc('ajuster_solde_user', {
-      p_user_id: userId, p_montant: m, p_note: null
-    });
+    const { error } = await sb.rpc('ajuster_solde_user', { p_user_id: userId, p_montant: m, p_note: null });
     if (error) return showToast('Erreur : ' + error.message, true);
     showToast('Solde ajusté');
     closeModal();
@@ -778,36 +632,16 @@
   function editUser(userId) {
     const u = DATA.users.find(x => x.id === userId);
     if (!u) return;
-
     openModal('Modifier l\'utilisateur', `
-      <div class="form-group">
-        <label>Nom complet</label>
-        <input id="euNom" value="${escapeHtml(u.nom || '')}">
-      </div>
-      <div class="form-group">
-        <label>Pseudo</label>
-        <input id="euPseudo" value="${escapeHtml(u.pseudo || '')}">
-      </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input id="euEmail" type="email" value="${escapeHtml(u.email || '')}">
-      </div>
-      <div class="form-group">
-        <label>Solde (FCFA)</label>
-        <input id="euSolde" type="number" value="${u.solde || 0}" min="0">
-      </div>
-      <div class="form-check">
-        <input type="checkbox" id="euAdmin" ${u.is_admin ? 'checked' : ''}>
-        <label for="euAdmin">Administrateur</label>
-      </div>
-      <div class="btn-row">
-        <button class="btn-primary" onclick="saveUserEdit('${userId}')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"/>
-          </svg>
-          Enregistrer
-        </button>
-      </div>
+      <div class="form-group"><label>Nom complet</label><input id="euNom" value="${escapeHtml(u.nom || '')}"></div>
+      <div class="form-group"><label>Pseudo</label><input id="euPseudo" value="${escapeHtml(u.pseudo || '')}"></div>
+      <div class="form-group"><label>Email</label><input id="euEmail" type="email" value="${escapeHtml(u.email || '')}"></div>
+      <div class="form-group"><label>Solde (FCFA)</label><input id="euSolde" type="number" value="${u.solde || 0}" min="0"></div>
+      <div class="form-check"><input type="checkbox" id="euAdmin" ${u.is_admin ? 'checked' : ''}><label for="euAdmin">Administrateur</label></div>
+      <div class="btn-row"><button class="btn-primary" onclick="saveUserEdit('${userId}')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>Enregistrer</button></div>
     `);
   }
 
@@ -820,15 +654,12 @@
       p_solde: Number(document.getElementById('euSolde').value),
       p_is_admin: document.getElementById('euAdmin').checked
     };
-
     if (!payload.p_nom) return showToast('Nom requis', true);
     if (!payload.p_pseudo || payload.p_pseudo.length < 3) return showToast('Pseudo (3 caractères min)', true);
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.p_email)) return showToast('Email invalide', true);
     if (payload.p_solde < 0) return showToast('Solde négatif interdit', true);
-
     const { error } = await sb.rpc('admin_update_user', payload);
     if (error) return showToast('Erreur : ' + error.message, true);
-
     showToast('Utilisateur mis à jour');
     closeModal();
     await loadUsers();
@@ -844,22 +675,17 @@
             <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
           </svg>
         </div>
-        <div style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:8px;">
-          ${escapeHtml(name)}
-        </div>
+        <div style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:8px;">${escapeHtml(name)}</div>
         <div style="font-size:13px;color:var(--muted);line-height:1.6;">
           Cette action est <strong style="color:#dc2626;">irréversible</strong>.<br>
-          Toutes les données de cet utilisateur seront supprimées :<br>
-          profil, activations, plans, retraits.
+          Toutes les données de cet utilisateur seront supprimées.
         </div>
       </div>
       <div class="btn-row">
-        <button class="btn-warn" onclick="closeModal()">
-          Annuler
-        </button>
+        <button class="btn-warn" onclick="closeModal()">Annuler</button>
         <button class="btn-danger" onclick="confirmDeleteUser('${userId}')">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/>
+            <polyline points="3 6 5 6 21 6"/>
           </svg>
           Supprimer
         </button>
@@ -910,7 +736,7 @@
           </button>
           <button class="icon-btn delete" onclick="deletePlan('${p.id}')">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/>
             </svg>
           </button>
         </div>
@@ -921,42 +747,18 @@
   function openPlanModal(id = null) {
     const p = id ? DATA.plans.find(x => x.id === id) : null;
     openModal(p ? 'Modifier le plan' : 'Nouveau plan', `
-      <div class="form-group">
-        <label>Nom</label>
-        <input id="fNom" value="${p ? escapeHtml(p.nom) : ''}" placeholder="Ex: Starter">
+      <div class="form-group"><label>Nom</label><input id="fNom" value="${p ? escapeHtml(p.nom) : ''}" placeholder="Ex: Starter"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Activation (F)</label><input id="fAct" type="number" value="${p ? p.montant_activation : ''}"></div>
+        <div class="form-group"><label>Gain/jour (F)</label><input id="fGain" type="number" value="${p ? p.gain_journalier : ''}"></div>
       </div>
       <div class="form-row">
-        <div class="form-group">
-          <label>Activation (F)</label>
-          <input id="fAct" type="number" value="${p ? p.montant_activation : ''}">
-        </div>
-        <div class="form-group">
-          <label>Gain/jour (F)</label>
-          <input id="fGain" type="number" value="${p ? p.gain_journalier : ''}">
-        </div>
+        <div class="form-group"><label>Durée (jours)</label><input id="fDuree" type="number" value="${p ? p.duree_jours : 45}"></div>
+        <div class="form-group"><label>Ordre</label><input id="fOrdre" type="number" value="${p ? p.ordre : 0}"></div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Durée (jours)</label>
-          <input id="fDuree" type="number" value="${p ? p.duree_jours : 45}">
-        </div>
-        <div class="form-group">
-          <label>Ordre</label>
-          <input id="fOrdre" type="number" value="${p ? p.ordre : 0}">
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Image (URL)</label>
-        <input id="fImg" value="${p ? escapeHtml(p.image_url || '') : ''}" placeholder="https://...">
-      </div>
-      <div class="form-group">
-        <label>Description</label>
-        <textarea id="fDesc" placeholder="Description du plan...">${p ? escapeHtml(p.description || '') : ''}</textarea>
-      </div>
-      <div class="form-check">
-        <input type="checkbox" id="fActif" ${!p || p.actif ? 'checked' : ''}>
-        <label for="fActif">Actif</label>
-      </div>
+      <div class="form-group"><label>Image (URL)</label><input id="fImg" value="${p ? escapeHtml(p.image_url || '') : ''}" placeholder="https://..."></div>
+      <div class="form-group"><label>Description</label><textarea id="fDesc">${p ? escapeHtml(p.description || '') : ''}</textarea></div>
+      <div class="form-check"><input type="checkbox" id="fActif" ${!p || p.actif ? 'checked' : ''}><label for="fActif">Actif</label></div>
       <button class="btn-primary" onclick="savePlan('${id || ''}')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="20 6 9 17 4 12"/>
@@ -977,12 +779,8 @@
       description: document.getElementById('fDesc').value.trim() || null,
       actif: document.getElementById('fActif').checked
     };
-    if (!payload.nom || !payload.montant_activation || !payload.gain_journalier) {
-      return showToast('Champs requis manquants', true);
-    }
-    const { error } = id
-      ? await sb.from('plans').update(payload).eq('id', id)
-      : await sb.from('plans').insert(payload);
+    if (!payload.nom || !payload.montant_activation || !payload.gain_journalier) return showToast('Champs requis manquants', true);
+    const { error } = id ? await sb.from('plans').update(payload).eq('id', id) : await sb.from('plans').insert(payload);
     if (error) return showToast('Erreur : ' + error.message, true);
     showToast(id ? 'Plan mis à jour' : 'Plan créé');
     closeModal();
@@ -1037,36 +835,15 @@
   function openPlantationModal(id = null) {
     const p = id ? DATA.plantations.find(x => x.id === id) : null;
     openModal(p ? 'Modifier la plantation' : 'Nouvelle plantation', `
-      <div class="form-group">
-        <label>Nom</label>
-        <input id="pfNom" value="${p ? escapeHtml(p.nom) : ''}">
-      </div>
-      <div class="form-group">
-        <label>Slug (unique, minuscules)</label>
-        <input id="pfSlug" value="${p ? escapeHtml(p.slug) : ''}" placeholder="Ex: mais">
-      </div>
+      <div class="form-group"><label>Nom</label><input id="pfNom" value="${p ? escapeHtml(p.nom) : ''}"></div>
+      <div class="form-group"><label>Slug (unique, minuscules)</label><input id="pfSlug" value="${p ? escapeHtml(p.slug) : ''}" placeholder="Ex: mais"></div>
       <div class="form-row">
-        <div class="form-group">
-          <label>Activation (F)</label>
-          <input id="pfAct" type="number" value="${p ? p.montant_activation : ''}">
-        </div>
-        <div class="form-group">
-          <label>Gain/jour (F)</label>
-          <input id="pfGain" type="number" value="${p ? p.gain_journalier : ''}">
-        </div>
+        <div class="form-group"><label>Activation (F)</label><input id="pfAct" type="number" value="${p ? p.montant_activation : ''}"></div>
+        <div class="form-group"><label>Gain/jour (F)</label><input id="pfGain" type="number" value="${p ? p.gain_journalier : ''}"></div>
       </div>
-      <div class="form-group">
-        <label>Ordre</label>
-        <input id="pfOrdre" type="number" value="${p ? p.ordre : 0}">
-      </div>
-      <div class="form-group">
-        <label>Image (URL)</label>
-        <input id="pfImg" value="${p ? escapeHtml(p.image_url) : ''}">
-      </div>
-      <div class="form-check">
-        <input type="checkbox" id="pfActif" ${!p || p.actif ? 'checked' : ''}>
-        <label for="pfActif">Actif</label>
-      </div>
+      <div class="form-group"><label>Ordre</label><input id="pfOrdre" type="number" value="${p ? p.ordre : 0}"></div>
+      <div class="form-group"><label>Image (URL)</label><input id="pfImg" value="${p ? escapeHtml(p.image_url) : ''}"></div>
+      <div class="form-check"><input type="checkbox" id="pfActif" ${!p || p.actif ? 'checked' : ''}><label for="pfActif">Actif</label></div>
       <button class="btn-primary" onclick="savePlantation('${id || ''}')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="20 6 9 17 4 12"/>
@@ -1086,12 +863,8 @@
       image_url: document.getElementById('pfImg').value.trim(),
       actif: document.getElementById('pfActif').checked
     };
-    if (!payload.nom || !payload.slug || !payload.image_url) {
-      return showToast('Champs requis manquants', true);
-    }
-    const { error } = id
-      ? await sb.from('plantations').update(payload).eq('id', id)
-      : await sb.from('plantations').insert(payload);
+    if (!payload.nom || !payload.slug || !payload.image_url) return showToast('Champs requis manquants', true);
+    const { error } = id ? await sb.from('plantations').update(payload).eq('id', id) : await sb.from('plantations').insert(payload);
     if (error) return showToast('Erreur : ' + error.message, true);
     showToast(id ? 'Plantation mise à jour' : 'Plantation créée');
     closeModal();
@@ -1145,41 +918,18 @@
 
   function openActualiteModal(id = null) {
     const a = id ? DATA.actualites.find(x => x.id === id) : null;
-    openModal(a ? 'Modifier l\'actualité' : 'Publier une actualité', `
-      <div class="form-group">
-        <label>Titre</label>
-        <input id="afTitre" value="${a ? escapeHtml(a.titre) : ''}">
-      </div>
-      <div class="form-group">
-        <label>Contenu</label>
-        <textarea id="afContenu" style="min-height:120px;">${a ? escapeHtml(a.contenu) : ''}</textarea>
-      </div>
-      <div class="form-group">
-        <label>Image (URL)</label>
-        <input id="afImg" value="${a ? escapeHtml(a.image_url || '') : ''}" placeholder="https://...">
-      </div>
+    openModal(a ? 'Modifier' : 'Publier une actualité', `
+      <div class="form-group"><label>Titre</label><input id="afTitre" value="${a ? escapeHtml(a.titre) : ''}"></div>
+      <div class="form-group"><label>Contenu</label><textarea id="afContenu" style="min-height:120px;">${a ? escapeHtml(a.contenu) : ''}</textarea></div>
+      <div class="form-group"><label>Image (URL)</label><input id="afImg" value="${a ? escapeHtml(a.image_url || '') : ''}"></div>
       <div class="form-row">
-        <div class="form-group">
-          <label>Catégorie</label>
-          <select id="afCat">
-            ${['Marché','Innovation','Export','Prix','Météo','Info'].map(c =>
-              `<option ${a && a.categorie === c ? 'selected' : ''}>${c}</option>`
-            ).join('')}
-          </select>
+        <div class="form-group"><label>Catégorie</label>
+          <select id="afCat">${['Marché','Innovation','Export','Prix','Météo','Info'].map(c => `<option ${a && a.categorie === c ? 'selected' : ''}>${c}</option>`).join('')}</select>
         </div>
-        <div class="form-group">
-          <label>Auteur</label>
-          <input id="afAuteur" value="${a ? escapeHtml(a.auteur || '') : 'Affinity Network'}">
-        </div>
+        <div class="form-group"><label>Auteur</label><input id="afAuteur" value="${a ? escapeHtml(a.auteur || '') : 'Affinity Network'}"></div>
       </div>
-      <div class="form-check">
-        <input type="checkbox" id="afEping" ${a && a.epingle ? 'checked' : ''}>
-        <label for="afEping">Épingler (à la une)</label>
-      </div>
-      <div class="form-check">
-        <input type="checkbox" id="afPub" ${!a || a.publie ? 'checked' : ''}>
-        <label for="afPub">Publié</label>
-      </div>
+      <div class="form-check"><input type="checkbox" id="afEping" ${a && a.epingle ? 'checked' : ''}><label for="afEping">Épingler (à la une)</label></div>
+      <div class="form-check"><input type="checkbox" id="afPub" ${!a || a.publie ? 'checked' : ''}><label for="afPub">Publié</label></div>
       <button class="btn-primary" onclick="saveActualite('${id || ''}')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="20 6 9 17 4 12"/>
@@ -1200,9 +950,7 @@
       publie: document.getElementById('afPub').checked
     };
     if (!payload.titre || !payload.contenu) return showToast('Titre et contenu requis', true);
-    const { error } = id
-      ? await sb.from('actualites').update(payload).eq('id', id)
-      : await sb.from('actualites').insert(payload);
+    const { error } = id ? await sb.from('actualites').update(payload).eq('id', id) : await sb.from('actualites').insert(payload);
     if (error) return showToast('Erreur : ' + error.message, true);
     showToast(id ? 'Actualité mise à jour' : 'Actualité publiée');
     closeModal();
@@ -1277,56 +1025,26 @@
 
   function openLoterieModal(id = null) {
     const l = id ? DATA.loteries.find(x => x.id === id) : null;
-    const defaultDate = l
-      ? new Date(l.date_tirage).toISOString().slice(0, 16)
-      : new Date(Date.now() + 86400000).toISOString().slice(0, 16);
-
+    const defaultDate = l ? new Date(l.date_tirage).toISOString().slice(0, 16) : new Date(Date.now() + 86400000).toISOString().slice(0, 16);
     openModal(l ? 'Modifier la loterie' : 'Nouvelle loterie', `
-      <div class="form-group">
-        <label>Nom</label>
-        <input id="loNom" value="${l ? escapeHtml(l.nom) : ''}" placeholder="Ex: Tirage Quotidien">
-      </div>
-      <div class="form-group">
-        <label>Description</label>
-        <textarea id="loDesc" placeholder="Description...">${l ? escapeHtml(l.description || '') : ''}</textarea>
+      <div class="form-group"><label>Nom</label><input id="loNom" value="${l ? escapeHtml(l.nom) : ''}" placeholder="Ex: Tirage Quotidien"></div>
+      <div class="form-group"><label>Description</label><textarea id="loDesc">${l ? escapeHtml(l.description || '') : ''}</textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Prix du ticket (F)</label><input id="loPrix" type="number" value="${l ? l.prix_ticket : 500}" min="1"></div>
+        <div class="form-group"><label>Montant du lot (F)</label><input id="loLot" type="number" value="${l ? l.montant_lot : 50000}" min="1"></div>
       </div>
       <div class="form-row">
-        <div class="form-group">
-          <label>Prix du ticket (F)</label>
-          <input id="loPrix" type="number" value="${l ? l.prix_ticket : 500}" min="1">
-        </div>
-        <div class="form-group">
-          <label>Montant du lot (F)</label>
-          <input id="loLot" type="number" value="${l ? l.montant_lot : 50000}" min="1">
-        </div>
+        <div class="form-group"><label>Nombre de gagnants</label><input id="loGagnants" type="number" value="${l ? l.nombre_gagnants : 1}" min="1" max="100"></div>
+        <div class="form-group"><label>Ordre</label><input id="loOrdre" type="number" value="${l ? l.ordre : 0}"></div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Nombre de gagnants</label>
-          <input id="loGagnants" type="number" value="${l ? l.nombre_gagnants : 1}" min="1" max="100">
-        </div>
-        <div class="form-group">
-          <label>Ordre</label>
-          <input id="loOrdre" type="number" value="${l ? l.ordre : 0}">
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Date et heure du tirage</label>
-        <input id="loDate" type="datetime-local" value="${defaultDate}">
-      </div>
-      <div class="form-group">
-        <label>Image (URL)</label>
-        <input id="loImg" value="${l ? escapeHtml(l.image_url || '') : ''}" placeholder="https://...">
-      </div>
-      <div class="form-check">
-        <input type="checkbox" id="loActif" ${!l || l.actif ? 'checked' : ''}>
-        <label for="loActif">Actif</label>
-      </div>
+      <div class="form-group"><label>Date et heure du tirage</label><input id="loDate" type="datetime-local" value="${defaultDate}"></div>
+      <div class="form-group"><label>Image (URL)</label><input id="loImg" value="${l ? escapeHtml(l.image_url || '') : ''}"></div>
+      <div class="form-check"><input type="checkbox" id="loActif" ${!l || l.actif ? 'checked' : ''}><label for="loActif">Actif</label></div>
       <button class="btn-primary" onclick="saveLoterie('${id || ''}')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="20 6 9 17 4 12"/>
         </svg>
-        ${l ? 'Mettre à jour' : 'Créer la loterie'}
+        ${l ? 'Mettre à jour' : 'Créer'}
       </button>
     `);
   }
@@ -1334,7 +1052,6 @@
   async function saveLoterie(id) {
     const dateVal = document.getElementById('loDate').value;
     if (!dateVal) return showToast('Date requise', true);
-
     const payload = {
       nom: document.getElementById('loNom').value.trim(),
       description: document.getElementById('loDesc').value.trim() || null,
@@ -1346,16 +1063,11 @@
       image_url: document.getElementById('loImg').value.trim() || null,
       actif: document.getElementById('loActif').checked
     };
-
     if (!payload.nom) return showToast('Nom requis', true);
     if (payload.prix_ticket <= 0) return showToast('Prix ticket invalide', true);
     if (payload.montant_lot <= 0) return showToast('Montant lot invalide', true);
     if (payload.nombre_gagnants < 1) return showToast('Au moins 1 gagnant', true);
-
-    const { error } = id
-      ? await sb.from('loteries').update(payload).eq('id', id)
-      : await sb.from('loteries').insert(payload);
-
+    const { error } = id ? await sb.from('loteries').update(payload).eq('id', id) : await sb.from('loteries').insert(payload);
     if (error) return showToast('Erreur : ' + error.message, true);
     showToast(id ? 'Loterie mise à jour' : 'Loterie créée');
     closeModal();
@@ -1372,14 +1084,11 @@
 
   async function drawLoterie(id, nom) {
     if (!confirm(`Lancer le tirage "${nom}" maintenant ?\n\nCette action est irréversible et désignera les gagnants.`)) return;
-
     const { data, error } = await sb.rpc('tirer_loterie', { p_loterie_id: id });
     if (error) return showToast('Erreur : ' + error.message, true);
-
     const gagnants = data.gagnants || [];
     let msg = `🎉 ${gagnants.length} gagnant${gagnants.length > 1 ? 's' : ''} désigné${gagnants.length > 1 ? 's' : ''} !`;
     alert(msg + '\n\n' + gagnants.map(g => `${g.position}. ${g.nom || g.pseudo} (${g.numero_ticket})`).join('\n'));
-
     showToast(msg);
     await loadLoteries();
   }
@@ -1400,9 +1109,7 @@
         <div class="ic-body">
           <div class="ic-name">${escapeHtml(p.nom)} ${p.actif ? '' : '<span class="badge red">Inactif</span>'}</div>
           <div class="ic-meta">
-            <span class="badge ${p.mode === 'mobile_money' ? 'green' : 'orange'}">
-              ${p.mode === 'mobile_money' ? 'Mobile Money' : 'Crypto'}
-            </span>
+            <span class="badge ${p.mode === 'mobile_money' ? 'green' : 'orange'}">${p.mode === 'mobile_money' ? 'Mobile Money' : 'Crypto'}</span>
             <span class="dot">•</span>
             <span>Min: ${formatF(p.minimum_retrait)}</span>
           </div>
@@ -1422,29 +1129,16 @@
     const p = DATA.pays.find(x => x.id === id);
     if (!p) return;
     openModal('Modifier ' + p.nom, `
-      <div class="form-group">
-        <label>Nom</label>
-        <input id="pyNom" value="${escapeHtml(p.nom)}">
-      </div>
-      <div class="form-group">
-        <label>Mode de retrait</label>
+      <div class="form-group"><label>Nom</label><input id="pyNom" value="${escapeHtml(p.nom)}"></div>
+      <div class="form-group"><label>Mode de retrait</label>
         <select id="pyMode">
           <option value="mobile_money" ${p.mode === 'mobile_money' ? 'selected' : ''}>Mobile Money</option>
           <option value="crypto" ${p.mode === 'crypto' ? 'selected' : ''}>Crypto</option>
         </select>
       </div>
-      <div class="form-group">
-        <label>Minimum de retrait (F)</label>
-        <input id="pyMin" type="number" value="${p.minimum_retrait}">
-      </div>
-      <div class="form-group">
-        <label>Ordre</label>
-        <input id="pyOrdre" type="number" value="${p.ordre}">
-      </div>
-      <div class="form-check">
-        <input type="checkbox" id="pyActif" ${p.actif ? 'checked' : ''}>
-        <label for="pyActif">Actif</label>
-      </div>
+      <div class="form-group"><label>Minimum de retrait (F)</label><input id="pyMin" type="number" value="${p.minimum_retrait}"></div>
+      <div class="form-group"><label>Ordre</label><input id="pyOrdre" type="number" value="${p.ordre}"></div>
+      <div class="form-check"><input type="checkbox" id="pyActif" ${p.actif ? 'checked' : ''}><label for="pyActif">Actif</label></div>
       <button class="btn-primary" onclick="savePays('${id}')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="20 6 9 17 4 12"/>
@@ -1469,6 +1163,191 @@
     await loadPays();
   }
 
+  // ================= BONUS CONFIG =================
+  async function loadBonusConfig() {
+    const list = document.getElementById('bonusConfigList');
+    list.innerHTML = `<div class="sk-item"><div class="sk-line w1"></div><div class="sk-line w2"></div></div>`;
+    const { data, error } = await sb.from('bonus_config').select('*').order('cle');
+    if (error || !data) { list.innerHTML = emptyBox('Erreur de chargement'); return; }
+    DATA.bonusConfig = data;
+    const categories = {
+      'Bonus de base': ['bonus_bienvenue', 'bonus_streak_journalier'],
+      'Paliers parrainage': ['palier_1_filleuls','palier_1_bonus','palier_2_filleuls','palier_2_bonus','palier_3_filleuls','palier_3_bonus','palier_4_filleuls','palier_4_bonus'],
+      'Bonus filleuls rechargés': ['seuil_recharge_filleul', 'bonus_5_filleuls_recharges'],
+      'Missions mensuelles': ['mission_3_plans_bonus', 'mission_10_amis_bonus', 'mission_10_amis_montant'],
+      'Frais de retrait': ['frais_retrait_pourcentage', 'frais_retrait_minimum'],
+      'Roue de la fortune': ['roue_tours_par_jour', 'roue_actif']
+    };
+    let html = '';
+    for (const [catName, keys] of Object.entries(categories)) {
+      const items = data.filter(c => keys.includes(c.cle));
+      if (items.length === 0) continue;
+      html += `<div class="config-group">
+        <div class="config-group-title">${catName}</div>
+        ${items.map(c => `
+          <div class="config-row">
+            <div class="cr-info">
+              <div class="cr-label">${escapeHtml(c.description || c.cle)}</div>
+              <div class="cr-cle">${c.cle}</div>
+            </div>
+            <input type="number" value="${c.valeur}" data-cle="${c.cle}" class="bonus-input">
+          </div>
+        `).join('')}
+      </div>`;
+    }
+    list.innerHTML = html;
+  }
+
+  async function saveAllBonusConfig() {
+    const inputs = document.querySelectorAll('.bonus-input');
+    if (inputs.length === 0) return showToast('Aucune donnée', true);
+    let updated = 0, errors = 0;
+    for (const input of inputs) {
+      const cle = input.dataset.cle;
+      const valeur = Number(input.value);
+      if (isNaN(valeur) || valeur < 0) { errors++; continue; }
+      const { error } = await sb.from('bonus_config').update({ valeur, updated_at: new Date().toISOString() }).eq('cle', cle);
+      if (error) errors++; else updated++;
+    }
+    if (errors > 0) showToast(`${updated} mis à jour, ${errors} erreur(s)`, true);
+    else showToast(`✅ ${updated} config(s) mise(s) à jour`);
+    await loadBonusConfig();
+  }
+
+  async function loadBonusHistory() {
+    const list = document.getElementById('bonusHistoryList');
+    const badge = document.getElementById('bonusTotalBadge');
+    list.innerHTML = `<div class="sk-item"><div class="sk-line w1"></div><div class="sk-line w2"></div></div>`;
+    const { data, error } = await sb.from('bonus_utilisateurs').select('*, profiles(nom, pseudo)').order('created_at', { ascending: false }).limit(50);
+    if (error || !data) { list.innerHTML = emptyBox('Erreur de chargement'); return; }
+    DATA.bonusHistory = data;
+    const total = data.reduce((sum, b) => sum + Number(b.montant || 0), 0);
+    badge.textContent = formatF(total) + ' distribués';
+    if (data.length === 0) { list.innerHTML = emptyBox('Aucun bonus distribué'); return; }
+    const typeInfo = {
+      'bienvenue': { icone: '🎁', label: 'Bienvenue', classe: 'green' },
+      'streak': { icone: '🔥', label: 'Streak', classe: 'orange' },
+      'palier_1': { icone: '🥉', label: 'Palier 1', classe: 'orange' },
+      'palier_2': { icone: '🥈', label: 'Palier 2', classe: 'blue' },
+      'palier_3': { icone: '🥇', label: 'Palier 3', classe: 'orange' },
+      'palier_4': { icone: '💎', label: 'Palier 4', classe: 'blue' },
+      'bonus_5_recharges': { icone: '💰', label: 'Recharges', classe: 'green' },
+      'mission_3_plans': { icone: '🎯', label: 'Mission 1', classe: 'orange' },
+      'mission_10_amis': { icone: '👥', label: 'Mission 2', classe: 'blue' },
+      'roue_fortune': { icone: '🎡', label: 'Roue', classe: 'gold' }
+    };
+    list.innerHTML = data.map((b, i) => {
+      const info = typeInfo[b.type] || { icone: '✨', label: b.type, classe: 'gray' };
+      const userNom = b.profiles?.nom || b.profiles?.pseudo || 'Utilisateur';
+      return `
+        <div class="item-card" style="animation-delay:${i * .02}s">
+          <div class="ic-img" style="display:flex;align-items:center;justify-content:center;font-size:22px;background:#f7faf8;">${info.icone}</div>
+          <div class="ic-body">
+            <div class="ic-name">${escapeHtml(b.description || info.label)} <span class="badge ${info.classe}">${info.label}</span></div>
+            <div class="ic-meta">
+              <span>${escapeHtml(userNom)}</span>
+              <span class="dot">•</span>
+              <span>${timeAgo(b.created_at)}</span>
+            </div>
+          </div>
+          <div style="font-size:15px;font-weight:800;color:var(--wa-dark);flex-shrink:0;">+${formatF(b.montant)}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ================= TOP DU MOIS =================
+  async function loadTopConfig() {
+    const list = document.getElementById('topConfigList');
+    list.innerHTML = `<div class="sk-item"><div class="sk-line w1"></div><div class="sk-line w2"></div></div>`;
+    const { data, error } = await sb.from('top_parrains_config').select('*').order('cle');
+    if (error || !data) { list.innerHTML = emptyBox('Erreur de chargement'); return; }
+    DATA.topConfig = data;
+    const descriptions = {
+      'montant_a_partager': '💰 Montant du jackpot mensuel à partager',
+      'seuil_filleuls': '👥 Nombre de filleuls actifs requis',
+      'actif': '⚡ Activer le top mensuel (1 = oui / 0 = non)'
+    };
+    list.innerHTML = `<div class="config-group">${data.map(c => `
+      <div class="config-row">
+        <div class="cr-info">
+          <div class="cr-label">${descriptions[c.cle] || c.description || c.cle}</div>
+          <div class="cr-cle">${c.cle}</div>
+        </div>
+        <input type="number" value="${c.valeur}" data-cle="${c.cle}" class="top-config-input">
+      </div>
+    `).join('')}</div>`;
+  }
+
+  async function saveTopConfig() {
+    const inputs = document.querySelectorAll('.top-config-input');
+    if (inputs.length === 0) return;
+    let updated = 0;
+    for (const input of inputs) {
+      const cle = input.dataset.cle;
+      const valeur = Number(input.value);
+      if (isNaN(valeur)) continue;
+      const { error } = await sb.from('top_parrains_config').update({ valeur, updated_at: new Date().toISOString() }).eq('cle', cle);
+      if (!error) updated++;
+    }
+    showToast(`✅ ${updated} config(s) mise(s) à jour`);
+    await loadTopConfig();
+  }
+
+  async function lancerCalculTop() {
+    const moisInput = document.getElementById('topMoisInput').value;
+    const mois = moisInput || null;
+    const confirme = confirm(
+      `Lancer le calcul du top pour ${mois || 'le mois précédent'} ?\n\n` +
+      `Cette action va :\n• Désigner les gagnants\n• Créditer leurs soldes\n• Enregistrer les résultats\n\n⚠️ Action irréversible.`
+    );
+    if (!confirme) return;
+    const { data, error } = await sb.rpc('calculer_top_parrains_mensuel', { p_mois: mois });
+    if (error) {
+      if (error.message.includes('déjà été calculé')) return showToast('Ce mois a déjà été calculé', true);
+      return showToast('Erreur : ' + error.message, true);
+    }
+    if (data.gagnants === 0) {
+      showToast(data.message || 'Aucun gagnant ce mois');
+      await loadTopHistory();
+      return;
+    }
+    let msg = `🎉 ${data.gagnants.length} gagnant${data.gagnants.length > 1 ? 's' : ''} !\n\n`;
+    msg += `Chacun reçoit : ${formatF(data.par_gagnant)}\n\n`;
+    msg += data.gagnants.map(g => `${g.position}. ${g.nom || g.pseudo} (${g.filleuls} filleuls)`).join('\n');
+    alert(msg);
+    showToast(`🎉 Top ${data.mois} calculé !`);
+    await loadTopHistory();
+    await loadStats();
+  }
+
+  async function loadTopHistory() {
+    const list = document.getElementById('topHistoryList');
+    list.innerHTML = `<div class="sk-item"><div class="sk-line w1"></div><div class="sk-line w2"></div></div>`;
+    const { data, error } = await sb.from('top_parrains_gagnants').select('*').order('created_at', { ascending: false }).limit(50);
+    if (error || !data) { list.innerHTML = emptyBox('Erreur de chargement'); return; }
+    DATA.topHistory = data;
+    if (data.length === 0) { list.innerHTML = emptyBox('Aucun top calculé pour le moment'); return; }
+    list.innerHTML = data.map((g, i) => {
+      const moisLabel = new Date(g.mois + '-01').toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+      const posMedal = g.position <= 3 ? ['🥇', '🥈', '🥉'][g.position - 1] : '#' + g.position;
+      return `
+        <div class="item-card" style="animation-delay:${i * .03}s">
+          <div class="rank-medal">${posMedal}</div>
+          <div class="ic-body">
+            <div class="ic-name">${escapeHtml(g.user_nom || g.user_pseudo || 'Anonyme')} <span class="badge orange">${moisLabel}</span></div>
+            <div class="ic-meta">
+              <span>${g.filleuls_actifs} filleuls actifs</span>
+              <span class="dot">•</span>
+              <span>Position ${g.position}</span>
+            </div>
+          </div>
+          <div style="font-size:15px;font-weight:800;color:var(--gold);flex-shrink:0;">+${formatF(g.montant_gagne)}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
   // ================= MODAL =================
   function openModal(title, html) {
     document.getElementById('modalTitle').textContent = title;
@@ -1476,34 +1355,33 @@
     document.getElementById('modalOverlay').classList.add('open');
     document.body.style.overflow = 'hidden';
   }
-  function closeModal() {
-    document.getElementById('modalOverlay').classList.remove('open');
-    document.body.style.overflow = '';
-  }
-  function closeModalOutside(e) {
-    if (e.target.id === 'modalOverlay') closeModal();
-  }
+  function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); document.body.style.overflow = ''; }
+  function closeModalOutside(e) { if (e.target.id === 'modalOverlay') closeModal(); }
 
   // ================= UTILITAIRES =================
-  function formatF(n) {
-    return Math.round(Number(n || 0)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F';
-  }
-  function escapeHtml(s) {
-    return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
+  function formatF(n) { return Math.round(Number(n || 0)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F'; }
+  function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   function emptyBox(msg) {
     return `<div class="empty">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
-        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
-      </svg>
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
       <div>${msg}</div>
     </div>`;
+  }
+  function timeAgo(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+    if (diff < 60) return 'À l\'instant';
+    if (diff < 3600) return `Il y a ${Math.floor(diff/60)} min`;
+    if (diff < 86400) return `Il y a ${Math.floor(diff/3600)} h`;
+    if (diff < 604800) return `Il y a ${Math.floor(diff/86400)} j`;
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
   }
   function showToast(msg, isError = false) {
     const t = document.getElementById('toast');
     document.getElementById('toastText').textContent = msg;
     t.className = 'toast show' + (isError ? ' error' : '');
-    setTimeout(() => t.classList.remove('show'), 2800);
+    setTimeout(() => t.classList.remove('show'), 3000);
   }
   function go(page) { window.location.href = page; }
 </script>
