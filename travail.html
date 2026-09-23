@@ -7,54 +7,104 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#075E54">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="icon" type="image/png" href="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png">
+<link rel="apple-touch-icon" href="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  (function() {
+    document.addEventListener('click', function(e) {
+      const link = e.target.closest('a');
+      if (!link) return;
+      let href = link.getAttribute('href');
+      if (!href) return;
+      if (href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) return;
+      if (href.endsWith('.html')) {
+        e.preventDefault();
+        window.location.href = href.replace(/\.html$/, '');
+      }
+    }, true);
+    if (window.location.pathname.endsWith('.html')) {
+      window.history.replaceState(null, '', window.location.pathname.replace(/\.html$/, '') + window.location.search);
+    }
+  })();
+</script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  :root {
-    --wa-green: #25D366; --wa-dark: #128C7E; --wa-deep: #075E54;
-    --alibaba: #FF6A00; --bg: #f7f9f8; --text: #1a1a1a; --muted: #6b7280; --border: #e5e7eb; --danger: #dc2626;
-  }
-  body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 80px; min-height: 100vh; overflow-x: hidden; -webkit-user-select: none; user-select: none; }
+  :root { --wa-green: #25D366; --wa-dark: #128C7E; --wa-deep: #075E54; --alibaba: #FF6A00; --gold: #FFB800; --bg: #f7f9f8; --text: #1a1a1a; --muted: #6b7280; --border: #e5e7eb; --danger: #dc2626; }
+  body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 84px; min-height: 100vh; overflow-x: hidden; -webkit-user-select: none; user-select: none; }
   input { -webkit-user-select: text; user-select: text; }
 
-  .loader { position: fixed; inset: 0; z-index: 9999; background: var(--wa-deep); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; transition: opacity .6s ease, visibility .6s ease; }
+  .loader { position: fixed; inset: 0; z-index: 9999; background: linear-gradient(135deg, var(--wa-deep) 0%, var(--wa-dark) 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; transition: opacity .6s ease, visibility .6s ease; }
   .loader.hidden { opacity: 0; visibility: hidden; }
-  .loader-logo { font-size: 24px; font-weight: 700; color: #fff; letter-spacing: 1px; }
-  .loader-logo span { color: var(--wa-green); }
-  .spinner { width: 46px; height: 46px; border: 4px solid rgba(255,255,255,.2); border-top-color: var(--wa-green); border-radius: 50%; animation: spin .9s linear infinite; }
+  .loader-logo-img { width: 90px; height: 90px; object-fit: contain; filter: drop-shadow(0 8px 24px rgba(0,0,0,.3)); }
+  .loader-logo-txt { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: 1.5px; }
+  .loader-logo-txt span { color: var(--wa-green); }
+  .spinner { width: 44px; height: 44px; border: 4px solid rgba(255,255,255,.2); border-top-color: var(--wa-green); border-radius: 50%; animation: spin .9s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   @keyframes fadeInUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes shimmer { to { background-position: -200% 0; } }
   .anim { opacity: 0; animation: fadeInUp .5s ease forwards; }
 
-  .header { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--wa-deep); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.15); padding-top: max(14px, env(safe-area-inset-top)); }
-  .burger { cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,.12); }
+  .header { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: linear-gradient(135deg, var(--wa-deep), var(--wa-dark)); color: #fff; box-shadow: 0 4px 20px rgba(7,94,84,.2); padding-top: max(12px, env(safe-area-inset-top)); }
+  .burger { cursor: pointer; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 14px; background: rgba(255,255,255,.12); }
   .burger svg { stroke: #fff; }
-  .logo { font-weight: 700; font-size: 18px; letter-spacing: .5px; }
-  .logo span { color: var(--wa-green); }
+  .header-logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 17px; }
+  .header-logo img { width: 34px; height: 34px; border-radius: 10px; background: #fff; padding: 3px; object-fit: contain; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+  .header-logo span { color: var(--wa-green); }
 
-  .menu { position: fixed; top: 0; left: 0; height: 100%; width: 280px; background: #fff; z-index: 200; transform: translateX(-100%); transition: transform .35s cubic-bezier(.4,0,.2,1); box-shadow: 4px 0 20px rgba(0,0,0,.2); padding-top: 18px; display: flex; flex-direction: column; overflow-y: auto; padding-top: max(18px, env(safe-area-inset-top)); }
+  .menu { position: fixed; top: 0; left: 0; height: 100%; width: 300px; background: #fff; z-index: 200; transform: translateX(-100%); transition: transform .35s cubic-bezier(.4,0,.2,1); box-shadow: 8px 0 32px rgba(0,0,0,.15); display: flex; flex-direction: column; overflow-y: auto; padding-top: max(18px, env(safe-area-inset-top)); }
   .menu.open { transform: translateX(0); }
-  .menu-header { padding: 8px 20px 18px; border-bottom: 1px solid #eee; margin-bottom: 10px; font-weight: 700; color: var(--wa-deep); font-size: 17px; display: flex; align-items: center; gap: 10px; }
-  .menu-header svg { stroke: var(--wa-green); }
-  .menu-item { display: flex; align-items: center; gap: 14px; padding: 15px 22px; cursor: pointer; font-size: 15px; color: #333; transition: background .2s, padding-left .2s; }
+  .menu-header { padding: 12px 22px 20px; border-bottom: 1px solid #f0f4f2; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+  .menu-header img { width: 44px; height: 44px; border-radius: 12px; background: #fff; padding: 4px; box-shadow: 0 4px 12px rgba(7,94,84,.12); object-fit: contain; }
+  .menu-header-info { flex: 1; }
+  .menu-header-name { font-size: 16px; font-weight: 800; color: var(--wa-deep); }
+  .menu-header-name span { color: var(--wa-green); }
+  .menu-header-sub { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+  .menu-item { display: flex; align-items: center; gap: 14px; padding: 14px 22px; cursor: pointer; font-size: 15px; color: #333; font-weight: 500; }
   .menu-item:active { background: #e7f9ee; padding-left: 26px; }
-  .menu-item svg { stroke: var(--wa-dark); flex-shrink: 0; }
-  .menu-item.active { background: #e7f9ee; color: var(--wa-deep); font-weight: 700; }
-  .menu-footer { margin-top: auto; padding: 16px 20px 22px; border-top: 1px solid #eee; padding-bottom: max(22px, env(safe-area-inset-bottom)); }
-  .btn-logout { width: 100%; padding: 14px; background: #fee2e2; color: #b91c1c; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .menu-item .mi-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .menu-item.invite .mi-icon { background: rgba(255,106,0,.12); }
+  .menu-item.invite svg { stroke: var(--alibaba); }
+  .menu-item.recharge .mi-icon { background: rgba(37,211,102,.15); }
+  .menu-item.recharge svg { stroke: var(--wa-green); }
+  .menu-item.roue .mi-icon { background: rgba(147,51,234,.12); }
+  .menu-item.roue svg { stroke: #9333EA; }
+  .menu-item.missions .mi-icon { background: rgba(255,184,0,.15); }
+  .menu-item.missions svg { stroke: var(--gold); }
+  .menu-item.notifs .mi-icon { background: rgba(220,38,38,.12); }
+  .menu-item.notifs svg { stroke: #DC2626; }
+  .menu-item.travail .mi-icon { background: rgba(18,140,126,.12); }
+  .menu-item.travail svg { stroke: var(--wa-dark); }
+  .menu-item.support .mi-icon { background: rgba(59,130,246,.12); }
+  .menu-item.support svg { stroke: #2563eb; }
+  .menu-item.faq .mi-icon { background: rgba(168,85,247,.12); }
+  .menu-item.faq svg { stroke: #A855F7; }
+  .menu-item.entreprise .mi-icon { background: rgba(245,158,11,.12); }
+  .menu-item.entreprise svg { stroke: #f59e0b; }
+  .menu-item.active { background: #e7f9ee; }
+  .menu-item.active .mi-icon { background: rgba(37,211,102,.2); }
+  .menu-item.active svg { stroke: var(--wa-green); }
+  .menu-footer { margin-top: auto; padding: 16px 22px 22px; border-top: 1px solid #f0f4f2; padding-bottom: max(22px, env(safe-area-inset-bottom)); }
+  .btn-logout { width: 100%; padding: 14px; background: #fee2e2; color: #b91c1c; border: none; border-radius: 14px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .btn-logout svg { stroke: #b91c1c; }
-  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 150; opacity: 0; pointer-events: none; transition: opacity .3s; }
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 150; opacity: 0; pointer-events: none; transition: opacity .3s; backdrop-filter: blur(2px); }
   .overlay.open { opacity: 1; pointer-events: auto; }
 
-  .content { padding: 18px 16px; }
-  .page-title { font-size: 22px; font-weight: 700; color: var(--wa-deep); margin-bottom: 4px; }
-  .page-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+  .content { padding: 16px; }
+  .page-title { font-size: 22px; font-weight: 800; color: var(--wa-deep); margin-bottom: 4px; }
+  .page-sub { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
 
-  .solde-banner { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; border-radius: 14px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 14px rgba(18,140,126,.3); }
-  .solde-banner .lbl { font-size: 12px; opacity: .9; display: flex; align-items: center; gap: 6px; }
+  .solde-banner { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; border-radius: 18px; padding: 16px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 8px 24px rgba(18,140,126,.28); }
+  .solde-banner .lbl { font-size: 12px; opacity: .9; display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
   .solde-banner .lbl svg { stroke: #fff; }
-  .solde-banner .val { font-size: 22px; font-weight: 800; }
+  .solde-banner .val { font-size: 24px; font-weight: 800; }
+  .solde-banner .ic-w { width: 48px; height: 48px; border-radius: 14px; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; }
+  .solde-banner .ic-w svg { stroke: #fff; }
+
+  .section-title { font-size: 15px; font-weight: 800; color: var(--wa-deep); margin: 22px 0 12px; display: flex; align-items: center; justify-content: space-between; }
+  .section-title .title-left { display: flex; align-items: center; gap: 8px; }
+  .section-title svg { stroke: var(--wa-green); }
+  .section-title .badge-count { background: rgba(18,140,126,.12); color: var(--wa-dark); font-size: 11px; padding: 4px 11px; border-radius: 12px; font-weight: 800; }
 
   .skeleton { background: #fff; border-radius: 18px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 3px 14px rgba(0,0,0,.06); }
   .skeleton .sk-img { height: 130px; background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
@@ -64,78 +114,105 @@
   .skeleton .sk-line.w2 { width: 60px; }
   .skeleton .sk-btn { width: 80px; height: 36px; border-radius: 12px; background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
 
-  .plant-card { background: #fff; border-radius: 18px; overflow: hidden; box-shadow: 0 3px 14px rgba(0,0,0,.07); margin-bottom: 16px; transition: transform .2s, box-shadow .2s; opacity: 0; animation: fadeInUp .5s ease forwards; }
+  .plant-card { background: #fff; border-radius: 22px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,.07); margin-bottom: 16px; transition: transform .2s; animation: fadeInUp .5s ease forwards; opacity: 0; }
   .plant-card:active { transform: scale(.99); }
-  .plant-card .photo { position: relative; height: 130px; overflow: hidden; }
-  .plant-card .photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
-  .plant-card .photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.55), transparent 60%); }
-  .plant-card .badge { position: absolute; top: 12px; right: 12px; background: var(--alibaba); color: #fff; font-size: 11px; font-weight: 700; padding: 5px 11px; border-radius: 20px; box-shadow: 0 2px 8px rgba(255,106,0,.4); display: flex; align-items: center; gap: 4px; }
-  .plant-card .plant-name { position: absolute; bottom: 12px; left: 16px; color: #fff; font-size: 18px; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,.5); display: flex; align-items: center; gap: 8px; }
+  .plant-card .photo { position: relative; height: 140px; overflow: hidden; }
+  .plant-card .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .plant-card .photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.6), transparent 60%); }
+  .plant-card .badge { position: absolute; top: 12px; right: 12px; background: var(--alibaba); color: #fff; font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 20px; box-shadow: 0 4px 12px rgba(255,106,0,.4); display: flex; align-items: center; gap: 4px; }
+  .plant-card .plant-name { position: absolute; bottom: 12px; left: 16px; color: #fff; font-size: 19px; font-weight: 800; text-shadow: 0 2px 8px rgba(0,0,0,.5); display: flex; align-items: center; gap: 8px; }
   .plant-card .plant-name svg { stroke: #fff; }
-  .plant-card .body { padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  .plant-card .info-col { display: flex; flex-direction: column; gap: 2px; }
-  .plant-card .label-sm { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
-  .plant-card .revenu { font-size: 19px; font-weight: 700; color: var(--wa-dark); }
+  .plant-card .body { padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .plant-card .info-col { display: flex; flex-direction: column; gap: 3px; }
+  .plant-card .label-sm { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; font-weight: 700; }
+  .plant-card .revenu { font-size: 20px; font-weight: 800; color: var(--wa-dark); }
   .plant-card .revenu small { font-size: 12px; color: var(--muted); font-weight: 500; }
 
-  .btn-voir { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; border: none; padding: 10px 22px; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; box-shadow: 0 3px 10px rgba(18,140,126,.3); transition: transform .15s; display: flex; align-items: center; gap: 6px; }
+  .btn-voir { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; border: none; padding: 11px 22px; border-radius: 14px; font-size: 14px; font-weight: 800; cursor: pointer; font-family: inherit; box-shadow: 0 4px 12px rgba(18,140,126,.3); display: flex; align-items: center; gap: 6px; transition: transform .15s; }
   .btn-voir:active { transform: scale(.95); }
   .btn-voir svg { stroke: #fff; }
 
-  .empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 14px; }
-  .empty svg { stroke: #d1d5db; margin-bottom: 12px; }
+  .active-plan { background: #fff; border-radius: 20px; padding: 16px; margin-bottom: 12px; box-shadow: 0 6px 20px rgba(0,0,0,.06); animation: fadeInUp .5s ease forwards; opacity: 0; border-left: 5px solid var(--wa-green); }
+  .active-plan.termine { border-left-color: #d1d5db; opacity: .8; }
+  .active-plan .ap-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .active-plan .ap-nom { font-size: 15px; font-weight: 800; color: var(--wa-deep); display: flex; align-items: center; gap: 8px; }
+  .active-plan .ap-badge { font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 10px; text-transform: uppercase; letter-spacing: .3px; }
+  .active-plan .ap-badge.active { background: rgba(37,211,102,.15); color: #166534; }
+  .active-plan .ap-badge.termine { background: rgba(107,114,128,.15); color: #4b5563; }
+  .active-plan .ap-gains { font-size: 15px; font-weight: 800; color: var(--alibaba); text-align: right; }
+  .active-plan .ap-gains small { display: block; font-size: 10px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+  .progress-bar { height: 10px; background: #f3f4f6; border-radius: 6px; overflow: hidden; margin-bottom: 10px; }
+  .progress-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--wa-dark), var(--wa-green)); transition: width .8s ease; }
+  .active-plan.termine .progress-fill { background: #9ca3af; }
+  .active-plan .ap-bottom { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--muted); font-weight: 600; }
+  .active-plan .ap-bottom b { color: var(--text); font-weight: 800; }
+
+  .empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; background: #fff; border-radius: 18px; box-shadow: 0 4px 16px rgba(0,0,0,.05); }
+  .empty svg { stroke: #d1d5db; margin-bottom: 10px; }
 
   .modal-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,.55); display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .3s; backdrop-filter: blur(3px); }
   .modal-overlay.open { opacity: 1; pointer-events: auto; }
-  .modal { background: #fff; width: 100%; max-width: 480px; border-radius: 24px 24px 0 0; padding: 22px 20px 28px; transform: translateY(100%); transition: transform .4s cubic-bezier(.4,0,.2,1); max-height: 90vh; overflow-y: auto; padding-bottom: max(28px, env(safe-area-inset-bottom)); }
+  .modal { background: #fff; width: 100%; max-width: 480px; border-radius: 28px 28px 0 0; padding: 22px 20px 28px; transform: translateY(100%); transition: transform .4s cubic-bezier(.4,0,.2,1); max-height: 92vh; overflow-y: auto; padding-bottom: max(28px, env(safe-area-inset-bottom)); }
   .modal-overlay.open .modal { transform: translateY(0); }
   .modal-handle { width: 42px; height: 5px; border-radius: 5px; background: #d1d5db; margin: 0 auto 16px; }
   .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-  .modal-title { font-size: 19px; font-weight: 700; color: var(--wa-deep); display: flex; align-items: center; gap: 8px; }
+  .modal-title { font-size: 19px; font-weight: 800; color: var(--wa-deep); display: flex; align-items: center; gap: 8px; }
   .modal-title svg { stroke: var(--wa-green); }
-  .modal-close { width: 34px; height: 34px; border-radius: 50%; background: #f3f4f6; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .modal-close { width: 36px; height: 36px; border-radius: 12px; background: #f3f4f6; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
   .modal-close svg { stroke: var(--muted); }
 
-  .user-solde-box { background: linear-gradient(135deg, rgba(18,140,126,.1), rgba(37,211,102,.14)); border-radius: 12px; padding: 12px 16px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(18,140,126,.2); }
-  .user-solde-box .lbl { font-size: 12px; font-weight: 600; color: var(--wa-deep); display: flex; align-items: center; gap: 6px; }
+  .user-solde-box { background: linear-gradient(135deg, rgba(18,140,126,.1), rgba(37,211,102,.14)); border-radius: 14px; padding: 14px 16px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(18,140,126,.2); }
+  .user-solde-box .lbl { font-size: 12px; font-weight: 700; color: var(--wa-deep); display: flex; align-items: center; gap: 6px; }
   .user-solde-box .lbl svg { stroke: var(--wa-dark); }
-  .user-solde-box .val { font-size: 17px; font-weight: 800; color: var(--wa-dark); }
+  .user-solde-box .val { font-size: 18px; font-weight: 800; color: var(--wa-dark); }
   .user-solde-box.insufficient { background: linear-gradient(135deg, rgba(220,38,38,.08), rgba(220,38,38,.14)); border-color: rgba(220,38,38,.3); }
   .user-solde-box.insufficient .lbl { color: var(--danger); }
   .user-solde-box.insufficient .lbl svg { stroke: var(--danger); }
   .user-solde-box.insufficient .val { color: var(--danger); }
 
-  .modal-photo { height: 130px; border-radius: 14px; overflow: hidden; margin-bottom: 16px; position: relative; }
+  .modal-photo { height: 140px; border-radius: 16px; overflow: hidden; margin-bottom: 16px; position: relative; }
   .modal-photo img { width: 100%; height: 100%; object-fit: cover; }
   .modal-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(7,94,84,.75), transparent 60%); }
-  .modal-photo .tag-plant { position: absolute; bottom: 12px; left: 14px; color: #fff; font-weight: 700; font-size: 17px; z-index: 2; display: flex; align-items: center; gap: 8px; }
+  .modal-photo .tag-plant { position: absolute; bottom: 12px; left: 16px; color: #fff; font-weight: 800; font-size: 18px; z-index: 2; display: flex; align-items: center; gap: 8px; }
   .modal-photo .tag-plant svg { stroke: #fff; }
 
-  .details { background: #f7faf8; border-radius: 14px; padding: 14px 16px; margin-bottom: 18px; display: flex; flex-direction: column; gap: 10px; }
+  .details { background: #f7faf8; border-radius: 16px; padding: 14px 16px; margin-bottom: 18px; display: flex; flex-direction: column; gap: 10px; }
   .detail-row { display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
-  .detail-row .lbl { color: var(--muted); display: flex; align-items: center; gap: 7px; }
+  .detail-row .lbl { color: var(--muted); display: flex; align-items: center; gap: 7px; font-weight: 600; }
   .detail-row .lbl svg { stroke: var(--muted); }
-  .detail-row .val { font-weight: 700; }
+  .detail-row .val { font-weight: 800; }
   .detail-row .val.green { color: var(--wa-dark); }
   .detail-row .val.orange { color: var(--alibaba); }
 
-  .period-title { font-size: 14px; font-weight: 700; color: var(--wa-deep); margin-bottom: 10px; }
+  .period-title { font-size: 14px; font-weight: 800; color: var(--wa-deep); margin-bottom: 10px; }
   .periods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 18px; }
-  .period-btn { background: #fff; border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 4px; text-align: center; cursor: pointer; transition: all .2s; font-family: inherit; }
-  .period-btn .num { font-size: 17px; font-weight: 700; color: var(--text); }
-  .period-btn .unit { font-size: 10px; color: var(--muted); margin-top: 2px; text-transform: uppercase; font-weight: 600; }
-  .period-btn.active { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); border-color: transparent; box-shadow: 0 4px 12px rgba(18,140,126,.3); transform: translateY(-2px); }
+  .period-btn { background: #fff; border: 2px solid var(--border); border-radius: 14px; padding: 12px 4px; text-align: center; cursor: pointer; transition: all .2s; font-family: inherit; }
+  .period-btn .num { font-size: 18px; font-weight: 800; color: var(--text); }
+  .period-btn .unit { font-size: 10px; color: var(--muted); margin-top: 2px; text-transform: uppercase; font-weight: 700; letter-spacing: .3px; }
+  .period-btn.active { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); border-color: transparent; box-shadow: 0 6px 16px rgba(18,140,126,.3); transform: translateY(-2px); }
   .period-btn.active .num, .period-btn.active .unit { color: #fff; }
 
-  .calc-box { background: linear-gradient(135deg, rgba(18,140,126,.08), rgba(37,211,102,.12)); border-radius: 14px; padding: 16px; margin-bottom: 18px; border: 1px dashed rgba(18,140,126,.35); }
+  .calc-box { background: linear-gradient(135deg, rgba(18,140,126,.08), rgba(37,211,102,.12)); border-radius: 16px; padding: 16px; margin-bottom: 18px; border: 1.5px dashed rgba(18,140,126,.35); }
   .calc-row { display: flex; align-items: center; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
-  .calc-row:last-child { margin-bottom: 0; padding-top: 10px; border-top: 1px solid rgba(18,140,126,.25); font-size: 16px; font-weight: 700; }
-  .calc-row .k { color: #4b5563; }
-  .calc-row .v { color: var(--text); font-weight: 600; }
-  .calc-row.total .v { color: var(--alibaba); font-size: 20px; font-weight: 800; }
-  .calc-row.total .k { color: var(--wa-deep); font-weight: 700; }
+  .calc-row:last-child { margin-bottom: 0; padding-top: 10px; border-top: 1px solid rgba(18,140,126,.25); font-size: 17px; font-weight: 800; }
+  .calc-row .k { color: #4b5563; font-weight: 600; }
+  .calc-row .v { color: var(--text); font-weight: 700; }
+  .calc-row.total .v { color: var(--alibaba); font-size: 22px; font-weight: 800; }
+  .calc-row.total .k { color: var(--wa-deep); font-weight: 800; }
 
-  .btn-activate { width: 100%; border: none; background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; box-shadow: 0 4px 14px rgba(18,140,126,.35); transition: transform .15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .info-echeance {
+    background: linear-gradient(135deg, rgba(255,184,0,.1), rgba(255,106,0,.1));
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; color: #B45309;
+    font-weight: 600; line-height: 1.5;
+    margin-bottom: 16px;
+    border: 1px solid rgba(255,184,0,.3);
+  }
+  .info-echeance svg { stroke: var(--alibaba); flex-shrink: 0; }
+
+  .btn-activate { width: 100%; border: none; background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; padding: 17px; border-radius: 16px; font-size: 16px; font-weight: 800; cursor: pointer; font-family: inherit; box-shadow: 0 8px 24px rgba(18,140,126,.35); display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform .15s; }
   .btn-activate:active { transform: scale(.97); }
   .btn-activate svg { stroke: #fff; }
   .btn-activate:disabled { background: #d1d5db; cursor: not-allowed; box-shadow: none; }
@@ -146,15 +223,19 @@
   .btn-activate.loading .spin-small { display: inline-block; }
   .btn-activate.loading .icon-check { display: none; }
 
-  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: #fff; border-top: 1px solid #e5e7eb; box-shadow: 0 -2px 12px rgba(0,0,0,.06); z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
-  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 9px 0 10px; cursor: pointer; color: #9ca3af; font-size: 11px; gap: 4px; font-weight: 500; text-decoration: none; }
-  .nav-item svg { stroke: #9ca3af; }
-  .nav-item.active { color: var(--wa-dark); font-weight: 700; }
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: #fff; border-top: 1px solid #eef2f0; box-shadow: 0 -4px 20px rgba(0,0,0,.06); z-index: 100; padding-bottom: env(safe-area-inset-bottom); padding-top: 6px; }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 6px 0 10px; cursor: pointer; color: #9ca3af; font-size: 10.5px; gap: 4px; font-weight: 600; text-decoration: none; }
+  .nav-item .nav-icon { width: 44px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: background .2s; }
+  .nav-item svg { stroke: #9ca3af; transition: stroke .2s; }
+  .nav-item.active { color: var(--wa-dark); }
+  .nav-item.active .nav-icon { background: rgba(37,211,102,.12); }
   .nav-item.active svg { stroke: var(--wa-green); }
 
-  .toast { position: fixed; left: 50%; bottom: 100px; transform: translateX(-50%) translateY(20px); background: var(--wa-deep); color: #fff; padding: 12px 22px; border-radius: 30px; font-size: 14px; font-weight: 600; box-shadow: 0 6px 20px rgba(0,0,0,.25); opacity: 0; pointer-events: none; transition: all .3s; z-index: 1000; display: flex; align-items: center; gap: 8px; max-width: 90%; }
+  .toast { position: fixed; left: 50%; bottom: 100px; transform: translateX(-50%) translateY(20px); background: var(--wa-deep); color: #fff; padding: 14px 24px; border-radius: 32px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,.3); opacity: 0; pointer-events: none; transition: all .3s; z-index: 1000; display: flex; align-items: center; gap: 10px; max-width: 90%; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast svg { stroke: var(--wa-green); flex-shrink: 0; }
+  .toast.win { background: linear-gradient(135deg, var(--gold), #FFD966); color: #1a1a1a; font-weight: 800; }
+  .toast.win svg { stroke: #1a1a1a; }
   .toast.error { background: #b91c1c; }
   .toast.error svg { stroke: #fff; }
 </style>
@@ -162,7 +243,8 @@
 <body>
 
   <div class="loader" id="loader">
-    <div class="loader-logo">Affinity<span> Network</span></div>
+    <img src="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png" alt="" class="loader-logo-img">
+    <div class="loader-logo-txt">Affinity<span> Network</span></div>
     <div class="spinner"></div>
   </div>
 
@@ -172,72 +254,97 @@
         <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
       </svg>
     </div>
-    <div class="logo">Affinity<span> Network</span></div>
-    <div style="width:40px"></div>
+    <div class="header-logo">
+      <img src="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png" alt="">
+      Affinity<span> Network</span>
+    </div>
+    <div style="width:42px"></div>
   </header>
 
   <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
   <nav class="menu" id="menu">
     <div class="menu-header">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01"/>
-      </svg>
-      Affinity Network
+      <img src="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png" alt="">
+      <div class="menu-header-info">
+        <div class="menu-header-name">Affinity<span> Network</span></div>
+        <div class="menu-header-sub">Plante et gagne</div>
+      </div>
     </div>
-    <div class="menu-item" onclick="go('parrainage.html')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-      </svg>
+    <div class="menu-item invite" onclick="go('parrainage')">
+      <div class="mi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/>
+          <line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>
+        </svg>
+      </div>
       Inviter un ami
     </div>
-    <div class="menu-item" onclick="go('recharge.html')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-      </svg>
+    <div class="menu-item recharge" onclick="go('recharge')">
+      <div class="mi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </div>
       Recharger mon solde
     </div>
-    <div class="menu-item" onclick="go('roue.html')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
-      </svg>
+    <div class="menu-item roue" onclick="go('roue')">
+      <div class="mi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+        </svg>
+      </div>
       Roue de la fortune
     </div>
-    <div class="menu-item" onclick="go('missions.html')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-        <path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
-      </svg>
-      Missions
+    <div class="menu-item missions" onclick="go('missions')">
+      <div class="mi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+          <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+          <path d="M4 22h16"/>
+          <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+        </svg>
+      </div>
+      Missions du mois
     </div>
-    <div class="menu-item" onclick="go('notifications.html')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-      </svg>
+    <div class="menu-item notifs" onclick="go('notifications')">
+      <div class="mi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+      </div>
       Notifications
     </div>
-    <div class="menu-item active" onclick="go('travail.html')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-      </svg>
+    <div class="menu-item travail active" onclick="go('travail')">
+      <div class="mi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2"/>
+        </svg>
+      </div>
       Travail
     </div>
-    <div class="menu-item" onclick="go('support.html')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
-      </svg>
+    <div class="menu-item support" onclick="go('support')">
+      <div class="mi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+        </svg>
+      </div>
       Support
     </div>
-    <div class="menu-item" onclick="go('faq.html')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <circle cx="12" cy="12" r="10"/>
-      </svg>
+    <div class="menu-item faq" onclick="go('faq')">
+      <div class="mi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+        </svg>
+      </div>
       FAQ
     </div>
-    <div class="menu-item" onclick="go('entreprise.html')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <path d="M3 21h18M5 21V7l7-4 7 4v14M10 9h4M10 13h4"/>
-      </svg>
+    <div class="menu-item entreprise" onclick="go('entreprise')">
+      <div class="mi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 21h18M5 21V7l7-4 7 4v14"/>
+        </svg>
+      </div>
       Notre entreprise
     </div>
     <div class="menu-footer">
@@ -254,7 +361,7 @@
 
   <main class="content">
     <h1 class="page-title">Travail</h1>
-    <p class="page-sub">Active une plantation et gagne chaque jour</p>
+    <p class="page-sub">Active une plantation et reçois ton capital + bénéfice à l'échéance</p>
 
     <div class="solde-banner anim">
       <div>
@@ -266,16 +373,33 @@
         </div>
         <div class="val" id="userSolde">0 F</div>
       </div>
+      <div class="ic-w">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+        </svg>
+      </div>
     </div>
 
-    <div id="plantsList">
-      <div class="skeleton">
-        <div class="sk-img"></div>
-        <div class="sk-body">
-          <div><div class="sk-line w1"></div><div class="sk-line w2"></div></div>
-          <div class="sk-btn"></div>
-        </div>
+    <div class="section-title">
+      <div class="title-left">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        Mes plantations en cours
       </div>
+      <span class="badge-count" id="activeCount">0</span>
+    </div>
+    <div id="myActivePlans"></div>
+
+    <div class="section-title">
+      <div class="title-left">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 20h10M10 20c5.5-2.5.8-6.4 3-10"/>
+        </svg>
+        Plantations disponibles
+      </div>
+    </div>
+    <div id="plantsList">
       <div class="skeleton">
         <div class="sk-img"></div>
         <div class="sk-body">
@@ -287,33 +411,41 @@
   </main>
 
   <nav class="bottom-nav">
-    <a href="lancer.html" class="nav-item">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
-        <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
-      </svg>
+    <a href="lancer" class="nav-item">
+      <div class="nav-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+        </svg>
+      </div>
       Lancer
     </a>
-    <a href="retirer.html" class="nav-item">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/>
-      </svg>
+    <a href="retirer" class="nav-item">
+      <div class="nav-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+        </svg>
+      </div>
       Retirer
     </a>
-    <a href="travail.html" class="nav-item active">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-      </svg>
+    <a href="travail" class="nav-item active">
+      <div class="nav-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2"/>
+        </svg>
+      </div>
       Travail
     </a>
-    <a href="moi.html" class="nav-item">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
-      </svg>
+    <a href="moi" class="nav-item">
+      <div class="nav-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+        </svg>
+      </div>
       Moi
     </a>
   </nav>
 
+  <!-- MODAL -->
   <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
     <div class="modal" id="modal">
       <div class="modal-handle"></div>
@@ -352,9 +484,9 @@
         <div class="detail-row">
           <div class="lbl">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+              <rect x="2" y="6" width="20" height="12" rx="2"/>
             </svg>
-            Montant d'activation
+            Capital à investir
           </div>
           <div class="val orange" id="detailActivation">—</div>
         </div>
@@ -368,7 +500,7 @@
           <div class="val green" id="detailGain">—</div>
         </div>
       </div>
-      <div class="period-title">Période d'activation</div>
+      <div class="period-title">Durée d'investissement</div>
       <div class="periods" id="periods">
         <button class="period-btn active" data-days="1" onclick="selectPeriod(this,1)"><div class="num">1</div><div class="unit">jour</div></button>
         <button class="period-btn" data-days="7" onclick="selectPeriod(this,7)"><div class="num">7</div><div class="unit">jours</div></button>
@@ -376,9 +508,15 @@
         <button class="period-btn" data-days="28" onclick="selectPeriod(this,28)"><div class="num">28</div><div class="unit">jours</div></button>
       </div>
       <div class="calc-box">
-        <div class="calc-row"><span class="k">Activation (débitée)</span><span class="v" id="calcActivation">—</span></div>
-        <div class="calc-row"><span class="k">Gains sur <b id="calcDaysLabel">1 jour</b></span><span class="v" id="calcGains">—</span></div>
+        <div class="calc-row"><span class="k">Capital investi</span><span class="v" id="calcActivation">—</span></div>
+        <div class="calc-row"><span class="k">Bénéfice sur <b id="calcDaysLabel">1 jour</b></span><span class="v" id="calcGains">—</span></div>
         <div class="calc-row total"><span class="k">Total à percevoir</span><span class="v" id="calcTotal">—</span></div>
+      </div>
+      <div class="info-echeance">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <span>Ton capital + bénéfice seront <b>crédités automatiquement</b> sur ton solde à la fin de la période choisie.</span>
       </div>
       <button class="btn-activate" id="btnActivate" onclick="activate()">
         <span class="spin-small"></span>
@@ -405,6 +543,7 @@
   let CURRENT_USER = null;
   let USER_SOLDE = 0;
   let PLANTS = [];
+  let MY_ACTIVATIONS = [];
   let currentPlant = null;
   let currentDays = 1;
 
@@ -412,10 +551,22 @@
 
   (async function init() {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) { window.location.replace('inscription.html'); return; }
+    if (!session) { window.location.replace('inscription'); return; }
     CURRENT_USER = session.user;
-    await Promise.all([loadProfile(), loadPlantations()]);
-    setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
+
+    // 1. Vérifier les échéances atteintes → créditer capital + bénéfices
+    try {
+      const { data: echeance } = await sb.rpc('verifier_echeances_plantations');
+      if (echeance?.total_credite > 0) {
+        setTimeout(() => {
+          showToast(`💰 ${echeance.nb_credite} plantation(s) arrivée(s) à échéance ! +${formatF(echeance.total_credite)} crédités`, 'win');
+        }, 800);
+      }
+    } catch (e) { console.warn(e); }
+
+    await Promise.all([loadProfile(), loadPlantations(), loadMyActivations()]);
+
+    setTimeout(() => document.getElementById('loader').classList.add('hidden'), 500);
   })();
 
   async function loadProfile() {
@@ -460,7 +611,7 @@
         </div>
         <div class="body">
           <div class="info-col">
-            <div class="label-sm">Revenu journalier</div>
+            <div class="label-sm">Gain par jour</div>
             <div class="revenu">${formatF(p.gain_journalier)} <small>/ jour</small></div>
           </div>
           <button class="btn-voir" data-id="${p.id}">
@@ -476,6 +627,89 @@
     document.querySelectorAll('.btn-voir').forEach(btn => {
       btn.addEventListener('click', () => openModal(btn.dataset.id));
     });
+  }
+
+  async function loadMyActivations() {
+    const { data, error } = await sb.from('activations_plans')
+      .select('*')
+      .eq('user_id', CURRENT_USER.id)
+      .eq('type', 'plantation')
+      .order('created_at', { ascending: false });
+    if (error || !data) return;
+    MY_ACTIVATIONS = data;
+    renderMyActivations();
+  }
+
+  function renderMyActivations() {
+    const container = document.getElementById('myActivePlans');
+    const enCours = MY_ACTIVATIONS.filter(a => a.statut === 'active');
+    document.getElementById('activeCount').textContent = enCours.length;
+
+    if (MY_ACTIVATIONS.length === 0) {
+      container.innerHTML = `<div class="empty">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+          <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+        </svg>
+        <div>Tu n'as aucune plantation active</div>
+        <div style="font-size:12px;margin-top:6px;opacity:.7">Choisis une plantation ci-dessous</div>
+      </div>`;
+      return;
+    }
+
+    container.innerHTML = '';
+    MY_ACTIVATIONS.forEach((a, i) => {
+      const progress = calculateProgress(a.date_debut, a.date_fin);
+      const isDone = a.statut === 'termine' || progress >= 100;
+      const total = Number(a.montant_activation) + Number(a.gains_totaux);
+      const joursRestants = isDone ? 0 : daysRemaining(a.date_fin);
+      const dateFin = formatDate(a.date_fin, true);
+      
+      const el = document.createElement('div');
+      el.className = 'active-plan' + (isDone ? ' termine' : '');
+      el.style.animationDelay = (i * 0.06) + 's';
+      el.innerHTML = `
+        <div class="ap-top">
+          <div class="ap-nom">
+            ${escapeHtml(a.plan_nom)}
+            <span class="ap-badge ${isDone ? 'termine' : 'active'}">${isDone ? '✓ Terminé' : 'Actif'}</span>
+          </div>
+          <div class="ap-gains">
+            +${formatF(total)}
+            <small>${isDone ? 'crédités' : 'à percevoir'}</small>
+          </div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+        <div class="ap-bottom">
+          <span>${isDone ? 'Échéance atteinte' : `Échéance : <b>${dateFin}</b>`}</span>
+          <span>${isDone ? '✓' : `⏱ ${joursRestants} j restant${joursRestants > 1 ? 's' : ''}`}</span>
+        </div>
+      `;
+      container.appendChild(el);
+    });
+  }
+
+  function calculateProgress(dateDebut, dateFin) {
+    const start = new Date(dateDebut).getTime();
+    const end = new Date(dateFin).getTime();
+    const now = Date.now();
+    if (now >= end) return 100;
+    const total = end - start;
+    const elapsed = now - start;
+    return Math.min(100, Math.max(0, (elapsed / total) * 100));
+  }
+
+  function daysRemaining(dateFin) {
+    const diff = new Date(dateFin).getTime() - Date.now();
+    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+  }
+
+  function formatDate(iso, short = false) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    const options = short 
+      ? { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }
+      : { day: '2-digit', month: 'long', year: 'numeric' };
+    return d.toLocaleDateString('fr-FR', options);
   }
 
   function openModal(id) {
@@ -495,14 +729,17 @@
     document.getElementById('modalOverlay').classList.add('open');
     document.body.style.overflow = 'hidden';
   }
+
   function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); document.body.style.overflow = ''; }
   function closeModalOutside(e) { if (e.target.id === 'modalOverlay') closeModal(); }
+
   function selectPeriod(btn, days) {
     document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentDays = days;
     updateCalc();
   }
+
   function updateCalc() {
     if (!currentPlant) return;
     const act = Number(currentPlant.montant_activation);
@@ -534,39 +771,48 @@
     const btn = document.getElementById('btnActivate');
     btn.classList.add('loading');
     document.getElementById('btnActivateText').textContent = 'Activation...';
+
     const { data, error } = await sb.rpc('activer_plantation', {
       p_plantation_id: currentPlant.id,
       p_periode_jours: currentDays
     });
+
     btn.classList.remove('loading');
+
     if (error) {
       let msg = error.message || 'Erreur';
-      if (msg.includes('Solde insuffisant')) msg = 'Solde insuffisant pour cette activation.';
+      if (msg.includes('Solde insuffisant')) msg = 'Solde insuffisant pour cette plantation.';
       showToast(msg, true);
       await loadProfile();
       updateCalc();
       return;
     }
+
     USER_SOLDE = Number(data.nouveau_solde ?? USER_SOLDE);
     document.getElementById('userSolde').textContent = formatF(USER_SOLDE);
     closeModal();
-    showToast(`${currentPlant.nom} activé pour ${currentDays} jour${currentDays > 1 ? 's' : ''} !`);
+    showToast(`🌱 ${currentPlant.nom} activé ! +${formatF(data.total_a_percevoir)} à percevoir dans ${currentDays} jour${currentDays > 1 ? 's' : ''}`, 'win');
+
+    await Promise.all([loadMyActivations(), loadProfile()]);
   }
 
   function formatF(n) { return Math.round(Number(n || 0)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F'; }
   function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-  function showToast(msg, isError = false) {
+  function showToast(msg, type = '') {
     const t = document.getElementById('toast');
     document.getElementById('toastText').textContent = msg;
-    t.className = 'toast show' + (isError ? ' error' : '');
-    setTimeout(() => t.classList.remove('show'), 3000);
+    t.className = 'toast show' + (type ? ' ' + type : '');
+    setTimeout(() => t.classList.remove('show'), 4500);
   }
   function toggleMenu() { document.getElementById('menu').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
-  function go(page) { window.location.href = page; }
+  function go(page) {
+    const cleanPage = page.replace(/\.html$/, '');
+    window.location.href = cleanPage;
+  }
   async function logout() {
     if (!confirm('Veux-tu vraiment te déconnecter ?')) return;
     await sb.auth.signOut();
-    window.location.replace('inscription.html');
+    window.location.replace('inscription');
   }
 </script>
 </body>
