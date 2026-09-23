@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Affinity Network — Accueil</title>
+<title>Affinity Network — Moi</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#075E54">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -34,19 +34,17 @@
   :root {
     --wa-green: #25D366; --wa-dark: #128C7E; --wa-deep: #075E54;
     --alibaba: #FF6A00; --gold: #FFB800; --fire: #FF4500;
-    --bg: #f7f9f8; --text: #1a1a1a; --muted: #6b7280; --border: #e5e7eb;
+    --bg: #f7f9f8; --text: #1a1a1a; --muted: #6b7280; --border: #e5e7eb; --danger: #dc2626;
   }
   body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 84px; min-height: 100vh; overflow-x: hidden; -webkit-user-select: none; user-select: none; }
   input { -webkit-user-select: text; user-select: text; }
 
-  /* ============ LOADER ============ */
+  /* LOADER */
   .loader {
     position: fixed; inset: 0; z-index: 9999;
     background: linear-gradient(135deg, var(--wa-deep) 0%, var(--wa-dark) 100%);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 22px;
-    transition: opacity .6s ease, visibility .6s ease;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 22px; transition: opacity .6s ease, visibility .6s ease;
   }
   .loader.hidden { opacity: 0; visibility: hidden; }
   .loader-logo-img { width: 90px; height: 90px; object-fit: contain; filter: drop-shadow(0 8px 24px rgba(0,0,0,.3)); }
@@ -55,15 +53,13 @@
   .spinner { width: 44px; height: 44px; border: 4px solid rgba(255,255,255,.2); border-top-color: var(--wa-green); border-radius: 50%; animation: spin .9s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ============ ANIMATIONS ============ */
   @keyframes fadeInUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes firePulse { 0%,100% { transform: scale(1) rotate(0deg); } 50% { transform: scale(1.15) rotate(-5deg); } }
-  @keyframes pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: .5; } }
   .anim { opacity: 0; animation: fadeInUp .5s ease forwards; }
-  .d1 { animation-delay: .05s; } .d2 { animation-delay: .12s; } .d3 { animation-delay: .2s; }
-  .d4 { animation-delay: .28s; } .d5 { animation-delay: .34s; } .d6 { animation-delay: .4s; }
+  .d1 { animation-delay: .05s; } .d2 { animation-delay: .1s; } .d3 { animation-delay: .15s; }
+  .d4 { animation-delay: .2s; } .d5 { animation-delay: .25s; }
 
-  /* ============ HEADER ============ */
+  /* HEADER */
   .header {
     position: sticky; top: 0; z-index: 100;
     display: flex; align-items: center; justify-content: space-between;
@@ -78,25 +74,13 @@
     display: flex; align-items: center; justify-content: center;
     border-radius: 14px;
     background: rgba(255,255,255,.12);
-    position: relative;
     transition: background .2s, transform .2s;
   }
   .burger:active { background: rgba(255,255,255,.25); transform: scale(.92); }
   .burger svg { stroke: #fff; }
-  .burger .notif-badge {
-    position: absolute; top: -2px; right: -2px;
-    background: #DC2626; color: #fff;
-    font-size: 9px; font-weight: 800;
-    padding: 2px 6px; border-radius: 10px;
-    min-width: 18px; text-align: center;
-    display: none; border: 2px solid var(--wa-deep);
-  }
-  .burger .notif-badge.show { display: block; }
-  
   .header-logo {
     display: flex; align-items: center; gap: 10px;
     font-weight: 800; font-size: 17px;
-    letter-spacing: .3px;
   }
   .header-logo img {
     width: 34px; height: 34px;
@@ -108,16 +92,7 @@
   }
   .header-logo span { color: var(--wa-green); }
 
-  .header-icon {
-    width: 42px; height: 42px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 14px;
-    background: rgba(255,255,255,.12);
-    cursor: pointer;
-  }
-  .header-icon svg { stroke: #fff; }
-
-  /* ============ MENU ============ */
+  /* MENU */
   .menu {
     position: fixed; top: 0; left: 0; height: 100%; width: 300px;
     background: #fff; z-index: 200;
@@ -144,33 +119,21 @@
     object-fit: contain;
   }
   .menu-header-info { flex: 1; }
-  .menu-header-name {
-    font-size: 16px; font-weight: 800;
-    color: var(--wa-deep);
-    letter-spacing: .2px;
-  }
+  .menu-header-name { font-size: 16px; font-weight: 800; color: var(--wa-deep); }
   .menu-header-name span { color: var(--wa-green); }
-  .menu-header-sub {
-    font-size: 11.5px; color: var(--muted);
-    margin-top: 2px;
-  }
+  .menu-header-sub { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
   .menu-item {
     display: flex; align-items: center; gap: 14px;
-    padding: 14px 22px;
-    cursor: pointer; font-size: 15px;
+    padding: 14px 22px; cursor: pointer; font-size: 15px;
     color: #333; font-weight: 500;
     transition: background .2s, padding-left .2s;
-    position: relative;
   }
   .menu-item:active { background: #e7f9ee; padding-left: 26px; }
   .menu-item .mi-icon {
-    width: 40px; height: 40px;
-    border-radius: 12px;
+    width: 40px; height: 40px; border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
-    transition: transform .2s;
   }
-  .menu-item:active .mi-icon { transform: scale(.9); }
   .menu-item.invite .mi-icon { background: rgba(255,106,0,.12); }
   .menu-item.invite svg { stroke: var(--alibaba); }
   .menu-item.recharge .mi-icon { background: rgba(37,211,102,.15); }
@@ -188,16 +151,10 @@
   .menu-item.faq .mi-icon { background: rgba(168,85,247,.12); }
   .menu-item.faq svg { stroke: #A855F7; }
   .menu-item.entreprise .mi-icon { background: rgba(245,158,11,.12); }
-  .menu-item.entreprise svg { stroke: var(--warn, #f59e0b); }
+  .menu-item.entreprise svg { stroke: #f59e0b; }
   .menu-item.active { background: #e7f9ee; }
-  .menu-item .menu-badge {
-    margin-left: auto; background: #DC2626; color: #fff;
-    font-size: 10px; font-weight: 800;
-    padding: 3px 8px; border-radius: 10px;
-    min-width: 22px; text-align: center;
-    display: none;
-  }
-  .menu-item .menu-badge.show { display: block; }
+  .menu-item.active .mi-icon { background: rgba(37,211,102,.2); }
+  .menu-item.active svg { stroke: var(--wa-green); }
   .menu-footer {
     margin-top: auto;
     padding: 16px 22px 22px;
@@ -213,120 +170,187 @@
     display: flex; align-items: center; justify-content: center; gap: 8px;
     transition: transform .15s;
   }
-  .btn-logout:active { transform: scale(.97); background: #fecaca; }
+  .btn-logout:active { transform: scale(.97); }
   .btn-logout svg { stroke: #b91c1c; }
-  
   .overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,.45);
     z-index: 150; opacity: 0; pointer-events: none;
-    transition: opacity .3s;
-    backdrop-filter: blur(2px);
+    transition: opacity .3s; backdrop-filter: blur(2px);
   }
   .overlay.open { opacity: 1; pointer-events: auto; }
 
-  /* ============ CONTENU ============ */
+  /* CONTENU */
   .content { padding: 16px; }
 
-  /* ============ CARTE PROFIL + SOLDE ============ */
-  .profile-solde-card {
+  /* PROFIL CARD */
+  .profile-card {
     background: linear-gradient(135deg, var(--wa-deep) 0%, var(--wa-dark) 55%, var(--wa-green) 130%);
     color: #fff;
     border-radius: 26px;
-    padding: 20px;
+    padding: 26px 20px 24px;
     margin-bottom: 20px;
-    box-shadow: 0 12px 36px rgba(7,94,84,.28), 0 4px 12px rgba(0,0,0,.08);
-    position: relative;
-    overflow: hidden;
+    box-shadow: 0 12px 36px rgba(7,94,84,.28);
+    position: relative; overflow: hidden;
+    text-align: center;
   }
-  .profile-solde-card::before {
+  .profile-card::before {
     content: ''; position: absolute;
     right: -50px; top: -50px;
     width: 200px; height: 200px; border-radius: 50%;
     background: rgba(255,255,255,.07);
   }
-  .profile-solde-card::after {
+  .profile-card::after {
     content: ''; position: absolute;
-    left: -60px; bottom: -100px;
-    width: 240px; height: 240px; border-radius: 50%;
+    left: -60px; bottom: -80px;
+    width: 220px; height: 220px; border-radius: 50%;
     background: rgba(37,211,102,.15);
   }
-  .ps-top {
-    display: flex; align-items: center; gap: 14px;
-    position: relative; z-index: 2;
-    margin-bottom: 16px;
-  }
-  .ps-avatar {
-    width: 58px; height: 58px; border-radius: 18px;
+  .avatar {
+    width: 92px; height: 92px; border-radius: 26px;
     background: rgba(255,255,255,.22);
-    border: 2.5px solid rgba(255,255,255,.5);
+    border: 3px solid rgba(255,255,255,.5);
+    margin: 0 auto 14px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 22px; font-weight: 800; color: #fff;
-    flex-shrink: 0;
-    box-shadow: 0 6px 16px rgba(0,0,0,.18);
+    font-size: 34px; font-weight: 800; color: #fff;
+    position: relative; z-index: 2;
+    box-shadow: 0 8px 24px rgba(0,0,0,.2);
     backdrop-filter: blur(10px);
   }
-  .ps-info { flex: 1; min-width: 0; }
-  .ps-hello {
-    font-size: 12.5px; opacity: .9;
-    margin-bottom: 3px;
-    display: flex; align-items: center; gap: 5px;
-  }
-  .ps-name {
-    font-size: 20px; font-weight: 800;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  .profile-name {
+    font-size: 21px; font-weight: 800;
+    margin-bottom: 4px; position: relative; z-index: 2;
     letter-spacing: -.2px;
   }
-  .ps-icon {
-    width: 44px; height: 44px; border-radius: 14px;
-    background: rgba(255,255,255,.15);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,.2);
+  .profile-pseudo {
+    font-size: 14px; opacity: .85;
+    margin-bottom: 12px; position: relative; z-index: 2;
   }
-  .ps-icon svg { stroke: #fff; }
-
-  .ps-solde {
-    background: rgba(255,255,255,.15);
-    border: 1px solid rgba(255,255,255,.28);
-    border-radius: 18px;
-    padding: 16px 18px;
+  .profile-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--alibaba);
+    color: #fff; font-size: 11px; font-weight: 800;
+    padding: 6px 14px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: .5px;
     position: relative; z-index: 2;
-    backdrop-filter: blur(12px);
-    display: flex; align-items: center; justify-content: space-between;
-    cursor: pointer;
-    transition: transform .15s;
+    box-shadow: 0 4px 12px rgba(255,106,0,.4);
   }
-  .ps-solde:active { transform: scale(.98); }
-  .ps-solde .ps-label {
-    font-size: 11px; opacity: .9;
+  .profile-badge svg { stroke: #fff; }
+
+  /* SOLDE */
+  .solde-card {
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    color: #fff; border-radius: 22px;
+    padding: 22px; margin-bottom: 20px;
+    box-shadow: 0 8px 24px rgba(18,140,126,.28);
+    display: flex; align-items: center; justify-content: space-between;
+    position: relative; overflow: hidden;
+  }
+  .solde-card::after {
+    content: ''; position: absolute;
+    right: -20px; top: -20px;
+    width: 130px; height: 130px; border-radius: 50%;
+    background: rgba(255,255,255,.1);
+  }
+  .solde-card .left { position: relative; z-index: 2; }
+  .solde-card .label {
+    font-size: 12px; opacity: .9; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .solde-card .label svg { stroke: #fff; }
+  .solde-card .montant { font-size: 30px; font-weight: 800; letter-spacing: -.5px; }
+  .solde-card .icon-wallet {
+    width: 56px; height: 56px; border-radius: 18px;
+    background: rgba(255,255,255,.2);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; z-index: 2;
+    backdrop-filter: blur(10px);
+  }
+  .solde-card .icon-wallet svg { stroke: #fff; }
+
+  /* STREAK */
+  .streak-card {
+    background: linear-gradient(135deg, #FF4500, #FF6B35);
+    color: #fff; border-radius: 20px;
+    padding: 16px 18px; margin-bottom: 20px;
+    box-shadow: 0 8px 24px rgba(255,69,0,.28);
+    display: flex; align-items: center; gap: 14px;
+    position: relative; overflow: hidden;
+  }
+  .streak-card::after {
+    content: ''; position: absolute;
+    right: -20px; top: -20px;
+    width: 110px; height: 110px; border-radius: 50%;
+    background: rgba(255,255,255,.1);
+  }
+  .streak-icon {
+    width: 54px; height: 54px; border-radius: 16px;
+    background: rgba(255,255,255,.22);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 26px;
+    animation: firePulse 1.5s ease-in-out infinite;
+    position: relative; z-index: 2;
+  }
+  .streak-body { flex: 1; position: relative; z-index: 2; }
+  .streak-body .st-top {
+    font-size: 10.5px; opacity: .9;
+    text-transform: uppercase; letter-spacing: .5px;
+    font-weight: 700; margin-bottom: 3px;
+  }
+  .streak-body .st-val {
+    font-size: 22px; font-weight: 800;
+    display: flex; align-items: baseline; gap: 5px;
+  }
+  .streak-body .st-val small { font-size: 11px; opacity: .85; font-weight: 600; }
+  .streak-body .st-sub { font-size: 10.5px; opacity: .85; margin-top: 2px; }
+  .streak-record {
+    background: rgba(255,255,255,.25);
+    padding: 6px 12px; border-radius: 16px;
+    font-size: 11px; font-weight: 800;
+    position: relative; z-index: 2;
+    flex-shrink: 0; text-align: center;
+    backdrop-filter: blur(10px);
+  }
+  .streak-record small {
+    display: block; font-size: 9px;
+    opacity: .8; font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  /* BONUS BANNER */
+  .bonus-banner {
+    background: linear-gradient(135deg, var(--gold), #FFD966);
+    color: #fff; border-radius: 20px;
+    padding: 18px 20px; margin-bottom: 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 8px 24px rgba(255,184,0,.3);
+    position: relative; overflow: hidden;
+  }
+  .bonus-banner::after {
+    content: ''; position: absolute;
+    right: -30px; top: -30px;
+    width: 130px; height: 130px; border-radius: 50%;
+    background: rgba(255,255,255,.15);
+  }
+  .bonus-banner .bb-lbl {
+    font-size: 11px; opacity: .95;
     text-transform: uppercase; font-weight: 700;
     letter-spacing: .5px; margin-bottom: 5px;
-    display: flex; align-items: center; gap: 5px;
   }
-  .ps-solde .ps-label svg { stroke: #fff; }
-  .ps-solde .ps-val {
-    font-size: 30px; font-weight: 800;
-    letter-spacing: -.8px;
-    text-shadow: 0 2px 8px rgba(0,0,0,.15);
-    line-height: 1;
-  }
-  .ps-solde .ps-arrow {
-    width: 48px; height: 48px; border-radius: 14px;
+  .bonus-banner .bb-val { font-size: 26px; font-weight: 800; letter-spacing: -.3px; }
+  .bonus-banner .bb-ic {
+    width: 52px; height: 52px; border-radius: 16px;
     background: rgba(255,255,255,.25);
     display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    transition: transform .15s;
+    position: relative; z-index: 2;
+    backdrop-filter: blur(10px);
   }
-  .ps-solde:active .ps-arrow { transform: scale(.9); }
-  .ps-solde .ps-arrow svg { stroke: #fff; }
+  .bonus-banner .bb-ic svg { stroke: #fff; }
 
-  /* ============ SECTION TITLE ============ */
+  /* SECTION TITLE */
   .section-title {
     font-size: 15.5px; font-weight: 800; color: var(--wa-deep);
     margin: 24px 0 14px;
     display: flex; align-items: center; justify-content: space-between;
-    letter-spacing: -.1px;
   }
   .section-title .title-left { display: flex; align-items: center; gap: 9px; }
   .section-title .title-icon {
@@ -334,359 +358,177 @@
     display: flex; align-items: center; justify-content: center;
     background: rgba(37,211,102,.12);
   }
-  .section-title .title-icon.gold { background: rgba(255,184,0,.15); }
-  .section-title .title-icon.fire { background: rgba(255,69,0,.12); }
   .section-title .title-icon svg { stroke: var(--wa-green); }
+  .section-title .title-icon.gold { background: rgba(255,184,0,.15); }
   .section-title .title-icon.gold svg { stroke: var(--gold); }
-  .section-title .title-icon.fire svg { stroke: var(--fire); }
+  .section-title .title-icon.blue { background: rgba(18,140,126,.12); }
+  .section-title .title-icon.blue svg { stroke: var(--wa-dark); }
   .section-title .badge-count {
     background: rgba(18,140,126,.12); color: var(--wa-dark);
     font-size: 11px; padding: 4px 11px; border-radius: 12px;
     font-weight: 800;
   }
+  .section-title .badge-gold {
+    background: rgba(255,184,0,.15); color: #B45309;
+    font-size: 11px; padding: 4px 11px; border-radius: 12px;
+    font-weight: 800;
+  }
 
-  /* ============ CARROUSEL ============ */
-  .carousel-wrap {
-    overflow: hidden;
-    border-radius: 22px;
-    position: relative;
-    box-shadow: 0 8px 24px rgba(0,0,0,.12), 0 2px 6px rgba(0,0,0,.04);
+  /* STATS */
+  .stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px; margin-bottom: 6px;
   }
-  .carousel { display: flex; transition: transform .7s cubic-bezier(.4,0,.2,1); }
-  .plant-card {
-    flex: 0 0 100%;
-    background: #fff;
-    position: relative;
-    height: 250px;
-    overflow: hidden;
+  .stat-card {
+    background: #fff; border-radius: 18px;
+    padding: 16px 10px; text-align: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,.06);
   }
-  .plant-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .plant-card .overlay-grad {
-    position: absolute; inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,.88) 5%, rgba(0,0,0,.4) 45%, transparent 75%);
+  .stat-card .ico {
+    width: 40px; height: 40px; border-radius: 12px;
+    margin: 0 auto 10px;
+    display: flex; align-items: center; justify-content: center;
   }
-  .plant-card .tag {
-    position: absolute; top: 16px; right: 16px;
-    background: var(--alibaba); color: #fff;
-    font-size: 12px; font-weight: 800;
-    padding: 7px 14px; border-radius: 20px;
-    box-shadow: 0 4px 14px rgba(255,106,0,.5);
-    letter-spacing: .2px;
-    backdrop-filter: blur(10px);
-    display: flex; align-items: center; gap: 4px;
+  .stat-card:nth-child(1) .ico { background: rgba(18,140,126,.12); }
+  .stat-card:nth-child(1) .ico svg { stroke: var(--wa-dark); }
+  .stat-card:nth-child(2) .ico { background: rgba(255,106,0,.12); }
+  .stat-card:nth-child(2) .ico svg { stroke: var(--alibaba); }
+  .stat-card:nth-child(3) .ico { background: rgba(255,184,0,.15); }
+  .stat-card:nth-child(3) .ico svg { stroke: var(--gold); }
+  .stat-card .val {
+    font-size: 18px; font-weight: 800; color: var(--text);
+    line-height: 1.2; margin-bottom: 3px;
   }
-  .plant-card .info {
-    position: absolute; bottom: 20px; left: 20px; right: 20px;
-    color: #fff;
-  }
-  .plant-card .nom {
-    font-size: 26px; font-weight: 800;
-    margin-bottom: 6px;
-    text-shadow: 0 2px 12px rgba(0,0,0,.5);
-    letter-spacing: -.5px;
-  }
-  .plant-card .prix {
-    font-size: 13.5px;
-    display: flex; align-items: center; gap: 7px;
-    opacity: .95;
-  }
-  .plant-card .prix .dot-live {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--wa-green);
-    box-shadow: 0 0 0 3px rgba(37,211,102,.3);
-    animation: pulse 1.5s ease-in-out infinite;
-  }
-  .dots {
-    display: flex; justify-content: center; gap: 6px;
-    margin-top: 16px;
-  }
-  .dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: #d1d5db; transition: all .3s;
-  }
-  .dot.active { background: var(--wa-green); width: 24px; border-radius: 4px; }
-
-  /* ============ TOP DU MOIS ============ */
-  .top-card {
-    background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
-    color: #fff; border-radius: 22px;
-    padding: 18px;
-    box-shadow: 0 8px 28px rgba(0,0,0,.28);
-    position: relative; overflow: hidden;
-  }
-  .top-card::before {
-    content: ''; position: absolute;
-    right: -40px; top: -40px;
-    width: 160px; height: 160px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,184,0,.35), transparent 70%);
-  }
-  .top-card .tc-head {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 14px; position: relative; z-index: 2;
-  }
-  .top-card .tc-title {
-    display: flex; align-items: center; gap: 9px;
-    font-size: 14px; font-weight: 800;
+  .stat-card .lbl {
+    font-size: 10px; color: var(--muted);
+    text-transform: uppercase; font-weight: 700;
     letter-spacing: .3px;
   }
-  .top-card .tc-title svg { stroke: var(--gold); }
-  .top-card .tc-jackpot {
-    background: linear-gradient(135deg, var(--gold), #FFD966);
-    color: #1a1a1a; font-size: 11.5px; font-weight: 800;
-    padding: 5px 12px; border-radius: 14px;
-    box-shadow: 0 4px 12px rgba(255,184,0,.4);
-  }
-  .top-card .tc-body {
-    display: flex; align-items: center; gap: 14px;
-    position: relative; z-index: 2;
-  }
-  .top-card .tc-icon {
-    width: 58px; height: 58px; border-radius: 18px;
-    background: linear-gradient(135deg, var(--gold), #FFD966);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 28px; flex-shrink: 0;
-    box-shadow: 0 6px 18px rgba(255,184,0,.4);
-  }
-  .top-card .tc-info { flex: 1; }
-  .top-card .tc-lbl {
-    font-size: 11px; opacity: .8;
-    text-transform: uppercase; font-weight: 700;
-    letter-spacing: .5px; margin-bottom: 4px;
-  }
-  .top-card .tc-val {
-    font-size: 24px; font-weight: 800;
-    display: flex; align-items: baseline; gap: 6px;
-    letter-spacing: -.3px;
-  }
-  .top-card .tc-val small { font-size: 12px; opacity: .85; font-weight: 600; }
-  .top-card .tc-sub { font-size: 11.5px; opacity: .75; margin-top: 4px; }
-  .top-card .tc-btn {
-    width: 100%; margin-top: 16px;
-    background: linear-gradient(135deg, var(--gold), #FFD966);
-    color: #1a1a1a; border: none; border-radius: 14px;
-    padding: 13px; font-size: 13.5px; font-weight: 800;
-    cursor: pointer; font-family: inherit;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    position: relative; z-index: 2;
-    transition: transform .15s;
-    box-shadow: 0 4px 14px rgba(255,184,0,.3);
-  }
-  .top-card .tc-btn:active { transform: scale(.97); }
-  .top-card .tc-btn svg { stroke: #1a1a1a; }
-  .top-card.eligible { background: linear-gradient(135deg, #B45309, var(--gold)); }
-  .top-card.eligible .tc-icon { background: #fff; }
 
-  /* ============ STREAK ============ */
-  .streak-card {
-    background: linear-gradient(135deg, #FF4500, #FF6B35);
-    color: #fff; border-radius: 22px;
-    padding: 16px 18px;
-    box-shadow: 0 8px 24px rgba(255,69,0,.28);
-    display: flex; align-items: center; gap: 14px;
-    position: relative; overflow: hidden;
-  }
-  .streak-card::after {
-    content: ''; position: absolute;
-    right: -30px; top: -30px;
-    width: 130px; height: 130px; border-radius: 50%;
-    background: rgba(255,255,255,.1);
-  }
-  .streak-icon {
-    width: 58px; height: 58px; border-radius: 18px;
-    background: rgba(255,255,255,.22);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; font-size: 28px;
-    animation: firePulse 1.5s ease-in-out infinite;
-    position: relative; z-index: 2;
-    backdrop-filter: blur(10px);
-  }
-  .streak-body { flex: 1; position: relative; z-index: 2; }
-  .streak-body .st-top {
-    font-size: 11px; opacity: .9;
-    text-transform: uppercase; letter-spacing: .5px;
-    font-weight: 700; margin-bottom: 4px;
-  }
-  .streak-body .st-val {
-    font-size: 24px; font-weight: 800;
-    display: flex; align-items: baseline; gap: 6px;
-    letter-spacing: -.3px;
-  }
-  .streak-body .st-val small { font-size: 12px; opacity: .85; font-weight: 600; }
-  .streak-body .st-sub { font-size: 11.5px; opacity: .9; margin-top: 3px; }
-  .streak-bonus {
-    background: rgba(255,255,255,.25);
-    padding: 7px 14px; border-radius: 22px;
-    font-size: 12.5px; font-weight: 800;
-    position: relative; z-index: 2; flex-shrink: 0;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,.3);
-  }
-  .streak-card.done {
-    background: linear-gradient(135deg, #6b7280, #9ca3af);
-    box-shadow: 0 8px 24px rgba(107,114,128,.25);
-  }
-  .streak-card.done .streak-icon { animation: none; }
-
-  /* ============ BOUTONS RAPIDES ============ */
-  .quick-actions {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-  .qa-btn {
-    border: none; border-radius: 20px;
-    padding: 18px 12px;
-    cursor: pointer; font-family: inherit;
-    display: flex; flex-direction: column; align-items: center;
-    gap: 10px;
-    transition: transform .15s, box-shadow .2s;
-    position: relative;
+  /* INFO LIST */
+  .info-list {
+    background: #fff; border-radius: 22px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.06);
     overflow: hidden;
   }
-  .qa-btn:active { transform: scale(.96); }
-  .qa-btn::before {
-    content: ''; position: absolute;
-    right: -30px; top: -30px;
-    width: 100px; height: 100px; border-radius: 50%;
-    background: rgba(255,255,255,.15);
+  .info-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 16px 18px;
+    border-bottom: 1px solid #f3f6f4;
   }
-  .qa-btn.invite {
-    background: linear-gradient(135deg, #FF8A3D, var(--alibaba));
-    color: #fff;
-    box-shadow: 0 8px 24px rgba(255,106,0,.3);
-  }
-  .qa-btn.invite svg { stroke: #fff; }
-  .qa-btn.recharge {
-    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
-    color: #fff;
-    box-shadow: 0 8px 24px rgba(18,140,126,.3);
-  }
-  .qa-btn.recharge svg { stroke: #fff; }
-  .qa-btn .qa-icon {
-    width: 46px; height: 46px; border-radius: 14px;
-    background: rgba(255,255,255,.22);
+  .info-row:last-child { border-bottom: none; }
+  .info-row .ico {
+    width: 42px; height: 42px; border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    position: relative; z-index: 2;
-    backdrop-filter: blur(10px);
+    flex-shrink: 0;
   }
-  .qa-btn .qa-label {
-    font-size: 14px; font-weight: 800;
-    position: relative; z-index: 2;
+  .info-row .ico svg { stroke: currentColor; }
+  .info-row:nth-child(1) .ico { background: rgba(18,140,126,.1); color: var(--wa-dark); }
+  .info-row:nth-child(2) .ico { background: rgba(255,106,0,.1); color: var(--alibaba); }
+  .info-row:nth-child(3) .ico { background: rgba(37,211,102,.12); color: var(--wa-green); }
+  .info-row:nth-child(4) .ico { background: rgba(18,140,126,.1); color: var(--wa-dark); }
+  .info-row .body {
+    flex: 1; display: flex; flex-direction: column; gap: 3px;
+    min-width: 0;
   }
-  .qa-btn .qa-sub {
-    font-size: 11px; opacity: .9;
-    margin-top: -4px;
-    position: relative; z-index: 2;
+  .info-row .k {
+    font-size: 11px; color: var(--muted);
+    text-transform: uppercase; font-weight: 700;
+    letter-spacing: .4px;
   }
-
-  /* ============ MISSIONS ============ */
-  .missions-card {
-    background: #fff; border-radius: 22px;
-    padding: 18px;
-    box-shadow: 0 6px 20px rgba(0,0,0,.06), 0 2px 6px rgba(0,0,0,.03);
-  }
-  .mission-item {
-    padding: 14px; background: #f7faf8;
-    border-radius: 16px; margin-bottom: 10px;
-    transition: background .2s;
-  }
-  .mission-item:last-child { margin-bottom: 0; }
-  .mission-item.complete {
-    background: linear-gradient(135deg, rgba(37,211,102,.1), rgba(18,140,126,.12));
-    border: 1px solid rgba(37,211,102,.3);
-  }
-  .mission-top {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 10px; margin-bottom: 10px;
-  }
-  .mission-info { flex: 1; min-width: 0; }
-  .mission-info .mi-title {
-    font-size: 13.5px; font-weight: 800;
-    color: var(--text); margin-bottom: 3px;
-  }
-  .mission-info .mi-sub {
-    font-size: 11.5px; color: var(--muted);
-  }
-  .mission-reward {
-    background: linear-gradient(135deg, var(--alibaba), #FF8A3D);
-    color: #fff; font-size: 11.5px; font-weight: 800;
-    padding: 5px 12px; border-radius: 20px; flex-shrink: 0;
-    box-shadow: 0 3px 10px rgba(255,106,0,.3);
-  }
-  .mission-item.complete .mission-reward {
-    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
-    box-shadow: 0 3px 10px rgba(18,140,126,.3);
-  }
-  .mission-progress-bar {
-    height: 9px; background: #e5e7eb;
-    border-radius: 6px; overflow: hidden;
-    margin-bottom: 8px;
-  }
-  .mission-fill {
-    height: 100%; border-radius: 6px;
-    background: linear-gradient(90deg, var(--alibaba), #FF8A3D);
-    transition: width .8s ease;
-  }
-  .mission-item.complete .mission-fill {
-    background: linear-gradient(90deg, var(--wa-dark), var(--wa-green));
-  }
-  .mission-bottom {
-    display: flex; align-items: center; justify-content: space-between;
-    font-size: 11.5px; color: var(--muted);
-  }
-  .mission-bottom .mb-count {
-    font-weight: 800; color: var(--text);
-  }
-  .mission-item.complete .mission-bottom .mb-status {
-    color: var(--wa-dark); font-weight: 800;
+  .info-row .v {
+    font-size: 14px; font-weight: 700; color: var(--text);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
 
-  /* ============ 4 BOUTONS ============ */
-  .actions {
-    display: grid; grid-template-columns: repeat(2, 1fr);
-    gap: 12px; margin-top: 20px;
+  /* BONUS HISTORY */
+  .bonus-item {
+    background: #fff; border-radius: 16px;
+    padding: 14px; margin-bottom: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.05);
+    display: flex; align-items: center; gap: 12px;
+    animation: fadeInUp .4s ease forwards; opacity: 0;
   }
-  .action-btn {
-    background: #fff; border-radius: 20px;
-    padding: 20px 12px;
-    display: flex; flex-direction: column; align-items: center;
-    gap: 12px; cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0,0,0,.06), 0 2px 4px rgba(0,0,0,.02);
-    transition: transform .2s, box-shadow .2s;
-    border: 1.5px solid #f3f6f4;
-    position: relative;
-  }
-  .action-btn:active {
-    transform: scale(.95);
-    box-shadow: 0 2px 8px rgba(0,0,0,.08);
-  }
-  .action-btn .icon-circle {
-    width: 52px; height: 52px; border-radius: 16px;
+  .bonus-item .bi-icon {
+    width: 44px; height: 44px; border-radius: 14px;
     display: flex; align-items: center; justify-content: center;
-    transition: transform .2s;
+    flex-shrink: 0; font-size: 20px;
   }
-  .action-btn:active .icon-circle { transform: scale(.9); }
-  .action-btn .label {
-    font-size: 13.5px; font-weight: 800;
-    color: #333; letter-spacing: -.1px;
+  .bonus-item .bi-icon.bienvenue { background: rgba(37,211,102,.15); }
+  .bonus-item .bi-icon.streak { background: rgba(255,69,0,.15); }
+  .bonus-item .bi-icon.palier { background: rgba(255,184,0,.15); }
+  .bonus-item .bi-icon.recharge { background: rgba(18,140,126,.15); }
+  .bonus-item .bi-icon.mission { background: rgba(255,106,0,.15); }
+  .bonus-item .bi-icon.roue { background: rgba(147,51,234,.15); }
+  .bonus-item .bi-body { flex: 1; min-width: 0; }
+  .bonus-item .bi-title {
+    font-size: 13.5px; font-weight: 800; color: var(--text);
+    margin-bottom: 3px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
-  .action-btn.home .icon-circle { background: rgba(7,94,84,.1); }
-  .action-btn.home svg { stroke: var(--wa-deep); }
-  .action-btn.rank .icon-circle { background: rgba(255,106,0,.12); }
-  .action-btn.rank svg { stroke: var(--alibaba); }
-  .action-btn.ticket .icon-circle { background: rgba(18,140,126,.12); }
-  .action-btn.ticket svg { stroke: var(--wa-dark); }
-  .action-btn.news .icon-circle { background: rgba(37,211,102,.15); }
-  .action-btn.news svg { stroke: var(--wa-green); }
-  .action-btn.current::before {
-    content: 'Actuel';
-    position: absolute; top: 10px; right: 10px;
-    background: var(--wa-green); color: #fff;
-    font-size: 9px; font-weight: 800;
-    padding: 3px 8px; border-radius: 10px;
-    text-transform: uppercase; letter-spacing: .3px;
+  .bonus-item .bi-sub { font-size: 11px; color: var(--muted); }
+  .bonus-item .bi-gain {
+    font-size: 15px; font-weight: 800; color: var(--wa-dark);
+    text-align: right; flex-shrink: 0;
   }
 
-  /* ============ BOTTOM NAV ============ */
+  /* HIST ACTIVATIONS */
+  .hist-item {
+    background: #fff; border-radius: 18px;
+    padding: 14px; margin-bottom: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.05);
+    display: flex; align-items: center; gap: 12px;
+    animation: fadeInUp .4s ease forwards; opacity: 0;
+  }
+  .hist-item .hist-img {
+    width: 54px; height: 54px; border-radius: 14px;
+    object-fit: cover; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    color: #fff; font-weight: 800; font-size: 20px;
+  }
+  .hist-item .hist-body { flex: 1; min-width: 0; }
+  .hist-item .hist-top {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; margin-bottom: 4px;
+  }
+  .hist-item .hist-nom {
+    font-size: 14px; font-weight: 800; color: var(--text);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .hist-item .hist-status {
+    font-size: 10px; font-weight: 800; padding: 4px 9px;
+    border-radius: 10px; text-transform: uppercase;
+    letter-spacing: .3px; flex-shrink: 0;
+  }
+  .hist-item .hist-status.active { background: rgba(37,211,102,.15); color: #166534; }
+  .hist-item .hist-status.termine { background: rgba(107,114,128,.15); color: #4b5563; }
+  .hist-item .hist-meta {
+    font-size: 11px; color: var(--muted);
+    display: flex; align-items: center; gap: 6px;
+    flex-wrap: wrap;
+  }
+  .hist-item .hist-meta svg { stroke: var(--muted); }
+  .hist-item .hist-gain {
+    font-size: 14px; font-weight: 800; color: var(--wa-dark);
+    text-align: right; flex-shrink: 0;
+  }
+  .hist-item .hist-gain small {
+    display: block; font-size: 10px;
+    color: var(--muted); font-weight: 500;
+    margin-top: 2px;
+  }
+
+  /* EMPTY */
+  .empty {
+    text-align: center; padding: 40px 20px;
+    color: var(--muted); font-size: 13px;
+    background: #fff; border-radius: 18px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.05);
+  }
+  .empty svg { stroke: #d1d5db; margin-bottom: 12px; }
+
+  /* BOTTOM NAV */
   .bottom-nav {
     position: fixed; bottom: 0; left: 0; right: 0;
     display: flex; background: #fff;
@@ -701,7 +543,6 @@
     padding: 6px 0 10px; cursor: pointer;
     color: #9ca3af; font-size: 10.5px; gap: 4px;
     font-weight: 600; text-decoration: none;
-    position: relative;
     transition: color .2s;
   }
   .nav-item .nav-icon {
@@ -714,18 +555,8 @@
   .nav-item.active { color: var(--wa-dark); }
   .nav-item.active .nav-icon { background: rgba(37,211,102,.12); }
   .nav-item.active svg { stroke: var(--wa-green); }
-  .nav-item .notif-badge {
-    position: absolute; top: 2px; right: 22%;
-    background: #DC2626; color: #fff;
-    font-size: 9px; font-weight: 800;
-    padding: 2px 5px; border-radius: 8px;
-    min-width: 16px; text-align: center;
-    display: none;
-    border: 2px solid #fff;
-  }
-  .nav-item .notif-badge.show { display: block; }
 
-  /* ============ TOAST ============ */
+  /* TOAST */
   .toast {
     position: fixed; left: 50%; bottom: 100px;
     transform: translateX(-50%) translateY(20px);
@@ -740,13 +571,6 @@
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast svg { stroke: var(--wa-green); flex-shrink: 0; }
-  .toast.streak {
-    background: linear-gradient(135deg, #FF4500, #FF6B35);
-    box-shadow: 0 8px 28px rgba(255,69,0,.5);
-  }
-  .toast.streak svg { stroke: #fff; }
-  .toast.error { background: #b91c1c; }
-  .toast.error svg { stroke: #fff; }
 </style>
 </head>
 <body>
@@ -764,19 +588,12 @@
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round">
         <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
       </svg>
-      <span class="notif-badge" id="burgerBadge"></span>
     </div>
     <div class="header-logo">
       <img src="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png" alt="">
       Affinity<span> Network</span>
     </div>
-    <div class="header-icon" onclick="go('notifications')" style="position:relative;">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-      </svg>
-      <span class="notif-badge" id="headerBadge" style="position:absolute;top:-4px;right:-4px;background:#DC2626;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:10px;min-width:18px;text-align:center;display:none;border:2px solid var(--wa-dark);"></span>
-    </div>
+    <div style="width:42px"></div>
   </header>
 
   <!-- MENU -->
@@ -786,7 +603,7 @@
       <img src="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png" alt="">
       <div class="menu-header-info">
         <div class="menu-header-name">Affinity<span> Network</span></div>
-        <div class="menu-header-sub">Gagne avec tes plantations</div>
+        <div class="menu-header-sub">Mon espace personnel</div>
       </div>
     </div>
 
@@ -799,7 +616,6 @@
       </div>
       Inviter un ami
     </div>
-
     <div class="menu-item recharge" onclick="go('recharge')">
       <div class="mi-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -808,7 +624,6 @@
       </div>
       Recharger mon solde
     </div>
-
     <div class="menu-item roue" onclick="go('roue')">
       <div class="mi-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -817,7 +632,6 @@
       </div>
       Roue de la fortune
     </div>
-
     <div class="menu-item missions" onclick="go('missions')">
       <div class="mi-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -829,7 +643,6 @@
       </div>
       Missions du mois
     </div>
-
     <div class="menu-item notifs" onclick="go('notifications')">
       <div class="mi-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -838,9 +651,7 @@
         </svg>
       </div>
       Notifications
-      <span class="menu-badge" id="menuNotifBadge"></span>
     </div>
-
     <div class="menu-item travail" onclick="go('travail')">
       <div class="mi-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -850,17 +661,14 @@
       </div>
       Travail
     </div>
-
     <div class="menu-item support" onclick="go('support')">
       <div class="mi-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
-          <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
         </svg>
       </div>
       Support
     </div>
-
     <div class="menu-item faq" onclick="go('faq')">
       <div class="mi-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -871,12 +679,10 @@
       </div>
       FAQ
     </div>
-
     <div class="menu-item entreprise" onclick="go('entreprise')">
       <div class="mi-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 21h18M5 21V7l7-4 7 4v14"/>
-          <path d="M10 9h4M10 13h4"/>
         </svg>
       </div>
       Notre entreprise
@@ -896,268 +702,211 @@
 
   <main class="content">
 
-    <!-- CARTE FUSIONNÉE PROFIL + SOLDE -->
-    <div class="profile-solde-card anim d1">
-      <div class="ps-top">
-        <div class="ps-avatar" id="psAvatar">?</div>
-        <div class="ps-info">
-          <div class="ps-hello">Bonjour 👋</div>
-          <div class="ps-name" id="userPseudo">...</div>
-        </div>
-        <div class="ps-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 21h18M5 21V7l7-4 7 4v14"/>
-          </svg>
-        </div>
-      </div>
-      <div class="ps-solde" onclick="go('moi')">
-        <div>
-          <div class="ps-label">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
-            </svg>
-            Solde disponible
-          </div>
-          <div class="ps-val" id="userSolde">0 F</div>
-        </div>
-        <div class="ps-arrow">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="9 18 15 12 9 6"/>
-          </svg>
-        </div>
-      </div>
-    </div>
-
-    <!-- CARROUSEL -->
-    <div class="section-title anim d2">
-      <div class="title-left">
-        <div class="title-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M7 20h10M10 20c5.5-2.5.8-6.4 3-10M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/>
-          </svg>
-        </div>
-        Plantations & cultures
-      </div>
-    </div>
-    <div class="carousel-wrap anim d2">
-      <div class="carousel" id="carousel">
-        <div class="plant-card">
-          <img src="https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=800" alt="Maïs">
-          <div class="overlay-grad"></div>
-          <span class="tag">+250 F / jour</span>
-          <div class="info">
-            <div class="nom">Maïs</div>
-            <div class="prix"><span class="dot-live"></span> Disponible maintenant</div>
-          </div>
-        </div>
-        <div class="plant-card">
-          <img src="https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=800" alt="Cacao">
-          <div class="overlay-grad"></div>
-          <span class="tag">+600 F / jour</span>
-          <div class="info">
-            <div class="nom">Cacao</div>
-            <div class="prix"><span class="dot-live"></span> Disponible maintenant</div>
-          </div>
-        </div>
-        <div class="plant-card">
-          <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800" alt="Café">
-          <div class="overlay-grad"></div>
-          <span class="tag">+1 250 F / jour</span>
-          <div class="info">
-            <div class="nom">Café</div>
-            <div class="prix"><span class="dot-live"></span> Disponible maintenant</div>
-          </div>
-        </div>
-        <div class="plant-card">
-          <img src="https://images.unsplash.com/photo-1591892150205-4a5d4a2a0e8c?w=800" alt="Palmier">
-          <div class="overlay-grad"></div>
-          <span class="tag">+1 700 F / jour</span>
-          <div class="info">
-            <div class="nom">Palmier à huile</div>
-            <div class="prix"><span class="dot-live"></span> Disponible maintenant</div>
-          </div>
-        </div>
-        <div class="plant-card">
-          <img src="https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=800" alt="Banane">
-          <div class="overlay-grad"></div>
-          <span class="tag">+2 200 F / jour</span>
-          <div class="info">
-            <div class="nom">Banane</div>
-            <div class="prix"><span class="dot-live"></span> Disponible maintenant</div>
-          </div>
-        </div>
-        <div class="plant-card">
-          <img src="https://images.unsplash.com/photo-1508747703725-719777637510?w=800" alt="Arachide">
-          <div class="overlay-grad"></div>
-          <span class="tag">+3 200 F / jour</span>
-          <div class="info">
-            <div class="nom">Arachide</div>
-            <div class="prix"><span class="dot-live"></span> Disponible maintenant</div>
-          </div>
-        </div>
-        <div class="plant-card">
-          <img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?w=800" alt="Riz">
-          <div class="overlay-grad"></div>
-          <span class="tag">+5 200 F / jour</span>
-          <div class="info">
-            <div class="nom">Riz</div>
-            <div class="prix"><span class="dot-live"></span> Disponible maintenant</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="dots" id="dots"></div>
-
-    <!-- TOP DU MOIS -->
-    <div class="section-title anim d3">
-      <div class="title-left">
-        <div class="title-icon gold">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-            <path d="M4 22h16"/>
-            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
-          </svg>
-        </div>
-        Top du mois
-      </div>
-    </div>
-    <div class="top-card anim d3" id="topCard">
-      <div class="tc-head">
-        <div class="tc-title">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-            <path d="M4 22h16"/>
-            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
-          </svg>
-          Classement des parrains
-        </div>
-        <div class="tc-jackpot" id="tcJackpot">100 000 F</div>
-      </div>
-      <div class="tc-body">
-        <div class="tc-icon">🏆</div>
-        <div class="tc-info">
-          <div class="tc-lbl">Ma position</div>
-          <div class="tc-val" id="tcPosition">—</div>
-          <div class="tc-sub" id="tcSub">—</div>
-        </div>
-      </div>
-      <button class="tc-btn" onclick="go('parrainage')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+    <!-- PROFIL -->
+    <div class="profile-card anim d1">
+      <div class="avatar" id="avatar">?</div>
+      <div class="profile-name" id="profileNom">...</div>
+      <div class="profile-pseudo" id="profilePseudo">@...</div>
+      <div class="profile-badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
         </svg>
-        Voir le classement complet
-      </button>
+        Membre actif
+      </div>
+    </div>
+
+    <!-- SOLDE -->
+    <div class="solde-card anim d1">
+      <div class="left">
+        <div class="label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+          </svg>
+          Solde disponible
+        </div>
+        <div class="montant" id="profileSolde">0 F</div>
+      </div>
+      <div class="icon-wallet">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+        </svg>
+      </div>
     </div>
 
     <!-- STREAK -->
-    <div class="section-title anim d4">
-      <div class="title-left">
-        <div class="title-icon fire">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
-          </svg>
-        </div>
-        Streak quotidien
-      </div>
-    </div>
-    <div class="streak-card anim d4" id="streakCard">
+    <div class="streak-card anim d2" id="streakCard">
       <div class="streak-icon">🔥</div>
       <div class="streak-body">
-        <div class="st-top">Série en cours</div>
+        <div class="st-top">Streak quotidien</div>
         <div class="st-val">
           <span id="streakVal">0</span>
           <small id="streakUnit">jour</small>
         </div>
-        <div class="st-sub" id="streakSub">Ouvre l'app chaque jour pour gagner</div>
+        <div class="st-sub" id="streakSub">Ouvre l'app chaque jour</div>
       </div>
-      <div class="streak-bonus" id="streakBonus">+25 F</div>
+      <div class="streak-record">
+        <span id="streakRecord">0</span>
+        <small>record</small>
+      </div>
     </div>
 
-    <!-- BOUTONS RAPIDES -->
-    <div class="quick-actions anim d5" style="margin-top:20px;">
-      <button class="qa-btn invite" onclick="go('parrainage')">
-        <div class="qa-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/>
-            <line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>
-          </svg>
-        </div>
-        <div class="qa-label">Inviter</div>
-        <div class="qa-sub">Gagne 20%</div>
-      </button>
-      <button class="qa-btn recharge" onclick="go('recharge')">
-        <div class="qa-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-          </svg>
-        </div>
-        <div class="qa-label">Recharger</div>
-        <div class="qa-sub">Ajouter du solde</div>
-      </button>
+    <!-- BONUS TOTAL -->
+    <div class="bonus-banner anim d2">
+      <div>
+        <div class="bb-lbl">Total bonus reçus</div>
+        <div class="bb-val" id="bonusTotal">0 F</div>
+      </div>
+      <div class="bb-ic">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+        </svg>
+      </div>
     </div>
 
-    <!-- MISSIONS -->
-    <div class="section-title anim d5">
+    <!-- STATS -->
+    <div class="section-title anim d3">
+      <div class="title-left">
+        <div class="title-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+        </div>
+        Mes statistiques
+      </div>
+    </div>
+    <div class="stats anim d3">
+      <div class="stat-card">
+        <div class="ico">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2"/>
+          </svg>
+        </div>
+        <div class="val" id="statTotal">0</div>
+        <div class="lbl">Activations</div>
+      </div>
+      <div class="stat-card">
+        <div class="ico">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div class="val" id="statActive">0</div>
+        <div class="lbl">En cours</div>
+      </div>
+      <div class="stat-card">
+        <div class="ico">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <div class="val" id="statGains">0 F</div>
+        <div class="lbl">Gains totaux</div>
+      </div>
+    </div>
+
+    <!-- INFORMATIONS -->
+    <div class="section-title anim d3">
+      <div class="title-left">
+        <div class="title-icon blue">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+          </svg>
+        </div>
+        Informations personnelles
+      </div>
+    </div>
+    <div class="info-list anim d3">
+      <div class="info-row">
+        <div class="ico">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+          </svg>
+        </div>
+        <div class="body">
+          <div class="k">Nom complet</div>
+          <div class="v" id="infoNom">—</div>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="ico">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <div class="body">
+          <div class="k">Pseudo</div>
+          <div class="v" id="infoPseudo">—</div>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="ico">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/>
+          </svg>
+        </div>
+        <div class="body">
+          <div class="k">Email</div>
+          <div class="v" id="infoEmail">—</div>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="ico">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <div class="body">
+          <div class="k">Membre depuis</div>
+          <div class="v" id="infoDate">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORIQUE BONUS -->
+    <div class="section-title anim d4">
       <div class="title-left">
         <div class="title-icon gold">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-            <path d="M4 22h16"/>
-            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+            <path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
           </svg>
         </div>
-        Missions du mois
+        Historique des bonus
       </div>
-      <span class="badge-count" id="missionsBadge">0/2</span>
+      <span class="badge-gold" id="bonusCount">0</span>
     </div>
-    <div class="missions-card anim d5" id="missionsCard">
-      <div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">Chargement des missions...</div>
+    <div id="bonusList" class="anim d4">
+      <div class="empty">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <div>Chargement...</div>
+      </div>
     </div>
 
-    <!-- 4 BOUTONS -->
-    <div class="actions anim d6">
-      <div class="action-btn home current" onclick="go('dashboard')">
-        <div class="icon-circle">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <polyline points="9 22 9 12 15 12 15 22"/>
+    <!-- HISTORIQUE ACTIVATIONS -->
+    <div class="section-title anim d5">
+      <div class="title-left">
+        <div class="title-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2"/>
           </svg>
         </div>
-        <div class="label">Accueil</div>
+        Historique des activations
       </div>
-      <div class="action-btn rank" onclick="go('classement')">
-        <div class="icon-circle">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-            <path d="M4 22h16"/>
-            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
-          </svg>
-        </div>
-        <div class="label">Classement</div>
-      </div>
-      <div class="action-btn ticket" onclick="go('ticket')">
-        <div class="icon-circle">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
-            <path d="M13 5v14"/>
-          </svg>
-        </div>
-        <div class="label">Ticket</div>
-      </div>
-      <div class="action-btn news" onclick="go('actualites')">
-        <div class="icon-circle">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/>
-            <path d="M18 14h-8M15 18h-5M10 6h8v4h-8V6Z"/>
-          </svg>
-        </div>
-        <div class="label">Actualités</div>
+      <span class="badge-count" id="histCount">0</span>
+    </div>
+    <div id="histList" class="anim d5">
+      <div class="empty">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <div>Chargement...</div>
       </div>
     </div>
+
   </main>
 
   <!-- BOTTOM NAV -->
@@ -1174,8 +923,7 @@
     <a href="retirer" class="nav-item">
       <div class="nav-icon">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="6" width="20" height="12" rx="2"/>
-          <circle cx="12" cy="12" r="2"/>
+          <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
           <path d="M6 12h.01M18 12h.01"/>
         </svg>
       </div>
@@ -1190,7 +938,7 @@
       </div>
       Travail
     </a>
-    <a href="moi" class="nav-item">
+    <a href="moi" class="nav-item active">
       <div class="nav-icon">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
@@ -1221,170 +969,181 @@
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.replace('inscription'); return; }
     CURRENT_USER = session.user;
-
-    await loadProfile();
-    await checkStreak();
-    await checkPaliers();
-    await checkBonusRecharges();
-    await loadMissions();
-    await loadTopCard();
-    await loadNotifBadge();
-    await loadProfile();
-
+    await Promise.all([loadProfile(), loadStreak(), loadBonus(), loadHistory(), loadBonusHistory()]);
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
-    setInterval(loadNotifBadge, 60000);
   })();
 
-  // ================= PROFIL =================
   async function loadProfile() {
-    const { data: profile } = await sb.from('profiles')
-      .select('nom, pseudo, solde').eq('id', CURRENT_USER.id).maybeSingle();
-    const nom = profile?.nom || '';
-    const pseudo = profile?.pseudo || CURRENT_USER.email.split('@')[0];
-    const solde = profile?.solde ?? 0;
-    const initiales = nom.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase() || '?';
-    document.getElementById('psAvatar').textContent = initiales;
-    document.getElementById('userPseudo').textContent = pseudo;
-    document.getElementById('userSolde').textContent = formatF(solde);
+    const { data } = await sb.from('profiles').select('nom, pseudo, email, solde, created_at').eq('id', CURRENT_USER.id).maybeSingle();
+    if (!data) return;
+    const nom = data.nom || 'Utilisateur';
+    const pseudo = data.pseudo || CURRENT_USER.email.split('@')[0];
+    const email = data.email || CURRENT_USER.email;
+    const solde = Number(data.solde ?? 0);
+    const dateInscription = data.created_at || CURRENT_USER.created_at;
+    const initiales = nom.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+    document.getElementById('avatar').textContent = initiales || '?';
+    document.getElementById('profileNom').textContent = nom;
+    document.getElementById('profilePseudo').textContent = '@' + pseudo;
+    document.getElementById('profileSolde').textContent = formatF(solde);
+    document.getElementById('infoNom').textContent = nom;
+    document.getElementById('infoPseudo').textContent = '@' + pseudo;
+    document.getElementById('infoEmail').textContent = email;
+    document.getElementById('infoDate').textContent = formatDate(dateInscription);
   }
 
-  // ================= STREAK =================
-  async function checkStreak() {
-    const { data, error } = await sb.rpc('check_streak');
-    if (error) { document.getElementById('streakVal').textContent = '0'; return; }
-    const streakVal = document.getElementById('streakVal');
-    const streakUnit = document.getElementById('streakUnit');
-    const streakSub = document.getElementById('streakSub');
-    const streakBonus = document.getElementById('streakBonus');
-    const streakCard = document.getElementById('streakCard');
-    streakVal.textContent = data.streak || 0;
-    streakUnit.textContent = (data.streak > 1) ? 'jours' : 'jour';
-    if (data.already) {
-      streakCard.classList.add('done');
-      streakSub.textContent = `Record : ${data.record} jour${data.record > 1 ? 's' : ''}`;
-      streakBonus.textContent = '✓ Fait';
-    } else if (data.success && data.bonus) {
-      streakSub.textContent = `Record : ${data.record} jour${data.record > 1 ? 's' : ''}`;
-      streakBonus.textContent = `+${data.bonus} F`;
-      showToast(`🔥 Streak jour ${data.streak} : +${data.bonus} F !`, 'streak');
-    } else {
-      streakSub.textContent = 'Reviens demain pour continuer';
-      streakBonus.textContent = '+25 F';
+  async function loadStreak() {
+    const { data, error } = await sb.from('streaks').select('*').eq('user_id', CURRENT_USER.id).maybeSingle();
+    if (error || !data) return;
+    document.getElementById('streakVal').textContent = data.streak_actuel || 0;
+    document.getElementById('streakUnit').textContent = (data.streak_actuel > 1) ? 'jours' : 'jour';
+    document.getElementById('streakRecord').textContent = data.record || 0;
+    if (data.dernier_check) {
+      const last = new Date(data.dernier_check);
+      const today = new Date();
+      const diffDays = Math.floor((today - last) / (1000 * 60 * 60 * 24));
+      if (diffDays === 0) document.getElementById('streakSub').textContent = '✓ Déjà validé aujourd\'hui';
+      else if (diffDays === 1) document.getElementById('streakSub').textContent = 'Reviens demain pour +25 F';
+      else document.getElementById('streakSub').textContent = 'Ouvre l\'app chaque jour';
     }
   }
 
-  async function checkPaliers() {
-    const { data, error } = await sb.rpc('verifier_paliers_parrainage');
-    if (error) return;
-    if (data?.bonus_recus > 0) {
-      setTimeout(() => showToast(`🏅 Palier atteint : +${formatF(data.bonus_recus)} !`, 'streak'), 1500);
-    }
+  async function loadBonus() {
+    const { data } = await sb.from('bonus_utilisateurs').select('montant').eq('user_id', CURRENT_USER.id);
+    const total = (data || []).reduce((sum, b) => sum + Number(b.montant || 0), 0);
+    document.getElementById('bonusTotal').textContent = formatF(total);
   }
 
-  async function checkBonusRecharges() {
-    const { data, error } = await sb.rpc('verifier_bonus_recharges_filleuls');
-    if (error) return;
-    if (data?.bonus > 0) {
-      setTimeout(() => showToast(`💰 ${data.filleuls} filleuls ont rechargé : +${formatF(data.bonus)} !`, 'streak'), 2500);
-    }
-  }
-
-  // ================= MISSIONS =================
-  async function loadMissions() {
-    const { data, error } = await sb.rpc('get_missions_mensuelles');
-    const card = document.getElementById('missionsCard');
-    if (error || !data) {
-      card.innerHTML = `<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">Impossible de charger les missions</div>`;
+  async function loadBonusHistory() {
+    const list = document.getElementById('bonusList');
+    const badge = document.getElementById('bonusCount');
+    const { data, error } = await sb.from('bonus_utilisateurs').select('*').eq('user_id', CURRENT_USER.id).order('created_at', { ascending: false }).limit(20);
+    if (error || !data || data.length === 0) {
+      badge.textContent = '0';
+      list.innerHTML = `<div class="empty">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+          <path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+        </svg>
+        <div>Aucun bonus pour le moment</div>
+      </div>`;
       return;
     }
-    const m1 = data.mission_3_plans;
-    const m2 = data.mission_10_amis;
-    const completeCount = (m1.complete ? 1 : 0) + (m2.complete ? 1 : 0);
-    document.getElementById('missionsBadge').textContent = `${completeCount}/2`;
-    card.innerHTML = `
-      ${renderMission('🎯', 'Active 3 plans ce mois', 'Objectif : 3 plans activés', m1)}
-      ${renderMission('👥', '10 amis actifs', '10 amis ayant activé ≥ 6 000 F', m2)}
-    `;
-  }
-
-  function renderMission(icone, titre, sous, m) {
-    const progress = Math.min(100, (m.progression / m.objectif) * 100);
-    const restant = Math.max(0, m.objectif - m.progression);
-    return `
-      <div class="mission-item ${m.complete ? 'complete' : ''}">
-        <div class="mission-top">
-          <div class="mission-info">
-            <div class="mi-title">${icone} ${titre}</div>
-            <div class="mi-sub">${sous}</div>
+    badge.textContent = data.length;
+    list.innerHTML = data.map((b, i) => {
+      const typeClass = getBonusClass(b.type);
+      const icone = getBonusIcon(b.type);
+      return `
+        <div class="bonus-item" style="animation-delay:${i * .04}s">
+          <div class="bi-icon ${typeClass}">${icone}</div>
+          <div class="bi-body">
+            <div class="bi-title">${escapeHtml(b.description || getBonusTitle(b.type))}</div>
+            <div class="bi-sub">${timeAgo(b.created_at)}</div>
           </div>
-          <div class="mission-reward">+${formatF(m.bonus)}</div>
+          <div class="bi-gain">+${formatF(b.montant)}</div>
         </div>
-        <div class="mission-progress-bar"><div class="mission-fill" style="width:${progress}%"></div></div>
-        <div class="mission-bottom">
-          <span class="mb-count">${m.progression} / ${m.objectif}</span>
-          ${m.complete ? '<span class="mb-status">✓ Terminé</span>' : `<span>${restant} restant${restant > 1 ? 's' : ''}</span>`}
+      `;
+    }).join('');
+  }
+
+  function getBonusClass(type) {
+    if (type === 'bienvenue') return 'bienvenue';
+    if (type === 'streak') return 'streak';
+    if (type && type.startsWith('palier_')) return 'palier';
+    if (type && type.includes('recharge')) return 'recharge';
+    if (type && type.startsWith('mission_')) return 'mission';
+    if (type === 'roue_fortune') return 'roue';
+    return 'bienvenue';
+  }
+  function getBonusIcon(type) {
+    if (type === 'bienvenue') return '🎁';
+    if (type === 'streak') return '🔥';
+    if (type && type.startsWith('palier_')) return '🏅';
+    if (type && type.includes('recharge')) return '💰';
+    if (type && type.startsWith('mission_')) return '🎯';
+    if (type === 'roue_fortune') return '🎡';
+    return '✨';
+  }
+  function getBonusTitle(type) {
+    if (type === 'bienvenue') return 'Bonus de bienvenue';
+    if (type === 'streak') return 'Streak quotidien';
+    if (type && type.startsWith('palier_')) return 'Palier de parrainage';
+    if (type && type.includes('recharge')) return 'Bonus filleuls rechargés';
+    if (type && type.startsWith('mission_')) return 'Mission accomplie';
+    if (type === 'roue_fortune') return 'Roue de la fortune';
+    return 'Bonus';
+  }
+
+  async function loadHistory() {
+    const list = document.getElementById('histList');
+    const countBadge = document.getElementById('histCount');
+    const { data, error } = await sb.from('activations_plans').select('*').eq('user_id', CURRENT_USER.id).order('created_at', { ascending: false });
+    if (error) { list.innerHTML = `<div class="empty"><div>Erreur de chargement</div></div>`; return; }
+    const items = data || [];
+    countBadge.textContent = items.length;
+    const total = items.length;
+    const actives = items.filter(a => a.statut === 'active').length;
+    const gainsTotal = items.reduce((sum, a) => sum + Number(a.gains_percus || 0), 0);
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statActive').textContent = actives;
+    document.getElementById('statGains').textContent = formatF(gainsTotal);
+    if (total === 0) {
+      list.innerHTML = `<div class="empty">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+          <rect x="2" y="7" width="20" height="14" rx="2"/>
+        </svg>
+        <div>Aucune activation pour le moment</div>
+        <div style="font-size:12px;margin-top:6px;opacity:.7">Va dans Lancer pour activer ton premier plan</div>
+      </div>`;
+      return;
+    }
+    list.innerHTML = items.map((a, i) => {
+      const isDone = a.statut === 'termine' || a.jours_credites >= a.duree_jours;
+      const statusLabel = isDone ? 'Terminé' : 'Actif';
+      const statusClass = isDone ? 'termine' : 'active';
+      const duree = a.duree_jours || 45;
+      return `
+        <div class="hist-item" style="animation-delay:${i * .04}s">
+          <div class="hist-img">${(a.plan_nom || '?')[0].toUpperCase()}</div>
+          <div class="hist-body">
+            <div class="hist-top">
+              <div class="hist-nom">${escapeHtml(a.plan_nom)}</div>
+              <div class="hist-status ${statusClass}">${statusLabel}</div>
+            </div>
+            <div class="hist-meta">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              </svg>
+              ${a.jours_credites}/${duree} j · ${formatDate(a.created_at, true)}
+            </div>
+          </div>
+          <div class="hist-gain">
+            +${formatF(a.gains_percus)}
+            <small>débité ${formatF(a.montant_activation)}</small>
+          </div>
         </div>
-      </div>
-    `;
+      `;
+    }).join('');
   }
 
-  // ================= TOP DU MOIS =================
-  async function loadTopCard() {
-    const { data, error } = await sb.rpc('get_mon_statut_top');
-    if (error || !data) return;
-    const card = document.getElementById('topCard');
-    const posEl = document.getElementById('tcPosition');
-    const subEl = document.getElementById('tcSub');
-    const jackpot = document.getElementById('tcJackpot');
-    jackpot.textContent = formatF(data.montant_total);
-    if (data.eligible) {
-      card.classList.add('eligible');
-      posEl.innerHTML = `Éligible <small>🎉</small>`;
-      subEl.textContent = `${data.filleuls_actifs} filleuls actifs · Objectif atteint !`;
-    } else {
-      posEl.innerHTML = `${data.filleuls_actifs} <small>/ ${data.seuil} filleuls</small>`;
-      const restant = Math.max(0, data.seuil - data.filleuls_actifs);
-      subEl.textContent = `Encore ${restant} filleul${restant > 1 ? 's' : ''} pour être éligible`;
-    }
+  function formatF(n) { return Math.round(Number(n)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F'; }
+  function formatDate(iso, short = false) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    const options = short ? { day: '2-digit', month: 'short', year: 'numeric' } : { day: '2-digit', month: 'long', year: 'numeric' };
+    return d.toLocaleDateString('fr-FR', options);
   }
-
-  // ================= BADGE NOTIFICATIONS =================
-  async function loadNotifBadge() {
-    const { data, error } = await sb.rpc('get_mes_notifications');
-    if (error || !data) return;
-    const badge1 = document.getElementById('burgerBadge');
-    const badge2 = document.getElementById('headerBadge');
-    const menuBadge = document.getElementById('menuNotifBadge');
-    const count = data.non_lues || 0;
-    if (count > 0) {
-      const label = count > 9 ? '9+' : count;
-      badge1.textContent = label;
-      badge1.classList.add('show');
-      badge2.textContent = label;
-      badge2.style.display = 'block';
-      menuBadge.textContent = count;
-      menuBadge.classList.add('show');
-    } else {
-      badge1.classList.remove('show');
-      badge2.style.display = 'none';
-      menuBadge.classList.remove('show');
-    }
+  function timeAgo(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+    if (diff < 60) return 'À l\'instant';
+    if (diff < 3600) return `Il y a ${Math.floor(diff/60)} min`;
+    if (diff < 86400) return `Il y a ${Math.floor(diff/3600)} h`;
+    if (diff < 604800) return `Il y a ${Math.floor(diff/86400)} j`;
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
   }
-
-  // ================= UTILITAIRES =================
-  function formatF(n) {
-    return Math.round(Number(n || 0)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F';
-  }
-  function showToast(msg, type = '') {
-    const t = document.getElementById('toast');
-    document.getElementById('toastText').textContent = msg;
-    t.className = 'toast show' + (type ? ' ' + type : '');
-    setTimeout(() => t.classList.remove('show'), 4000);
-  }
-  function toggleMenu() {
-    document.getElementById('menu').classList.toggle('open');
-    document.getElementById('overlay').classList.toggle('open');
-  }
+  function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function toggleMenu() { document.getElementById('menu').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
   function go(page) {
     const cleanPage = page.replace(/\.html$/, '');
     window.location.href = cleanPage;
@@ -1394,34 +1153,6 @@
     await sb.auth.signOut();
     window.location.replace('inscription');
   }
-
-  // ================= CARROUSEL =================
-  const carousel = document.getElementById('carousel');
-  const total = carousel.children.length;
-  const dotsContainer = document.getElementById('dots');
-  let index = 0;
-  for (let i = 0; i < total; i++) {
-    const dot = document.createElement('div');
-    dot.className = 'dot' + (i === 0 ? ' active' : '');
-    dotsContainer.appendChild(dot);
-  }
-  const dots = dotsContainer.children;
-  function goTo(i) {
-    index = (i + total) % total;
-    carousel.style.transform = `translateX(-${index * 100}%)`;
-    for (let d = 0; d < total; d++) dots[d].classList.toggle('active', d === index);
-  }
-  let auto = setInterval(() => goTo(index + 1), 3500);
-  let startX = 0;
-  carousel.addEventListener('touchstart', e => startX = e.touches[0].clientX);
-  carousel.addEventListener('touchend', e => {
-    const diff = startX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 50) {
-      clearInterval(auto);
-      goTo(index + (diff > 0 ? 1 : -1));
-      auto = setInterval(() => goTo(index + 1), 3500);
-    }
-  });
 </script>
 </body>
 </html>
