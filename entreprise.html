@@ -4,486 +4,127 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Affinity Network — Notre entreprise</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#075E54">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  :root {
-    --wa-green: #25D366;
-    --wa-dark: #128C7E;
-    --wa-deep: #075E54;
-    --alibaba: #FF6A00;
-    --white: #ffffff;
-    --bg: #f7f9f8;
-    --text: #1a1a1a;
-    --muted: #6b7280;
-    --border: #e5e7eb;
-  }
-  body {
-    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
-    background: var(--bg); color: var(--text);
-    padding-bottom: 80px; min-height: 100vh; overflow-x: hidden;
-  }
+  :root { --wa-green: #25D366; --wa-dark: #128C7E; --wa-deep: #075E54; --alibaba: #FF6A00; --gold: #FFB800; --bg: #f7f9f8; --text: #1a1a1a; --muted: #6b7280; --border: #e5e7eb; }
+  body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 80px; min-height: 100vh; overflow-x: hidden; -webkit-user-select: none; user-select: none; }
 
-  /* LOADER */
-  .loader {
-    position: fixed; inset: 0; z-index: 9999;
-    background: var(--wa-deep);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 22px;
-    transition: opacity .6s ease, visibility .6s ease;
-  }
+  .loader { position: fixed; inset: 0; z-index: 9999; background: var(--wa-deep); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; transition: opacity .6s ease, visibility .6s ease; }
   .loader.hidden { opacity: 0; visibility: hidden; }
-  .loader-logo {
-    font-size: 24px; font-weight: 700; color: #fff;
-    letter-spacing: 1px; animation: fadeUp .8s ease;
-  }
+  .loader-logo { font-size: 24px; font-weight: 700; color: #fff; }
   .loader-logo span { color: var(--wa-green); }
-  .spinner {
-    width: 46px; height: 46px;
-    border: 4px solid rgba(255,255,255,.2);
-    border-top-color: var(--wa-green);
-    border-radius: 50%;
-    animation: spin .9s linear infinite;
-  }
+  .spinner { width: 46px; height: 46px; border: 4px solid rgba(255,255,255,.2); border-top-color: var(--wa-green); border-radius: 50%; animation: spin .9s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes scaleIn {
-    from { opacity: 0; transform: scale(.94); }
-    to { opacity: 1; transform: scale(1); }
-  }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes scaleIn { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: scale(1); } }
   .anim { opacity: 0; animation: fadeInUp .7s ease forwards; }
-  .d1 { animation-delay: .1s; }
-  .d2 { animation-delay: .2s; }
-  .d3 { animation-delay: .3s; }
-  .d4 { animation-delay: .4s; }
+  .d1 { animation-delay: .1s; } .d2 { animation-delay: .2s; } .d3 { animation-delay: .3s; } .d4 { animation-delay: .4s; }
 
-  /* HEADER */
-  .header {
-    position: sticky; top: 0; z-index: 100;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 18px;
-    background: var(--wa-deep); color: #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,.15);
-  }
-  .burger {
-    cursor: pointer; width: 40px; height: 40px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 50%; background: rgba(255,255,255,.12);
-    transition: background .2s, transform .2s;
-  }
-  .burger:active { background: rgba(255,255,255,.25); transform: scale(.92); }
+  .header { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--wa-deep); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.15); padding-top: max(14px, env(safe-area-inset-top)); }
+  .burger { cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,.12); }
   .burger svg { stroke: #fff; }
   .logo { font-weight: 700; font-size: 18px; letter-spacing: .5px; }
   .logo span { color: var(--wa-green); }
 
-  /* MENU */
-  .menu {
-    position: fixed; top: 0; left: 0; height: 100%; width: 280px;
-    background: #fff; z-index: 200;
-    transform: translateX(-100%);
-    transition: transform .35s cubic-bezier(.4,0,.2,1);
-    box-shadow: 4px 0 20px rgba(0,0,0,.2);
-    padding-top: 18px;
-    display: flex; flex-direction: column;
-  }
+  .menu { position: fixed; top: 0; left: 0; height: 100%; width: 280px; background: #fff; z-index: 200; transform: translateX(-100%); transition: transform .35s cubic-bezier(.4,0,.2,1); box-shadow: 4px 0 20px rgba(0,0,0,.2); padding-top: 18px; display: flex; flex-direction: column; overflow-y: auto; padding-top: max(18px, env(safe-area-inset-top)); }
   .menu.open { transform: translateX(0); }
-  .menu-header {
-    padding: 8px 20px 18px; border-bottom: 1px solid #eee; margin-bottom: 10px;
-    font-weight: 700; color: var(--wa-deep); font-size: 17px;
-    display: flex; align-items: center; gap: 10px;
-  }
+  .menu-header { padding: 8px 20px 18px; border-bottom: 1px solid #eee; margin-bottom: 10px; font-weight: 700; color: var(--wa-deep); font-size: 17px; display: flex; align-items: center; gap: 10px; }
   .menu-header svg { stroke: var(--wa-green); }
-  .menu-item {
-    display: flex; align-items: center; gap: 14px;
-    padding: 15px 22px; cursor: pointer; font-size: 15px;
-    color: #333; transition: background .2s, padding-left .2s;
-  }
-  .menu-item:active { background: #e7f9ee; padding-left: 26px; }
+  .menu-item { display: flex; align-items: center; gap: 14px; padding: 15px 22px; cursor: pointer; font-size: 15px; color: #333; }
   .menu-item svg { stroke: var(--wa-dark); flex-shrink: 0; }
   .menu-item.active { background: #e7f9ee; color: var(--wa-deep); font-weight: 700; }
-  .menu-footer {
-    margin-top: auto; padding: 16px 20px 22px;
-    border-top: 1px solid #eee;
-  }
-  .btn-logout {
-    width: 100%; padding: 14px;
-    background: #fee2e2; color: #b91c1c;
-    border: none; border-radius: 12px;
-    font-size: 14px; font-weight: 700;
-    cursor: pointer; font-family: inherit;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-  }
+  .menu-footer { margin-top: auto; padding: 16px 20px 22px; border-top: 1px solid #eee; padding-bottom: max(22px, env(safe-area-inset-bottom)); }
+  .btn-logout { width: 100%; padding: 14px; background: #fee2e2; color: #b91c1c; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .btn-logout svg { stroke: #b91c1c; }
-  .overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,.45);
-    z-index: 150; opacity: 0; pointer-events: none; transition: opacity .3s;
-  }
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 150; opacity: 0; pointer-events: none; transition: opacity .3s; }
   .overlay.open { opacity: 1; pointer-events: auto; }
 
-  /* HERO */
-  .hero {
-    position: relative; height: 340px;
-    overflow: hidden;
-    display: flex; align-items: flex-end;
-    padding: 26px 20px;
-  }
-  .hero img {
-    position: absolute; inset: 0;
-    width: 100%; height: 100%; object-fit: cover;
-    animation: scaleIn 1.2s ease forwards;
-  }
-  .hero::after {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(to top, rgba(7,94,84,.95) 15%, rgba(7,94,84,.35) 55%, transparent);
-  }
-  .hero-content {
-    position: relative; z-index: 2; color: #fff;
-    animation: fadeInUp .8s ease .3s forwards; opacity: 0;
-  }
-  .hero-tag {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(255,106,0,.9);
-    font-size: 10px; font-weight: 800; letter-spacing: 1px;
-    padding: 5px 12px; border-radius: 20px;
-    text-transform: uppercase;
-    margin-bottom: 12px;
-  }
-  .hero-tag svg { stroke: #fff; }
-  .hero h1 {
-    font-size: 30px; font-weight: 800;
-    line-height: 1.2; margin-bottom: 8px;
-    text-shadow: 0 2px 12px rgba(0,0,0,.4);
-  }
-  .hero p {
-    font-size: 14px; opacity: .9;
-    line-height: 1.5; max-width: 340px;
-  }
-
-  /* CONTENU */
   .content { padding: 0 0 20px; }
 
-  /* CHAPITRE */
-  .chapter {
-    padding: 28px 20px 4px;
-  }
-  .chapter-tag {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(18,140,126,.1);
-    color: var(--wa-dark);
-    font-size: 10px; font-weight: 800; letter-spacing: 1px;
-    padding: 5px 12px; border-radius: 20px;
-    text-transform: uppercase;
-    margin-bottom: 12px;
-  }
+  .hero { position: relative; height: 340px; overflow: hidden; display: flex; align-items: flex-end; padding: 26px 20px; }
+  .hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; animation: scaleIn 1.2s ease forwards; }
+  .hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(7,94,84,.95) 15%, rgba(7,94,84,.35) 55%, transparent); }
+  .hero-content { position: relative; z-index: 2; color: #fff; animation: fadeInUp .8s ease .3s forwards; opacity: 0; }
+  .hero-tag { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,106,0,.9); font-size: 10px; font-weight: 800; letter-spacing: 1px; padding: 5px 12px; border-radius: 20px; text-transform: uppercase; margin-bottom: 12px; }
+  .hero-tag svg { stroke: #fff; }
+  .hero h1 { font-size: 30px; font-weight: 800; line-height: 1.2; margin-bottom: 8px; text-shadow: 0 2px 12px rgba(0,0,0,.4); }
+  .hero p { font-size: 14px; opacity: .9; line-height: 1.5; max-width: 340px; }
+
+  .chapter { padding: 28px 20px 4px; }
+  .chapter-tag { display: inline-flex; align-items: center; gap: 6px; background: rgba(18,140,126,.1); color: var(--wa-dark); font-size: 10px; font-weight: 800; letter-spacing: 1px; padding: 5px 12px; border-radius: 20px; text-transform: uppercase; margin-bottom: 12px; }
   .chapter-tag svg { stroke: var(--wa-dark); }
-  .chapter h2 {
-    font-size: 22px; font-weight: 800; color: var(--wa-deep);
-    line-height: 1.3; margin-bottom: 14px;
-  }
-  .chapter p {
-    font-size: 15px; line-height: 1.75;
-    color: #374151; margin-bottom: 14px;
-  }
-  .chapter p.lead {
-    font-size: 16px; color: #1f2937; font-weight: 500;
-  }
+  .chapter h2 { font-size: 22px; font-weight: 800; color: var(--wa-deep); line-height: 1.3; margin-bottom: 14px; }
+  .chapter p { font-size: 15px; line-height: 1.75; color: #374151; margin-bottom: 14px; }
+  .chapter p.lead { font-size: 16px; color: #1f2937; font-weight: 500; }
   .chapter strong { color: var(--wa-dark); font-weight: 700; }
 
-  /* PHOTO CHAPITRE */
-  .chapter-photo {
-    margin: 18px 0 18px;
-    border-radius: 18px; overflow: hidden;
-    box-shadow: 0 6px 24px rgba(0,0,0,.1);
-    position: relative;
-    animation: fadeInUp .7s ease forwards; opacity: 0;
-  }
-  .chapter-photo img {
-    width: 100%; height: 220px; object-fit: cover; display: block;
-    transition: transform .6s;
-  }
-  .chapter-photo:hover img { transform: scale(1.04); }
-  .chapter-photo .caption {
-    position: absolute; bottom: 0; left: 0; right: 0;
-    background: linear-gradient(to top, rgba(0,0,0,.85), transparent);
-    color: #fff; padding: 22px 16px 14px;
-    font-size: 12px; line-height: 1.5;
-    font-style: italic;
-    opacity: .95;
-  }
-  .chapter-photo .caption b {
-    font-style: normal; font-weight: 700;
-    display: block; margin-bottom: 2px; font-size: 13px;
-  }
+  .chapter-photo { margin: 18px 0; border-radius: 18px; overflow: hidden; box-shadow: 0 6px 24px rgba(0,0,0,.1); position: relative; animation: fadeInUp .7s ease forwards; opacity: 0; }
+  .chapter-photo img { width: 100%; height: 220px; object-fit: cover; display: block; }
+  .chapter-photo .caption { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,.85), transparent); color: #fff; padding: 22px 16px 14px; font-size: 12px; line-height: 1.5; font-style: italic; }
+  .chapter-photo .caption b { font-style: normal; font-weight: 700; display: block; margin-bottom: 2px; font-size: 13px; }
 
-  /* DOUBLE PHOTO */
-  .photo-grid {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 10px; margin: 18px 0;
-    animation: fadeInUp .7s ease forwards; opacity: 0;
-  }
-  .photo-grid .pg-item {
-    border-radius: 14px; overflow: hidden;
-    box-shadow: 0 4px 14px rgba(0,0,0,.08);
-    position: relative;
-    aspect-ratio: 1/1;
-  }
-  .photo-grid img {
-    width: 100%; height: 100%; object-fit: cover;
-    transition: transform .5s;
-  }
-  .photo-grid .pg-item:hover img { transform: scale(1.06); }
+  .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 18px 0; animation: fadeInUp .7s ease forwards; opacity: 0; }
+  .photo-grid .pg-item { border-radius: 14px; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,.08); position: relative; aspect-ratio: 1/1; }
+  .photo-grid img { width: 100%; height: 100%; object-fit: cover; }
 
-  /* CHIFFRES CLÉS */
-  .stats-band {
-    background: linear-gradient(135deg, var(--wa-deep), var(--wa-dark));
-    padding: 30px 20px;
-    margin: 26px 0;
-    border-radius: 0;
-    display: grid; grid-template-columns: repeat(2, 1fr);
-    gap: 22px 12px;
-    position: relative; overflow: hidden;
-  }
-  .stats-band::before {
-    content: ''; position: absolute; right: -50px; top: -50px;
-    width: 180px; height: 180px; border-radius: 50%;
-    background: rgba(37,211,102,.15);
-  }
-  .stats-band::after {
-    content: ''; position: absolute; left: -60px; bottom: -60px;
-    width: 160px; height: 160px; border-radius: 50%;
-    background: rgba(255,106,0,.1);
-  }
-  .stat-item {
-    text-align: center; color: #fff;
-    position: relative; z-index: 2;
-  }
-  .stat-item .num {
-    font-size: 32px; font-weight: 800;
-    color: var(--wa-green);
-    line-height: 1; margin-bottom: 6px;
-    letter-spacing: -.5px;
-  }
-  .stat-item .num small {
-    font-size: 18px; color: #fff; font-weight: 700;
-  }
-  .stat-item .lbl {
-    font-size: 11px; opacity: .85;
-    text-transform: uppercase; font-weight: 600;
-    letter-spacing: .8px; line-height: 1.4;
-  }
+  .stats-band { background: linear-gradient(135deg, var(--wa-deep), var(--wa-dark)); padding: 30px 20px; margin: 26px 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px 12px; position: relative; overflow: hidden; }
+  .stats-band::before { content: ''; position: absolute; right: -50px; top: -50px; width: 180px; height: 180px; border-radius: 50%; background: rgba(37,211,102,.15); }
+  .stats-band::after { content: ''; position: absolute; left: -60px; bottom: -60px; width: 160px; height: 160px; border-radius: 50%; background: rgba(255,106,0,.1); }
+  .stat-item { text-align: center; color: #fff; position: relative; z-index: 2; }
+  .stat-item .num { font-size: 32px; font-weight: 800; color: var(--wa-green); line-height: 1; margin-bottom: 6px; letter-spacing: -.5px; }
+  .stat-item .num small { font-size: 18px; color: #fff; font-weight: 700; }
+  .stat-item .lbl { font-size: 11px; opacity: .85; text-transform: uppercase; font-weight: 600; letter-spacing: .8px; line-height: 1.4; }
 
-  /* TIMELINE */
-  .timeline {
-    padding: 10px 20px 0;
-    position: relative;
-  }
-  .timeline::before {
-    content: ''; position: absolute;
-    left: 42px; top: 20px; bottom: 20px;
-    width: 2px;
-    background: linear-gradient(to bottom, var(--wa-green), var(--alibaba));
-    opacity: .35;
-  }
-  .tl-item {
-    display: flex; gap: 16px;
-    margin-bottom: 24px;
-    animation: fadeInUp .6s ease forwards; opacity: 0;
-    position: relative;
-  }
-  .tl-dot {
-    width: 46px; height: 46px; border-radius: 50%;
-    background: #fff; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 14px rgba(18,140,126,.2);
-    border: 3px solid var(--wa-green);
-    font-weight: 800; color: var(--wa-deep);
-    font-size: 12px; z-index: 2;
-    position: relative;
-  }
-  .tl-item:nth-child(even) .tl-dot {
-    border-color: var(--alibaba);
-  }
-  .tl-body {
-    flex: 1;
-    background: #fff; border-radius: 14px;
-    padding: 14px 16px;
-    box-shadow: 0 2px 10px rgba(0,0,0,.05);
-  }
-  .tl-body h3 {
-    font-size: 15px; font-weight: 800; color: var(--wa-deep);
-    margin-bottom: 4px;
-  }
-  .tl-body p {
-    font-size: 13px; line-height: 1.6;
-    color: #4b5563;
-    margin: 0;
-  }
+  .timeline { padding: 10px 20px 0; position: relative; }
+  .timeline::before { content: ''; position: absolute; left: 42px; top: 20px; bottom: 20px; width: 2px; background: linear-gradient(to bottom, var(--wa-green), var(--alibaba)); opacity: .35; }
+  .tl-item { display: flex; gap: 16px; margin-bottom: 24px; animation: fadeInUp .6s ease forwards; opacity: 0; position: relative; }
+  .tl-dot { width: 46px; height: 46px; border-radius: 50%; background: #fff; flex-shrink: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(18,140,126,.2); border: 3px solid var(--wa-green); font-weight: 800; color: var(--wa-deep); font-size: 12px; z-index: 2; position: relative; }
+  .tl-item:nth-child(even) .tl-dot { border-color: var(--alibaba); }
+  .tl-body { flex: 1; background: #fff; border-radius: 14px; padding: 14px 16px; box-shadow: 0 2px 10px rgba(0,0,0,.05); }
+  .tl-body h3 { font-size: 15px; font-weight: 800; color: var(--wa-deep); margin-bottom: 4px; }
+  .tl-body p { font-size: 13px; line-height: 1.6; color: #4b5563; margin: 0; }
 
-  /* VALEURS */
-  .values {
-    padding: 10px 20px 0;
-    display: flex; flex-direction: column; gap: 12px;
-  }
-  .value-card {
-    background: #fff; border-radius: 16px;
-    padding: 16px;
-    box-shadow: 0 2px 10px rgba(0,0,0,.05);
-    display: flex; gap: 14px; align-items: flex-start;
-    animation: fadeInUp .6s ease forwards; opacity: 0;
-    border-left: 4px solid var(--wa-green);
-  }
+  .values { padding: 10px 20px 0; display: flex; flex-direction: column; gap: 12px; }
+  .value-card { background: #fff; border-radius: 16px; padding: 16px; box-shadow: 0 2px 10px rgba(0,0,0,.05); display: flex; gap: 14px; align-items: flex-start; animation: fadeInUp .6s ease forwards; opacity: 0; border-left: 4px solid var(--wa-green); }
   .value-card:nth-child(2) { border-left-color: var(--alibaba); }
   .value-card:nth-child(3) { border-left-color: var(--wa-dark); }
   .value-card:nth-child(4) { border-left-color: var(--alibaba); }
-  .value-card .vc-icon {
-    width: 42px; height: 42px; border-radius: 12px;
-    background: rgba(18,140,126,.1);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  .value-card:nth-child(2) .vc-icon,
-  .value-card:nth-child(4) .vc-icon {
-    background: rgba(255,106,0,.12);
-  }
+  .value-card .vc-icon { width: 42px; height: 42px; border-radius: 12px; background: rgba(18,140,126,.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .value-card:nth-child(2) .vc-icon, .value-card:nth-child(4) .vc-icon { background: rgba(255,106,0,.12); }
   .value-card .vc-icon svg { stroke: var(--wa-dark); }
-  .value-card:nth-child(2) .vc-icon svg,
-  .value-card:nth-child(4) .vc-icon svg { stroke: var(--alibaba); }
+  .value-card:nth-child(2) .vc-icon svg, .value-card:nth-child(4) .vc-icon svg { stroke: var(--alibaba); }
   .value-card .vc-body { flex: 1; }
-  .value-card h3 {
-    font-size: 15px; font-weight: 800; color: var(--wa-deep);
-    margin-bottom: 4px;
-  }
-  .value-card p {
-    font-size: 13px; line-height: 1.6; color: #4b5563;
-  }
+  .value-card h3 { font-size: 15px; font-weight: 800; color: var(--wa-deep); margin-bottom: 4px; }
+  .value-card p { font-size: 13px; line-height: 1.6; color: #4b5563; }
 
-  /* CITATION */
-  .quote {
-    margin: 26px 20px;
-    background: linear-gradient(135deg, rgba(255,106,0,.08), rgba(18,140,126,.08));
-    border-radius: 18px;
-    padding: 26px 22px;
-    position: relative;
-    border-left: 5px solid var(--alibaba);
-    animation: fadeInUp .7s ease forwards; opacity: 0;
-  }
-  .quote::before {
-    content: '"'; position: absolute;
-    top: 6px; left: 18px;
-    font-size: 60px; line-height: 1;
-    color: var(--alibaba); opacity: .25;
-    font-family: Georgia, serif;
-    font-weight: 700;
-  }
-  .quote p {
-    font-size: 15px; line-height: 1.7;
-    color: var(--wa-deep); font-style: italic;
-    font-weight: 500;
-    margin-bottom: 12px;
-    position: relative; z-index: 2;
-  }
-  .quote .author {
-    display: flex; align-items: center; gap: 10px;
-    font-size: 13px; color: var(--muted);
-  }
-  .quote .author strong {
-    color: var(--wa-deep); font-weight: 800;
-    font-size: 14px;
-    display: block;
-  }
-  .quote .author span {
-    font-size: 11px; opacity: .8;
-  }
-  .quote .author .av {
-    width: 38px; height: 38px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
-    display: flex; align-items: center; justify-content: center;
-    color: #fff; font-weight: 800; font-size: 14px;
-    flex-shrink: 0;
-  }
+  .quote { margin: 26px 20px; background: linear-gradient(135deg, rgba(255,106,0,.08), rgba(18,140,126,.08)); border-radius: 18px; padding: 26px 22px; position: relative; border-left: 5px solid var(--alibaba); animation: fadeInUp .7s ease forwards; opacity: 0; }
+  .quote::before { content: '"'; position: absolute; top: 6px; left: 18px; font-size: 60px; line-height: 1; color: var(--alibaba); opacity: .25; font-family: Georgia, serif; font-weight: 700; }
+  .quote p { font-size: 15px; line-height: 1.7; color: var(--wa-deep); font-style: italic; font-weight: 500; margin-bottom: 12px; position: relative; z-index: 2; }
+  .quote .author { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+  .quote .author strong { color: var(--wa-deep); font-weight: 800; font-size: 14px; display: block; }
+  .quote .author span { font-size: 11px; opacity: .8; }
+  .quote .author .av { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 14px; flex-shrink: 0; }
 
-  /* CTA FINAL */
-  .cta-final {
-    margin: 30px 20px 20px;
-    background: linear-gradient(135deg, var(--wa-deep), var(--wa-dark));
-    color: #fff;
-    border-radius: 20px;
-    padding: 30px 22px;
-    text-align: center;
-    position: relative; overflow: hidden;
-    animation: fadeInUp .7s ease forwards; opacity: 0;
-  }
-  .cta-final::before {
-    content: ''; position: absolute;
-    width: 220px; height: 220px; border-radius: 50%;
-    background: rgba(37,211,102,.15);
-    top: -100px; right: -80px;
-  }
-  .cta-final::after {
-    content: ''; position: absolute;
-    width: 180px; height: 180px; border-radius: 50%;
-    background: rgba(255,106,0,.1);
-    bottom: -80px; left: -60px;
-  }
-  .cta-final .ico-big {
-    width: 60px; height: 60px; border-radius: 50%;
-    background: rgba(37,211,102,.2);
-    margin: 0 auto 14px;
-    display: flex; align-items: center; justify-content: center;
-    position: relative; z-index: 2;
-  }
+  .cta-final { margin: 30px 20px 20px; background: linear-gradient(135deg, var(--wa-deep), var(--wa-dark)); color: #fff; border-radius: 20px; padding: 30px 22px; text-align: center; position: relative; overflow: hidden; animation: fadeInUp .7s ease forwards; opacity: 0; }
+  .cta-final::before { content: ''; position: absolute; width: 220px; height: 220px; border-radius: 50%; background: rgba(37,211,102,.15); top: -100px; right: -80px; }
+  .cta-final::after { content: ''; position: absolute; width: 180px; height: 180px; border-radius: 50%; background: rgba(255,106,0,.1); bottom: -80px; left: -60px; }
+  .cta-final .ico-big { width: 60px; height: 60px; border-radius: 50%; background: rgba(37,211,102,.2); margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; position: relative; z-index: 2; }
   .cta-final .ico-big svg { stroke: var(--wa-green); }
-  .cta-final h2 {
-    font-size: 20px; font-weight: 800;
-    margin-bottom: 8px;
-    position: relative; z-index: 2;
-  }
-  .cta-final p {
-    font-size: 14px; opacity: .9;
-    line-height: 1.6; margin-bottom: 20px;
-    position: relative; z-index: 2;
-  }
-  .cta-btn {
-    background: var(--wa-green); color: #fff;
-    border: none; padding: 14px 32px;
-    border-radius: 30px;
-    font-size: 14px; font-weight: 800;
-    cursor: pointer; font-family: inherit;
-    box-shadow: 0 6px 18px rgba(37,211,102,.4);
-    transition: transform .15s, box-shadow .2s;
-    position: relative; z-index: 2;
-    display: inline-flex; align-items: center; gap: 8px;
-  }
+  .cta-final h2 { font-size: 20px; font-weight: 800; margin-bottom: 8px; position: relative; z-index: 2; }
+  .cta-final p { font-size: 14px; opacity: .9; line-height: 1.6; margin-bottom: 20px; position: relative; z-index: 2; }
+  .cta-btn { background: var(--wa-green); color: #fff; border: none; padding: 14px 32px; border-radius: 30px; font-size: 14px; font-weight: 800; cursor: pointer; font-family: inherit; box-shadow: 0 6px 18px rgba(37,211,102,.4); position: relative; z-index: 2; display: inline-flex; align-items: center; gap: 8px; }
   .cta-btn:active { transform: scale(.96); }
   .cta-btn svg { stroke: #fff; }
 
-  /* BOTTOM NAV */
-  .bottom-nav {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    display: flex; background: #fff;
-    border-top: 1px solid #e5e7eb;
-    box-shadow: 0 -2px 12px rgba(0,0,0,.06);
-    z-index: 100;
-  }
-  .nav-item {
-    flex: 1; display: flex; flex-direction: column; align-items: center;
-    padding: 9px 0 10px; cursor: pointer;
-    color: #9ca3af; font-size: 11px; gap: 4px;
-    transition: color .2s, transform .2s; font-weight: 500;
-    text-decoration: none;
-  }
-  .nav-item svg { stroke: #9ca3af; transition: stroke .2s, transform .2s; }
-  .nav-item:active { transform: scale(.92); }
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: #fff; border-top: 1px solid #e5e7eb; box-shadow: 0 -2px 12px rgba(0,0,0,.06); z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 9px 0 10px; cursor: pointer; color: #9ca3af; font-size: 11px; gap: 4px; text-decoration: none; font-weight: 500; }
+  .nav-item svg { stroke: #9ca3af; }
   .nav-item.active { color: var(--wa-dark); font-weight: 700; }
-  .nav-item.active svg { stroke: var(--wa-green); transform: translateY(-1px); }
+  .nav-item.active svg { stroke: var(--wa-green); }
 </style>
 </head>
 <body>
@@ -496,9 +137,7 @@
   <header class="header">
     <div class="burger" onclick="toggleMenu()">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round">
-        <line x1="3" y1="6" x2="21" y2="6"/>
-        <line x1="3" y1="12" x2="21" y2="12"/>
-        <line x1="3" y1="18" x2="21" y2="18"/>
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
       </svg>
     </div>
     <div class="logo">Affinity<span> Network</span></div>
@@ -509,35 +148,60 @@
   <nav class="menu" id="menu">
     <div class="menu-header">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01"/>
+        <path d="M3 21h18M5 21V7l7-4 7 4v14"/>
       </svg>
       Affinity Network
     </div>
+    <div class="menu-item" onclick="go('parrainage.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+      </svg>
+      Inviter un ami
+    </div>
+    <div class="menu-item" onclick="go('recharge.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Recharger mon solde
+    </div>
+    <div class="menu-item" onclick="go('roue.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+      </svg>
+      Roue de la fortune
+    </div>
+    <div class="menu-item" onclick="go('missions.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+        <path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+      </svg>
+      Missions
+    </div>
+    <div class="menu-item" onclick="go('notifications.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      Notifications
+    </div>
     <div class="menu-item" onclick="go('travail.html')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+        <rect x="2" y="7" width="20" height="14" rx="2"/>
       </svg>
       Travail
     </div>
     <div class="menu-item" onclick="go('support.html')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+        <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
       </svg>
       Support
     </div>
     <div class="menu-item" onclick="go('faq.html')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        <circle cx="12" cy="12" r="10"/>
       </svg>
       FAQ
     </div>
-    <div class="menu-item active" onclick="go('entreprise.html')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <path d="M3 21h18M5 21V7l7-4 7 4v14M10 9h4M10 13h4"/>
-      </svg>
-      Notre entreprise
-    </div>
-
     <div class="menu-footer">
       <button class="btn-logout" onclick="logout()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -551,10 +215,8 @@
   </nav>
 
   <main class="content">
-
-    <!-- HERO -->
     <div class="hero">
-      <img src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=800" alt="Champs agricoles">
+      <img src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=800" alt="Champs">
       <div class="hero-content">
         <div class="hero-tag">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -567,7 +229,6 @@
       </div>
     </div>
 
-    <!-- CHAPITRE 1 — LES ORIGINES -->
     <div class="chapter anim d1">
       <div class="chapter-tag">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -576,26 +237,16 @@
         Chapitre 01
       </div>
       <h2>Une graine plantée dans la terre rouge</h2>
-      <p class="lead">
-        Tout a commencé dans un petit village des hauts plateaux de l'Ouest, là où la terre rouge s'accroche aux mains et où l'odeur du café fraîchement récolté embaume l'air dès l'aube.
-      </p>
-      <p>
-        En <strong>2019</strong>, <strong>Emmanuel Nkolo</strong>, fils d'agriculteur et ingénieur agronome fraîchement diplômé, retourne dans son village natal après cinq années passées en ville. Ce qu'il découvre le bouleverse : les producteurs de cacao vendent leur récolte à des prix dérisoires, sans connaître la valeur réelle de leur travail sur les marchés mondiaux.
-      </p>
-      <p>
-        Sa mère, <strong>Mama Jeanne</strong>, cultive trois hectares de cacao depuis plus de trente ans. Elle ne sait ni lire ni écrire, mais elle connaît chaque arbre par son nom. Un soir, elle lui dit une phrase qui allait tout changer : <em>« Le cacao que je récolte traverse l'océan pour devenir du chocolat en Europe. Et moi, je n'ai jamais goûté à ce chocolat. »</em>
-      </p>
+      <p class="lead">Tout a commencé dans un petit village des hauts plateaux de l'Ouest, là où la terre rouge s'accroche aux mains et où l'odeur du café fraîchement récolté embaume l'air dès l'aube.</p>
+      <p>En <strong>2019</strong>, <strong>Emmanuel Nkolo</strong>, fils d'agriculteur et ingénieur agronome fraîchement diplômé, retourne dans son village natal après cinq années passées en ville. Ce qu'il découvre le bouleverse : les producteurs de cacao vendent leur récolte à des prix dérisoires, sans connaître la valeur réelle de leur travail.</p>
+      <p>Sa mère, <strong>Mama Jeanne</strong>, cultive trois hectares de cacao depuis plus de trente ans. Un soir, elle lui dit une phrase qui allait tout changer : <em>« Le cacao que je récolte traverse l'océan pour devenir du chocolat en Europe. Et moi, je n'ai jamais goûté à ce chocolat. »</em></p>
     </div>
 
     <div class="chapter-photo anim d1">
       <img src="https://images.unsplash.com/photo-1611071522052-12c55ab32e4d?w=800" alt="Champ de cacao">
-      <div class="caption">
-        <b>Hautes terres de l'Ouest — Octobre 2019</b>
-        Les premières plantations partenaires d'Affinity Network, à 1 400 mètres d'altitude.
-      </div>
+      <div class="caption"><b>Hautes terres de l'Ouest — Octobre 2019</b>Les premières plantations partenaires d'Affinity Network.</div>
     </div>
 
-    <!-- CHAPITRE 2 — LA VISION -->
     <div class="chapter anim d1">
       <div class="chapter-tag">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -604,24 +255,15 @@
         Chapitre 02
       </div>
       <h2>La vision d'un réseau transparent</h2>
-      <p>
-        Pendant six mois, Emmanuel sillonne les villages. Il s'assoit sous les arbres à palabres, écoute les anciens, observe, note. Il comprend que le problème n'est pas la production — l'Afrique produit 70% du cacao mondial — mais l'<strong>accès à l'information</strong> et la <strong>répartition des revenus</strong>.
-      </p>
-      <p>
-        Il imagine alors une idée folle : créer une plateforme qui permettrait à chaque acteur de la chaîne agricole — du producteur au consommateur — de <strong>participer aux bénéfices</strong> de la filière. Une plateforme où le travail est reconnu, où chaque tâche accomplie est récompensée, où l'argent circule dans les deux sens.
-      </p>
+      <p>Pendant six mois, Emmanuel sillonne les villages. Il comprend que le problème n'est pas la production — l'Afrique produit 70% du cacao mondial — mais l'<strong>accès à l'information</strong> et la <strong>répartition des revenus</strong>.</p>
+      <p>Il imagine alors une idée folle : créer une plateforme qui permettrait à chaque acteur de la chaîne agricole — du producteur au consommateur — de <strong>participer aux bénéfices</strong> de la filière.</p>
     </div>
 
     <div class="photo-grid anim d1">
-      <div class="pg-item">
-        <img src="https://images.unsplash.com/photo-1595855759920-86582396756c?w=500" alt="Réunion villageoise">
-      </div>
-      <div class="pg-item">
-        <img src="https://images.unsplash.com/photo-1595855759920-86582396756c?w=500" alt="Réunion villageoise">
-      </div>
+      <div class="pg-item"><img src="https://images.unsplash.com/photo-1595855759920-86582396756c?w=500" alt="Réunion"></div>
+      <div class="pg-item"><img src="https://images.unsplash.com/photo-1595855759920-86582396756c?w=500" alt="Réunion"></div>
     </div>
 
-    <!-- CHAPITRE 3 — LA CRÉATION -->
     <div class="chapter anim d1">
       <div class="chapter-tag">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -630,43 +272,22 @@
         Chapitre 03
       </div>
       <h2>Affinity Network voit le jour</h2>
-      <p>
-        Le <strong>15 janvier 2021</strong>, à Douala, dans un petit bureau de deux pièces au-dessus d'un marché de fruits, <strong>Affinity Network</strong> est officiellement enregistrée. Ils sont cinq à croire au projet : Emmanuel, sa sœur cadette <strong>Ariane</strong> (experte en marketing digital), un développeur autodidacte nommé <strong>Kevin</strong>, un ancien trader de matières premières, et <strong>Mama Jeanne</strong>, qui devient la première « marraine » de la communauté.
-      </p>
-      <p>
-        Le nom vient d'une intuition d'Ariane : <em>« On ne cherche pas à recruter des utilisateurs. On cherche à créer une affinité, une connexion naturelle entre les gens et la terre. Le gain viendra de cette affinité. »</em>
-      </p>
+      <p>Le <strong>15 janvier 2021</strong>, à Douala, dans un petit bureau de deux pièces, <strong>Affinity Network</strong> est officiellement enregistrée. Ils sont cinq à croire au projet : Emmanuel, sa sœur cadette <strong>Ariane</strong>, un développeur autodidacte nommé <strong>Kevin</strong>, un ancien trader, et <strong>Mama Jeanne</strong>.</p>
+      <p>Le nom vient d'une intuition d'Ariane : <em>« On ne cherche pas à recruter des utilisateurs. On cherche à créer une affinité, une connexion naturelle entre les gens et la terre. »</em></p>
     </div>
 
     <div class="chapter-photo anim d1">
-      <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800" alt="Équipe fondatrice">
-      <div class="caption">
-        <b>Douala — Janvier 2021</b>
-        L'équipe fondatrice dans le premier bureau d'Affinity Network, avant le premier lancement.
-      </div>
+      <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800" alt="Équipe">
+      <div class="caption"><b>Douala — Janvier 2021</b>L'équipe fondatrice avant le premier lancement.</div>
     </div>
 
-    <!-- CHIFFRES CLÉS -->
     <div class="stats-band anim d1">
-      <div class="stat-item">
-        <div class="num">7<small>+</small></div>
-        <div class="lbl">Cultures<br>partenaires</div>
-      </div>
-      <div class="stat-item">
-        <div class="num">12<small>k+</small></div>
-        <div class="lbl">Membres<br>actifs</div>
-      </div>
-      <div class="stat-item">
-        <div class="num">8</div>
-        <div class="lbl">Régions<br>couvertes</div>
-      </div>
-      <div class="stat-item">
-        <div class="num">450<small>M F</small></div>
-        <div class="lbl">FCFA<br>redistribués</div>
-      </div>
+      <div class="stat-item"><div class="num">7<small>+</small></div><div class="lbl">Cultures<br>partenaires</div></div>
+      <div class="stat-item"><div class="num">12<small>k+</small></div><div class="lbl">Membres<br>actifs</div></div>
+      <div class="stat-item"><div class="num">8</div><div class="lbl">Régions<br>couvertes</div></div>
+      <div class="stat-item"><div class="num">450<small>M F</small></div><div class="lbl">FCFA<br>redistribués</div></div>
     </div>
 
-    <!-- CHAPITRE 4 — LA CROISSANCE -->
     <div class="chapter anim d1">
       <div class="chapter-tag">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -675,23 +296,15 @@
         Chapitre 04
       </div>
       <h2>La croissance d'un mouvement</h2>
-      <p>
-        Les premiers mois sont difficiles. Beaucoup doutent. <em>« Encore un projet qui va disparaître »</em>, entendent-ils. Mais la communauté grandit. D'un village, on passe à trois. Puis à dix. Les premiers retraits Mobile Money sont effectués en <strong>mars 2021</strong> : 25 000 FCFA pour Mama Jeanne. Ce jour-là, elle pleure.
-      </p>
-      <p>
-        En 2022, Affinity Network franchit le cap des <strong>1 000 membres actifs</strong>. En 2023, <strong>5 000</strong>. En 2024, l'entreprise s'étend au-delà des frontières : Gabon, Tchad, République Centrafricaine. Aujourd'hui, plus de <strong>12 000 membres</strong> font vivre le réseau chaque jour.
-      </p>
+      <p>Les premiers mois sont difficiles. Mais la communauté grandit. Les premiers retraits Mobile Money sont effectués en <strong>mars 2021</strong> : 25 000 FCFA pour Mama Jeanne. Ce jour-là, elle pleure.</p>
+      <p>En 2022, <strong>1 000 membres</strong>. En 2023, <strong>5 000</strong>. En 2024, l'entreprise s'étend au Gabon, Tchad, RCA. Aujourd'hui, plus de <strong>12 000 membres</strong>.</p>
     </div>
 
     <div class="chapter-photo anim d1">
-      <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800" alt="Champ en croissance">
-      <div class="caption">
-        <b>Région du Littoral — 2024</b>
-        Une plantation de palmiers à huile gérée par une coopérative partenaire d'Affinity Network.
-      </div>
+      <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800" alt="Plantation">
+      <div class="caption"><b>Région du Littoral — 2024</b>Une plantation de palmiers à huile gérée par une coopérative partenaire.</div>
     </div>
 
-    <!-- CHAPITRE 5 — AUJOURD'HUI -->
     <div class="chapter anim d1">
       <div class="chapter-tag">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -700,61 +313,19 @@
         Chapitre 05
       </div>
       <h2>Ce que nous sommes devenus</h2>
-      <p>
-        Affinity Network n'est plus seulement une plateforme. C'est un <strong>écosystème</strong> qui relie agriculteurs, distributeurs, consommateurs et investisseurs autour d'une même conviction : <strong>la terre mérite d'être valorisée, et ceux qui la travaillent méritent d'en vivre dignement</strong>.
-      </p>
-      <p>
-        Chaque membre de la communauté peut aujourd'hui activer des plantations virtuelles, participer à la chaîne de valeur, et percevoir des gains réels reversés chaque jour. Derrière chaque activation se trouve un vrai producteur, un vrai champ, une vraie histoire.
-      </p>
+      <p>Affinity Network n'est plus seulement une plateforme. C'est un <strong>écosystème</strong> qui relie agriculteurs, distributeurs, consommateurs et investisseurs autour d'une même conviction : <strong>la terre mérite d'être valorisée, et ceux qui la travaillent méritent d'en vivre dignement</strong>.</p>
+      <p>Chaque membre peut aujourd'hui activer des plantations virtuelles, participer à la chaîne de valeur, et percevoir des gains réels reversés chaque jour.</p>
     </div>
 
-    <!-- TIMELINE -->
     <div class="timeline">
-      <div class="tl-item anim">
-        <div class="tl-dot">'19</div>
-        <div class="tl-body">
-          <h3>Le retour aux sources</h3>
-          <p>Emmanuel rentre au village et découvre l'injustice de la filière cacao.</p>
-        </div>
-      </div>
-      <div class="tl-item anim">
-        <div class="tl-dot">'21</div>
-        <div class="tl-body">
-          <h3>Naissance d'Affinity Network</h3>
-          <p>Création officielle à Douala avec 5 fondateurs et une conviction.</p>
-        </div>
-      </div>
-      <div class="tl-item anim">
-        <div class="tl-dot">'22</div>
-        <div class="tl-body">
-          <h3>1 000 membres</h3>
-          <p>Le cap symbolique est franchi, avec des retraits quotidiens en Mobile Money.</p>
-        </div>
-      </div>
-      <div class="tl-item anim">
-        <div class="tl-dot">'23</div>
-        <div class="tl-body">
-          <h3>5 000 membres</h3>
-          <p>Ouverture de 3 nouvelles régions et partenariat avec 12 coopératives.</p>
-        </div>
-      </div>
-      <div class="tl-item anim">
-        <div class="tl-dot">'24</div>
-        <div class="tl-body">
-          <h3>Expansion régionale</h3>
-          <p>L'aventure dépasse les frontières : Gabon, Tchad, Centrafrique.</p>
-        </div>
-      </div>
-      <div class="tl-item anim">
-        <div class="tl-dot">'26</div>
-        <div class="tl-body">
-          <h3>Aujourd'hui</h3>
-          <p>Plus de 12 000 membres et 450 millions de FCFA redistribués.</p>
-        </div>
-      </div>
+      <div class="tl-item anim"><div class="tl-dot">'19</div><div class="tl-body"><h3>Le retour aux sources</h3><p>Emmanuel rentre au village et découvre l'injustice de la filière cacao.</p></div></div>
+      <div class="tl-item anim"><div class="tl-dot">'21</div><div class="tl-body"><h3>Naissance d'Affinity Network</h3><p>Création officielle à Douala avec 5 fondateurs.</p></div></div>
+      <div class="tl-item anim"><div class="tl-dot">'22</div><div class="tl-body"><h3>1 000 membres</h3><p>Le cap symbolique est franchi avec des retraits quotidiens en Mobile Money.</p></div></div>
+      <div class="tl-item anim"><div class="tl-dot">'23</div><div class="tl-body"><h3>5 000 membres</h3><p>Ouverture de 3 nouvelles régions et 12 coopératives partenaires.</p></div></div>
+      <div class="tl-item anim"><div class="tl-dot">'24</div><div class="tl-body"><h3>Expansion régionale</h3><p>L'aventure dépasse les frontières : Gabon, Tchad, Centrafrique.</p></div></div>
+      <div class="tl-item anim"><div class="tl-dot">'26</div><div class="tl-body"><h3>Aujourd'hui</h3><p>Plus de 12 000 membres et 450 millions de FCFA redistribués.</p></div></div>
     </div>
 
-    <!-- VALEURS -->
     <div class="chapter anim d1" style="padding-bottom:0">
       <div class="chapter-tag">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -772,10 +343,7 @@
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           </svg>
         </div>
-        <div class="vc-body">
-          <h3>Transparence totale</h3>
-          <p>Chaque franc qui entre et sort est tracé. Pas de zone d'ombre, pas de promesse en l'air.</p>
-        </div>
+        <div class="vc-body"><h3>Transparence totale</h3><p>Chaque franc qui entre et sort est tracé. Pas de zone d'ombre.</p></div>
       </div>
       <div class="value-card">
         <div class="vc-icon">
@@ -783,10 +351,7 @@
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
           </svg>
         </div>
-        <div class="vc-body">
-          <h3>Communauté d'abord</h3>
-          <p>Nous ne construisons pas pour les gens, nous construisons avec eux. Chaque membre compte.</p>
-        </div>
+        <div class="vc-body"><h3>Communauté d'abord</h3><p>Nous construisons avec les gens, pas pour eux. Chaque membre compte.</p></div>
       </div>
       <div class="value-card">
         <div class="vc-icon">
@@ -794,10 +359,7 @@
             <path d="M7 20h10M10 20c5.5-2.5.8-6.4 3-10M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/>
           </svg>
         </div>
-        <div class="vc-body">
-          <h3>Respect de la terre</h3>
-          <p>Nos partenaires agricoles pratiquent une culture durable, respectueuse des sols et des saisons.</p>
-        </div>
+        <div class="vc-body"><h3>Respect de la terre</h3><p>Nos partenaires pratiquent une culture durable et respectueuse.</p></div>
       </div>
       <div class="value-card">
         <div class="vc-icon">
@@ -805,49 +367,34 @@
             <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
           </svg>
         </div>
-        <div class="vc-body">
-          <h3>Croissance partagée</h3>
-          <p>Quand l'entreprise grandit, tous ceux qui l'ont fait grandir en bénéficient. C'est notre promesse.</p>
-        </div>
+        <div class="vc-body"><h3>Croissance partagée</h3><p>Quand l'entreprise grandit, tous ceux qui l'ont fait grandir en bénéficient.</p></div>
       </div>
     </div>
 
-    <!-- CITATION -->
     <div class="quote anim">
-      <p>
-        Nous ne vendons pas du rêve. Nous construisons une réalité où chaque tâche accomplie sur cette plateforme a un sens, un impact, une récompense. L'Afrique n'a pas besoin de charité — elle a besoin d'opportunités équitables.
-      </p>
+      <p>Nous ne vendons pas du rêve. Nous construisons une réalité où chaque tâche accomplie sur cette plateforme a un sens, un impact, une récompense. L'Afrique n'a pas besoin de charité — elle a besoin d'opportunités équitables.</p>
       <div class="author">
         <div class="av">EN</div>
-        <div>
-          <strong>Emmanuel Nkolo</strong>
-          <span>Fondateur & CEO d'Affinity Network</span>
-        </div>
+        <div><strong>Emmanuel Nkolo</strong><span>Fondateur & CEO</span></div>
       </div>
     </div>
 
-    <!-- CHAPITRE 6 — DEMAIN -->
     <div class="chapter anim d1">
       <div class="chapter-tag">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2v6M12 22v-4M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M22 12h-4M4.93 19.07l4.24-4.24M14.83 9.17l4.24-4.24"/>
+          <path d="M12 2v6M12 22v-4M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M22 12h-4"/>
         </svg>
         Demain
       </div>
       <h2>La suite de l'histoire s'écrit avec toi</h2>
-      <p>
-        Notre ambition pour les cinq prochaines années : toucher <strong>100 000 membres</strong> à travers l'Afrique de l'Ouest et Centrale, ouvrir des bureaux dans 5 pays, et reverser plus de <strong>5 milliards de FCFA</strong> aux communautés agricoles.
-      </p>
-      <p>
-        Mais surtout, nous voulons que dans chaque village, il y ait au moins une personne qui puisse dire : <em>« Grâce à Affinity Network, j'ai pu scolariser mes enfants, construire ma maison, et vivre de ma terre avec dignité. »</em>
-      </p>
+      <p>Notre ambition pour les 5 prochaines années : toucher <strong>100 000 membres</strong> en Afrique, ouvrir des bureaux dans 5 pays, et reverser plus de <strong>5 milliards de FCFA</strong> aux communautés agricoles.</p>
+      <p>Mais surtout, nous voulons que dans chaque village, il y ait au moins une personne qui puisse dire : <em>« Grâce à Affinity Network, j'ai pu scolariser mes enfants, construire ma maison, et vivre de ma terre avec dignité. »</em></p>
     </div>
 
-    <!-- CTA FINAL -->
     <div class="cta-final anim">
       <div class="ico-big">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2v6M12 22v-4M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M22 12h-4M4.93 19.07l4.24-4.24M14.83 9.17l4.24-4.24"/>
+          <path d="M12 2v6M12 22v-4M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M22 12h-4"/>
         </svg>
       </div>
       <h2>Rejoins le mouvement</h2>
@@ -855,31 +402,28 @@
       <button class="cta-btn" onclick="go('travail.html')">
         Commencer à gagner
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="5" y1="12" x2="19" y2="12"/>
-          <polyline points="12 5 19 12 12 19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
         </svg>
       </button>
     </div>
-
   </main>
 
   <nav class="bottom-nav">
-    <a href="dashboard.html" class="nav-item">
+    <a href="lancer.html" class="nav-item">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
-        <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
       </svg>
       Lancer
     </a>
     <a href="retirer.html" class="nav-item">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/>
+        <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
       </svg>
       Retirer
     </a>
     <a href="travail.html" class="nav-item">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+        <rect x="2" y="7" width="20" height="14" rx="2"/>
       </svg>
       Travail
     </a>
@@ -892,51 +436,25 @@
   </nav>
 
 <script>
-  // ================= SUPABASE =================
   const SUPABASE_URL = 'https://ydwjvvlcnqsftciedpqm.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2p2dmxjbnFzZnRjaWVkcHFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMDQyNDAsImV4cCI6MjEwNTY4MDI0MH0.4uQwBGedMBjUZErd8lUM5YfA26gw96RvHdo_J-3PZCY';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-  // ================= INIT =================
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+
   (async function init() {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) {
-      window.location.replace('inscription.html');
-      return;
-    }
+    if (!session) { window.location.replace('inscription.html'); return; }
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 500);
   })();
 
-  // ================= UTILITAIRES =================
-  function toggleMenu() {
-    document.getElementById('menu').classList.toggle('open');
-    document.getElementById('overlay').classList.toggle('open');
-  }
+  function toggleMenu() { document.getElementById('menu').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
   function go(page) { window.location.href = page; }
   async function logout() {
     if (!confirm('Veux-tu vraiment te déconnecter ?')) return;
     await sb.auth.signOut();
     window.location.replace('inscription.html');
   }
-
-  // ================= ANIMATION AU SCROLL =================
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.style.animationPlayState = 'running';
-        entry.target.style.opacity = '1';
-        entry.target.style.transform = 'translateY(0)';
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.1 });
-
-  document.querySelectorAll('.chapter-photo, .photo-grid, .quote, .cta-final, .tl-item, .value-card').forEach((el, i) => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(24px)';
-    el.style.transition = `opacity .6s ease ${i * 0.03}s, transform .6s ease ${i * 0.03}s`;
-    observer.observe(el);
-  });
 </script>
 </body>
 </html>
