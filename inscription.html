@@ -105,6 +105,10 @@
     0%,100% { transform: translate(0,0) scale(1); }
     50% { transform: translate(20px,-20px) scale(1.08); }
   }
+  @keyframes pulse {
+    0%,100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.08); opacity: .85; }
+  }
   .anim { opacity: 0; animation: fadeInUp .5s ease forwards; }
   .d1 { animation-delay: .05s; } .d2 { animation-delay: .12s; }
   .d3 { animation-delay: .20s; } .d4 { animation-delay: .28s; }
@@ -371,6 +375,119 @@
   .bottom-note svg { stroke: var(--wa-green); flex-shrink: 0; }
 
   .hidden { display: none !important; }
+
+  /* ============ POPUP DE BIENVENUE ============ */
+  .welcome-modal {
+    position: fixed; inset: 0; z-index: 2000;
+    background: rgba(0,0,0,.7);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    opacity: 0; pointer-events: none;
+    transition: opacity .4s ease;
+    backdrop-filter: blur(6px);
+  }
+  .welcome-modal.open { opacity: 1; pointer-events: auto; }
+  .welcome-card {
+    background: #fff;
+    border-radius: 28px;
+    padding: 30px 24px 26px;
+    text-align: center;
+    max-width: 400px; width: 100%;
+    transform: scale(.85) translateY(20px);
+    transition: transform .5s cubic-bezier(.34,1.56,.64,1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,.35);
+  }
+  .welcome-modal.open .welcome-card {
+    transform: scale(1) translateY(0);
+  }
+  .welcome-card::before {
+    content: ''; position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(37,211,102,.15), transparent 40%);
+    animation: pulse 3s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .welcome-logo {
+    width: 80px; height: 80px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, var(--wa-deep), var(--wa-dark));
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px;
+    padding: 10px;
+    box-shadow: 0 10px 30px rgba(7,94,84,.3);
+    position: relative; z-index: 2;
+  }
+  .welcome-logo img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    filter: brightness(1.1);
+  }
+  .welcome-emoji {
+    font-size: 42px;
+    margin-bottom: 10px;
+    position: relative; z-index: 2;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  .welcome-title {
+    font-size: 24px; font-weight: 800;
+    color: var(--wa-deep);
+    margin-bottom: 10px;
+    position: relative; z-index: 2;
+    letter-spacing: -.5px;
+  }
+  .welcome-title span { color: var(--wa-green); }
+  .welcome-text {
+    font-size: 14.5px;
+    color: #4b5563;
+    line-height: 1.6;
+    margin-bottom: 8px;
+    position: relative; z-index: 2;
+  }
+  .welcome-highlight {
+    background: linear-gradient(135deg, rgba(255,184,0,.15), rgba(255,106,0,.15));
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin: 16px 0 20px;
+    font-size: 13px;
+    color: #B45309;
+    font-weight: 700;
+    line-height: 1.5;
+    position: relative; z-index: 2;
+    border: 1px dashed rgba(255,184,0,.4);
+  }
+  .welcome-highlight b { color: var(--alibaba); }
+  .welcome-actions {
+    display: flex; flex-direction: column; gap: 10px;
+    position: relative; z-index: 2;
+  }
+  .welcome-btn {
+    width: 100%;
+    padding: 15px 20px;
+    border-radius: 16px;
+    font-size: 14.5px; font-weight: 800;
+    cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    transition: transform .15s;
+    letter-spacing: .2px;
+    border: none;
+  }
+  .welcome-btn:active { transform: scale(.97); }
+  .welcome-btn.primary {
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(18,140,126,.4);
+  }
+  .welcome-btn.primary svg { stroke: #fff; }
+  .welcome-btn.secondary {
+    background: #f7faf8;
+    color: var(--wa-deep);
+    border: 1.5px solid var(--border);
+  }
+  .welcome-btn.secondary svg { stroke: var(--wa-dark); }
 </style>
 </head>
 <body>
@@ -516,6 +633,42 @@
       Tes données sont chiffrées et sécurisées
     </div>
 
+  </div>
+
+  <!-- POPUP DE BIENVENUE -->
+  <div class="welcome-modal" id="welcomeModal">
+    <div class="welcome-card">
+      <div class="welcome-logo">
+        <img src="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png" alt="Affinity Network">
+      </div>
+      <div class="welcome-emoji">🎉</div>
+      <h2 class="welcome-title">Bienvenue sur <span>Affinity</span></h2>
+      <p class="welcome-text">
+        Ton compte a été créé avec succès. Tu fais maintenant partie de la communauté !
+      </p>
+      <div class="welcome-highlight">
+        🎁 Tu as reçu <b>200 F de bonus</b> de bienvenue<br>
+        Et <b>+25 F</b> pour ton premier streak quotidien !
+      </div>
+      <div class="welcome-actions">
+        <button class="welcome-btn primary" onclick="goToPartenaires()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <line x1="23" y1="11" x2="17" y2="11"/>
+            <line x1="20" y1="8" x2="20" y2="14"/>
+          </svg>
+          Devenir partenaire
+        </button>
+        <button class="welcome-btn secondary" onclick="goToSupport()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+            <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+          </svg>
+          Nous contacter
+        </button>
+      </div>
+    </div>
   </div>
 
 <script>
@@ -724,7 +877,7 @@
       return;
     }
 
-    // 4. Insérer le profil
+    // 4. Insérer le profil (bonus 200 F crédité automatiquement par trigger)
     const { error: profileError } = await sb
       .from('profiles')
       .insert({
@@ -738,9 +891,11 @@
 
     if (profileError) console.warn('Erreur insertion profil:', profileError);
 
-    // 5. Redirection
-    showMsg('Inscription réussie ! Redirection...', 'success');
-    setTimeout(() => window.location.href = 'dashboard', 1200);
+    // 5. Afficher le popup de bienvenue
+    showMsg('Inscription réussie ! 🎉', 'success');
+    setTimeout(() => {
+      document.getElementById('welcomeModal').classList.add('open');
+    }, 500);
   }
 
   // ================= CONNEXION =================
@@ -751,6 +906,17 @@
     if (error) throw new Error(traduireErreur(error.message));
     showMsg('Connexion réussie ! Redirection...', 'success');
     setTimeout(() => window.location.href = 'dashboard', 900);
+  }
+
+  // ================= POPUP DE BIENVENUE =================
+  function goToPartenaires() {
+    document.getElementById('welcomeModal').classList.remove('open');
+    setTimeout(() => window.location.href = 'partenaires', 300);
+  }
+
+  function goToSupport() {
+    document.getElementById('welcomeModal').classList.remove('open');
+    setTimeout(() => window.location.href = 'support', 300);
   }
 
   // ================= TRADUCTION =================
