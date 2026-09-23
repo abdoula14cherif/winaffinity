@@ -24,7 +24,6 @@
     padding-bottom: 80px; min-height: 100vh; overflow-x: hidden;
   }
 
-  /* LOADER */
   .loader {
     position: fixed; inset: 0; z-index: 9999;
     background: var(--wa-deep);
@@ -35,25 +34,15 @@
   .loader.hidden { opacity: 0; visibility: hidden; }
   .loader-logo { font-size: 24px; font-weight: 700; color: #fff; letter-spacing: 1px; }
   .loader-logo span { color: var(--wa-green); }
-  .spinner {
-    width: 46px; height: 46px;
-    border: 4px solid rgba(255,255,255,.2);
-    border-top-color: var(--wa-green);
-    border-radius: 50%;
-    animation: spin .9s linear infinite;
-  }
+  .spinner { width: 46px; height: 46px; border: 4px solid rgba(255,255,255,.2); border-top-color: var(--wa-green); border-radius: 50%; animation: spin .9s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(18px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes shimmer { to { background-position: -200% 0; } }
   .anim { opacity: 0; animation: fadeInUp .5s ease forwards; }
   .d1 { animation-delay: .05s; }
   .d2 { animation-delay: .12s; }
   .d3 { animation-delay: .2s; }
 
-  /* HEADER */
   .header {
     position: sticky; top: 0; z-index: 100;
     display: flex; align-items: center; justify-content: space-between;
@@ -61,70 +50,30 @@
     background: var(--wa-deep); color: #fff;
     box-shadow: 0 2px 8px rgba(0,0,0,.15);
   }
-  .burger {
-    cursor: pointer; width: 40px; height: 40px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 50%; background: rgba(255,255,255,.12);
-    transition: background .2s, transform .2s;
-  }
+  .burger { cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,.12); transition: background .2s, transform .2s; }
   .burger:active { background: rgba(255,255,255,.25); transform: scale(.92); }
   .burger svg { stroke: #fff; }
   .logo { font-weight: 700; font-size: 18px; letter-spacing: .5px; }
   .logo span { color: var(--wa-green); }
 
-  /* MENU */
-  .menu {
-    position: fixed; top: 0; left: 0; height: 100%; width: 280px;
-    background: #fff; z-index: 200;
-    transform: translateX(-100%);
-    transition: transform .35s cubic-bezier(.4,0,.2,1);
-    box-shadow: 4px 0 20px rgba(0,0,0,.2);
-    padding-top: 18px;
-    display: flex; flex-direction: column;
-  }
+  .menu { position: fixed; top: 0; left: 0; height: 100%; width: 280px; background: #fff; z-index: 200; transform: translateX(-100%); transition: transform .35s cubic-bezier(.4,0,.2,1); box-shadow: 4px 0 20px rgba(0,0,0,.2); padding-top: 18px; display: flex; flex-direction: column; overflow-y: auto; }
   .menu.open { transform: translateX(0); }
-  .menu-header {
-    padding: 8px 20px 18px; border-bottom: 1px solid #eee; margin-bottom: 10px;
-    font-weight: 700; color: var(--wa-deep); font-size: 17px;
-    display: flex; align-items: center; gap: 10px;
-  }
+  .menu-header { padding: 8px 20px 18px; border-bottom: 1px solid #eee; margin-bottom: 10px; font-weight: 700; color: var(--wa-deep); font-size: 17px; display: flex; align-items: center; gap: 10px; }
   .menu-header svg { stroke: var(--wa-green); }
-  .menu-item {
-    display: flex; align-items: center; gap: 14px;
-    padding: 15px 22px; cursor: pointer; font-size: 15px;
-    color: #333; transition: background .2s, padding-left .2s;
-  }
+  .menu-item { display: flex; align-items: center; gap: 14px; padding: 15px 22px; cursor: pointer; font-size: 15px; color: #333; transition: background .2s, padding-left .2s; }
   .menu-item:active { background: #e7f9ee; padding-left: 26px; }
   .menu-item svg { stroke: var(--wa-dark); flex-shrink: 0; }
   .menu-item.active { background: #e7f9ee; color: var(--wa-deep); font-weight: 700; }
-  .menu-footer {
-    margin-top: auto; padding: 16px 20px 22px;
-    border-top: 1px solid #eee;
-  }
-  .btn-logout {
-    width: 100%; padding: 14px;
-    background: #fee2e2; color: #b91c1c;
-    border: none; border-radius: 12px;
-    font-size: 14px; font-weight: 700;
-    cursor: pointer; font-family: inherit;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-  }
+  .menu-footer { margin-top: auto; padding: 16px 20px 22px; border-top: 1px solid #eee; }
+  .btn-logout { width: 100%; padding: 14px; background: #fee2e2; color: #b91c1c; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .btn-logout svg { stroke: #b91c1c; }
-  .overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,.45);
-    z-index: 150; opacity: 0; pointer-events: none; transition: opacity .3s;
-  }
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 150; opacity: 0; pointer-events: none; transition: opacity .3s; }
   .overlay.open { opacity: 1; pointer-events: auto; }
 
-  /* CONTENU */
   .content { padding: 18px 16px; }
-  .page-title {
-    font-size: 24px; font-weight: 800; color: var(--wa-deep);
-    margin-bottom: 4px;
-  }
+  .page-title { font-size: 24px; font-weight: 800; color: var(--wa-deep); margin-bottom: 4px; }
   .page-sub { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
 
-  /* SOLDE */
   .solde-card {
     background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
     color: #fff; border-radius: 16px;
@@ -133,109 +82,69 @@
     box-shadow: 0 4px 14px rgba(18,140,126,.35);
     position: relative; overflow: hidden;
   }
-  .solde-card::after {
-    content: ''; position: absolute; right: -30px; top: -30px;
-    width: 130px; height: 130px; border-radius: 50%;
-    background: rgba(255,255,255,.1);
-  }
-  .solde-card .lbl {
-    font-size: 12px; opacity: .9; margin-bottom: 4px;
-    display: flex; align-items: center; gap: 6px;
-  }
+  .solde-card::after { content: ''; position: absolute; right: -30px; top: -30px; width: 130px; height: 130px; border-radius: 50%; background: rgba(255,255,255,.1); }
+  .solde-card .lbl { font-size: 12px; opacity: .9; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
   .solde-card .lbl svg { stroke: #fff; }
   .solde-card .val { font-size: 26px; font-weight: 800; }
-  .solde-card .ic-w {
-    width: 52px; height: 52px; border-radius: 50%;
-    background: rgba(255,255,255,.15);
-    display: flex; align-items: center; justify-content: center;
-    position: relative; z-index: 2;
-  }
+  .solde-card .ic-w { width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,.15); display: flex; align-items: center; justify-content: center; position: relative; z-index: 2; }
   .solde-card .ic-w svg { stroke: #fff; }
 
-  /* FORMULAIRE */
-  .form-card {
-    background: #fff; border-radius: 18px;
-    padding: 20px; margin-bottom: 20px;
-    box-shadow: 0 3px 14px rgba(0,0,0,.07);
-  }
-  .field {
-    margin-bottom: 16px;
-    position: relative;
-  }
-  .field label {
-    display: block; font-size: 13px; font-weight: 700;
-    color: var(--wa-deep); margin-bottom: 8px;
-  }
-  .field .input-wrap {
-    display: flex; align-items: center;
-    background: #f7faf8; border: 1.5px solid var(--border);
-    border-radius: 12px; padding: 0 14px;
-    transition: border-color .2s, box-shadow .2s;
-    cursor: pointer;
-  }
-  .field .input-wrap.active,
-  .field .input-wrap:focus-within {
-    border-color: var(--wa-green);
-    box-shadow: 0 0 0 3px rgba(37,211,102,.15);
-    background: #fff;
-  }
+  .form-card { background: #fff; border-radius: 18px; padding: 20px; margin-bottom: 20px; box-shadow: 0 3px 14px rgba(0,0,0,.07); }
+  .field { margin-bottom: 16px; position: relative; }
+  .field label { display: block; font-size: 13px; font-weight: 700; color: var(--wa-deep); margin-bottom: 8px; }
+  .field .input-wrap { display: flex; align-items: center; background: #f7faf8; border: 1.5px solid var(--border); border-radius: 12px; padding: 0 14px; transition: border-color .2s, box-shadow .2s; cursor: pointer; }
+  .field .input-wrap.active, .field .input-wrap:focus-within { border-color: var(--wa-green); box-shadow: 0 0 0 3px rgba(37,211,102,.15); background: #fff; }
   .field .input-wrap svg.lead { stroke: var(--muted); flex-shrink: 0; }
-  .field input, .field .select-display {
-    flex: 1; border: none; outline: none;
-    padding: 14px 10px; font-size: 15px;
-    background: transparent; color: var(--text);
-    font-family: inherit;
-    width: 100%;
-  }
+  .field input, .field .select-display { flex: 1; border: none; outline: none; padding: 14px 10px; font-size: 15px; background: transparent; color: var(--text); font-family: inherit; width: 100%; }
   .field input::placeholder { color: #b0b7be; }
-  .field .chev {
-    stroke: var(--muted); flex-shrink: 0;
-    transition: transform .2s;
-  }
-  .field .flag-img {
-    width: 24px; height: 18px; border-radius: 3px;
-    object-fit: cover; flex-shrink: 0;
-    box-shadow: 0 1px 3px rgba(0,0,0,.15);
-  }
-  .field .mode-badge {
-    display: inline-flex; align-items: center; gap: 4px;
-    font-size: 10px; font-weight: 800;
-    padding: 3px 8px; border-radius: 10px;
-    text-transform: uppercase; letter-spacing: .3px;
-  }
-  .mode-badge.mobile_money {
-    background: rgba(37,211,102,.15); color: #166534;
-  }
-  .mode-badge.crypto {
-    background: rgba(255,106,0,.15); color: var(--alibaba);
-  }
+  .field .chev { stroke: var(--muted); flex-shrink: 0; transition: transform .2s; }
+  .field .flag-img { width: 24px; height: 18px; border-radius: 3px; object-fit: cover; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+  .field .mode-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: .3px; }
+  .mode-badge.mobile_money { background: rgba(37,211,102,.15); color: #166534; }
+  .mode-badge.crypto { background: rgba(255,106,0,.15); color: var(--alibaba); }
 
-  .hint {
-    font-size: 11px; color: var(--muted);
-    margin-top: 6px;
-    display: flex; align-items: center; gap: 5px;
-  }
+  .hint { font-size: 11px; color: var(--muted); margin-top: 6px; display: flex; align-items: center; gap: 5px; }
   .hint svg { stroke: var(--muted); }
   .hint.min-warn { color: var(--danger); }
   .hint.min-warn svg { stroke: var(--danger); }
 
-  .amount-quick {
-    display: flex; gap: 6px; margin-top: 8px;
-    flex-wrap: wrap;
-  }
-  .quick-btn {
-    background: #f7faf8; border: 1px solid var(--border);
-    border-radius: 8px; padding: 6px 12px;
-    font-size: 12px; font-weight: 700;
-    color: var(--text); cursor: pointer;
-    font-family: inherit;
-    transition: all .2s;
-  }
+  .amount-quick { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .quick-btn { background: #f7faf8; border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 700; color: var(--text); cursor: pointer; font-family: inherit; transition: all .2s; }
   .quick-btn:active { transform: scale(.95); }
-  .quick-btn.selected {
-    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
-    color: #fff; border-color: transparent;
+  .quick-btn.selected { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; border-color: transparent; }
+
+  /* FRAIS BLOCK */
+  .frais-block {
+    background: linear-gradient(135deg, rgba(255,106,0,.08), rgba(255,184,0,.08));
+    border: 1.5px dashed rgba(255,106,0,.35);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    display: none;
   }
+  .frais-block.show { display: block; animation: fadeInUp .3s ease; }
+  .frais-block .fb-title {
+    font-size: 12px; color: var(--alibaba);
+    text-transform: uppercase; font-weight: 800;
+    letter-spacing: .4px; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .frais-block .fb-title svg { stroke: var(--alibaba); }
+  .frais-block .fb-row {
+    display: flex; justify-content: space-between;
+    font-size: 13px; padding: 5px 0;
+    color: #4b5563;
+  }
+  .frais-block .fb-row .k { font-weight: 600; }
+  .frais-block .fb-row .v { font-weight: 700; color: var(--text); }
+  .frais-block .fb-row.frais-row .v { color: var(--alibaba); }
+  .frais-block .fb-row.total {
+    border-top: 1px solid rgba(255,106,0,.25);
+    padding-top: 10px; margin-top: 6px;
+    font-size: 15px;
+  }
+  .frais-block .fb-row.total .k { color: var(--wa-deep); font-weight: 800; }
+  .frais-block .fb-row.total .v { color: var(--wa-dark); font-size: 18px; font-weight: 800; }
 
   .btn-submit {
     width: 100%; border: none;
@@ -251,177 +160,58 @@
   }
   .btn-submit:active { transform: scale(.97); }
   .btn-submit svg { stroke: #fff; }
-  .btn-submit:disabled {
-    background: #d1d5db; box-shadow: none; cursor: not-allowed;
-  }
+  .btn-submit:disabled { background: #d1d5db; box-shadow: none; cursor: not-allowed; }
   .btn-submit:disabled svg { stroke: #6b7280; }
   .btn-submit:disabled .txt { color: #4b5563; }
-  .btn-submit .spin-small {
-    width: 18px; height: 18px;
-    border: 2.5px solid rgba(255,255,255,.4);
-    border-top-color: #fff; border-radius: 50%;
-    animation: spin .7s linear infinite; display: none;
-  }
+  .btn-submit .spin-small { width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; display: none; }
   .btn-submit.loading .spin-small { display: inline-block; }
   .btn-submit.loading .icon-default { display: none; }
 
-  /* HISTORIQUE */
-  .section-title {
-    font-size: 15px; font-weight: 700; color: var(--wa-deep);
-    margin: 22px 0 12px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .section-title .badge-count {
-    background: rgba(18,140,126,.12); color: var(--wa-dark);
-    font-size: 11px; padding: 3px 10px; border-radius: 10px;
-    font-weight: 700;
-  }
-  .hist-item {
-    background: #fff; border-radius: 14px;
-    padding: 14px 16px; margin-bottom: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.05);
-    animation: fadeInUp .4s ease forwards; opacity: 0;
-  }
-  .hist-top {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 6px;
-  }
-  .hist-amount {
-    font-size: 16px; font-weight: 800; color: var(--text);
-  }
-  .hist-status {
-    font-size: 10px; font-weight: 800;
-    padding: 3px 8px; border-radius: 10px;
-    text-transform: uppercase; letter-spacing: .3px;
-  }
-  .hist-status.en_attente {
-    background: rgba(255,106,0,.15); color: var(--alibaba);
-  }
-  .hist-status.valide {
-    background: rgba(37,211,102,.15); color: #166534;
-  }
-  .hist-status.paye {
-    background: rgba(18,140,126,.15); color: var(--wa-dark);
-  }
-  .hist-status.rejete {
-    background: rgba(220,38,38,.15); color: var(--danger);
-  }
-  .hist-meta {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 11.5px; color: var(--muted);
-    flex-wrap: wrap;
-  }
-  .hist-meta .flag {
-    width: 16px; height: 12px; border-radius: 2px;
-    object-fit: cover;
-  }
-  .hist-meta svg { stroke: var(--muted); }
+  .section-title { font-size: 15px; font-weight: 700; color: var(--wa-deep); margin: 22px 0 12px; display: flex; align-items: center; justify-content: space-between; }
+  .section-title .badge-count { background: rgba(18,140,126,.12); color: var(--wa-dark); font-size: 11px; padding: 3px 10px; border-radius: 10px; font-weight: 700; }
 
-  .empty {
-    text-align: center; padding: 30px 20px;
-    color: var(--muted); font-size: 13px;
-    background: #fff; border-radius: 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.05);
-  }
+  .hist-item { background: #fff; border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.05); animation: fadeInUp .4s ease forwards; opacity: 0; }
+  .hist-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .hist-amount { font-size: 16px; font-weight: 800; color: var(--text); }
+  .hist-status { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: .3px; }
+  .hist-status.en_attente { background: rgba(255,106,0,.15); color: var(--alibaba); }
+  .hist-status.valide { background: rgba(37,211,102,.15); color: #166534; }
+  .hist-status.paye { background: rgba(18,140,126,.15); color: var(--wa-dark); }
+  .hist-status.rejete { background: rgba(220,38,38,.15); color: var(--danger); }
+  .hist-meta { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--muted); flex-wrap: wrap; }
+  .hist-meta .flag { width: 16px; height: 12px; border-radius: 2px; object-fit: cover; }
+  .hist-meta svg { stroke: var(--muted); }
+  .hist-net { font-size: 11px; color: var(--wa-dark); font-weight: 700; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #e5e7eb; }
+
+  .empty { text-align: center; padding: 30px 20px; color: var(--muted); font-size: 13px; background: #fff; border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
   .empty svg { stroke: #d1d5db; margin-bottom: 10px; }
 
-  /* MODAL SÉLECTION PAYS */
-  .modal-overlay {
-    position: fixed; inset: 0; z-index: 500;
-    background: rgba(0,0,0,.55);
-    display: flex; align-items: flex-end; justify-content: center;
-    opacity: 0; pointer-events: none;
-    transition: opacity .3s; backdrop-filter: blur(3px);
-  }
+  .modal-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,.55); display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .3s; backdrop-filter: blur(3px); }
   .modal-overlay.open { opacity: 1; pointer-events: auto; }
-  .modal {
-    background: #fff; width: 100%; max-width: 500px;
-    border-radius: 24px 24px 0 0;
-    transform: translateY(100%);
-    transition: transform .4s cubic-bezier(.4,0,.2,1);
-    max-height: 85vh; overflow: hidden;
-    display: flex; flex-direction: column;
-  }
+  .modal { background: #fff; width: 100%; max-width: 500px; border-radius: 24px 24px 0 0; transform: translateY(100%); transition: transform .4s cubic-bezier(.4,0,.2,1); max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; }
   .modal-overlay.open .modal { transform: translateY(0); }
-  .modal-handle {
-    width: 42px; height: 5px; border-radius: 5px;
-    background: #d1d5db; margin: 12px auto 6px;
-  }
-  .modal-head {
-    padding: 8px 20px 14px;
-    display: flex; align-items: center; justify-content: space-between;
-    border-bottom: 1px solid #f3f4f6;
-  }
-  .modal-title {
-    font-size: 17px; font-weight: 800; color: var(--wa-deep);
-  }
-  .modal-close {
-    width: 34px; height: 34px; border-radius: 50%;
-    background: #f3f4f6; border: none; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-  }
+  .modal-handle { width: 42px; height: 5px; border-radius: 5px; background: #d1d5db; margin: 12px auto 6px; }
+  .modal-head { padding: 8px 20px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f3f4f6; }
+  .modal-title { font-size: 17px; font-weight: 800; color: var(--wa-deep); }
+  .modal-close { width: 34px; height: 34px; border-radius: 50%; background: #f3f4f6; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
   .modal-close svg { stroke: var(--muted); }
-
-  .modal-search {
-    padding: 12px 20px;
-    border-bottom: 1px solid #f3f4f6;
-  }
-  .modal-search input {
-    width: 100%; border: 1.5px solid var(--border);
-    border-radius: 10px; padding: 11px 14px;
-    font-size: 14px; font-family: inherit;
-    outline: none;
-    transition: border-color .2s;
-  }
+  .modal-search { padding: 12px 20px; border-bottom: 1px solid #f3f4f6; }
+  .modal-search input { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 14px; font-size: 14px; font-family: inherit; outline: none; transition: border-color .2s; }
   .modal-search input:focus { border-color: var(--wa-green); }
-
-  .modal-body {
-    flex: 1; overflow-y: auto;
-    padding: 8px 0 20px;
-  }
-  .country-item {
-    padding: 12px 20px;
-    display: flex; align-items: center; gap: 12px;
-    cursor: pointer;
-    transition: background .15s;
-  }
+  .modal-body { flex: 1; overflow-y: auto; padding: 8px 0 20px; }
+  .country-item { padding: 12px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background .15s; }
   .country-item:active { background: #f7faf8; }
-  .country-item .flag-img {
-    width: 32px; height: 22px; border-radius: 4px;
-    object-fit: cover; flex-shrink: 0;
-    box-shadow: 0 1px 4px rgba(0,0,0,.12);
-  }
-  .country-item .c-name {
-    flex: 1; font-size: 14px; font-weight: 600; color: var(--text);
-  }
-  .country-item .mode-badge {
-    display: inline-flex; align-items: center; gap: 4px;
-    font-size: 9.5px; font-weight: 800;
-    padding: 3px 8px; border-radius: 10px;
-    text-transform: uppercase; letter-spacing: .3px;
-  }
+  .country-item .flag-img { width: 32px; height: 22px; border-radius: 4px; object-fit: cover; flex-shrink: 0; box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+  .country-item .c-name { flex: 1; font-size: 14px; font-weight: 600; color: var(--text); }
+  .country-item .mode-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 9.5px; font-weight: 800; padding: 3px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: .3px; }
 
-  /* BOTTOM NAV */
-  .bottom-nav {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    display: flex; background: #fff;
-    border-top: 1px solid #e5e7eb;
-    box-shadow: 0 -2px 12px rgba(0,0,0,.06);
-    z-index: 100;
-  }
-  .nav-item {
-    flex: 1; display: flex; flex-direction: column; align-items: center;
-    padding: 9px 0 10px; cursor: pointer;
-    color: #9ca3af; font-size: 11px; gap: 4px;
-    transition: color .2s, transform .2s; font-weight: 500;
-    text-decoration: none;
-  }
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: #fff; border-top: 1px solid #e5e7eb; box-shadow: 0 -2px 12px rgba(0,0,0,.06); z-index: 100; }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 9px 0 10px; cursor: pointer; color: #9ca3af; font-size: 11px; gap: 4px; transition: color .2s, transform .2s; font-weight: 500; text-decoration: none; }
   .nav-item svg { stroke: #9ca3af; transition: stroke .2s, transform .2s; }
   .nav-item:active { transform: scale(.92); }
   .nav-item.active { color: var(--wa-dark); font-weight: 700; }
   .nav-item.active svg { stroke: var(--wa-green); transform: translateY(-1px); }
 
-  /* TOAST */
   .toast {
     position: fixed; left: 50%; bottom: 100px;
     transform: translateX(-50%) translateY(20px);
@@ -473,6 +263,19 @@
       </svg>
       Travail
     </div>
+    <div class="menu-item" onclick="go('parrainage.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+      </svg>
+      Parrainage
+    </div>
+    <div class="menu-item" onclick="go('missions.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+        <path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+      </svg>
+      Missions
+    </div>
     <div class="menu-item" onclick="go('support.html')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
         <path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
@@ -491,7 +294,6 @@
       </svg>
       Notre entreprise
     </div>
-
     <div class="menu-footer">
       <button class="btn-logout" onclick="logout()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -508,7 +310,6 @@
     <h1 class="page-title">Retirer</h1>
     <p class="page-sub">Retire tes gains par Mobile Money ou Crypto</p>
 
-    <!-- SOLDE -->
     <div class="solde-card anim d1">
       <div>
         <div class="lbl">
@@ -526,10 +327,8 @@
       </div>
     </div>
 
-    <!-- FORMULAIRE -->
     <div class="form-card anim d2">
 
-      <!-- Pays -->
       <div class="field">
         <label>Pays de retrait</label>
         <div class="input-wrap" id="countryField" onclick="openCountryModal()">
@@ -544,7 +343,6 @@
         </div>
       </div>
 
-      <!-- Opérateur -->
       <div class="field">
         <label>Opérateur / Réseau</label>
         <div class="input-wrap" id="operatorField" style="opacity:.5;pointer-events:none;">
@@ -560,7 +358,6 @@
         </div>
       </div>
 
-      <!-- Montant -->
       <div class="field">
         <label>Montant à retirer</label>
         <div class="input-wrap">
@@ -585,7 +382,6 @@
         </div>
       </div>
 
-      <!-- Numéro / Adresse -->
       <div class="field">
         <label id="numeroLabel">Numéro Mobile Money</label>
         <div class="input-wrap">
@@ -602,6 +398,28 @@
         </div>
       </div>
 
+      <!-- FRAIS -->
+      <div class="frais-block" id="fraisBlock">
+        <div class="fb-title">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+          Détail des frais
+        </div>
+        <div class="fb-row">
+          <span class="k">Montant demandé</span>
+          <span class="v" id="fbMontant">0 F</span>
+        </div>
+        <div class="fb-row frais-row">
+          <span class="k">Frais (<span id="fbPct">8</span>%)</span>
+          <span class="v" id="fbFrais">-0 F</span>
+        </div>
+        <div class="fb-row total">
+          <span class="k">Tu recevras</span>
+          <span class="v" id="fbNet">0 F</span>
+        </div>
+      </div>
+
       <button class="btn-submit" id="btnSubmit" onclick="submitRetrait()">
         <span class="spin-small"></span>
         <svg class="icon-default" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -611,7 +429,6 @@
       </button>
     </div>
 
-    <!-- HISTORIQUE -->
     <div class="section-title anim d3">
       Historique des retraits
       <span class="badge-count" id="histCount">0</span>
@@ -654,7 +471,6 @@
     </a>
   </nav>
 
-  <!-- MODAL PAYS -->
   <div class="modal-overlay" id="countryModal" onclick="closeCountryModalOutside(event)">
     <div class="modal">
       <div class="modal-handle"></div>
@@ -673,7 +489,6 @@
     </div>
   </div>
 
-  <!-- TOAST -->
   <div class="toast" id="toast">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <polyline points="20 6 9 17 4 12"/>
@@ -682,7 +497,6 @@
   </div>
 
 <script>
-  // ================= SUPABASE =================
   const SUPABASE_URL = 'https://ydwjvvlcnqsftciedpqm.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2p2dmxjbnFzZnRjaWVkcHFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMDQyNDAsImV4cCI6MjEwNTY4MDI0MH0.4uQwBGedMBjUZErd8lUM5YfA26gw96RvHdo_J-3PZCY';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
@@ -694,21 +508,33 @@
   let SELECTED_COUNTRY = null;
   let SELECTED_OPERATOR = null;
   let HIST = [];
+  let FRAIS_PCT = 8;
+  let FRAIS_MIN = 100;
 
   // ================= INIT =================
   (async function init() {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) {
-      window.location.replace('inscription.html');
-      return;
-    }
+    if (!session) { window.location.replace('inscription.html'); return; }
     CURRENT_USER = session.user;
+
+    // Charger la config des frais
+    const { data: config } = await sb.from('bonus_config')
+      .select('*').in('cle', ['frais_retrait_pourcentage', 'frais_retrait_minimum']);
+
+    const c1 = config?.find(c => c.cle === 'frais_retrait_pourcentage');
+    const c2 = config?.find(c => c.cle === 'frais_retrait_minimum');
+    if (c1) FRAIS_PCT = Number(c1.valeur);
+    if (c2) FRAIS_MIN = Number(c2.valeur);
+
+    document.getElementById('fbPct').textContent = FRAIS_PCT;
 
     await Promise.all([
       loadProfile(),
       loadCountries(),
       loadHistory()
     ]);
+
+    document.getElementById('fraisBlock').classList.remove('show');
 
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
   })();
@@ -746,17 +572,14 @@
 
   function filterCountries() {
     const q = document.getElementById('countrySearch').value.trim().toLowerCase();
-    const filtered = q
-      ? COUNTRIES.filter(c => c.nom.toLowerCase().includes(q))
-      : COUNTRIES;
+    const filtered = q ? COUNTRIES.filter(c => c.nom.toLowerCase().includes(q)) : COUNTRIES;
     renderCountries(filtered);
   }
 
   function renderCountries(list) {
     const el = document.getElementById('countryList');
     if (list.length === 0) {
-      el.innerHTML = `<div class="empty" style="box-shadow:none">
-        <div>Aucun pays trouvé</div></div>`;
+      el.innerHTML = `<div class="empty" style="box-shadow:none"><div>Aucun pays trouvé</div></div>`;
       return;
     }
     el.innerHTML = list.map(c => `
@@ -783,13 +606,11 @@
       </div>
     `;
 
-    // Charger les opérateurs
     const { data } = await sb.from('operateurs_retrait')
       .select('*').eq('pays_id', c.id).eq('actif', true)
       .order('ordre', { ascending: true });
     OPERATORS = data || [];
 
-    // Remplir le select
     const select = document.getElementById('operatorSelect');
     select.innerHTML = '<option value="">Choisis un opérateur</option>' +
       OPERATORS.map(o => `<option value="${o.id}">${escapeHtml(o.nom)}</option>`).join('');
@@ -802,12 +623,9 @@
     document.getElementById('operatorField').style.opacity = '1';
     document.getElementById('operatorField').style.pointerEvents = 'auto';
 
-    // Mettre à jour le minimum
-    document.getElementById('minHintText').textContent =
-      `Minimum : ${formatF(c.minimum_retrait)}`;
+    document.getElementById('minHintText').textContent = `Minimum : ${formatF(c.minimum_retrait)}`;
     document.getElementById('minHint').classList.remove('min-warn');
 
-    // Adapter le libellé selon le mode
     if (c.mode === 'mobile_money') {
       document.getElementById('numeroLabel').textContent = 'Numéro Mobile Money';
       document.getElementById('numeroInput').placeholder = 'Ex: 6 55 00 00 00';
@@ -837,6 +655,7 @@
     document.getElementById('amountInput').value = max;
     onAmountChange();
   }
+
   function onAmountChange() {
     const v = Number(document.getElementById('amountInput').value || 0);
     if (!SELECTED_COUNTRY) return;
@@ -850,6 +669,20 @@
     } else {
       hint.classList.remove('min-warn');
       hintText.textContent = `Minimum : ${formatF(min)} · Solde : ${formatF(USER_SOLDE)}`;
+    }
+
+    // Mise à jour du bloc frais
+    const fraisBlock = document.getElementById('fraisBlock');
+    if (v > 0) {
+      const frais = Math.max(Math.round(v * FRAIS_PCT / 100), FRAIS_MIN);
+      const net = Math.max(0, v - frais);
+
+      document.getElementById('fbMontant').textContent = formatF(v);
+      document.getElementById('fbFrais').textContent = '-' + formatF(frais);
+      document.getElementById('fbNet').textContent = formatF(net);
+      fraisBlock.classList.add('show');
+    } else {
+      fraisBlock.classList.remove('show');
     }
   }
 
@@ -883,7 +716,6 @@
     if (error) {
       let msg = error.message || 'Erreur';
       if (msg.includes('Solde insuffisant')) msg = 'Solde insuffisant.';
-      if (msg.includes('minimum')) msg = msg;
       showToast(msg, true);
       await loadProfile();
       return;
@@ -892,12 +724,15 @@
     USER_SOLDE = Number(data.nouveau_solde ?? USER_SOLDE);
     document.getElementById('userSolde').textContent = formatF(USER_SOLDE);
 
-    showToast('Demande de retrait envoyée !');
+    const frais = data.frais || 0;
+    const net = data.montant_net || montant;
+    showToast(`Retrait envoyé ! Tu recevras ${formatF(net)} (frais : ${formatF(frais)})`);
 
-    // Reset formulaire
+    // Reset
     document.getElementById('amountInput').value = '';
     document.getElementById('numeroInput').value = '';
     document.getElementById('operatorSelect').value = '';
+    document.getElementById('fraisBlock').classList.remove('show');
     SELECTED_OPERATOR = null;
     document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('selected'));
 
@@ -936,28 +771,41 @@
       rejete: 'Rejeté'
     };
 
-    list.innerHTML = HIST.map((h, i) => `
-      <div class="hist-item" style="animation-delay:${i * 0.04}s">
-        <div class="hist-top">
-          <div class="hist-amount">${formatF(h.montant)}</div>
-          <div class="hist-status ${h.statut}">${statusLabels[h.statut] || h.statut}</div>
+    list.innerHTML = HIST.map((h, i) => {
+      // Extraire frais/net depuis note_admin si présent
+      let frais = 0;
+      let net = h.montant;
+      if (h.note_admin && h.note_admin.includes('Frais:')) {
+        const match = h.note_admin.match(/Frais:\s*(\d+)\s*F\s*\|\s*Net à payer:\s*(\d+)/);
+        if (match) {
+          frais = Number(match[1]);
+          net = Number(match[2]);
+        }
+      }
+
+      return `
+        <div class="hist-item" style="animation-delay:${i * 0.04}s">
+          <div class="hist-top">
+            <div class="hist-amount">${formatF(h.montant)}</div>
+            <div class="hist-status ${h.statut}">${statusLabels[h.statut] || h.statut}</div>
+          </div>
+          <div class="hist-meta">
+            ${h.pays_code ? `<img class="flag" src="https://flagcdn.com/w40/${h.pays_code.toLowerCase()}.png" alt="">` : ''}
+            <span>${escapeHtml(h.pays_nom || '')}</span>
+            <span>·</span>
+            <span>${escapeHtml(h.operateur_nom || '')}</span>
+            <span>·</span>
+            <span>${timeAgo(h.created_at)}</span>
+          </div>
+          ${frais > 0 ? `<div class="hist-net">Frais : ${formatF(frais)} · Net reçu : ${formatF(net)}</div>` : ''}
         </div>
-        <div class="hist-meta">
-          ${h.pays_code ? `<img class="flag" src="https://flagcdn.com/w40/${h.pays_code.toLowerCase()}.png" alt="">` : ''}
-          <span>${escapeHtml(h.pays_nom || '')}</span>
-          <span>·</span>
-          <span>${escapeHtml(h.operateur_nom || '')}</span>
-          <span>·</span>
-          <span>${timeAgo(h.created_at)}</span>
-        </div>
-        ${h.note_admin ? `<div style="font-size:11px;color:var(--danger);margin-top:6px;">Note admin : ${escapeHtml(h.note_admin)}</div>` : ''}
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   // ================= UTILITAIRES =================
   function formatF(n) {
-    return Math.round(Number(n)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F';
+    return Math.round(Number(n || 0)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F';
   }
   function escapeHtml(s) {
     return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -976,7 +824,7 @@
     const t = document.getElementById('toast');
     document.getElementById('toastText').textContent = msg;
     t.className = 'toast show' + (isError ? ' error' : '');
-    setTimeout(() => t.classList.remove('show'), 2800);
+    setTimeout(() => t.classList.remove('show'), 3500);
   }
   function toggleMenu() {
     document.getElementById('menu').classList.toggle('open');
