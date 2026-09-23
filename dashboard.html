@@ -8,426 +8,141 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root {
-    --wa-green: #25D366;
-    --wa-dark: #128C7E;
-    --wa-deep: #075E54;
-    --alibaba: #FF6A00;
-    --gold: #FFB800;
-    --fire: #FF4500;
-    --white: #ffffff;
-    --bg: #f7f9f8;
-    --text: #1a1a1a;
-    --muted: #6b7280;
-    --border: #e5e7eb;
+    --wa-green: #25D366; --wa-dark: #128C7E; --wa-deep: #075E54;
+    --alibaba: #FF6A00; --gold: #FFB800; --fire: #FF4500;
+    --bg: #f7f9f8; --text: #1a1a1a; --muted: #6b7280; --border: #e5e7eb;
   }
-  body {
-    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
-    background: var(--bg); color: var(--text);
-    padding-bottom: 72px; min-height: 100vh; overflow-x: hidden;
-  }
-  .loader {
-    position: fixed; inset: 0; z-index: 9999;
-    background: var(--wa-deep);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 22px;
-    transition: opacity .6s ease, visibility .6s ease;
-  }
+  body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 72px; min-height: 100vh; overflow-x: hidden; }
+  .loader { position: fixed; inset: 0; z-index: 9999; background: var(--wa-deep); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; transition: opacity .6s ease, visibility .6s ease; }
   .loader.hidden { opacity: 0; visibility: hidden; }
-  .loader-logo {
-    font-size: 24px; font-weight: 700; color: #fff;
-    letter-spacing: 1px; animation: fadeUp .8s ease;
-  }
+  .loader-logo { font-size: 24px; font-weight: 700; color: #fff; letter-spacing: 1px; }
   .loader-logo span { color: var(--wa-green); }
-  .spinner {
-    width: 46px; height: 46px;
-    border: 4px solid rgba(255,255,255,.2);
-    border-top-color: var(--wa-green);
-    border-radius: 50%;
-    animation: spin .9s linear infinite;
-  }
+  .spinner { width: 46px; height: 46px; border: 4px solid rgba(255,255,255,.2); border-top-color: var(--wa-green); border-radius: 50%; animation: spin .9s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(18px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes pulse {
-    0%,100% { transform: scale(1); opacity: .8; }
-    50% { transform: scale(1.15); opacity: 1; }
-  }
-  @keyframes firePulse {
-    0%,100% { transform: scale(1) rotate(0deg); }
-    50% { transform: scale(1.15) rotate(-5deg); }
-  }
-  @keyframes shine {
-    0% { background-position: -200% center; }
-    100% { background-position: 200% center; }
-  }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulse { 0%,100% { transform: scale(1); opacity: .8; } 50% { transform: scale(1.15); opacity: 1; } }
+  @keyframes firePulse { 0%,100% { transform: scale(1) rotate(0deg); } 50% { transform: scale(1.15) rotate(-5deg); } }
   .anim { opacity: 0; animation: fadeInUp .5s ease forwards; }
-  .d1 { animation-delay: .05s; }
-  .d2 { animation-delay: .12s; }
-  .d3 { animation-delay: .2s; }
-  .d4 { animation-delay: .28s; }
-  .d5 { animation-delay: .34s; }
-  .d6 { animation-delay: .4s; }
+  .d1 { animation-delay: .05s; } .d2 { animation-delay: .12s; } .d3 { animation-delay: .2s; }
+  .d4 { animation-delay: .28s; } .d5 { animation-delay: .34s; } .d6 { animation-delay: .4s; }
 
-  .header {
-    position: sticky; top: 0; z-index: 100;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 18px;
-    background: var(--wa-deep); color: #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,.15);
-  }
-  .burger {
-    cursor: pointer; width: 40px; height: 40px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 50%; background: rgba(255,255,255,.12);
-    transition: background .2s, transform .2s;
-  }
+  .header { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--wa-deep); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+  .burger { cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,.12); transition: background .2s, transform .2s; }
   .burger:active { background: rgba(255,255,255,.25); transform: scale(.92); }
   .burger svg { stroke: #fff; }
   .logo { font-weight: 700; font-size: 18px; letter-spacing: .5px; }
   .logo span { color: var(--wa-green); }
 
-  .menu {
-    position: fixed; top: 0; left: 0; height: 100%; width: 280px;
-    background: #fff; z-index: 200;
-    transform: translateX(-100%);
-    transition: transform .35s cubic-bezier(.4,0,.2,1);
-    box-shadow: 4px 0 20px rgba(0,0,0,.2);
-    padding-top: 18px;
-    display: flex; flex-direction: column;
-    overflow-y: auto;
-  }
+  .menu { position: fixed; top: 0; left: 0; height: 100%; width: 280px; background: #fff; z-index: 200; transform: translateX(-100%); transition: transform .35s cubic-bezier(.4,0,.2,1); box-shadow: 4px 0 20px rgba(0,0,0,.2); padding-top: 18px; display: flex; flex-direction: column; overflow-y: auto; }
   .menu.open { transform: translateX(0); }
-  .menu-header {
-    padding: 8px 20px 18px; border-bottom: 1px solid #eee; margin-bottom: 10px;
-    font-weight: 700; color: var(--wa-deep); font-size: 17px;
-    display: flex; align-items: center; gap: 10px;
-  }
+  .menu-header { padding: 8px 20px 18px; border-bottom: 1px solid #eee; margin-bottom: 10px; font-weight: 700; color: var(--wa-deep); font-size: 17px; display: flex; align-items: center; gap: 10px; }
   .menu-header svg { stroke: var(--wa-green); }
-  .menu-item {
-    display: flex; align-items: center; gap: 14px;
-    padding: 15px 22px; cursor: pointer; font-size: 15px;
-    color: #333; transition: background .2s, padding-left .2s;
-  }
+  .menu-item { display: flex; align-items: center; gap: 14px; padding: 15px 22px; cursor: pointer; font-size: 15px; color: #333; transition: background .2s, padding-left .2s; }
   .menu-item:active { background: #e7f9ee; padding-left: 26px; }
   .menu-item svg { stroke: var(--wa-dark); flex-shrink: 0; }
   .menu-item.active { background: #e7f9ee; color: var(--wa-deep); font-weight: 700; }
   .menu-item.invite svg { stroke: var(--alibaba); }
-  .menu-item.invite:active { background: rgba(255,106,0,.08); }
   .menu-item.recharge svg { stroke: var(--wa-green); }
-  .menu-item.recharge:active { background: rgba(37,211,102,.08); }
   .menu-item.missions svg { stroke: var(--gold); }
-  .menu-item.missions:active { background: rgba(255,184,0,.08); }
-
-  .menu-footer {
-    margin-top: auto; padding: 16px 20px 22px;
-    border-top: 1px solid #eee;
-  }
-  .btn-logout {
-    width: 100%; padding: 14px;
-    background: #fee2e2; color: #b91c1c;
-    border: none; border-radius: 12px;
-    font-size: 14px; font-weight: 700;
-    cursor: pointer; font-family: inherit;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-  }
+  .menu-footer { margin-top: auto; padding: 16px 20px 22px; border-top: 1px solid #eee; }
+  .btn-logout { width: 100%; padding: 14px; background: #fee2e2; color: #b91c1c; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .btn-logout svg { stroke: #b91c1c; }
-
-  .overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,.45);
-    z-index: 150; opacity: 0; pointer-events: none; transition: opacity .3s;
-  }
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 150; opacity: 0; pointer-events: none; transition: opacity .3s; }
   .overlay.open { opacity: 1; pointer-events: auto; }
 
   .content { padding: 18px 16px; }
-  .welcome {
-    background: #fff; border-radius: 16px; padding: 18px;
-    box-shadow: 0 2px 10px rgba(0,0,0,.06); margin-bottom: 16px;
-  }
-  .welcome h2 {
-    font-size: 19px; color: var(--wa-deep); margin-bottom: 4px;
-    display: flex; align-items: center; gap: 8px;
-  }
+  .welcome { background: #fff; border-radius: 16px; padding: 18px; box-shadow: 0 2px 10px rgba(0,0,0,.06); margin-bottom: 16px; }
+  .welcome h2 { font-size: 19px; color: var(--wa-deep); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
   .welcome h2 .pseudo-badge { color: var(--wa-green); font-weight: 800; }
   .welcome p { font-size: 14px; color: var(--muted); }
 
-  /* CARTE SOLDE */
-  .solde {
-    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
-    color: #fff; border-radius: 16px; padding: 22px 20px;
-    margin-bottom: 12px; box-shadow: 0 4px 14px rgba(18,140,126,.35);
-    position: relative; overflow: hidden;
-  }
-  .solde::after {
-    content: ''; position: absolute; right: -30px; top: -30px;
-    width: 140px; height: 140px; border-radius: 50%;
-    background: rgba(255,255,255,.08);
-    animation: pulse 3s ease-in-out infinite;
-  }
+  .solde { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; border-radius: 16px; padding: 22px 20px; margin-bottom: 12px; box-shadow: 0 4px 14px rgba(18,140,126,.35); position: relative; overflow: hidden; }
+  .solde::after { content: ''; position: absolute; right: -30px; top: -30px; width: 140px; height: 140px; border-radius: 50%; background: rgba(255,255,255,.08); animation: pulse 3s ease-in-out infinite; }
   .solde .label { font-size: 13px; opacity: .9; }
   .solde .montant { font-size: 32px; font-weight: 700; margin: 6px 0; }
   .solde .sub { font-size: 12px; opacity: .85; }
 
-  /* ========== CARTE STREAK ========== */
-  .streak-card {
-    background: linear-gradient(135deg, #FF4500, #FF6B35);
-    color: #fff;
-    border-radius: 16px;
-    padding: 14px 18px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 14px rgba(255,69,0,.3);
-    display: flex; align-items: center; gap: 14px;
-    position: relative; overflow: hidden;
-  }
-  .streak-card::after {
-    content: ''; position: absolute; right: -20px; top: -20px;
-    width: 100px; height: 100px; border-radius: 50%;
-    background: rgba(255,255,255,.1);
-  }
-  .streak-icon {
-    width: 52px; height: 52px; border-radius: 50%;
-    background: rgba(255,255,255,.2);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    font-size: 26px;
-    animation: firePulse 1.5s ease-in-out infinite;
-    position: relative; z-index: 2;
-  }
+  .streak-card { background: linear-gradient(135deg, #FF4500, #FF6B35); color: #fff; border-radius: 16px; padding: 14px 18px; margin-bottom: 12px; box-shadow: 0 4px 14px rgba(255,69,0,.3); display: flex; align-items: center; gap: 14px; position: relative; overflow: hidden; }
+  .streak-card::after { content: ''; position: absolute; right: -20px; top: -20px; width: 100px; height: 100px; border-radius: 50%; background: rgba(255,255,255,.1); }
+  .streak-icon { width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 26px; animation: firePulse 1.5s ease-in-out infinite; position: relative; z-index: 2; }
   .streak-body { flex: 1; position: relative; z-index: 2; }
-  .streak-body .st-top {
-    font-size: 11px; opacity: .9;
-    text-transform: uppercase; letter-spacing: .5px;
-    font-weight: 700; margin-bottom: 3px;
-  }
-  .streak-body .st-val {
-    font-size: 22px; font-weight: 800;
-    display: flex; align-items: baseline; gap: 6px;
-  }
-  .streak-body .st-val small {
-    font-size: 12px; opacity: .85; font-weight: 600;
-  }
-  .streak-body .st-sub {
-    font-size: 11px; opacity: .85; margin-top: 2px;
-  }
-  .streak-bonus {
-    background: rgba(255,255,255,.25);
-    padding: 6px 12px; border-radius: 20px;
-    font-size: 12px; font-weight: 800;
-    position: relative; z-index: 2;
-    flex-shrink: 0;
-  }
-  .streak-card.done {
-    background: linear-gradient(135deg, #6b7280, #9ca3af);
-    box-shadow: 0 4px 14px rgba(107,114,128,.3);
-  }
+  .streak-body .st-top { font-size: 11px; opacity: .9; text-transform: uppercase; letter-spacing: .5px; font-weight: 700; margin-bottom: 3px; }
+  .streak-body .st-val { font-size: 22px; font-weight: 800; display: flex; align-items: baseline; gap: 6px; }
+  .streak-body .st-val small { font-size: 12px; opacity: .85; font-weight: 600; }
+  .streak-body .st-sub { font-size: 11px; opacity: .85; margin-top: 2px; }
+  .streak-bonus { background: rgba(255,255,255,.25); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 800; position: relative; z-index: 2; flex-shrink: 0; }
+  .streak-card.done { background: linear-gradient(135deg, #6b7280, #9ca3af); box-shadow: 0 4px 14px rgba(107,114,128,.3); }
   .streak-card.done .streak-icon { animation: none; }
 
-  /* SECTION */
-  .section-title {
-    font-size: 15px; font-weight: 700; color: var(--wa-deep);
-    margin: 22px 0 12px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .section-title .title-left {
-    display: flex; align-items: center; gap: 8px;
-  }
-  .section-title .badge-count {
-    background: rgba(18,140,126,.12); color: var(--wa-dark);
-    font-size: 11px; padding: 3px 10px; border-radius: 10px;
-    font-weight: 700;
-  }
+  /* TOP CARD */
+  .top-card { background: linear-gradient(135deg, #1a1a1a, #2d2d2d); color: #fff; border-radius: 16px; padding: 16px 18px; margin-bottom: 20px; box-shadow: 0 4px 18px rgba(0,0,0,.3); position: relative; overflow: hidden; }
+  .top-card::before { content: ''; position: absolute; right: -30px; top: -30px; width: 130px; height: 130px; border-radius: 50%; background: radial-gradient(circle, rgba(255,184,0,.3), transparent 70%); }
+  .top-card .tc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; position: relative; z-index: 2; }
+  .top-card .tc-title { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; letter-spacing: .3px; }
+  .top-card .tc-title svg { stroke: var(--gold); }
+  .top-card .tc-jackpot { background: linear-gradient(135deg, var(--gold), #FFD966); color: #1a1a1a; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 12px; box-shadow: 0 3px 10px rgba(255,184,0,.4); }
+  .top-card .tc-body { display: flex; align-items: center; gap: 14px; position: relative; z-index: 2; }
+  .top-card .tc-icon { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), #FFD966); display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; box-shadow: 0 4px 14px rgba(255,184,0,.4); }
+  .top-card .tc-info { flex: 1; }
+  .top-card .tc-lbl { font-size: 11px; opacity: .8; text-transform: uppercase; font-weight: 700; letter-spacing: .4px; margin-bottom: 3px; }
+  .top-card .tc-val { font-size: 22px; font-weight: 800; display: flex; align-items: baseline; gap: 6px; }
+  .top-card .tc-val small { font-size: 12px; opacity: .85; font-weight: 600; }
+  .top-card .tc-sub { font-size: 11px; opacity: .75; margin-top: 3px; }
+  .top-card .tc-btn { width: 100%; margin-top: 14px; background: linear-gradient(135deg, var(--gold), #FFD966); color: #1a1a1a; border: none; border-radius: 12px; padding: 12px; font-size: 13.5px; font-weight: 800; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; position: relative; z-index: 2; transition: transform .15s; box-shadow: 0 4px 12px rgba(255,184,0,.3); }
+  .top-card .tc-btn:active { transform: scale(.97); }
+  .top-card .tc-btn svg { stroke: #1a1a1a; }
+  .top-card.eligible { background: linear-gradient(135deg, #B45309, var(--gold)); }
+  .top-card.eligible .tc-icon { background: #fff; }
 
-  /* CARROUSEL */
+  .section-title { font-size: 15px; font-weight: 700; color: var(--wa-deep); margin: 22px 0 12px; display: flex; align-items: center; justify-content: space-between; }
+  .section-title .title-left { display: flex; align-items: center; gap: 8px; }
+  .section-title .badge-count { background: rgba(18,140,126,.12); color: var(--wa-dark); font-size: 11px; padding: 3px 10px; border-radius: 10px; font-weight: 700; }
+
   .carousel-wrap { overflow: hidden; border-radius: 16px; position: relative; }
   .carousel { display: flex; transition: transform .7s cubic-bezier(.4,0,.2,1); }
   .plant-card { flex: 0 0 100%; background: #fff; position: relative; height: 220px; }
   .plant-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .plant-card .overlay-grad {
-    position: absolute; inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,.75), transparent 60%);
-  }
-  .plant-card .tag {
-    position: absolute; top: 12px; right: 12px;
-    background: var(--alibaba); color: #fff;
-    font-size: 12px; font-weight: 700;
-    padding: 5px 12px; border-radius: 20px;
-    box-shadow: 0 2px 8px rgba(255,106,0,.4);
-  }
-  .plant-card .info {
-    position: absolute; bottom: 14px; left: 16px; right: 16px;
-    color: #fff;
-  }
-  .plant-card .nom {
-    font-size: 20px; font-weight: 700; margin-bottom: 2px;
-    text-shadow: 0 1px 4px rgba(0,0,0,.5);
-  }
+  .plant-card .overlay-grad { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.75), transparent 60%); }
+  .plant-card .tag { position: absolute; top: 12px; right: 12px; background: var(--alibaba); color: #fff; font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 20px; box-shadow: 0 2px 8px rgba(255,106,0,.4); }
+  .plant-card .info { position: absolute; bottom: 14px; left: 16px; right: 16px; color: #fff; }
+  .plant-card .nom { font-size: 20px; font-weight: 700; margin-bottom: 2px; text-shadow: 0 1px 4px rgba(0,0,0,.5); }
   .plant-card .prix { font-size: 13px; opacity: .9; }
   .dots { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
-  .dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: #d1d5db; transition: all .3s;
-  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #d1d5db; transition: all .3s; }
   .dot.active { background: var(--wa-green); width: 20px; border-radius: 4px; }
 
-  /* 2 BOUTONS RAPIDES */
-  .quick-actions {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 10px; margin-top: 16px;
-  }
-  .qa-btn {
-    border: none; border-radius: 14px;
-    padding: 16px 10px;
-    cursor: pointer; font-family: inherit;
-    display: flex; flex-direction: column; align-items: center;
-    gap: 10px;
-    transition: transform .15s;
-  }
+  .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .qa-btn { border: none; border-radius: 14px; padding: 16px 10px; cursor: pointer; font-family: inherit; display: flex; flex-direction: column; align-items: center; gap: 10px; transition: transform .15s; }
   .qa-btn:active { transform: scale(.96); }
-  .qa-btn.invite {
-    background: linear-gradient(135deg, #FF8A3D, var(--alibaba));
-    color: #fff; box-shadow: 0 4px 14px rgba(255,106,0,.35);
-  }
+  .qa-btn.invite { background: linear-gradient(135deg, #FF8A3D, var(--alibaba)); color: #fff; box-shadow: 0 4px 14px rgba(255,106,0,.35); }
   .qa-btn.invite svg { stroke: #fff; }
-  .qa-btn.recharge {
-    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
-    color: #fff; box-shadow: 0 4px 14px rgba(18,140,126,.35);
-  }
+  .qa-btn.recharge { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; box-shadow: 0 4px 14px rgba(18,140,126,.35); }
   .qa-btn.recharge svg { stroke: #fff; }
-  .qa-btn .qa-icon {
-    width: 42px; height: 42px; border-radius: 50%;
-    background: rgba(255,255,255,.2);
-    display: flex; align-items: center; justify-content: center;
-  }
+  .qa-btn .qa-icon { width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; }
   .qa-btn .qa-label { font-size: 13px; font-weight: 800; }
   .qa-btn .qa-sub { font-size: 10.5px; opacity: .9; margin-top: -4px; }
 
-  /* ========== CARTE MISSIONS ========== */
-  .missions-card {
-    background: #fff;
-    border-radius: 16px;
-    padding: 16px;
-    box-shadow: 0 3px 14px rgba(0,0,0,.07);
-    margin-top: 16px;
-  }
-  .missions-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 14px;
-  }
-  .missions-header .mh-left {
-    display: flex; align-items: center; gap: 8px;
-  }
-  .missions-header .mh-icon {
-    width: 36px; height: 36px; border-radius: 10px;
-    background: linear-gradient(135deg, var(--gold), #FFD966);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  .missions-header .mh-icon svg { stroke: #fff; }
-  .missions-header .mh-txt {
-    font-size: 14px; font-weight: 800; color: var(--wa-deep);
-  }
-  .missions-header .mh-mois {
-    font-size: 10.5px; color: var(--muted);
-    font-weight: 600; margin-top: 1px;
-  }
-  .missions-header .mh-badge {
-    background: rgba(255,184,0,.15);
-    color: #B45309;
-    font-size: 10px; font-weight: 800;
-    padding: 3px 9px; border-radius: 10px;
-    text-transform: uppercase; letter-spacing: .3px;
-  }
-
-  .mission-item {
-    padding: 12px;
-    background: #f7faf8;
-    border-radius: 12px;
-    margin-bottom: 10px;
-  }
+  .missions-card { background: #fff; border-radius: 16px; padding: 16px; box-shadow: 0 3px 14px rgba(0,0,0,.07); margin-top: 16px; }
+  .mission-item { padding: 12px; background: #f7faf8; border-radius: 12px; margin-bottom: 10px; }
   .mission-item:last-child { margin-bottom: 0; }
-  .mission-item.complete {
-    background: linear-gradient(135deg, rgba(37,211,102,.08), rgba(18,140,126,.1));
-    border: 1px solid rgba(37,211,102,.3);
-  }
-
-  .mission-top {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 10px; margin-bottom: 8px;
-  }
+  .mission-item.complete { background: linear-gradient(135deg, rgba(37,211,102,.08), rgba(18,140,126,.1)); border: 1px solid rgba(37,211,102,.3); }
+  .mission-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
   .mission-info { flex: 1; min-width: 0; }
-  .mission-info .mi-title {
-    font-size: 13px; font-weight: 800; color: var(--text);
-    margin-bottom: 2px;
-  }
-  .mission-info .mi-sub {
-    font-size: 11px; color: var(--muted);
-  }
-  .mission-reward {
-    background: linear-gradient(135deg, var(--alibaba), #FF8A3D);
-    color: #fff;
-    font-size: 11px; font-weight: 800;
-    padding: 4px 10px; border-radius: 20px;
-    flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(255,106,0,.3);
-  }
-  .mission-item.complete .mission-reward {
-    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
-    box-shadow: 0 2px 8px rgba(18,140,126,.3);
-  }
+  .mission-info .mi-title { font-size: 13px; font-weight: 800; color: var(--text); margin-bottom: 2px; }
+  .mission-info .mi-sub { font-size: 11px; color: var(--muted); }
+  .mission-reward { background: linear-gradient(135deg, var(--alibaba), #FF8A3D); color: #fff; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(255,106,0,.3); }
+  .mission-item.complete .mission-reward { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); box-shadow: 0 2px 8px rgba(18,140,126,.3); }
+  .mission-progress-bar { height: 8px; background: #e5e7eb; border-radius: 5px; overflow: hidden; margin-bottom: 6px; }
+  .mission-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, var(--alibaba), #FF8A3D); transition: width .8s ease; }
+  .mission-item.complete .mission-fill { background: linear-gradient(90deg, var(--wa-dark), var(--wa-green)); }
+  .mission-bottom { display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--muted); }
+  .mission-bottom .mb-count { font-weight: 800; color: var(--text); }
+  .mission-item.complete .mission-bottom .mb-status { color: var(--wa-dark); font-weight: 800; }
 
-  .mission-progress-bar {
-    height: 8px;
-    background: #e5e7eb;
-    border-radius: 5px;
-    overflow: hidden;
-    margin-bottom: 6px;
-  }
-  .mission-fill {
-    height: 100%; border-radius: 5px;
-    background: linear-gradient(90deg, var(--alibaba), #FF8A3D);
-    transition: width .8s ease;
-  }
-  .mission-item.complete .mission-fill {
-    background: linear-gradient(90deg, var(--wa-dark), var(--wa-green));
-  }
-
-  .mission-bottom {
-    display: flex; align-items: center; justify-content: space-between;
-    font-size: 11px; color: var(--muted);
-  }
-  .mission-bottom .mb-count {
-    font-weight: 800; color: var(--text);
-  }
-  .mission-item.complete .mission-bottom .mb-status {
-    color: var(--wa-dark); font-weight: 800;
-  }
-
-  /* 4 BOUTONS */
-  .actions {
-    display: grid; grid-template-columns: repeat(2, 1fr);
-    gap: 10px; margin-top: 16px;
-  }
-  .action-btn {
-    background: #fff; border-radius: 14px;
-    padding: 18px 10px;
-    display: flex; flex-direction: column; align-items: center;
-    gap: 10px; cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06);
-    transition: transform .2s;
-    border: 1px solid #f0f0f0;
-    position: relative;
-  }
+  .actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 16px; }
+  .action-btn { background: #fff; border-radius: 14px; padding: 18px 10px; display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.06); transition: transform .2s; border: 1px solid #f0f0f0; position: relative; }
   .action-btn:active { transform: scale(.95); }
-  .action-btn .icon-circle {
-    width: 46px; height: 46px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-  }
+  .action-btn .icon-circle { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
   .action-btn .label { font-size: 13px; font-weight: 700; color: #333; }
   .action-btn.home .icon-circle { background: rgba(7,94,84,.1); }
   .action-btn.home svg { stroke: var(--wa-deep); }
@@ -437,52 +152,18 @@
   .action-btn.ticket svg { stroke: var(--wa-dark); }
   .action-btn.news .icon-circle { background: rgba(37,211,102,.15); }
   .action-btn.news svg { stroke: var(--wa-green); }
-  .action-btn.current::before {
-    content: 'Actuel';
-    position: absolute; top: 8px; right: 8px;
-    background: var(--wa-green); color: #fff;
-    font-size: 9px; font-weight: 800;
-    padding: 2px 7px; border-radius: 10px;
-    text-transform: uppercase; letter-spacing: .3px;
-  }
+  .action-btn.current::before { content: 'Actuel'; position: absolute; top: 8px; right: 8px; background: var(--wa-green); color: #fff; font-size: 9px; font-weight: 800; padding: 2px 7px; border-radius: 10px; text-transform: uppercase; letter-spacing: .3px; }
 
-  /* BOTTOM NAV */
-  .bottom-nav {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    display: flex; background: #fff;
-    border-top: 1px solid #e5e7eb;
-    box-shadow: 0 -2px 12px rgba(0,0,0,.06);
-    z-index: 100;
-  }
-  .nav-item {
-    flex: 1; display: flex; flex-direction: column; align-items: center;
-    padding: 9px 0 10px; cursor: pointer;
-    color: #9ca3af; font-size: 11px; gap: 4px;
-    font-weight: 500; text-decoration: none;
-  }
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: #fff; border-top: 1px solid #e5e7eb; box-shadow: 0 -2px 12px rgba(0,0,0,.06); z-index: 100; }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 9px 0 10px; cursor: pointer; color: #9ca3af; font-size: 11px; gap: 4px; font-weight: 500; text-decoration: none; }
   .nav-item svg { stroke: #9ca3af; }
   .nav-item.active { color: var(--wa-dark); font-weight: 700; }
   .nav-item.active svg { stroke: var(--wa-green); }
 
-  /* TOAST */
-  .toast {
-    position: fixed; left: 50%; bottom: 100px;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--wa-deep); color: #fff;
-    padding: 12px 22px; border-radius: 30px;
-    font-size: 14px; font-weight: 600;
-    box-shadow: 0 6px 20px rgba(0,0,0,.25);
-    opacity: 0; pointer-events: none;
-    transition: all .3s; z-index: 1000;
-    display: flex; align-items: center; gap: 8px;
-    max-width: 90%;
-  }
+  .toast { position: fixed; left: 50%; bottom: 100px; transform: translateX(-50%) translateY(20px); background: var(--wa-deep); color: #fff; padding: 12px 22px; border-radius: 30px; font-size: 14px; font-weight: 600; box-shadow: 0 6px 20px rgba(0,0,0,.25); opacity: 0; pointer-events: none; transition: all .3s; z-index: 1000; display: flex; align-items: center; gap: 8px; max-width: 90%; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast svg { stroke: var(--wa-green); flex-shrink: 0; }
-  .toast.streak {
-    background: linear-gradient(135deg, #FF4500, #FF6B35);
-    box-shadow: 0 6px 24px rgba(255,69,0,.5);
-  }
+  .toast.streak { background: linear-gradient(135deg, #FF4500, #FF6B35); box-shadow: 0 6px 24px rgba(255,69,0,.5); }
   .toast.streak svg { stroke: #fff; }
   .toast.error { background: #b91c1c; }
   .toast.error svg { stroke: #fff; }
@@ -498,9 +179,7 @@
   <header class="header">
     <div class="burger" onclick="toggleMenu()">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round">
-        <line x1="3" y1="6" x2="21" y2="6"/>
-        <line x1="3" y1="12" x2="21" y2="12"/>
-        <line x1="3" y1="18" x2="21" y2="18"/>
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
       </svg>
     </div>
     <div class="logo">Affinity<span> Network</span></div>
@@ -511,41 +190,32 @@
   <nav class="menu" id="menu">
     <div class="menu-header">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01"/>
+        <path d="M3 21h18M5 21V7l7-4 7 4v14"/>
       </svg>
       Affinity Network
     </div>
-
     <div class="menu-item invite" onclick="go('parrainage.html')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-        <circle cx="8.5" cy="7" r="4"/>
-        <line x1="20" y1="8" x2="20" y2="14"/>
-        <line x1="23" y1="11" x2="17" y2="11"/>
+        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/>
+        <line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>
       </svg>
       Inviter un ami
     </div>
-
     <div class="menu-item recharge" onclick="go('recharge.html')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="12" y1="5" x2="12" y2="19"/>
-        <line x1="5" y1="12" x2="19" y2="12"/>
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
       </svg>
       Recharger mon solde
     </div>
-
     <div class="menu-item missions" onclick="go('missions.html')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
         <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
         <path d="M4 22h16"/>
-        <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
-        <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
         <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
       </svg>
       Missions du mois
     </div>
-
     <div class="menu-item active" onclick="go('travail.html')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
         <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
@@ -570,7 +240,6 @@
       </svg>
       Notre entreprise
     </div>
-
     <div class="menu-footer">
       <button class="btn-logout" onclick="logout()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -589,14 +258,12 @@
       <p>Prêt à accomplir des tâches et gagner aujourd'hui ?</p>
     </div>
 
-    <!-- CARTE SOLDE -->
     <div class="solde anim d2">
       <div class="label">Solde disponible</div>
       <div class="montant" id="userSolde">0 FCFA</div>
       <div class="sub">Retirez dès 1 000 FCFA</div>
     </div>
 
-    <!-- CARTE STREAK -->
     <div class="streak-card anim d2" id="streakCard">
       <div class="streak-icon">🔥</div>
       <div class="streak-body">
@@ -610,99 +277,67 @@
       <div class="streak-bonus" id="streakBonus">+25 F</div>
     </div>
 
-    <!-- CARROUSEL -->
+    <!-- TOP DU MOIS -->
+    <div class="top-card anim d2" id="topCard">
+      <div class="tc-head">
+        <div class="tc-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+            <path d="M4 22h16"/>
+            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+          </svg>
+          Top du mois
+        </div>
+        <div class="tc-jackpot" id="tcJackpot">100 000 F</div>
+      </div>
+      <div class="tc-body">
+        <div class="tc-icon">🏆</div>
+        <div class="tc-info">
+          <div class="tc-lbl">Ma position</div>
+          <div class="tc-val" id="tcPosition">—</div>
+          <div class="tc-sub" id="tcSub">—</div>
+        </div>
+      </div>
+      <button class="tc-btn" onclick="go('parrainage.html')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        </svg>
+        Voir le classement complet
+      </button>
+    </div>
+
     <div class="section-title anim d3">
       <div class="title-left">Plantations & cultures</div>
     </div>
     <div class="carousel-wrap anim d3">
       <div class="carousel" id="carousel">
-        <div class="plant-card">
-          <img src="https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=600" alt="Maïs">
-          <div class="overlay-grad"></div>
-          <span class="tag">+250 F</span>
-          <div class="info">
-            <div class="nom">Maïs</div>
-            <div class="prix">Disponible maintenant</div>
-          </div>
-        </div>
-        <div class="plant-card">
-          <img src="https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=600" alt="Cacao">
-          <div class="overlay-grad"></div>
-          <span class="tag">+600 F</span>
-          <div class="info">
-            <div class="nom">Cacao</div>
-            <div class="prix">Disponible maintenant</div>
-          </div>
-        </div>
-        <div class="plant-card">
-          <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=600" alt="Café">
-          <div class="overlay-grad"></div>
-          <span class="tag">+1 250 F</span>
-          <div class="info">
-            <div class="nom">Café</div>
-            <div class="prix">Disponible maintenant</div>
-          </div>
-        </div>
-        <div class="plant-card">
-          <img src="https://images.unsplash.com/photo-1591892150205-4a5d4a2a0e8c?w=600" alt="Palmier">
-          <div class="overlay-grad"></div>
-          <span class="tag">+1 700 F</span>
-          <div class="info">
-            <div class="nom">Palmier à huile</div>
-            <div class="prix">Disponible maintenant</div>
-          </div>
-        </div>
-        <div class="plant-card">
-          <img src="https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=600" alt="Banane">
-          <div class="overlay-grad"></div>
-          <span class="tag">+2 200 F</span>
-          <div class="info">
-            <div class="nom">Banane</div>
-            <div class="prix">Disponible maintenant</div>
-          </div>
-        </div>
-        <div class="plant-card">
-          <img src="https://images.unsplash.com/photo-1508747703725-719777637510?w=600" alt="Arachide">
-          <div class="overlay-grad"></div>
-          <span class="tag">+3 200 F</span>
-          <div class="info">
-            <div class="nom">Arachide</div>
-            <div class="prix">Disponible maintenant</div>
-          </div>
-        </div>
-        <div class="plant-card">
-          <img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600" alt="Riz">
-          <div class="overlay-grad"></div>
-          <span class="tag">+5 200 F</span>
-          <div class="info">
-            <div class="nom">Riz</div>
-            <div class="prix">Disponible maintenant</div>
-          </div>
-        </div>
+        <div class="plant-card"><img src="https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=600" alt="Maïs"><div class="overlay-grad"></div><span class="tag">+250 F</span><div class="info"><div class="nom">Maïs</div><div class="prix">Disponible maintenant</div></div></div>
+        <div class="plant-card"><img src="https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=600" alt="Cacao"><div class="overlay-grad"></div><span class="tag">+600 F</span><div class="info"><div class="nom">Cacao</div><div class="prix">Disponible maintenant</div></div></div>
+        <div class="plant-card"><img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=600" alt="Café"><div class="overlay-grad"></div><span class="tag">+1 250 F</span><div class="info"><div class="nom">Café</div><div class="prix">Disponible maintenant</div></div></div>
+        <div class="plant-card"><img src="https://images.unsplash.com/photo-1591892150205-4a5d4a2a0e8c?w=600" alt="Palmier"><div class="overlay-grad"></div><span class="tag">+1 700 F</span><div class="info"><div class="nom">Palmier à huile</div><div class="prix">Disponible maintenant</div></div></div>
+        <div class="plant-card"><img src="https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=600" alt="Banane"><div class="overlay-grad"></div><span class="tag">+2 200 F</span><div class="info"><div class="nom">Banane</div><div class="prix">Disponible maintenant</div></div></div>
+        <div class="plant-card"><img src="https://images.unsplash.com/photo-1508747703725-719777637510?w=600" alt="Arachide"><div class="overlay-grad"></div><span class="tag">+3 200 F</span><div class="info"><div class="nom">Arachide</div><div class="prix">Disponible maintenant</div></div></div>
+        <div class="plant-card"><img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600" alt="Riz"><div class="overlay-grad"></div><span class="tag">+5 200 F</span><div class="info"><div class="nom">Riz</div><div class="prix">Disponible maintenant</div></div></div>
       </div>
     </div>
     <div class="dots" id="dots"></div>
 
-    <!-- 2 BOUTONS RAPIDES -->
     <div class="quick-actions anim d4">
       <button class="qa-btn invite" onclick="go('parrainage.html')">
         <div class="qa-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-            <circle cx="8.5" cy="7" r="4"/>
-            <line x1="20" y1="8" x2="20" y2="14"/>
-            <line x1="23" y1="11" x2="17" y2="11"/>
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/>
+            <line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>
           </svg>
         </div>
         <div class="qa-label">Inviter</div>
         <div class="qa-sub">Gagne 20%</div>
       </button>
-
       <button class="qa-btn recharge" onclick="go('recharge.html')">
         <div class="qa-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"/>
-            <line x1="5" y1="12" x2="19" y2="12"/>
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
         </div>
         <div class="qa-label">Recharger</div>
@@ -710,15 +345,12 @@
       </button>
     </div>
 
-    <!-- MISSIONS DU MOIS -->
     <div class="section-title anim d4">
       <div class="title-left">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
           <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
           <path d="M4 22h16"/>
-          <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
-          <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
           <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
         </svg>
         Missions du mois
@@ -727,18 +359,14 @@
     </div>
 
     <div class="missions-card anim d4" id="missionsCard">
-      <div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">
-        Chargement des missions...
-      </div>
+      <div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">Chargement des missions...</div>
     </div>
 
-    <!-- 4 BOUTONS -->
     <div class="actions anim d5">
       <div class="action-btn home current" onclick="go('dashboard.html')">
         <div class="icon-circle">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <polyline points="9 22 9 12 15 12 15 22"/>
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
           </svg>
         </div>
         <div class="label">Accueil</div>
@@ -746,11 +374,7 @@
       <div class="action-btn rank" onclick="go('classement.html')">
         <div class="icon-circle">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-            <path d="M4 22h16"/>
-            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
-            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/>
             <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
           </svg>
         </div>
@@ -759,8 +383,7 @@
       <div class="action-btn ticket" onclick="go('ticket.html')">
         <div class="icon-circle">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
-            <path d="M13 5v14"/>
+            <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v14"/>
           </svg>
         </div>
         <div class="label">Ticket</div>
@@ -819,70 +442,40 @@
 
   let CURRENT_USER = null;
 
-  // ================= INIT =================
   (async function init() {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) {
-      window.location.replace('inscription.html');
-      return;
-    }
+    if (!session) { window.location.replace('inscription.html'); return; }
     CURRENT_USER = session.user;
 
-    // 1. Charger le profil
     await loadProfile();
-
-    // 2. Check streak quotidien (crédite bonus +25 F si nouveau jour)
     await checkStreak();
-
-    // 3. Vérifier les paliers parrainage
     await checkPaliers();
-
-    // 4. Vérifier le bonus 5 filleuls rechargés
     await checkBonusRecharges();
-
-    // 5. Charger les missions du mois
     await loadMissions();
-
-    // 6. Recharger le profil (solde à jour)
+    await loadTopCard();
     await loadProfile();
 
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
   })();
 
-  // ================= PROFIL =================
   async function loadProfile() {
-    const { data: profile } = await sb.from('profiles')
-      .select('nom, pseudo, solde')
-      .eq('id', CURRENT_USER.id)
-      .maybeSingle();
-
+    const { data: profile } = await sb.from('profiles').select('nom, pseudo, solde').eq('id', CURRENT_USER.id).maybeSingle();
     const pseudo = profile?.pseudo || CURRENT_USER.email.split('@')[0];
     const solde = profile?.solde ?? 0;
-
     document.getElementById('userPseudo').textContent = pseudo;
     document.getElementById('userSolde').textContent = formatF(solde);
   }
 
-  // ================= STREAK =================
   async function checkStreak() {
     const { data, error } = await sb.rpc('check_streak');
-
-    if (error) {
-      console.warn('Erreur streak:', error);
-      document.getElementById('streakVal').textContent = '0';
-      return;
-    }
-
-    // Mettre à jour la carte
+    if (error) { document.getElementById('streakVal').textContent = '0'; return; }
     const streakVal = document.getElementById('streakVal');
     const streakUnit = document.getElementById('streakUnit');
     const streakSub = document.getElementById('streakSub');
     const streakBonus = document.getElementById('streakBonus');
     const streakCard = document.getElementById('streakCard');
-
     streakVal.textContent = data.streak || 0;
     streakUnit.textContent = (data.streak > 1) ? 'jours' : 'jour';
-
     if (data.already) {
       streakCard.classList.add('done');
       streakSub.textContent = `Record : ${data.record} jour${data.record > 1 ? 's' : ''}`;
@@ -897,111 +490,81 @@
     }
   }
 
-  // ================= PALIERS PARRAINAGE =================
   async function checkPaliers() {
     const { data, error } = await sb.rpc('verifier_paliers_parrainage');
     if (error) return;
     if (data?.bonus_recus > 0) {
-      setTimeout(() => {
-        showToast(`🏅 Palier atteint : +${formatF(data.bonus_recus)} !`, 'streak');
-      }, 1500);
+      setTimeout(() => showToast(`🏅 Palier atteint : +${formatF(data.bonus_recus)} !`, 'streak'), 1500);
     }
   }
 
-  // ================= BONUS RECHARGES FILLEULS =================
   async function checkBonusRecharges() {
     const { data, error } = await sb.rpc('verifier_bonus_recharges_filleuls');
     if (error) return;
     if (data?.bonus > 0) {
-      setTimeout(() => {
-        showToast(`💰 ${data.filleuls} filleuls ont rechargé : +${formatF(data.bonus)} !`, 'streak');
-      }, 2500);
+      setTimeout(() => showToast(`💰 ${data.filleuls} filleuls ont rechargé : +${formatF(data.bonus)} !`, 'streak'), 2500);
     }
   }
 
-  // ================= MISSIONS =================
   async function loadMissions() {
     const { data, error } = await sb.rpc('get_missions_mensuelles');
     const card = document.getElementById('missionsCard');
-
     if (error || !data) {
-      card.innerHTML = `<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">
-        Impossible de charger les missions</div>`;
+      card.innerHTML = `<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">Impossible de charger les missions</div>`;
       return;
     }
-
     const m1 = data.mission_3_plans;
     const m2 = data.mission_10_amis;
-
-    // Badge
     const completeCount = (m1.complete ? 1 : 0) + (m2.complete ? 1 : 0);
     document.getElementById('missionsBadge').textContent = `${completeCount}/2`;
 
-    // Mois formaté
-    const moisDate = new Date(data.mois + '-01');
-    const moisLabel = moisDate.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
-
     card.innerHTML = `
-      <div class="missions-header">
-        <div class="mh-left">
-          <div class="mh-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-              <path d="M4 22h16"/>
-              <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
-            </svg>
-          </div>
-          <div>
-            <div class="mh-txt">Missions mensuelles</div>
-            <div class="mh-mois">${moisLabel}</div>
-          </div>
-        </div>
-      </div>
+      ${renderMission('🎯', 'Active 3 plans ce mois', 'Objectif : 3 plans activés', m1)}
+      ${renderMission('👥', '10 amis actifs', '10 amis ayant activé ≥ 6 000 F', m2)}
+    `;
+  }
 
-      <div class="mission-item ${m1.complete ? 'complete' : ''}">
+  function renderMission(icone, titre, sous, m) {
+    const progress = Math.min(100, (m.progression / m.objectif) * 100);
+    const restant = Math.max(0, m.objectif - m.progression);
+    return `
+      <div class="mission-item ${m.complete ? 'complete' : ''}">
         <div class="mission-top">
           <div class="mission-info">
-            <div class="mi-title">🎯 Active 3 plans ce mois</div>
-            <div class="mi-sub">Objectif : 3 plans activés</div>
+            <div class="mi-title">${icone} ${titre}</div>
+            <div class="mi-sub">${sous}</div>
           </div>
-          <div class="mission-reward">+${formatF(m1.bonus)}</div>
+          <div class="mission-reward">+${formatF(m.bonus)}</div>
         </div>
-        <div class="mission-progress-bar">
-          <div class="mission-fill" style="width:${Math.min(100, (m1.progression / m1.objectif) * 100)}%"></div>
-        </div>
+        <div class="mission-progress-bar"><div class="mission-fill" style="width:${progress}%"></div></div>
         <div class="mission-bottom">
-          <span class="mb-count">${m1.progression} / ${m1.objectif}</span>
-          ${m1.complete
-            ? '<span class="mb-status">✓ Terminé</span>'
-            : `<span>${m1.objectif - m1.progression} restant${(m1.objectif - m1.progression) > 1 ? 's' : ''}</span>`
-          }
-        </div>
-      </div>
-
-      <div class="mission-item ${m2.complete ? 'complete' : ''}">
-        <div class="mission-top">
-          <div class="mission-info">
-            <div class="mi-title">👥 10 amis actifs</div>
-            <div class="mi-sub">10 amis ayant activé ≥ 6 000 F</div>
-          </div>
-          <div class="mission-reward">+${formatF(m2.bonus)}</div>
-        </div>
-        <div class="mission-progress-bar">
-          <div class="mission-fill" style="width:${Math.min(100, (m2.progression / m2.objectif) * 100)}%"></div>
-        </div>
-        <div class="mission-bottom">
-          <span class="mb-count">${m2.progression} / ${m2.objectif}</span>
-          ${m2.complete
-            ? '<span class="mb-status">✓ Terminé</span>'
-            : `<span>${m2.objectif - m2.progression} restant${(m2.objectif - m2.progression) > 1 ? 's' : ''}</span>`
-          }
+          <span class="mb-count">${m.progression} / ${m.objectif}</span>
+          ${m.complete ? '<span class="mb-status">✓ Terminé</span>'
+            : `<span>${restant} restant${restant > 1 ? 's' : ''}</span>`}
         </div>
       </div>
     `;
   }
 
-  // ================= UTILITAIRES =================
+  async function loadTopCard() {
+    const { data, error } = await sb.rpc('get_mon_statut_top');
+    if (error || !data) return;
+    const card = document.getElementById('topCard');
+    const posEl = document.getElementById('tcPosition');
+    const subEl = document.getElementById('tcSub');
+    const jackpot = document.getElementById('tcJackpot');
+    jackpot.textContent = formatF(data.montant_total);
+    if (data.eligible) {
+      card.classList.add('eligible');
+      posEl.innerHTML = `Éligible <small>🎉</small>`;
+      subEl.textContent = `${data.filleuls_actifs} filleuls actifs · Objectif atteint !`;
+    } else {
+      posEl.innerHTML = `${data.filleuls_actifs} <small>/ ${data.seuil} filleuls</small>`;
+      const restant = Math.max(0, data.seuil - data.filleuls_actifs);
+      subEl.textContent = `Encore ${restant} filleul${restant > 1 ? 's' : ''} pour être éligible`;
+    }
+  }
+
   function formatF(n) {
     return Math.round(Number(n || 0)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F';
   }
@@ -1022,27 +585,21 @@
     window.location.replace('inscription.html');
   }
 
-  // Carrousel
   const carousel = document.getElementById('carousel');
   const total = carousel.children.length;
   const dotsContainer = document.getElementById('dots');
   let index = 0;
-
   for (let i = 0; i < total; i++) {
     const dot = document.createElement('div');
     dot.className = 'dot' + (i === 0 ? ' active' : '');
     dotsContainer.appendChild(dot);
   }
   const dots = dotsContainer.children;
-
   function goTo(i) {
     index = (i + total) % total;
     carousel.style.transform = `translateX(-${index * 100}%)`;
-    for (let d = 0; d < total; d++) {
-      dots[d].classList.toggle('active', d === index);
-    }
+    for (let d = 0; d < total; d++) dots[d].classList.toggle('active', d === index);
   }
-
   let auto = setInterval(() => goTo(index + 1), 3500);
   let startX = 0;
   carousel.addEventListener('touchstart', e => startX = e.touches[0].clientX);
