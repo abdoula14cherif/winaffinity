@@ -7,12 +7,13 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#075E54">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="icon" type="image/png" href="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root {
     --wa-green: #25D366; --wa-dark: #128C7E; --wa-deep: #075E54;
-    --alibaba: #FF6A00; --gold: #FFB800;
+    --alibaba: #FF6A00; --gold: #FFB800; --vip: #9333EA;
     --bg: #f7f9f8; --text: #1a1a1a; --muted: #6b7280; --border: #e5e7eb;
     --danger: #dc2626; --warn: #f59e0b;
   }
@@ -30,6 +31,8 @@
   .anim { opacity: 0; animation: fadeInUp .4s ease forwards; }
 
   .header { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: linear-gradient(135deg, #1a1a1a, var(--wa-deep)); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.2); padding-top: max(14px, env(safe-area-inset-top)); }
+  .header-logo-wrap { display: flex; align-items: center; gap: 10px; }
+  .header-logo-wrap img { width: 36px; height: 36px; border-radius: 10px; background: #fff; padding: 3px; object-fit: contain; }
   .logo { font-weight: 700; font-size: 17px; display: flex; align-items: center; gap: 8px; }
   .logo .badge-admin { background: var(--alibaba); color: #fff; font-size: 9px; padding: 2px 8px; border-radius: 8px; text-transform: uppercase; letter-spacing: .5px; font-weight: 800; }
   .btn-exit { background: rgba(255,255,255,.15); border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -37,9 +40,11 @@
 
   .tabs { background: #fff; padding: 8px 10px; display: flex; gap: 6px; overflow-x: auto; border-bottom: 1px solid var(--border); position: sticky; top: 64px; z-index: 99; -ms-overflow-style: none; scrollbar-width: none; }
   .tabs::-webkit-scrollbar { display: none; }
-  .tab { padding: 10px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; background: #f7faf8; color: var(--muted); border: none; cursor: pointer; font-family: inherit; white-space: nowrap; display: flex; align-items: center; gap: 6px; transition: all .2s; }
+  .tab { padding: 10px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; background: #f7faf8; color: var(--muted); border: none; cursor: pointer; font-family: inherit; white-space: nowrap; display: flex; align-items: center; gap: 6px; transition: all .2s; position: relative; }
   .tab svg { stroke: currentColor; }
   .tab.active { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; box-shadow: 0 3px 10px rgba(18,140,126,.3); }
+  .tab .tab-badge { background: var(--danger); color: #fff; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 8px; min-width: 18px; text-align: center; display: none; }
+  .tab .tab-badge.show { display: inline-block; }
 
   .content { padding: 16px; }
   .panel { display: none; }
@@ -61,13 +66,14 @@
   .btn-add:active { transform: scale(.95); }
   .btn-add svg { stroke: #fff; }
 
-  .item-card { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.05); display: flex; align-items: center; gap: 12px; animation: fadeInUp .35s ease forwards; opacity: 0; }
-  .item-card .ic-img { width: 52px; height: 52px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #f3f4f6; }
+  .item-card { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.05); display: flex; align-items: flex-start; gap: 12px; animation: fadeInUp .35s ease forwards; opacity: 0; }
+  .item-card .ic-img { width: 52px; height: 52px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 22px; }
   .item-card .ic-body { flex: 1; min-width: 0; }
   .item-card .ic-name { font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 4px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
-  .item-card .ic-meta { font-size: 11.5px; color: var(--muted); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .item-card .ic-meta { font-size: 11.5px; color: var(--muted); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
   .item-card .ic-meta .dot { color: #d1d5db; }
-  .item-card .ic-actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .item-card .ic-desc { font-size: 12px; color: #4b5563; line-height: 1.5; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #f3f4f6; }
+  .item-card .ic-actions { display: flex; gap: 4px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
   .icon-btn { width: 32px; height: 32px; border-radius: 9px; background: #f7faf8; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s, transform .15s; }
   .icon-btn:active { transform: scale(.9); }
   .icon-btn.edit svg { stroke: var(--wa-dark); }
@@ -76,6 +82,10 @@
   .icon-btn.delete:hover { background: rgba(220,38,38,.1); }
   .icon-btn.view svg { stroke: var(--alibaba); }
   .icon-btn.view:hover { background: rgba(255,106,0,.1); }
+  .icon-btn.check svg { stroke: #166534; }
+  .icon-btn.check:hover { background: rgba(37,211,102,.15); }
+  .icon-btn.close-x svg { stroke: var(--danger); }
+  .icon-btn.close-x:hover { background: rgba(220,38,38,.1); }
 
   .badge { display: inline-flex; align-items: center; gap: 3px; font-size: 9.5px; font-weight: 800; padding: 3px 8px; border-radius: 8px; text-transform: uppercase; letter-spacing: .3px; }
   .badge.green { background: rgba(37,211,102,.15); color: #166534; }
@@ -84,6 +94,7 @@
   .badge.blue { background: rgba(59,130,246,.15); color: #2563eb; }
   .badge.gray { background: rgba(107,114,128,.15); color: #4b5563; }
   .badge.gold { background: rgba(255,184,0,.15); color: #B45309; }
+  .badge.vip { background: linear-gradient(135deg, rgba(147,51,234,.15), rgba(217,70,239,.15)); color: var(--vip); }
 
   .empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; background: #fff; border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
   .empty svg { stroke: #d1d5db; margin-bottom: 10px; }
@@ -112,7 +123,6 @@
   .btn-primary { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; box-shadow: 0 4px 14px rgba(18,140,126,.3); }
   .btn-primary:active { transform: scale(.97); }
   .btn-primary svg { stroke: #fff; }
-  .btn-primary:disabled { background: #d1d5db; box-shadow: none; cursor: not-allowed; }
   .btn-danger { background: linear-gradient(135deg, #b91c1c, #dc2626); color: #fff; box-shadow: 0 4px 14px rgba(185,28,28,.3); }
   .btn-danger:active { transform: scale(.97); }
   .btn-danger svg { stroke: #fff; }
@@ -120,17 +130,6 @@
   .btn-warn:active { transform: scale(.97); }
   .btn-row { display: flex; gap: 8px; margin-top: 8px; }
   .btn-row .btn-primary, .btn-row .btn-danger, .btn-row .btn-warn { flex: 1; }
-
-  .sk-item { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
-  .sk-line { height: 12px; border-radius: 6px; background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; margin-bottom: 8px; }
-  .sk-line.w1 { width: 40%; height: 16px; }
-  .sk-line.w2 { width: 70%; }
-
-  .toast { position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px); background: var(--wa-deep); color: #fff; padding: 12px 22px; border-radius: 30px; font-size: 14px; font-weight: 600; box-shadow: 0 6px 20px rgba(0,0,0,.25); opacity: 0; pointer-events: none; transition: all .3s; z-index: 1000; display: flex; align-items: center; gap: 8px; max-width: 90%; }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  .toast svg { stroke: var(--wa-green); flex-shrink: 0; }
-  .toast.error { background: #b91c1c; }
-  .toast.error svg { stroke: #fff; }
 
   .config-group { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
   .config-group-title { font-size: 12.5px; font-weight: 800; color: var(--wa-deep); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 12px; }
@@ -145,7 +144,31 @@
   .search-input { padding: 8px 12px; border-radius: 8px; border: 1.5px solid var(--border); font-family: inherit; font-size: 13px; max-width: 180px; outline: none; }
   .search-input:focus { border-color: var(--wa-green); }
 
-  .rank-medal { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; background: #f7faf8; flex-shrink: 0; }
+  .filter-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; -ms-overflow-style: none; scrollbar-width: none; }
+  .filter-row::-webkit-scrollbar { display: none; }
+  .filter-chip { padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; background: #fff; border: 1.5px solid var(--border); color: var(--muted); cursor: pointer; font-family: inherit; white-space: nowrap; }
+  .filter-chip.active { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; border-color: transparent; }
+
+  .candidature-reponses {
+    background: #f7faf8; border-radius: 10px; padding: 10px 12px; margin-top: 8px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .candidature-reponses .rep-row {
+    display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px;
+  }
+  .candidature-reponses .rep-row .k { color: var(--muted); font-weight: 600; }
+  .candidature-reponses .rep-row .v { color: var(--text); font-weight: 700; text-align: right; word-break: break-word; max-width: 60%; }
+
+  .sk-item { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+  .sk-line { height: 12px; border-radius: 6px; background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; margin-bottom: 8px; }
+  .sk-line.w1 { width: 40%; height: 16px; }
+  .sk-line.w2 { width: 70%; }
+
+  .toast { position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px); background: var(--wa-deep); color: #fff; padding: 12px 22px; border-radius: 30px; font-size: 14px; font-weight: 600; box-shadow: 0 6px 20px rgba(0,0,0,.25); opacity: 0; pointer-events: none; transition: all .3s; z-index: 1000; display: flex; align-items: center; gap: 8px; max-width: 90%; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast svg { stroke: var(--wa-green); flex-shrink: 0; }
+  .toast.error { background: #b91c1c; }
+  .toast.error svg { stroke: #fff; }
 </style>
 </head>
 <body>
@@ -156,10 +179,13 @@
   </div>
 
   <header class="header">
-    <div class="logo">
-      Affinity <span class="badge-admin">Admin</span>
+    <div class="header-logo-wrap">
+      <img src="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png" alt="">
+      <div class="logo">
+        Affinity <span class="badge-admin">Admin</span>
+      </div>
     </div>
-    <button class="btn-exit" onclick="go('dashboard.html')">
+    <button class="btn-exit" onclick="go('dashboard')">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
       </svg>
@@ -173,6 +199,23 @@
       </svg>
       Stats
     </button>
+    <button class="tab" data-tab="candidatures">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+      </svg>
+      Partenaires
+      <span class="tab-badge" id="candBadge"></span>
+    </button>
+    <button class="tab" data-tab="types">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 7h-9M14 17H5"/>
+        <circle cx="17" cy="17" r="3"/>
+        <circle cx="7" cy="7" r="3"/>
+      </svg>
+      Types
+    </button>
     <button class="tab" data-tab="retraits">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
@@ -183,7 +226,7 @@
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
       </svg>
-      Utilisateurs
+      Users
     </button>
     <button class="tab" data-tab="plans">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -201,7 +244,7 @@
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Z"/>
       </svg>
-      Actualités
+      Actus
     </button>
     <button class="tab" data-tab="loteries">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -228,7 +271,7 @@
         <path d="M4 22h16"/>
         <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
       </svg>
-      Top du mois
+      Top
     </button>
   </nav>
 
@@ -240,6 +283,29 @@
         <div class="sk-item"><div class="sk-line w1"></div><div class="sk-line w2"></div></div>
         <div class="sk-item"><div class="sk-line w1"></div><div class="sk-line w2"></div></div>
       </div>
+    </div>
+
+    <!-- CANDIDATURES PARTENAIRES -->
+    <div class="panel" id="panel-candidatures">
+      <div class="admin-toolbar">
+        <h2>Candidatures partenaires</h2>
+        <span class="badge orange" id="candPendingBadge">— en attente</span>
+      </div>
+      <div class="filter-row" id="candFilters">
+        <button class="filter-chip active" data-filter="all">Toutes</button>
+        <button class="filter-chip" data-filter="nouveau">Nouvelles</button>
+        <button class="filter-chip" data-filter="approuve">Approuvées</button>
+        <button class="filter-chip" data-filter="rejete">Rejetées</button>
+      </div>
+      <div id="candList"></div>
+    </div>
+
+    <!-- TYPES PARTENAIRES -->
+    <div class="panel" id="panel-types">
+      <div class="admin-toolbar">
+        <h2>Types de partenaires</h2>
+      </div>
+      <div id="typesList"></div>
     </div>
 
     <!-- RETRAITS -->
@@ -324,7 +390,7 @@
       <div id="paysList"></div>
     </div>
 
-    <!-- BONUS CONFIG -->
+    <!-- BONUS -->
     <div class="panel" id="panel-bonus">
       <div class="admin-toolbar">
         <h2>Configuration des bonus</h2>
@@ -336,7 +402,6 @@
         </button>
       </div>
       <div id="bonusConfigList"></div>
-
       <div class="admin-toolbar" style="margin-top:24px;">
         <h2>Derniers bonus distribués</h2>
         <span class="badge orange" id="bonusTotalBadge">— F</span>
@@ -356,18 +421,16 @@
         </button>
       </div>
       <div id="topConfigList" style="margin-bottom:20px;"></div>
-
       <div class="admin-toolbar">
         <h2>Calculer le top du mois</h2>
       </div>
       <div style="background:#fff;border-radius:14px;padding:18px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.05);">
         <div style="font-size:13px;line-height:1.6;color:var(--muted);margin-bottom:14px;">
-          Cette action va <b style="color:#dc2626;">désigner les gagnants</b>, créditer leurs soldes et enregistrer les résultats. Une seule fois par mois.
+          Cette action va <b style="color:#dc2626;">désigner les gagnants</b>, créditer leurs soldes et enregistrer les résultats.
         </div>
         <div style="margin-bottom:14px;">
           <label style="display:block;font-size:12.5px;font-weight:700;color:var(--wa-deep);margin-bottom:6px;">Mois à calculer</label>
           <input type="month" id="topMoisInput" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;outline:none;background:#f7faf8;">
-          <div style="font-size:11px;color:var(--muted);margin-top:6px;">Par défaut : mois précédent.</div>
         </div>
         <button class="btn-add" onclick="lancerCalculTop()" style="width:100%;padding:14px;justify-content:center;font-size:14px;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -376,7 +439,6 @@
           Lancer le calcul
         </button>
       </div>
-
       <div class="admin-toolbar">
         <h2>Historique des tops</h2>
       </div>
@@ -413,14 +475,20 @@
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
   let CURRENT_USER = null;
-  let DATA = { retraits: [], users: [], plans: [], plantations: [], actualites: [], pays: [], loteries: [], bonusConfig: [], bonusHistory: [], topConfig: [], topHistory: [] };
+  let DATA = {
+    retraits: [], users: [], plans: [], plantations: [], actualites: [],
+    pays: [], loteries: [], bonusConfig: [], bonusHistory: [],
+    topConfig: [], topHistory: [],
+    candidatures: [], typesPartenaires: []
+  };
+  let CAND_FILTER = 'all';
 
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 
   // ================= INIT =================
   (async function init() {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) { window.location.replace('inscription.html'); return; }
+    if (!session) { window.location.replace('inscription'); return; }
     CURRENT_USER = session.user;
 
     const { data: profile } = await sb.from('profiles').select('is_admin').eq('id', session.user.id).maybeSingle();
@@ -429,7 +497,7 @@
         <div style="padding:80px 30px;text-align:center;font-family:sans-serif;">
           <h1 style="color:#dc2626;margin-bottom:12px;">Accès refusé</h1>
           <p style="color:#666;">Tu n'es pas administrateur.</p>
-          <button onclick="window.location.replace('dashboard.html')" style="margin-top:24px;padding:12px 24px;background:#25D366;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;">
+          <button onclick="window.location.replace('dashboard')" style="margin-top:24px;padding:12px 24px;background:#25D366;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;">
             Retour
           </button>
         </div>`;
@@ -439,7 +507,8 @@
     await Promise.all([
       loadStats(), loadRetraits(), loadUsers(), loadPlans(), loadPlantations(),
       loadActualites(), loadLoteries(), loadPays(), loadBonusConfig(), loadBonusHistory(),
-      loadTopConfig(), loadTopHistory()
+      loadTopConfig(), loadTopHistory(),
+      loadCandidatures(), loadTypesPartenaires()
     ]);
 
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
@@ -476,6 +545,269 @@
     `).join('');
   }
 
+  // ================= CANDIDATURES PARTENAIRES =================
+  async function loadCandidatures() {
+    const { data, error } = await sb.from('partenaires_candidatures')
+      .select('*, profiles(nom, pseudo)')
+      .order('created_at', { ascending: false })
+      .limit(100);
+    if (error) { console.warn(error); return; }
+    DATA.candidatures = data || [];
+
+    const pending = DATA.candidatures.filter(c => c.statut === 'nouveau').length;
+    document.getElementById('candPendingBadge').textContent = pending + ' en attente';
+    document.getElementById('retraitsPendingBadge') && (document.getElementById('retraitsPendingBadge').textContent = pending + ' nouvelles');
+
+    const badge = document.getElementById('candBadge');
+    if (pending > 0) {
+      badge.textContent = pending;
+      badge.classList.add('show');
+    } else {
+      badge.classList.remove('show');
+    }
+
+    renderCandidatures();
+  }
+
+  function renderCandidatures() {
+    const list = document.getElementById('candList');
+    const filtered = CAND_FILTER === 'all'
+      ? DATA.candidatures
+      : DATA.candidatures.filter(c => c.statut === CAND_FILTER);
+
+    if (filtered.length === 0) {
+      list.innerHTML = emptyBox('Aucune candidature');
+      return;
+    }
+
+    const statutInfo = {
+      nouveau: { label: 'Nouveau', classe: 'orange' },
+      approuve: { label: 'Approuvé', classe: 'green' },
+      rejete: { label: 'Rejeté', classe: 'red' }
+    };
+
+    list.innerHTML = filtered.map((c, i) => {
+      const info = statutInfo[c.statut] || { label: c.statut, classe: 'gray' };
+      const reponses = c.reponses || {};
+      const reponsesHTML = Object.keys(reponses).length > 0
+        ? `<div class="candidature-reponses">
+            ${Object.entries(reponses).map(([k, v]) => `
+              <div class="rep-row">
+                <span class="k">${escapeHtml(k.replace(/_/g, ' '))}</span>
+                <span class="v">${escapeHtml(String(v).substring(0, 100))}</span>
+              </div>
+            `).join('')}
+          </div>`
+        : '';
+
+      return `
+        <div class="item-card" style="animation-delay:${i * .03}s">
+          <div class="ic-img">${getTypeIcon(c.type_code)}</div>
+          <div class="ic-body">
+            <div class="ic-name">
+              ${escapeHtml(c.nom)}
+              <span class="badge ${info.classe}">${info.label}</span>
+              ${c.type_nom ? `<span class="badge gray">${escapeHtml(c.type_nom)}</span>` : ''}
+            </div>
+            <div class="ic-meta">
+              <span>📞 ${escapeHtml(c.telephone)}</span>
+              <span class="dot">•</span>
+              <span>${escapeHtml(c.pays_region)}</span>
+              <span class="dot">•</span>
+              <span>${timeAgo(c.created_at)}</span>
+            </div>
+            <div class="ic-meta">
+              <span>${escapeHtml(c.email)}</span>
+              ${c.recompense_attendue > 0 ? `<span class="dot">•</span><span style="color:var(--gold);font-weight:800;">+${formatF(c.recompense_attendue)}</span>` : ''}
+              ${c.niveau_vip_attendu > 0 ? `<span class="dot">•</span><span style="color:var(--vip);font-weight:800;">VIP ${c.niveau_vip_attendu}</span>` : ''}
+            </div>
+            ${c.message ? `<div class="ic-desc">${escapeHtml(c.message)}</div>` : ''}
+            ${reponsesHTML}
+          </div>
+          <div class="ic-actions">
+            ${c.statut === 'nouveau' ? `
+              <button class="icon-btn check" onclick="approuverCandidature('${c.id}')" title="Approuver">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </button>
+              <button class="icon-btn close-x" onclick="rejeterCandidature('${c.id}')" title="Rejeter">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  document.getElementById('candFilters').addEventListener('click', (e) => {
+    const chip = e.target.closest('.filter-chip');
+    if (!chip) return;
+    document.querySelectorAll('#candFilters .filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    CAND_FILTER = chip.dataset.filter;
+    renderCandidatures();
+  });
+
+  async function approuverCandidature(id) {
+    const note = prompt('Note interne (optionnel) :', '');
+    if (note === null) return;
+
+    const { data, error } = await sb.rpc('approuver_candidature_partenaire', {
+      p_candidature_id: id,
+      p_note: note || null
+    });
+
+    if (error) return showToast('Erreur : ' + error.message, true);
+
+    showToast(`✅ Approuvé ! +${formatF(data.recompense)} crédités · VIP ${data.vip}`);
+    await loadCandidatures();
+  }
+
+  async function rejeterCandidature(id) {
+    const note = prompt('Motif du rejet :', '');
+    if (note === null) return;
+    if (!note.trim()) return showToast('Motif requis', true);
+
+    const { error } = await sb.rpc('rejeter_candidature_partenaire', {
+      p_candidature_id: id,
+      p_note: note
+    });
+
+    if (error) return showToast('Erreur : ' + error.message, true);
+
+    showToast('Candidature rejetée');
+    await loadCandidatures();
+  }
+
+  // ================= TYPES PARTENAIRES =================
+  async function loadTypesPartenaires() {
+    const { data, error } = await sb.from('types_partenaires').select('*').order('ordre');
+    if (error) { console.warn(error); return; }
+    DATA.typesPartenaires = data || [];
+    renderTypesPartenaires();
+  }
+
+  function renderTypesPartenaires() {
+    const list = document.getElementById('typesList');
+    if (DATA.typesPartenaires.length === 0) {
+      list.innerHTML = emptyBox('Aucun type de partenaire');
+      return;
+    }
+
+    list.innerHTML = DATA.typesPartenaires.map((t, i) => {
+      const criteres = (t.criteres || []).length;
+      return `
+        <div class="item-card" style="animation-delay:${i * .04}s">
+          <div class="ic-img">${t.icone || '🌟'}</div>
+          <div class="ic-body">
+            <div class="ic-name">
+              ${escapeHtml(t.nom)}
+              ${t.actif ? '' : '<span class="badge red">Inactif</span>'}
+            </div>
+            <div class="ic-meta">
+              <span>${criteres} condition${criteres > 1 ? 's' : ''}</span>
+              ${t.recompense_fcfa > 0 ? `<span class="dot">•</span><span style="color:var(--gold);font-weight:800;">+${formatF(t.recompense_fcfa)}</span>` : ''}
+              ${t.niveau_vip > 0 ? `<span class="dot">•</span><span style="color:var(--vip);font-weight:800;">VIP ${t.niveau_vip}</span>` : ''}
+            </div>
+            ${t.description ? `<div class="ic-desc">${escapeHtml(t.description)}</div>` : ''}
+          </div>
+          <div class="ic-actions">
+            <button class="icon-btn edit" onclick="openTypeModal('${t.id}')" title="Modifier">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function openTypeModal(id) {
+    const t = DATA.typesPartenaires.find(x => x.id === id);
+    if (!t) return;
+
+    // Format critères en JSON pretty pour édition
+    const criteresStr = JSON.stringify(t.criteres || [], null, 2);
+
+    openModal('Modifier : ' + t.nom, `
+      <div class="form-group">
+        <label>Nom</label>
+        <input id="tpNom" value="${escapeHtml(t.nom)}">
+      </div>
+      <div class="form-group">
+        <label>Icône (emoji)</label>
+        <input id="tpIcone" value="${escapeHtml(t.icone || '🌟')}" maxlength="4">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="tpDesc">${escapeHtml(t.description || '')}</textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Récompense (FCFA)</label>
+          <input id="tpFcfa" type="number" value="${t.recompense_fcfa || 0}">
+        </div>
+        <div class="form-group">
+          <label>Niveau VIP</label>
+          <input id="tpVip" type="number" value="${t.niveau_vip || 0}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Critères (JSON)</label>
+        <textarea id="tpCriteres" style="font-family:monospace;font-size:11px;min-height:200px;">${escapeHtml(criteresStr)}</textarea>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5;">
+          Format : <code>[{"key":"filleuls_actifs","label":"Filleuls actifs","type":"number","min":2,"placeholder":"Ex: 2","required":true}]</code>
+        </div>
+      </div>
+      <div class="form-check">
+        <input type="checkbox" id="tpActif" ${t.actif ? 'checked' : ''}>
+        <label for="tpActif">Actif</label>
+      </div>
+      <button class="btn-primary" onclick="saveType('${id}')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Enregistrer
+      </button>
+    `);
+  }
+
+  async function saveType(id) {
+    let criteres;
+    try {
+      criteres = JSON.parse(document.getElementById('tpCriteres').value);
+    } catch (e) {
+      return showToast('JSON invalide : ' + e.message, true);
+    }
+
+    const payload = {
+      nom: document.getElementById('tpNom').value.trim(),
+      icone: document.getElementById('tpIcone').value.trim() || '🌟',
+      description: document.getElementById('tpDesc').value.trim() || null,
+      recompense_fcfa: Number(document.getElementById('tpFcfa').value),
+      niveau_vip: Number(document.getElementById('tpVip').value),
+      criteres: criteres,
+      actif: document.getElementById('tpActif').checked
+    };
+
+    const { error } = await sb.from('types_partenaires').update(payload).eq('id', id);
+    if (error) return showToast('Erreur : ' + error.message, true);
+
+    showToast('Type mis à jour');
+    closeModal();
+    await loadTypesPartenaires();
+  }
+
+  function getTypeIcon(code) {
+    const icons = { promoteur: '📣', manager: '👔', pp: '💎', autre: '🌟' };
+    return icons[code] || '🌟';
+  }
+
   // ================= RETRAITS =================
   async function loadRetraits() {
     const { data } = await sb.from('retraits').select('*').order('created_at', { ascending: false }).limit(100);
@@ -494,12 +826,10 @@
       return `
         <div class="item-card" style="animation-delay:${i * .04}s">
           <div class="ic-body">
-            <div class="ic-name">${formatF(r.montant)} <span class="badge ${statusClass}" style="margin-left:6px;">${statusLabel}</span></div>
+            <div class="ic-name">${formatF(r.montant)} <span class="badge ${statusClass}">${statusLabel}</span></div>
             <div class="ic-meta">
-              <span>${escapeHtml(r.pays_nom || '')}</span>
-              <span class="dot">•</span>
-              <span>${escapeHtml(r.operateur_nom || '')}</span>
-              <span class="dot">•</span>
+              <span>${escapeHtml(r.pays_nom || '')}</span><span class="dot">•</span>
+              <span>${escapeHtml(r.operateur_nom || '')}</span><span class="dot">•</span>
               <span>${escapeHtml(r.numero || '')}</span>
             </div>
           </div>
@@ -545,7 +875,7 @@
 
   // ================= USERS =================
   async function loadUsers() {
-    const { data } = await sb.from('profiles').select('id, nom, pseudo, email, solde, is_admin, created_at').order('created_at', { ascending: false }).limit(200);
+    const { data } = await sb.from('profiles').select('id, nom, pseudo, email, solde, is_admin, niveau_vip, type_partenaire, created_at').order('created_at', { ascending: false }).limit(200);
     DATA.users = data || [];
     renderUsers();
   }
@@ -560,13 +890,13 @@
         <div class="ic-body">
           <div class="ic-name">
             ${escapeHtml(u.nom || '—')}
-            ${u.is_admin ? '<span class="badge orange" style="margin-left:6px;">Admin</span>' : ''}
+            ${u.is_admin ? '<span class="badge orange">Admin</span>' : ''}
+            ${u.niveau_vip > 0 ? `<span class="badge vip">VIP ${u.niveau_vip}</span>` : ''}
+            ${u.type_partenaire ? `<span class="badge gold">${escapeHtml(u.type_partenaire)}</span>` : ''}
           </div>
           <div class="ic-meta">
-            <span>@${escapeHtml(u.pseudo || '—')}</span>
-            <span class="dot">•</span>
-            <span>${escapeHtml(u.email)}</span>
-            <span class="dot">•</span>
+            <span>@${escapeHtml(u.pseudo || '—')}</span><span class="dot">•</span>
+            <span>${escapeHtml(u.email)}</span><span class="dot">•</span>
             <span style="color:var(--wa-dark);font-weight:800;">${formatF(u.solde)}</span>
           </div>
         </div>
@@ -637,11 +967,19 @@
       <div class="form-group"><label>Pseudo</label><input id="euPseudo" value="${escapeHtml(u.pseudo || '')}"></div>
       <div class="form-group"><label>Email</label><input id="euEmail" type="email" value="${escapeHtml(u.email || '')}"></div>
       <div class="form-group"><label>Solde (FCFA)</label><input id="euSolde" type="number" value="${u.solde || 0}" min="0"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Niveau VIP</label><input id="euVip" type="number" value="${u.niveau_vip || 0}" min="0"></div>
+        <div class="form-group"><label>Type partenaire</label><input id="euPartenaire" value="${escapeHtml(u.type_partenaire || '')}"></div>
+      </div>
       <div class="form-check"><input type="checkbox" id="euAdmin" ${u.is_admin ? 'checked' : ''}><label for="euAdmin">Administrateur</label></div>
-      <div class="btn-row"><button class="btn-primary" onclick="saveUserEdit('${userId}')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="20 6 9 17 4 12"/>
-        </svg>Enregistrer</button></div>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="saveUserEdit('${userId}')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Enregistrer
+        </button>
+      </div>
     `);
   }
 
@@ -658,8 +996,17 @@
     if (!payload.p_pseudo || payload.p_pseudo.length < 3) return showToast('Pseudo (3 caractères min)', true);
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.p_email)) return showToast('Email invalide', true);
     if (payload.p_solde < 0) return showToast('Solde négatif interdit', true);
+
     const { error } = await sb.rpc('admin_update_user', payload);
     if (error) return showToast('Erreur : ' + error.message, true);
+
+    // Mettre à jour VIP + partenariat
+    const vip = Number(document.getElementById('euVip').value);
+    const partenaire = document.getElementById('euPartenaire').value.trim();
+    if (vip !== u.niveau_vip || partenaire !== (u.type_partenaire || '')) {
+      await sb.from('profiles').update({ niveau_vip: vip, type_partenaire: partenaire || null }).eq('id', userId);
+    }
+
     showToast('Utilisateur mis à jour');
     closeModal();
     await loadUsers();
@@ -677,8 +1024,7 @@
         </div>
         <div style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:8px;">${escapeHtml(name)}</div>
         <div style="font-size:13px;color:var(--muted);line-height:1.6;">
-          Cette action est <strong style="color:#dc2626;">irréversible</strong>.<br>
-          Toutes les données de cet utilisateur seront supprimées.
+          Cette action est <strong style="color:#dc2626;">irréversible</strong>.
         </div>
       </div>
       <div class="btn-row">
@@ -721,10 +1067,8 @@
         <div class="ic-body">
           <div class="ic-name">${escapeHtml(p.nom)} ${p.actif ? '' : '<span class="badge red">Inactif</span>'}</div>
           <div class="ic-meta">
-            <span>${formatF(p.montant_activation)}</span>
-            <span class="dot">•</span>
-            <span style="color:var(--wa-dark);font-weight:700;">+${formatF(p.gain_journalier)}/j</span>
-            <span class="dot">•</span>
+            <span>${formatF(p.montant_activation)}</span><span class="dot">•</span>
+            <span style="color:var(--wa-dark);font-weight:700;">+${formatF(p.gain_journalier)}/j</span><span class="dot">•</span>
             <span>${p.duree_jours} j</span>
           </div>
         </div>
@@ -756,14 +1100,14 @@
         <div class="form-group"><label>Durée (jours)</label><input id="fDuree" type="number" value="${p ? p.duree_jours : 45}"></div>
         <div class="form-group"><label>Ordre</label><input id="fOrdre" type="number" value="${p ? p.ordre : 0}"></div>
       </div>
-      <div class="form-group"><label>Image (URL)</label><input id="fImg" value="${p ? escapeHtml(p.image_url || '') : ''}" placeholder="https://..."></div>
+      <div class="form-group"><label>Image (URL)</label><input id="fImg" value="${p ? escapeHtml(p.image_url || '') : ''}"></div>
       <div class="form-group"><label>Description</label><textarea id="fDesc">${p ? escapeHtml(p.description || '') : ''}</textarea></div>
       <div class="form-check"><input type="checkbox" id="fActif" ${!p || p.actif ? 'checked' : ''}><label for="fActif">Actif</label></div>
       <button class="btn-primary" onclick="savePlan('${id || ''}')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="20 6 9 17 4 12"/>
         </svg>
-        ${p ? 'Mettre à jour' : 'Créer le plan'}
+        ${p ? 'Mettre à jour' : 'Créer'}
       </button>
     `);
   }
@@ -779,7 +1123,7 @@
       description: document.getElementById('fDesc').value.trim() || null,
       actif: document.getElementById('fActif').checked
     };
-    if (!payload.nom || !payload.montant_activation || !payload.gain_journalier) return showToast('Champs requis manquants', true);
+    if (!payload.nom || !payload.montant_activation || !payload.gain_journalier) return showToast('Champs requis', true);
     const { error } = id ? await sb.from('plans').update(payload).eq('id', id) : await sb.from('plans').insert(payload);
     if (error) return showToast('Erreur : ' + error.message, true);
     showToast(id ? 'Plan mis à jour' : 'Plan créé');
@@ -811,8 +1155,7 @@
         <div class="ic-body">
           <div class="ic-name">${escapeHtml(p.nom)} ${p.actif ? '' : '<span class="badge red">Inactif</span>'}</div>
           <div class="ic-meta">
-            <span>${formatF(p.montant_activation)}</span>
-            <span class="dot">•</span>
+            <span>${formatF(p.montant_activation)}</span><span class="dot">•</span>
             <span style="color:var(--wa-dark);font-weight:700;">+${formatF(p.gain_journalier)}/j</span>
           </div>
         </div>
@@ -836,7 +1179,7 @@
     const p = id ? DATA.plantations.find(x => x.id === id) : null;
     openModal(p ? 'Modifier la plantation' : 'Nouvelle plantation', `
       <div class="form-group"><label>Nom</label><input id="pfNom" value="${p ? escapeHtml(p.nom) : ''}"></div>
-      <div class="form-group"><label>Slug (unique, minuscules)</label><input id="pfSlug" value="${p ? escapeHtml(p.slug) : ''}" placeholder="Ex: mais"></div>
+      <div class="form-group"><label>Slug (unique)</label><input id="pfSlug" value="${p ? escapeHtml(p.slug) : ''}" placeholder="Ex: mais"></div>
       <div class="form-row">
         <div class="form-group"><label>Activation (F)</label><input id="pfAct" type="number" value="${p ? p.montant_activation : ''}"></div>
         <div class="form-group"><label>Gain/jour (F)</label><input id="pfGain" type="number" value="${p ? p.gain_journalier : ''}"></div>
@@ -863,7 +1206,7 @@
       image_url: document.getElementById('pfImg').value.trim(),
       actif: document.getElementById('pfActif').checked
     };
-    if (!payload.nom || !payload.slug || !payload.image_url) return showToast('Champs requis manquants', true);
+    if (!payload.nom || !payload.slug || !payload.image_url) return showToast('Champs requis', true);
     const { error } = id ? await sb.from('plantations').update(payload).eq('id', id) : await sb.from('plantations').insert(payload);
     if (error) return showToast('Erreur : ' + error.message, true);
     showToast(id ? 'Plantation mise à jour' : 'Plantation créée');
@@ -928,7 +1271,7 @@
         </div>
         <div class="form-group"><label>Auteur</label><input id="afAuteur" value="${a ? escapeHtml(a.auteur || '') : 'Affinity Network'}"></div>
       </div>
-      <div class="form-check"><input type="checkbox" id="afEping" ${a && a.epingle ? 'checked' : ''}><label for="afEping">Épingler (à la une)</label></div>
+      <div class="form-check"><input type="checkbox" id="afEping" ${a && a.epingle ? 'checked' : ''}><label for="afEping">Épingler</label></div>
       <div class="form-check"><input type="checkbox" id="afPub" ${!a || a.publie ? 'checked' : ''}><label for="afPub">Publié</label></div>
       <button class="btn-primary" onclick="saveActualite('${id || ''}')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -986,14 +1329,10 @@
             <div class="ic-name">
               ${escapeHtml(l.nom)}
               <span class="badge ${isFinished ? 'gray' : 'green'}">${isFinished ? 'Terminé' : 'Actif'}</span>
-              ${l.actif ? '' : '<span class="badge red">Désactivé</span>'}
             </div>
             <div class="ic-meta">
-              <span>Ticket: ${formatF(l.prix_ticket)}</span>
-              <span class="dot">•</span>
+              <span>Ticket: ${formatF(l.prix_ticket)}</span><span class="dot">•</span>
               <span style="color:var(--alibaba);font-weight:700;">Lot: ${formatF(l.montant_lot)}</span>
-              <span class="dot">•</span>
-              <span>${l.nombre_gagnants} gagnant${l.nombre_gagnants > 1 ? 's' : ''}</span>
             </div>
             <div class="ic-meta" style="margin-top:4px;">
               <span style="font-size:10.5px;">📅 ${dateStr}</span>
@@ -1001,18 +1340,18 @@
           </div>
           <div class="ic-actions">
             ${!isFinished ? `
-              <button class="icon-btn view" onclick="drawLoterie('${l.id}', '${escapeHtml(l.nom)}')" title="Tirer maintenant">
+              <button class="icon-btn view" onclick="drawLoterie('${l.id}', '${escapeHtml(l.nom)}')" title="Tirer">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M12 2v6M12 22v-4M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M22 12h-4"/>
                 </svg>
               </button>
             ` : ''}
-            <button class="icon-btn edit" onclick="openLoterieModal('${l.id}')" title="Modifier">
+            <button class="icon-btn edit" onclick="openLoterieModal('${l.id}')">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
               </svg>
             </button>
-            <button class="icon-btn delete" onclick="deleteLoterie('${l.id}')" title="Supprimer">
+            <button class="icon-btn delete" onclick="deleteLoterie('${l.id}')">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/>
               </svg>
@@ -1027,17 +1366,17 @@
     const l = id ? DATA.loteries.find(x => x.id === id) : null;
     const defaultDate = l ? new Date(l.date_tirage).toISOString().slice(0, 16) : new Date(Date.now() + 86400000).toISOString().slice(0, 16);
     openModal(l ? 'Modifier la loterie' : 'Nouvelle loterie', `
-      <div class="form-group"><label>Nom</label><input id="loNom" value="${l ? escapeHtml(l.nom) : ''}" placeholder="Ex: Tirage Quotidien"></div>
+      <div class="form-group"><label>Nom</label><input id="loNom" value="${l ? escapeHtml(l.nom) : ''}"></div>
       <div class="form-group"><label>Description</label><textarea id="loDesc">${l ? escapeHtml(l.description || '') : ''}</textarea></div>
       <div class="form-row">
-        <div class="form-group"><label>Prix du ticket (F)</label><input id="loPrix" type="number" value="${l ? l.prix_ticket : 500}" min="1"></div>
-        <div class="form-group"><label>Montant du lot (F)</label><input id="loLot" type="number" value="${l ? l.montant_lot : 50000}" min="1"></div>
+        <div class="form-group"><label>Prix du ticket (F)</label><input id="loPrix" type="number" value="${l ? l.prix_ticket : 500}"></div>
+        <div class="form-group"><label>Montant du lot (F)</label><input id="loLot" type="number" value="${l ? l.montant_lot : 50000}"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Nombre de gagnants</label><input id="loGagnants" type="number" value="${l ? l.nombre_gagnants : 1}" min="1" max="100"></div>
+        <div class="form-group"><label>Nombre de gagnants</label><input id="loGagnants" type="number" value="${l ? l.nombre_gagnants : 1}"></div>
         <div class="form-group"><label>Ordre</label><input id="loOrdre" type="number" value="${l ? l.ordre : 0}"></div>
       </div>
-      <div class="form-group"><label>Date et heure du tirage</label><input id="loDate" type="datetime-local" value="${defaultDate}"></div>
+      <div class="form-group"><label>Date du tirage</label><input id="loDate" type="datetime-local" value="${defaultDate}"></div>
       <div class="form-group"><label>Image (URL)</label><input id="loImg" value="${l ? escapeHtml(l.image_url || '') : ''}"></div>
       <div class="form-check"><input type="checkbox" id="loActif" ${!l || l.actif ? 'checked' : ''}><label for="loActif">Actif</label></div>
       <button class="btn-primary" onclick="saveLoterie('${id || ''}')">
@@ -1050,8 +1389,6 @@
   }
 
   async function saveLoterie(id) {
-    const dateVal = document.getElementById('loDate').value;
-    if (!dateVal) return showToast('Date requise', true);
     const payload = {
       nom: document.getElementById('loNom').value.trim(),
       description: document.getElementById('loDesc').value.trim() || null,
@@ -1059,14 +1396,11 @@
       montant_lot: Number(document.getElementById('loLot').value),
       nombre_gagnants: Number(document.getElementById('loGagnants').value),
       ordre: Number(document.getElementById('loOrdre').value),
-      date_tirage: new Date(dateVal).toISOString(),
+      date_tirage: new Date(document.getElementById('loDate').value).toISOString(),
       image_url: document.getElementById('loImg').value.trim() || null,
       actif: document.getElementById('loActif').checked
     };
     if (!payload.nom) return showToast('Nom requis', true);
-    if (payload.prix_ticket <= 0) return showToast('Prix ticket invalide', true);
-    if (payload.montant_lot <= 0) return showToast('Montant lot invalide', true);
-    if (payload.nombre_gagnants < 1) return showToast('Au moins 1 gagnant', true);
     const { error } = id ? await sb.from('loteries').update(payload).eq('id', id) : await sb.from('loteries').insert(payload);
     if (error) return showToast('Erreur : ' + error.message, true);
     showToast(id ? 'Loterie mise à jour' : 'Loterie créée');
@@ -1075,7 +1409,7 @@
   }
 
   async function deleteLoterie(id) {
-    if (!confirm('Supprimer cette loterie ? Les tickets associés seront supprimés.')) return;
+    if (!confirm('Supprimer cette loterie ?')) return;
     const { error } = await sb.from('loteries').delete().eq('id', id);
     if (error) return showToast('Erreur : ' + error.message, true);
     showToast('Loterie supprimée');
@@ -1083,13 +1417,12 @@
   }
 
   async function drawLoterie(id, nom) {
-    if (!confirm(`Lancer le tirage "${nom}" maintenant ?\n\nCette action est irréversible et désignera les gagnants.`)) return;
+    if (!confirm(`Lancer le tirage "${nom}" ?\n\nCette action désignera les gagnants.`)) return;
     const { data, error } = await sb.rpc('tirer_loterie', { p_loterie_id: id });
     if (error) return showToast('Erreur : ' + error.message, true);
     const gagnants = data.gagnants || [];
-    let msg = `🎉 ${gagnants.length} gagnant${gagnants.length > 1 ? 's' : ''} désigné${gagnants.length > 1 ? 's' : ''} !`;
-    alert(msg + '\n\n' + gagnants.map(g => `${g.position}. ${g.nom || g.pseudo} (${g.numero_ticket})`).join('\n'));
-    showToast(msg);
+    alert(`🎉 ${gagnants.length} gagnant(s) !\n\n` + gagnants.map(g => `${g.position}. ${g.nom || g.pseudo} (${g.numero_ticket})`).join('\n'));
+    showToast('Tirage effectué');
     await loadLoteries();
   }
 
@@ -1130,13 +1463,13 @@
     if (!p) return;
     openModal('Modifier ' + p.nom, `
       <div class="form-group"><label>Nom</label><input id="pyNom" value="${escapeHtml(p.nom)}"></div>
-      <div class="form-group"><label>Mode de retrait</label>
+      <div class="form-group"><label>Mode</label>
         <select id="pyMode">
           <option value="mobile_money" ${p.mode === 'mobile_money' ? 'selected' : ''}>Mobile Money</option>
           <option value="crypto" ${p.mode === 'crypto' ? 'selected' : ''}>Crypto</option>
         </select>
       </div>
-      <div class="form-group"><label>Minimum de retrait (F)</label><input id="pyMin" type="number" value="${p.minimum_retrait}"></div>
+      <div class="form-group"><label>Minimum (F)</label><input id="pyMin" type="number" value="${p.minimum_retrait}"></div>
       <div class="form-group"><label>Ordre</label><input id="pyOrdre" type="number" value="${p.ordre}"></div>
       <div class="form-check"><input type="checkbox" id="pyActif" ${p.actif ? 'checked' : ''}><label for="pyActif">Actif</label></div>
       <button class="btn-primary" onclick="savePays('${id}')">
@@ -1173,7 +1506,7 @@
     const categories = {
       'Bonus de base': ['bonus_bienvenue', 'bonus_streak_journalier'],
       'Paliers parrainage': ['palier_1_filleuls','palier_1_bonus','palier_2_filleuls','palier_2_bonus','palier_3_filleuls','palier_3_bonus','palier_4_filleuls','palier_4_bonus'],
-      'Bonus filleuls rechargés': ['seuil_recharge_filleul', 'bonus_5_filleuls_recharges'],
+      'Bonus recharges filleuls': ['seuil_recharge_filleul', 'bonus_5_filleuls_recharges'],
       'Missions mensuelles': ['mission_3_plans_bonus', 'mission_10_amis_bonus', 'mission_10_amis_montant'],
       'Frais de retrait': ['frais_retrait_pourcentage', 'frais_retrait_minimum'],
       'Roue de la fortune': ['roue_tours_par_jour', 'roue_actif']
@@ -1210,7 +1543,7 @@
       if (error) errors++; else updated++;
     }
     if (errors > 0) showToast(`${updated} mis à jour, ${errors} erreur(s)`, true);
-    else showToast(`✅ ${updated} config(s) mise(s) à jour`);
+    else showToast(`✅ ${updated} config(s) enregistrée(s)`);
     await loadBonusConfig();
   }
 
@@ -1241,12 +1574,11 @@
       const userNom = b.profiles?.nom || b.profiles?.pseudo || 'Utilisateur';
       return `
         <div class="item-card" style="animation-delay:${i * .02}s">
-          <div class="ic-img" style="display:flex;align-items:center;justify-content:center;font-size:22px;background:#f7faf8;">${info.icone}</div>
+          <div class="ic-img">${info.icone}</div>
           <div class="ic-body">
             <div class="ic-name">${escapeHtml(b.description || info.label)} <span class="badge ${info.classe}">${info.label}</span></div>
             <div class="ic-meta">
-              <span>${escapeHtml(userNom)}</span>
-              <span class="dot">•</span>
+              <span>${escapeHtml(userNom)}</span><span class="dot">•</span>
               <span>${timeAgo(b.created_at)}</span>
             </div>
           </div>
@@ -1290,18 +1622,13 @@
       const { error } = await sb.from('top_parrains_config').update({ valeur, updated_at: new Date().toISOString() }).eq('cle', cle);
       if (!error) updated++;
     }
-    showToast(`✅ ${updated} config(s) mise(s) à jour`);
+    showToast(`✅ ${updated} config(s) enregistrée(s)`);
     await loadTopConfig();
   }
 
   async function lancerCalculTop() {
-    const moisInput = document.getElementById('topMoisInput').value;
-    const mois = moisInput || null;
-    const confirme = confirm(
-      `Lancer le calcul du top pour ${mois || 'le mois précédent'} ?\n\n` +
-      `Cette action va :\n• Désigner les gagnants\n• Créditer leurs soldes\n• Enregistrer les résultats\n\n⚠️ Action irréversible.`
-    );
-    if (!confirme) return;
+    const mois = document.getElementById('topMoisInput').value || null;
+    if (!confirm(`Lancer le calcul du top pour ${mois || 'le mois précédent'} ?`)) return;
     const { data, error } = await sb.rpc('calculer_top_parrains_mensuel', { p_mois: mois });
     if (error) {
       if (error.message.includes('déjà été calculé')) return showToast('Ce mois a déjà été calculé', true);
@@ -1312,11 +1639,10 @@
       await loadTopHistory();
       return;
     }
-    let msg = `🎉 ${data.gagnants.length} gagnant${data.gagnants.length > 1 ? 's' : ''} !\n\n`;
-    msg += `Chacun reçoit : ${formatF(data.par_gagnant)}\n\n`;
+    let msg = `🎉 ${data.gagnants.length} gagnant(s) !\n\nChacun reçoit : ${formatF(data.par_gagnant)}\n\n`;
     msg += data.gagnants.map(g => `${g.position}. ${g.nom || g.pseudo} (${g.filleuls} filleuls)`).join('\n');
     alert(msg);
-    showToast(`🎉 Top ${data.mois} calculé !`);
+    showToast(`🎉 Top ${data.mois} calculé`);
     await loadTopHistory();
     await loadStats();
   }
@@ -1325,20 +1651,19 @@
     const list = document.getElementById('topHistoryList');
     list.innerHTML = `<div class="sk-item"><div class="sk-line w1"></div><div class="sk-line w2"></div></div>`;
     const { data, error } = await sb.from('top_parrains_gagnants').select('*').order('created_at', { ascending: false }).limit(50);
-    if (error || !data) { list.innerHTML = emptyBox('Erreur de chargement'); return; }
+    if (error || !data) { list.innerHTML = emptyBox('Erreur'); return; }
     DATA.topHistory = data;
-    if (data.length === 0) { list.innerHTML = emptyBox('Aucun top calculé pour le moment'); return; }
+    if (data.length === 0) { list.innerHTML = emptyBox('Aucun top calculé'); return; }
     list.innerHTML = data.map((g, i) => {
       const moisLabel = new Date(g.mois + '-01').toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
       const posMedal = g.position <= 3 ? ['🥇', '🥈', '🥉'][g.position - 1] : '#' + g.position;
       return `
         <div class="item-card" style="animation-delay:${i * .03}s">
-          <div class="rank-medal">${posMedal}</div>
+          <div class="ic-img">${posMedal}</div>
           <div class="ic-body">
             <div class="ic-name">${escapeHtml(g.user_nom || g.user_pseudo || 'Anonyme')} <span class="badge orange">${moisLabel}</span></div>
             <div class="ic-meta">
-              <span>${g.filleuls_actifs} filleuls actifs</span>
-              <span class="dot">•</span>
+              <span>${g.filleuls_actifs} filleuls</span><span class="dot">•</span>
               <span>Position ${g.position}</span>
             </div>
           </div>
@@ -1375,7 +1700,7 @@
     if (diff < 3600) return `Il y a ${Math.floor(diff/60)} min`;
     if (diff < 86400) return `Il y a ${Math.floor(diff/3600)} h`;
     if (diff < 604800) return `Il y a ${Math.floor(diff/86400)} j`;
-    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
   }
   function showToast(msg, isError = false) {
     const t = document.getElementById('toast');
@@ -1383,7 +1708,10 @@
     t.className = 'toast show' + (isError ? ' error' : '');
     setTimeout(() => t.classList.remove('show'), 3000);
   }
-  function go(page) { window.location.href = page; }
+  function go(page) {
+    const cleanPage = page.replace(/\.html$/, '');
+    window.location.href = cleanPage;
+  }
 </script>
 </body>
 </html>
