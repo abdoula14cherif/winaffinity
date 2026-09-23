@@ -55,6 +55,10 @@
     50% { opacity: 1; }
     100% { transform: translateX(100%); opacity: 0; }
   }
+  @keyframes glow {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,184,0,.4); }
+    50% { box-shadow: 0 0 0 8px rgba(255,184,0,0); }
+  }
   .anim { opacity: 0; animation: fadeInUp .5s ease forwards; }
   .d1 { animation-delay: .05s; }
   .d2 { animation-delay: .1s; }
@@ -84,6 +88,7 @@
     box-shadow: 4px 0 20px rgba(0,0,0,.2);
     padding-top: 18px;
     display: flex; flex-direction: column;
+    overflow-y: auto;
   }
   .menu.open { transform: translateX(0); }
   .menu-header {
@@ -97,6 +102,7 @@
     padding: 15px 22px; cursor: pointer; font-size: 15px; color: #333;
   }
   .menu-item svg { stroke: var(--wa-dark); flex-shrink: 0; }
+  .menu-item.active { background: #e7f9ee; color: var(--wa-deep); font-weight: 700; }
   .menu-footer {
     margin-top: auto; padding: 16px 20px 22px;
     border-top: 1px solid #eee;
@@ -146,7 +152,6 @@
   .hero h1 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
   .hero p { font-size: 13.5px; opacity: .9; line-height: 1.5; }
 
-  /* CODE */
   .code-card {
     background: #fff; border-radius: 18px;
     padding: 20px; margin: -20px 20px 20px;
@@ -197,7 +202,6 @@
   .btn-share svg { stroke: #fff; }
   .btn-copy:active, .btn-share:active { transform: scale(.96); }
 
-  /* NOUVEAU BOUTON LIEN */
   .btn-link {
     grid-column: 1 / -1;
     padding: 12px;
@@ -234,7 +238,6 @@
     background: rgba(37,211,102,.05);
   }
 
-  /* STATS */
   .stats-grid {
     display: grid; grid-template-columns: repeat(3, 1fr);
     gap: 8px; padding: 0 20px;
@@ -299,20 +302,205 @@
   }
   .section-title svg { stroke: var(--wa-green); }
 
-  /* SCHÉMA DE CHAÎNE */
+  /* ============ PALIERS ============ */
+  .paliers-container {
+    margin: 0 20px 20px;
+    background: #fff;
+    border-radius: 18px;
+    padding: 18px;
+    box-shadow: 0 3px 14px rgba(0,0,0,.07);
+  }
+
+  .palier-resume {
+    background: linear-gradient(135deg, rgba(255,184,0,.1), rgba(255,106,0,.1));
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+    border: 1px dashed rgba(255,184,0,.4);
+  }
+  .palier-resume .pr-lbl {
+    font-size: 11px; color: var(--muted);
+    text-transform: uppercase; font-weight: 700;
+    letter-spacing: .3px; margin-bottom: 3px;
+  }
+  .palier-resume .pr-val {
+    font-size: 15px; font-weight: 800; color: var(--wa-deep);
+  }
+  .palier-resume .pr-badge {
+    background: linear-gradient(135deg, var(--gold), #FFD966);
+    color: #fff;
+    font-size: 11px; font-weight: 800;
+    padding: 5px 12px; border-radius: 15px;
+    box-shadow: 0 3px 10px rgba(255,184,0,.35);
+  }
+
+  .palier-item {
+    padding: 14px;
+    background: #f7faf8;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 12px;
+    transition: all .3s;
+    border: 2px solid transparent;
+  }
+  .palier-item.completed {
+    background: linear-gradient(135deg, rgba(37,211,102,.08), rgba(18,140,126,.1));
+    border-color: rgba(37,211,102,.4);
+    animation: glow 2s ease-in-out infinite;
+  }
+  .palier-item.locked {
+    opacity: .75;
+  }
+
+  .palier-medal {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 800;
+    flex-shrink: 0;
+    background: #e5e7eb; color: #6b7280;
+    border: 3px solid #e5e7eb;
+  }
+  .palier-item.completed .palier-medal {
+    background: linear-gradient(135deg, var(--gold), #FFD966);
+    color: #fff;
+    border-color: rgba(255,184,0,.5);
+    box-shadow: 0 4px 12px rgba(255,184,0,.4);
+  }
+  .palier-item.p1:not(.completed) .palier-medal { border-color: #CD7F32; color: #CD7F32; background: rgba(205,127,50,.1); }
+  .palier-item.p2:not(.completed) .palier-medal { border-color: #A8B5C2; color: #A8B5C2; background: rgba(168,181,194,.15); }
+  .palier-item.p3:not(.completed) .palier-medal { border-color: #FFD700; color: #B45309; background: rgba(255,215,0,.1); }
+  .palier-item.p4:not(.completed) .palier-medal { border-color: #9333EA; color: #9333EA; background: rgba(147,51,234,.1); }
+
+  .palier-body { flex: 1; min-width: 0; }
+  .palier-body .pb-title {
+    font-size: 13.5px; font-weight: 800; color: var(--text);
+    margin-bottom: 4px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .palier-body .pb-title .pb-check {
+    color: var(--wa-green); font-size: 14px;
+  }
+  .palier-progress-bar {
+    height: 6px; background: #e5e7eb;
+    border-radius: 4px; overflow: hidden;
+    margin-bottom: 4px;
+  }
+  .palier-fill {
+    height: 100%; border-radius: 4px;
+    background: linear-gradient(90deg, var(--wa-dark), var(--wa-green));
+    transition: width .8s ease;
+  }
+  .palier-item.completed .palier-fill {
+    background: linear-gradient(90deg, var(--gold), #FFD966);
+  }
+  .palier-body .pb-meta {
+    font-size: 11px; color: var(--muted);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .palier-body .pb-meta b {
+    color: var(--text); font-weight: 800;
+  }
+
+  .palier-reward {
+    background: linear-gradient(135deg, var(--alibaba), #FF8A3D);
+    color: #fff;
+    font-size: 12px; font-weight: 800;
+    padding: 6px 12px; border-radius: 20px;
+    flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(255,106,0,.3);
+    text-align: center;
+  }
+  .palier-item.completed .palier-reward {
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    box-shadow: 0 3px 10px rgba(18,140,126,.3);
+  }
+  .palier-reward small {
+    display: block; font-size: 8.5px;
+    opacity: .85; font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  /* ============ BONUS 5 FILLEULS ============ */
+  .bonus-special {
+    margin: 0 20px 20px;
+    background: linear-gradient(135deg, var(--wa-deep), var(--wa-dark));
+    color: #fff;
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 6px 20px rgba(7,94,84,.3);
+    position: relative; overflow: hidden;
+  }
+  .bonus-special::after {
+    content: ''; position: absolute; right: -30px; bottom: -30px;
+    width: 130px; height: 130px; border-radius: 50%;
+    background: rgba(37,211,102,.15);
+  }
+  .bonus-special .bs-head {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 12px;
+    position: relative; z-index: 2;
+  }
+  .bonus-special .bs-icon {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(255,184,0,.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .bonus-special .bs-txt {
+    flex: 1;
+  }
+  .bonus-special .bs-title {
+    font-size: 14px; font-weight: 800;
+  }
+  .bonus-special .bs-sub {
+    font-size: 11px; opacity: .85; margin-top: 2px;
+  }
+  .bonus-special .bs-amount {
+    font-size: 18px; font-weight: 800;
+    color: var(--gold);
+    position: relative; z-index: 2;
+    text-align: right;
+    margin-bottom: 12px;
+  }
+  .bonus-special .bs-amount small {
+    display: block; font-size: 10px;
+    opacity: .8; color: #fff; font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .bonus-special .bs-progress {
+    height: 8px; background: rgba(255,255,255,.15);
+    border-radius: 5px; overflow: hidden;
+    margin-bottom: 6px;
+    position: relative; z-index: 2;
+  }
+  .bonus-special .bs-fill {
+    height: 100%; border-radius: 5px;
+    background: linear-gradient(90deg, var(--gold), #FFD966);
+    transition: width .8s ease;
+  }
+  .bonus-special .bs-meta {
+    display: flex; justify-content: space-between;
+    font-size: 11px; opacity: .9;
+    position: relative; z-index: 2;
+  }
+  .bonus-special .bs-meta b {
+    font-weight: 800;
+    color: var(--gold);
+  }
+
+  /* ============ CHAÎNE ============ */
   .chain-container {
     margin: 0 20px 20px;
     background: #fff; border-radius: 18px;
     padding: 20px 16px;
     box-shadow: 0 4px 16px rgba(0,0,0,.08);
-    overflow: hidden;
     animation: fadeInUp .5s ease forwards; opacity: 0;
   }
 
   .chain-row {
     display: flex; align-items: center; justify-content: center;
     gap: 6px; margin-bottom: 16px;
-    position: relative;
   }
 
   .chain-person {
@@ -492,9 +680,7 @@
     padding: 6px 12px; border-radius: 20px;
     font-size: 11.5px; font-weight: 700;
     cursor: pointer; font-family: inherit;
-    transition: background .2s;
   }
-  .sim-quick button:hover { background: rgba(255,255,255,.25); }
   .sim-quick button:active { transform: scale(.95); }
 
   .sim-results {
@@ -634,7 +820,6 @@
   .lvl-tag.n2 { background: rgba(255,106,0,.15); color: var(--alibaba); }
   .lvl-tag.n3 { background: rgba(255,184,0,.15); color: #B45309; }
 
-  /* HISTORIQUE */
   .hist-item {
     margin: 0 20px 8px;
     background: #fff; border-radius: 12px;
@@ -757,12 +942,21 @@
       </svg>
       Travail
     </div>
-    <div class="menu-item" onclick="go('parrainage.html')">
+    <div class="menu-item active" onclick="go('parrainage.html')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
         <circle cx="9" cy="7" r="4"/>
       </svg>
       Parrainage
+    </div>
+    <div class="menu-item" onclick="go('missions.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+        <path d="M4 22h16"/>
+        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+      </svg>
+      Missions
     </div>
     <div class="menu-item" onclick="go('support.html')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
@@ -800,11 +994,11 @@
           </svg>
         </div>
         <h1>Parrainage</h1>
-        <p>Invite tes amis et gagne sur 3 niveaux à chaque activation.</p>
+        <p>Invite tes amis et gagne sur 3 niveaux + paliers bonus.</p>
       </div>
     </div>
 
-    <!-- CODE PARRAINAGE -->
+    <!-- CODE -->
     <div class="code-card anim d1">
       <div class="cc-lbl">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -829,8 +1023,6 @@
           </svg>
           Partager
         </button>
-
-        <!-- NOUVEAU BOUTON LIEN -->
         <button class="btn-link" onclick="copyLink()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
@@ -839,8 +1031,6 @@
           Copier le lien d'invitation
         </button>
       </div>
-
-      <!-- Aperçu du lien -->
       <div class="link-preview" id="linkPreview" onclick="copyLink()">—</div>
     </div>
 
@@ -876,7 +1066,54 @@
       </div>
     </div>
 
-    <!-- SCHÉMA DE CHAÎNE -->
+    <!-- ====== PALIERS DE PARRAINAGE ====== -->
+    <div class="section-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+        <path d="M4 22h16"/>
+        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+      </svg>
+      Paliers de récompense
+    </div>
+
+    <div class="paliers-container anim d2">
+      <div class="palier-resume">
+        <div>
+          <div class="pr-lbl">Filleuls actifs</div>
+          <div class="pr-val" id="filleulsActifs">0</div>
+        </div>
+        <div class="pr-badge" id="paliersCompletes">0/4</div>
+      </div>
+
+      <div id="paliersList">
+        <div class="sk-item"><div class="sk-line w1"></div><div class="sk-line w2"></div></div>
+      </div>
+    </div>
+
+    <!-- ====== BONUS 5 FILLEULS RECHARGÉS ====== -->
+    <div class="bonus-special anim d2">
+      <div class="bs-head">
+        <div class="bs-icon">💎</div>
+        <div class="bs-txt">
+          <div class="bs-title">Bonus Filleuls Rechargés</div>
+          <div class="bs-sub">5 filleuls ayant rechargé <span id="seuilRecharge">10 000</span> F chacun</div>
+        </div>
+      </div>
+      <div class="bs-amount">
+        <small>Bonus à recevoir</small>
+        <span id="bonusRechargeVal">10 000 F</span>
+      </div>
+      <div class="bs-progress">
+        <div class="bs-fill" id="bonusRechargeFill" style="width:0%"></div>
+      </div>
+      <div class="bs-meta">
+        <span><b id="rechargesCount">0</b> / 5 recharges</span>
+        <span id="rechargesStatut">En cours</span>
+      </div>
+    </div>
+
+    <!-- ====== CHAÎNE ====== -->
     <div class="section-title">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
@@ -958,7 +1195,7 @@
       </div>
     </div>
 
-    <!-- SIMULATEUR -->
+    <!-- ====== SIMULATEUR ====== -->
     <div class="simulator">
       <div class="sim-header">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -989,7 +1226,7 @@
       <div class="sim-results" id="simResults"></div>
     </div>
 
-    <!-- COMMENT ÇA MARCHE -->
+    <!-- NIVEAUX EXPLIQUÉS -->
     <div class="section-title">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
@@ -1091,6 +1328,7 @@
   let CURRENT_USER = null;
   let MY_CODE = '';
   let MY_LINK = '';
+  let PALIERS_CONFIG = [];
 
   (async function init() {
     const { data: { session } } = await sb.auth.getSession();
@@ -1103,15 +1341,16 @@
     MY_CODE = profile?.code_parrainage || '—';
     document.getElementById('myCode').textContent = MY_CODE;
 
-    // Générer le lien d'invitation
     MY_LINK = `${window.location.origin}/inscription?ref=${MY_CODE}`;
     document.getElementById('linkPreview').textContent = MY_LINK;
 
-    // Lancer le simulateur initial
     runSimulator();
 
     await Promise.all([
       loadStats(),
+      loadPaliersConfig(),
+      loadPaliers(),
+      loadBonusRecharges(),
       loadFilleuls(),
       loadCommissions()
     ]);
@@ -1135,37 +1374,157 @@
     document.getElementById('simResults').innerHTML = `
       <div class="sim-row lvl1">
         <div class="sim-badge lvl1">N1</div>
-        <div class="sim-label">
-          Filleul direct
-          <small>20% du montant</small>
-        </div>
+        <div class="sim-label">Filleul direct<small>20% du montant</small></div>
         <div class="sim-value">+${formatF(n1)}</div>
       </div>
       <div class="sim-row lvl2">
         <div class="sim-badge lvl2">N2</div>
-        <div class="sim-label">
-          Filleul du filleul
-          <small>2% du montant</small>
-        </div>
+        <div class="sim-label">Filleul du filleul<small>2% du montant</small></div>
         <div class="sim-value">+${formatF(n2)}</div>
       </div>
       <div class="sim-row lvl3">
         <div class="sim-badge lvl3">N3</div>
-        <div class="sim-label">
-          Niveau 3
-          <small>1% du montant</small>
-        </div>
+        <div class="sim-label">Niveau 3<small>1% du montant</small></div>
         <div class="sim-value">+${formatF(n3)}</div>
       </div>
       <div class="sim-row total">
         <div class="sim-badge total">Σ</div>
-        <div class="sim-label">
-          Gains totaux du réseau
-          <small>sur cette activation</small>
-        </div>
+        <div class="sim-label">Gains totaux du réseau<small>sur cette activation</small></div>
         <div class="sim-value">+${formatF(total)}</div>
       </div>
     `;
+  }
+
+  // ================= CONFIG PALIERS =================
+  async function loadPaliersConfig() {
+    const { data } = await sb.from('bonus_config')
+      .select('*')
+      .like('cle', 'palier_%');
+
+    PALIERS_CONFIG = (data || []).map(c => ({
+      cle: c.cle,
+      valeur: c.valeur,
+      description: c.description
+    }));
+  }
+
+  // ================= PALIERS =================
+  async function loadPaliers() {
+    // Nombre de filleuls actifs
+    const { count } = await sb.from('filleuls_actifs')
+      .select('*', { count: 'exact', head: true })
+      .eq('parrain_id', CURRENT_USER.id)
+      .eq('a_active', true);
+
+    const nbActifs = count || 0;
+    document.getElementById('filleulsActifs').textContent = nbActifs;
+
+    // Bonus déjà reçus
+    const { data: bonusRecus } = await sb.from('bonus_utilisateurs')
+      .select('type')
+      .eq('user_id', CURRENT_USER.id)
+      .like('type', 'palier_%');
+
+    const dejaRecus = (bonusRecus || []).map(b => b.type);
+
+    // Construire la liste des paliers
+    const paliers = [
+      { num: 1, seuil: 2, bonus: 500, classe: 'p1', medal: '🥉' },
+      { num: 2, seuil: 15, bonus: 3000, classe: 'p2', medal: '🥈' },
+      { num: 3, seuil: 30, bonus: 5000, classe: 'p3', medal: '🥇' },
+      { num: 4, seuil: 50, bonus: 12000, classe: 'p4', medal: '💎' }
+    ];
+
+    // Surcharger avec la config DB si trouvée
+    paliers.forEach(p => {
+      const seuilKey = `palier_${p.num}_filleuls`;
+      const bonusKey = `palier_${p.num}_bonus`;
+      const seuilConf = PALIERS_CONFIG.find(c => c.cle === seuilKey);
+      const bonusConf = PALIERS_CONFIG.find(c => c.cle === bonusKey);
+      if (seuilConf) p.seuil = seuilConf.valeur;
+      if (bonusConf) p.bonus = bonusConf.valeur;
+    });
+
+    const completed = paliers.filter(p => nbActifs >= p.seuil).length;
+    document.getElementById('paliersCompletes').textContent = `${completed}/4`;
+
+    document.getElementById('paliersList').innerHTML = paliers.map(p => {
+      const isCompleted = nbActifs >= p.seuil;
+      const progress = Math.min(100, (nbActifs / p.seuil) * 100);
+      const bonusRecu = dejaRecus.includes(`palier_${p.num}`);
+
+      return `
+        <div class="palier-item ${p.classe} ${isCompleted ? 'completed' : ''}">
+          <div class="palier-medal">${p.medal}</div>
+          <div class="palier-body">
+            <div class="pb-title">
+              Palier ${p.num} · ${p.seuil} filleuls actifs
+              ${isCompleted ? '<span class="pb-check">✓</span>' : ''}
+            </div>
+            <div class="palier-progress-bar">
+              <div class="palier-fill" style="width:${progress}%"></div>
+            </div>
+            <div class="pb-meta">
+              <span><b>${nbActifs}</b> / ${p.seuil}</span>
+              ${bonusRecu
+                ? '<span style="color:var(--wa-dark);font-weight:800;">✓ Bonus reçu</span>'
+                : isCompleted
+                  ? '<span style="color:var(--wa-dark);font-weight:700;">Complété</span>'
+                  : `<span>${Math.max(0, p.seuil - nbActifs)} restant${p.seuil - nbActifs > 1 ? 's' : ''}</span>`
+              }
+            </div>
+          </div>
+          <div class="palier-reward">
+            +${formatF(p.bonus).replace(' F', '')}
+            <small>FCFA</small>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ================= BONUS 5 FILLEULS RECHARGÉS =================
+  async function loadBonusRecharges() {
+    // Récupérer la config
+    const { data: config } = await sb.from('bonus_config')
+      .select('*')
+      .in('cle', ['seuil_recharge_filleul', 'bonus_5_filleuls_recharges']);
+
+    const seuilConf = config?.find(c => c.cle === 'seuil_recharge_filleul');
+    const bonusConf = config?.find(c => c.cle === 'bonus_5_filleuls_recharges');
+
+    const seuil = seuilConf?.valeur || 10000;
+    const bonus = bonusConf?.valeur || 10000;
+
+    document.getElementById('seuilRecharge').textContent = formatF(seuil).replace(' F', '');
+    document.getElementById('bonusRechargeVal').textContent = formatF(bonus);
+
+    // Compter les filleuls qui ont rechargé le seuil
+    const { count } = await sb.from('filleuls_actifs')
+      .select('*', { count: 'exact', head: true })
+      .eq('parrain_id', CURRENT_USER.id)
+      .gte('a_recharge', seuil);
+
+    const nbRecharges = count || 0;
+    document.getElementById('rechargesCount').textContent = nbRecharges;
+
+    const fill = Math.min(100, (nbRecharges / 5) * 100);
+    document.getElementById('bonusRechargeFill').style.width = fill + '%';
+
+    // Statut
+    const { data: bonusRecu } = await sb.from('bonus_utilisateurs')
+      .select('id')
+      .eq('user_id', CURRENT_USER.id)
+      .eq('type', 'bonus_5_recharges')
+      .maybeSingle();
+
+    if (bonusRecu) {
+      document.getElementById('rechargesStatut').innerHTML = '✓ Bonus reçu';
+    } else if (nbRecharges >= 5) {
+      document.getElementById('rechargesStatut').innerHTML = 'Complété';
+    } else {
+      document.getElementById('rechargesStatut').textContent = `${5 - nbRecharges} restant${5 - nbRecharges > 1 ? 's' : ''}`;
+    }
   }
 
   // ================= STATS =================
@@ -1243,31 +1602,17 @@
 
   // ================= PARTAGE =================
   function copyCode() {
-    if (!MY_CODE || MY_CODE === '—') {
-      showToast('Code indisponible', true);
-      return;
-    }
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(MY_CODE)
-        .then(() => showToast('✅ Code copié !'))
-        .catch(() => fallbackCopy(MY_CODE));
-    } else {
-      fallbackCopy(MY_CODE);
-    }
+    if (!MY_CODE || MY_CODE === '—') { showToast('Code indisponible', true); return; }
+    navigator.clipboard.writeText(MY_CODE)
+      .then(() => showToast('✅ Code copié !'))
+      .catch(() => fallbackCopy(MY_CODE));
   }
 
   function copyLink() {
-    if (!MY_LINK) {
-      showToast('Lien indisponible', true);
-      return;
-    }
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(MY_LINK)
-        .then(() => showToast('✅ Lien copié ! Partage-le à tes amis'))
-        .catch(() => fallbackCopy(MY_LINK));
-    } else {
-      fallbackCopy(MY_LINK);
-    }
+    if (!MY_LINK) { showToast('Lien indisponible', true); return; }
+    navigator.clipboard.writeText(MY_LINK)
+      .then(() => showToast('✅ Lien copié ! Partage-le à tes amis'))
+      .catch(() => fallbackCopy(MY_LINK));
   }
 
   function fallbackCopy(text) {
@@ -1277,23 +1622,15 @@
     ta.style.opacity = '0';
     document.body.appendChild(ta);
     ta.select();
-    try {
-      document.execCommand('copy');
-      showToast('✅ Copié !');
-    } catch (e) {
-      showToast('Impossible de copier', true);
-    }
+    try { document.execCommand('copy'); showToast('✅ Copié !'); }
+    catch (e) { showToast('Impossible de copier', true); }
     document.body.removeChild(ta);
   }
 
   function shareCode() {
     const texte = `Rejoins Affinity Network avec mon code de parrainage : ${MY_CODE}\n\n👉 ${MY_LINK}\n\nGagne de l'argent en activant des plans et parraine à ton tour !`;
     if (navigator.share) {
-      navigator.share({
-        title: 'Affinity Network',
-        text: texte,
-        url: MY_LINK
-      }).catch(() => {});
+      navigator.share({ title: 'Affinity Network', text: texte, url: MY_LINK }).catch(() => {});
     } else {
       fallbackCopy(texte);
     }
