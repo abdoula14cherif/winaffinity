@@ -4,17 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Affinity Network — Notifications</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#075E54">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root {
     --wa-green: #25D366; --wa-dark: #128C7E; --wa-deep: #075E54;
-    --alibaba: #FF6A00; --gold: #FFB800;
-    --bg: #f7f9f8; --text: #1a1a1a; --muted: #6b7280; --border: #e5e7eb;
+    --alibaba: #FF6A00; --bg: #f7f9f8; --text: #1a1a1a; --muted: #6b7280; --border: #e5e7eb;
   }
-  body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 80px; min-height: 100vh; }
+  body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 80px; min-height: 100vh; -webkit-user-select: none; user-select: none; }
 
   .loader { position: fixed; inset: 0; z-index: 9999; background: var(--wa-deep); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; transition: opacity .6s ease, visibility .6s ease; }
   .loader.hidden { opacity: 0; visibility: hidden; }
@@ -25,7 +25,7 @@
   @keyframes fadeInUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
   .anim { opacity: 0; animation: fadeInUp .4s ease forwards; }
 
-  .header { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--wa-deep); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+  .header { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--wa-deep); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.15); padding-top: max(14px, env(safe-area-inset-top)); }
   .burger { cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,.12); }
   .burger svg { stroke: #fff; }
   .logo { font-weight: 700; font-size: 18px; }
@@ -34,14 +34,14 @@
   .btn-mark:active { transform: scale(.95); }
   .btn-mark svg { stroke: #fff; }
 
-  .menu { position: fixed; top: 0; left: 0; height: 100%; width: 280px; background: #fff; z-index: 200; transform: translateX(-100%); transition: transform .35s cubic-bezier(.4,0,.2,1); box-shadow: 4px 0 20px rgba(0,0,0,.2); padding-top: 18px; display: flex; flex-direction: column; overflow-y: auto; }
+  .menu { position: fixed; top: 0; left: 0; height: 100%; width: 280px; background: #fff; z-index: 200; transform: translateX(-100%); transition: transform .35s cubic-bezier(.4,0,.2,1); box-shadow: 4px 0 20px rgba(0,0,0,.2); padding-top: 18px; display: flex; flex-direction: column; overflow-y: auto; padding-top: max(18px, env(safe-area-inset-top)); }
   .menu.open { transform: translateX(0); }
   .menu-header { padding: 8px 20px 18px; border-bottom: 1px solid #eee; margin-bottom: 10px; font-weight: 700; color: var(--wa-deep); font-size: 17px; display: flex; align-items: center; gap: 10px; }
   .menu-header svg { stroke: var(--wa-green); }
   .menu-item { display: flex; align-items: center; gap: 14px; padding: 15px 22px; cursor: pointer; font-size: 15px; color: #333; }
   .menu-item svg { stroke: var(--wa-dark); flex-shrink: 0; }
   .menu-item.active { background: #e7f9ee; color: var(--wa-deep); font-weight: 700; }
-  .menu-footer { margin-top: auto; padding: 16px 20px 22px; border-top: 1px solid #eee; }
+  .menu-footer { margin-top: auto; padding: 16px 20px 22px; border-top: 1px solid #eee; padding-bottom: max(22px, env(safe-area-inset-bottom)); }
   .btn-logout { width: 100%; padding: 14px; background: #fee2e2; color: #b91c1c; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .btn-logout svg { stroke: #b91c1c; }
   .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 150; opacity: 0; pointer-events: none; transition: opacity .3s; }
@@ -52,108 +52,44 @@
   .page-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
   .page-sub .badge-nl { background: linear-gradient(135deg, var(--alibaba), #FF8A3D); color: #fff; font-size: 11px; padding: 3px 10px; border-radius: 12px; font-weight: 800; }
 
-  .notif-item {
-    background: #fff; border-radius: 14px;
-    padding: 14px; margin-bottom: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.05);
-    display: flex; gap: 12px;
-    animation: fadeInUp .4s ease forwards; opacity: 0;
-    position: relative;
-    border-left: 4px solid transparent;
-    cursor: pointer;
-    transition: transform .15s;
-  }
-  .notif-item:active { transform: scale(.98); }
-  .notif-item.unread {
-    border-left-color: var(--wa-green);
-    background: linear-gradient(to right, rgba(37,211,102,.05), #fff);
-  }
-  .notif-item.unread::after {
-    content: '';
-    position: absolute; top: 14px; right: 14px;
-    width: 10px; height: 10px; border-radius: 50%;
-    background: var(--wa-green);
-    box-shadow: 0 0 0 4px rgba(37,211,102,.2);
-  }
-  .notif-icon {
-    width: 44px; height: 44px; border-radius: 12px;
-    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px; flex-shrink: 0;
-  }
-  .notif-body { flex: 1; min-width: 0; padding-right: 16px; }
-  .notif-title {
-    font-size: 14px; font-weight: 800; color: var(--text);
-    margin-bottom: 4px;
-  }
-  .notif-message {
-    font-size: 13px; color: #4b5563;
-    line-height: 1.5;
-    margin-bottom: 6px;
-    word-wrap: break-word;
-  }
-  .notif-time {
-    font-size: 11px; color: var(--muted);
-    display: flex; align-items: center; gap: 4px;
-  }
-  .notif-time svg { stroke: var(--muted); }
-
-  .empty {
-    text-align: center; padding: 60px 20px;
-    color: var(--muted); font-size: 13px;
-    background: #fff; border-radius: 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.05);
-  }
-  .empty svg { stroke: #d1d5db; margin-bottom: 12px; }
-  .empty .em-title { font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
-  .empty .em-sub { font-size: 12.5px; }
-
-  /* BOUTON ACTIVER NOTIFS */
-  .push-banner {
-    background: linear-gradient(135deg, var(--wa-deep), var(--wa-dark));
-    color: #fff; border-radius: 14px;
-    padding: 14px 16px; margin-bottom: 20px;
-    display: flex; align-items: center; gap: 12px;
-    box-shadow: 0 4px 14px rgba(7,94,84,.25);
-  }
-  .push-banner .pb-icon {
-    width: 42px; height: 42px; border-radius: 50%;
-    background: rgba(37,211,102,.2);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
+  .push-banner { background: linear-gradient(135deg, var(--wa-deep), var(--wa-dark)); color: #fff; border-radius: 14px; padding: 14px 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 14px rgba(7,94,84,.25); }
+  .push-banner .pb-icon { width: 42px; height: 42px; border-radius: 50%; background: rgba(37,211,102,.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .push-banner .pb-icon svg { stroke: var(--wa-green); }
   .push-banner .pb-body { flex: 1; }
   .push-banner .pb-title { font-size: 13.5px; font-weight: 800; margin-bottom: 2px; }
   .push-banner .pb-sub { font-size: 11px; opacity: .85; }
-  .push-banner .pb-btn {
-    background: var(--wa-green); color: #fff;
-    border: none; border-radius: 10px;
-    padding: 8px 14px; font-size: 12px; font-weight: 800;
-    cursor: pointer; font-family: inherit;
-    flex-shrink: 0;
-  }
+  .push-banner .pb-btn { background: var(--wa-green); color: #fff; border: none; border-radius: 10px; padding: 8px 14px; font-size: 12px; font-weight: 800; cursor: pointer; font-family: inherit; flex-shrink: 0; }
   .push-banner .pb-btn:active { transform: scale(.95); }
-  .push-banner.active { display: none; }
 
-  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: #fff; border-top: 1px solid #e5e7eb; box-shadow: 0 -2px 12px rgba(0,0,0,.06); z-index: 100; }
+  .notif-item { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.05); display: flex; gap: 12px; animation: fadeInUp .4s ease forwards; opacity: 0; position: relative; border-left: 4px solid transparent; cursor: pointer; }
+  .notif-item:active { transform: scale(.98); }
+  .notif-item.unread { border-left-color: var(--wa-green); background: linear-gradient(to right, rgba(37,211,102,.05), #fff); }
+  .notif-item.unread::after { content: ''; position: absolute; top: 14px; right: 14px; width: 10px; height: 10px; border-radius: 50%; background: var(--wa-green); box-shadow: 0 0 0 4px rgba(37,211,102,.2); }
+  .notif-icon { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .notif-body { flex: 1; min-width: 0; padding-right: 16px; }
+  .notif-title { font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+  .notif-message { font-size: 13px; color: #4b5563; line-height: 1.5; margin-bottom: 6px; word-wrap: break-word; }
+  .notif-time { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+  .notif-time svg { stroke: var(--muted); }
+
+  .empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 13px; background: #fff; border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+  .empty svg { stroke: #d1d5db; margin-bottom: 12px; }
+  .empty .em-title { font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+  .empty .em-sub { font-size: 12.5px; }
+
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: #fff; border-top: 1px solid #e5e7eb; box-shadow: 0 -2px 12px rgba(0,0,0,.06); z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
   .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 9px 0 10px; cursor: pointer; color: #9ca3af; font-size: 11px; gap: 4px; text-decoration: none; font-weight: 500; position: relative; }
   .nav-item svg { stroke: #9ca3af; }
   .nav-item.active { color: var(--wa-dark); font-weight: 700; }
   .nav-item.active svg { stroke: var(--wa-green); }
-  .nav-item .notif-badge {
-    position: absolute; top: 6px; right: 22%;
-    background: #DC2626; color: #fff;
-    font-size: 9px; font-weight: 800;
-    padding: 1px 5px; border-radius: 8px;
-    min-width: 16px; text-align: center;
-    display: none;
-  }
+  .nav-item .notif-badge { position: absolute; top: 6px; right: 22%; background: #DC2626; color: #fff; font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 8px; min-width: 16px; text-align: center; display: none; }
   .nav-item .notif-badge.show { display: block; }
 
   .toast { position: fixed; left: 50%; bottom: 100px; transform: translateX(-50%) translateY(20px); background: var(--wa-deep); color: #fff; padding: 12px 22px; border-radius: 30px; font-size: 14px; font-weight: 600; box-shadow: 0 6px 20px rgba(0,0,0,.25); opacity: 0; pointer-events: none; transition: all .3s; z-index: 1000; display: flex; align-items: center; gap: 8px; max-width: 90%; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast svg { stroke: var(--wa-green); flex-shrink: 0; }
+  .toast.error { background: #b91c1c; }
+  .toast.error svg { stroke: #fff; }
 </style>
 </head>
 <body>
@@ -186,30 +122,23 @@
       </svg>
       Affinity Network
     </div>
-    <div class="menu-item" onclick="go('travail.html')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <rect x="2" y="7" width="20" height="14" rx="2"/>
-      </svg>
-      Travail
-    </div>
     <div class="menu-item" onclick="go('parrainage.html')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
       </svg>
-      Parrainage
+      Inviter un ami
+    </div>
+    <div class="menu-item" onclick="go('recharge.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Recharger mon solde
     </div>
     <div class="menu-item" onclick="go('roue.html')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <circle cx="12" cy="12" r="10"/>
+        <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
       </svg>
       Roue de la fortune
-    </div>
-    <div class="menu-item active" onclick="go('notifications.html')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-      </svg>
-      Notifications
     </div>
     <div class="menu-item" onclick="go('missions.html')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
@@ -218,11 +147,30 @@
       </svg>
       Missions
     </div>
+    <div class="menu-item active" onclick="go('notifications.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      Notifications
+    </div>
+    <div class="menu-item" onclick="go('travail.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <rect x="2" y="7" width="20" height="14" rx="2"/>
+      </svg>
+      Travail
+    </div>
     <div class="menu-item" onclick="go('support.html')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
         <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
       </svg>
       Support
+    </div>
+    <div class="menu-item" onclick="go('faq.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10"/>
+      </svg>
+      FAQ
     </div>
     <div class="menu-footer">
       <button class="btn-logout" onclick="logout()">
@@ -243,7 +191,6 @@
       <span class="badge-nl" id="badgeNL" style="display:none;">0</span>
     </div>
 
-    <!-- Bannière push -->
     <div class="push-banner" id="pushBanner" style="display:none;">
       <div class="pb-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -259,9 +206,7 @@
 
     <div id="notifsList">
       <div class="empty">
-        <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
-          <circle cx="12" cy="12" r="10"/>
-        </svg>
+        <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="12" cy="12" r="10"/></svg>
         <div class="em-title">Chargement...</div>
       </div>
     </div>
@@ -310,27 +255,17 @@
 
   let CURRENT_USER = null;
 
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+
   (async function init() {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.replace('inscription.html'); return; }
     CURRENT_USER = session.user;
-
-    // Enregistrer le service worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(err => {
-        console.warn('SW enregistrement échoué:', err);
-      });
-    }
-
-    // Vérifier si les notifs push sont déjà activées
     checkPushStatus();
-
     await loadNotifs();
-
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
   })();
 
-  // ================= NOTIFICATIONS =================
   async function loadNotifs() {
     const list = document.getElementById('notifsList');
     const badge = document.getElementById('badgeNL');
@@ -338,7 +273,6 @@
     const navBadge = document.getElementById('navBadge');
 
     const { data, error } = await sb.rpc('get_mes_notifications');
-
     if (error || !data) {
       list.innerHTML = emptyBox('Erreur', 'Impossible de charger les notifications');
       return;
@@ -346,7 +280,6 @@
 
     const notifs = data.notifications || [];
 
-    // Badge
     if (data.non_lues > 0) {
       badge.textContent = data.non_lues;
       badge.style.display = 'inline-block';
@@ -389,13 +322,8 @@
   }
 
   async function openNotif(id, lien) {
-    // Marquer comme lue
     await sb.from('notifications').update({ lu: true }).eq('id', id);
-
-    // Recharger
     await loadNotifs();
-
-    // Rediriger si lien
     if (lien && lien !== '' && lien !== 'null' && lien !== 'undefined') {
       window.location.href = lien;
     }
@@ -408,33 +336,22 @@
     await loadNotifs();
   }
 
-  // ================= PUSH NOTIFICATIONS =================
   function checkPushStatus() {
     if (!('Notification' in window)) return;
-
     if (Notification.permission === 'default') {
       document.getElementById('pushBanner').style.display = 'flex';
-    } else if (Notification.permission === 'granted') {
-      // Déjà accordé, afficher une notification test à la première visite
-      document.getElementById('pushBanner').style.display = 'none';
     } else {
       document.getElementById('pushBanner').style.display = 'none';
     }
   }
 
   async function activatePush() {
-    if (!('Notification' in window)) {
-      return showToast('Ton navigateur ne supporte pas les notifications', true);
-    }
-
+    if (!('Notification' in window)) return showToast('Navigateur non supporté', true);
     try {
       const perm = await Notification.requestPermission();
       if (perm === 'granted') {
-        document.getElementById('pushBanner').classList.add('active');
         document.getElementById('pushBanner').style.display = 'none';
         showToast('✅ Notifications activées !');
-
-        // Afficher une notif de bienvenue
         new Notification('Affinity Network', {
           body: 'Tu recevras maintenant tes alertes en temps réel !',
           icon: 'https://ui-avatars.com/api/?name=AN&size=192&background=075E54&color=25D366',
@@ -445,27 +362,19 @@
         document.getElementById('pushBanner').style.display = 'none';
       }
     } catch (e) {
-      console.warn(e);
-      showToast('Impossible d\'activer les notifications', true);
+      showToast('Impossible d\'activer', true);
     }
   }
 
-  // ================= UTILITAIRES =================
   function emptyBox(title, sub) {
     return `<div class="empty">
-      <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
-        <circle cx="12" cy="12" r="10"/>
-      </svg>
+      <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="12" cy="12" r="10"/></svg>
       <div class="em-title">${title}</div>
       <div class="em-sub">${sub}</div>
     </div>`;
   }
-  function escapeHtml(s) {
-    return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
-  function escapeJs(s) {
-    return String(s ?? '').replace(/['"\\]/g, '');
-  }
+  function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function escapeJs(s) { return String(s ?? '').replace(/['"\\]/g, ''); }
   function timeAgo(iso) {
     if (!iso) return '—';
     const d = new Date(iso);
@@ -482,10 +391,7 @@
     t.className = 'toast show' + (isError ? ' error' : '');
     setTimeout(() => t.classList.remove('show'), 3000);
   }
-  function toggleMenu() {
-    document.getElementById('menu').classList.toggle('open');
-    document.getElementById('overlay').classList.toggle('open');
-  }
+  function toggleMenu() { document.getElementById('menu').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
   function go(page) { window.location.href = page; }
   async function logout() {
     if (!confirm('Veux-tu vraiment te déconnecter ?')) return;
