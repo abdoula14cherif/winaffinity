@@ -12,6 +12,8 @@
     --wa-dark: #128C7E;
     --wa-deep: #075E54;
     --alibaba: #FF6A00;
+    --gold: #FFB800;
+    --fire: #FF4500;
     --white: #ffffff;
     --bg: #f7f9f8;
     --text: #1a1a1a;
@@ -56,11 +58,17 @@
     from { opacity: 0; transform: translateY(18px); }
     to { opacity: 1; transform: translateY(0); }
   }
+  @keyframes firePulse {
+    0%,100% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.15) rotate(-5deg); }
+  }
+  @keyframes shimmer { to { background-position: -200% 0; } }
   .anim { opacity: 0; animation: fadeInUp .5s ease forwards; }
   .d1 { animation-delay: .05s; }
   .d2 { animation-delay: .1s; }
   .d3 { animation-delay: .15s; }
   .d4 { animation-delay: .2s; }
+  .d5 { animation-delay: .25s; }
 
   /* HEADER */
   .header {
@@ -90,6 +98,7 @@
     box-shadow: 4px 0 20px rgba(0,0,0,.2);
     padding-top: 18px;
     display: flex; flex-direction: column;
+    overflow-y: auto;
   }
   .menu.open { transform: translateX(0); }
   .menu-header {
@@ -101,9 +110,8 @@
   .menu-item {
     display: flex; align-items: center; gap: 14px;
     padding: 15px 22px; cursor: pointer; font-size: 15px;
-    color: #333; transition: background .2s, padding-left .2s;
+    color: #333;
   }
-  .menu-item:active { background: #e7f9ee; padding-left: 26px; }
   .menu-item svg { stroke: var(--wa-dark); flex-shrink: 0; }
   .menu-item.active { background: #e7f9ee; color: var(--wa-deep); font-weight: 700; }
   .menu-footer {
@@ -117,9 +125,7 @@
     font-size: 14px; font-weight: 700;
     cursor: pointer; font-family: inherit;
     display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: background .2s, transform .15s;
   }
-  .btn-logout:active { transform: scale(.97); }
   .btn-logout svg { stroke: #b91c1c; }
   .overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,.45);
@@ -130,7 +136,7 @@
   /* CONTENU */
   .content { padding: 18px 16px; }
 
-  /* CARTE PROFIL */
+  /* PROFIL CARD */
   .profile-card {
     background: linear-gradient(135deg, var(--wa-deep), var(--wa-dark));
     color: #fff; border-radius: 20px;
@@ -182,8 +188,7 @@
   .solde-card {
     background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
     color: #fff; border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 18px;
+    padding: 20px; margin-bottom: 18px;
     box-shadow: 0 4px 14px rgba(18,140,126,.35);
     display: flex; align-items: center; justify-content: space-between;
     position: relative; overflow: hidden;
@@ -208,17 +213,79 @@
   }
   .solde-card .icon-wallet svg { stroke: #fff; }
 
-  /* STATS */
+  /* STREAK CARD */
+  .streak-card {
+    background: linear-gradient(135deg, #FF4500, #FF6B35);
+    color: #fff;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 14px rgba(255,69,0,.3);
+    display: flex; align-items: center; gap: 14px;
+    position: relative; overflow: hidden;
+  }
+  .streak-card::after {
+    content: ''; position: absolute; right: -20px; top: -20px;
+    width: 100px; height: 100px; border-radius: 50%;
+    background: rgba(255,255,255,.1);
+  }
+  .streak-icon {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: rgba(255,255,255,.2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 24px;
+    animation: firePulse 1.5s ease-in-out infinite;
+    position: relative; z-index: 2;
+  }
+  .streak-body { flex: 1; position: relative; z-index: 2; }
+  .streak-body .st-top {
+    font-size: 10.5px; opacity: .9;
+    text-transform: uppercase; letter-spacing: .5px;
+    font-weight: 700; margin-bottom: 3px;
+  }
+  .streak-body .st-val {
+    font-size: 20px; font-weight: 800;
+    display: flex; align-items: baseline; gap: 5px;
+  }
+  .streak-body .st-val small { font-size: 11px; opacity: .85; font-weight: 600; }
+  .streak-body .st-sub { font-size: 10.5px; opacity: .85; margin-top: 1px; }
+  .streak-record {
+    background: rgba(255,255,255,.25);
+    padding: 5px 10px; border-radius: 15px;
+    font-size: 11px; font-weight: 800;
+    position: relative; z-index: 2;
+    flex-shrink: 0;
+    text-align: center;
+  }
+  .streak-record small {
+    display: block; font-size: 9px;
+    opacity: .8; font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  /* SECTION */
   .section-title {
     font-size: 15px; font-weight: 700; color: var(--wa-deep);
     margin: 22px 0 12px;
-    display: flex; align-items: center; justify-content: space-between;
+    display: flex; align-items: center;
+    justify-content: space-between;
   }
-  .section-title .count-badge {
+  .section-title .title-left {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title svg { stroke: var(--wa-green); }
+  .section-title .badge-count {
     background: rgba(18,140,126,.12); color: var(--wa-dark);
     font-size: 11px; padding: 3px 10px; border-radius: 10px;
     font-weight: 700;
   }
+  .section-title .badge-gold {
+    background: rgba(255,184,0,.15); color: #B45309;
+    font-size: 11px; padding: 3px 10px; border-radius: 10px;
+    font-weight: 700;
+  }
+
+  /* STATS */
   .stats {
     display: grid; grid-template-columns: repeat(3, 1fr);
     gap: 10px; margin-bottom: 6px;
@@ -237,8 +304,8 @@
   .stat-card:nth-child(1) .ico svg { stroke: var(--wa-dark); }
   .stat-card:nth-child(2) .ico { background: rgba(255,106,0,.12); }
   .stat-card:nth-child(2) .ico svg { stroke: var(--alibaba); }
-  .stat-card:nth-child(3) .ico { background: rgba(37,211,102,.15); }
-  .stat-card:nth-child(3) .ico svg { stroke: var(--wa-green); }
+  .stat-card:nth-child(3) .ico { background: rgba(255,184,0,.15); }
+  .stat-card:nth-child(3) .ico svg { stroke: var(--gold); }
   .stat-card .val {
     font-size: 17px; font-weight: 800; color: var(--text);
     line-height: 1.2; margin-bottom: 2px;
@@ -248,6 +315,36 @@
     text-transform: uppercase; font-weight: 600;
     letter-spacing: .3px;
   }
+
+  /* BONUS BANNER */
+  .bonus-banner {
+    background: linear-gradient(135deg, var(--gold), #FFD966);
+    color: #fff;
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 4px 14px rgba(255,184,0,.35);
+    position: relative; overflow: hidden;
+  }
+  .bonus-banner::after {
+    content: ''; position: absolute; right: -30px; top: -30px;
+    width: 120px; height: 120px; border-radius: 50%;
+    background: rgba(255,255,255,.15);
+  }
+  .bonus-banner .bb-lbl {
+    font-size: 11px; opacity: .95;
+    text-transform: uppercase; font-weight: 700;
+    letter-spacing: .5px; margin-bottom: 4px;
+  }
+  .bonus-banner .bb-val { font-size: 24px; font-weight: 800; }
+  .bonus-banner .bb-ic {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: rgba(255,255,255,.25);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; z-index: 2;
+  }
+  .bonus-banner .bb-ic svg { stroke: #fff; }
 
   /* INFO LIST */
   .info-list {
@@ -286,24 +383,54 @@
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
 
-  /* HISTORIQUE */
-  .hist-item {
-    background: #fff; border-radius: 14px;
-    padding: 14px;
-    margin-bottom: 10px;
+  /* HISTORIQUE BONUS */
+  .bonus-item {
+    background: #fff; border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,.05);
     display: flex; align-items: center; gap: 12px;
-    animation: fadeInUp .4s ease forwards;
-    opacity: 0;
+    animation: fadeInUp .4s ease forwards; opacity: 0;
+  }
+  .bonus-item .bi-icon {
+    width: 40px; height: 40px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px;
+  }
+  .bonus-item .bi-icon.bienvenue { background: rgba(37,211,102,.15); }
+  .bonus-item .bi-icon.streak { background: rgba(255,69,0,.15); }
+  .bonus-item .bi-icon.palier { background: rgba(255,184,0,.15); }
+  .bonus-item .bi-icon.recharge { background: rgba(18,140,126,.15); }
+  .bonus-item .bi-icon.mission { background: rgba(255,106,0,.15); }
+  .bonus-item .bi-body { flex: 1; min-width: 0; }
+  .bonus-item .bi-title {
+    font-size: 13.5px; font-weight: 700; color: var(--text);
+    margin-bottom: 2px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .bonus-item .bi-sub {
+    font-size: 11px; color: var(--muted);
+  }
+  .bonus-item .bi-gain {
+    font-size: 14px; font-weight: 800; color: var(--wa-dark);
+    text-align: right; flex-shrink: 0;
+  }
+
+  /* HISTORIQUE ACTIVATIONS */
+  .hist-item {
+    background: #fff; border-radius: 14px;
+    padding: 14px; margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    display: flex; align-items: center; gap: 12px;
+    animation: fadeInUp .4s ease forwards; opacity: 0;
   }
   .hist-item .hist-img {
     width: 52px; height: 52px; border-radius: 12px;
     object-fit: cover; flex-shrink: 0;
     background: #f3f4f6;
   }
-  .hist-item .hist-body {
-    flex: 1; min-width: 0;
-  }
+  .hist-item .hist-body { flex: 1; min-width: 0; }
   .hist-item .hist-top {
     display: flex; align-items: center; justify-content: space-between;
     gap: 8px; margin-bottom: 3px;
@@ -340,7 +467,7 @@
 
   /* EMPTY */
   .empty {
-    text-align: center; padding: 40px 20px;
+    text-align: center; padding: 30px 20px;
     color: var(--muted); font-size: 13px;
     background: #fff; border-radius: 14px;
     box-shadow: 0 2px 8px rgba(0,0,0,.05);
@@ -359,13 +486,12 @@
     flex: 1; display: flex; flex-direction: column; align-items: center;
     padding: 9px 0 10px; cursor: pointer;
     color: #9ca3af; font-size: 11px; gap: 4px;
-    transition: color .2s, transform .2s; font-weight: 500;
-    text-decoration: none;
+    transition: color .2s;
+    font-weight: 500; text-decoration: none;
   }
-  .nav-item svg { stroke: #9ca3af; transition: stroke .2s, transform .2s; }
-  .nav-item:active { transform: scale(.92); }
+  .nav-item svg { stroke: #9ca3af; transition: stroke .2s; }
   .nav-item.active { color: var(--wa-dark); font-weight: 700; }
-  .nav-item.active svg { stroke: var(--wa-green); transform: translateY(-1px); }
+  .nav-item.active svg { stroke: var(--wa-green); }
 
   /* TOAST */
   .toast {
@@ -382,8 +508,6 @@
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast svg { stroke: var(--wa-green); flex-shrink: 0; }
-  .toast.error { background: #b91c1c; }
-  .toast.error svg { stroke: #fff; }
 </style>
 </head>
 <body>
@@ -419,21 +543,37 @@
       </svg>
       Travail
     </div>
+    <div class="menu-item" onclick="go('parrainage.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+      </svg>
+      Parrainage
+    </div>
+    <div class="menu-item" onclick="go('missions.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+        <path d="M4 22h16"/>
+        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+      </svg>
+      Missions
+    </div>
     <div class="menu-item" onclick="go('support.html')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+        <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
       </svg>
       Support
     </div>
     <div class="menu-item" onclick="go('faq.html')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        <circle cx="12" cy="12" r="10"/>
       </svg>
       FAQ
     </div>
     <div class="menu-item" onclick="go('entreprise.html')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <path d="M3 21h18M5 21V7l7-4 7 4v14M10 9h4M10 13h4"/>
+        <path d="M3 21h18M5 21V7l7-4 7 4v14"/>
       </svg>
       Notre entreprise
     </div>
@@ -483,9 +623,49 @@
       </div>
     </div>
 
+    <!-- STREAK -->
+    <div class="streak-card anim d2" id="streakCard">
+      <div class="streak-icon">🔥</div>
+      <div class="streak-body">
+        <div class="st-top">Streak quotidien</div>
+        <div class="st-val">
+          <span id="streakVal">0</span>
+          <small id="streakUnit">jour</small>
+        </div>
+        <div class="st-sub" id="streakSub">Ouvre l'app chaque jour</div>
+      </div>
+      <div class="streak-record">
+        <span id="streakRecord">0</span>
+        <small>record</small>
+      </div>
+    </div>
+
+    <!-- BONUS TOTAL -->
+    <div class="bonus-banner anim d2">
+      <div>
+        <div class="bb-lbl">Total bonus reçus</div>
+        <div class="bb-val" id="bonusTotal">0 F</div>
+      </div>
+      <div class="bb-ic">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+        </svg>
+      </div>
+    </div>
+
     <!-- STATS -->
-    <div class="section-title anim d2">Statistiques</div>
-    <div class="stats anim d2">
+    <div class="section-title anim d3">
+      <div class="title-left">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"/>
+          <line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+        Mes statistiques
+      </div>
+    </div>
+
+    <div class="stats anim d3">
       <div class="stat-card">
         <div class="ico">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -493,7 +673,7 @@
           </svg>
         </div>
         <div class="val" id="statTotal">0</div>
-        <div class="lbl">Total</div>
+        <div class="lbl">Activations</div>
       </div>
       <div class="stat-card">
         <div class="ico">
@@ -502,7 +682,7 @@
           </svg>
         </div>
         <div class="val" id="statActive">0</div>
-        <div class="lbl">Actives</div>
+        <div class="lbl">En cours</div>
       </div>
       <div class="stat-card">
         <div class="ico">
@@ -511,12 +691,19 @@
           </svg>
         </div>
         <div class="val" id="statGains">0 F</div>
-        <div class="lbl">Gains</div>
+        <div class="lbl">Gains totaux</div>
       </div>
     </div>
 
     <!-- INFORMATIONS -->
-    <div class="section-title anim d3">Informations personnelles</div>
+    <div class="section-title anim d3">
+      <div class="title-left">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+        </svg>
+        Informations personnelles
+      </div>
+    </div>
     <div class="info-list anim d3">
       <div class="info-row">
         <div class="ico">
@@ -554,7 +741,8 @@
       <div class="info-row">
         <div class="ico">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
           </svg>
         </div>
         <div class="body">
@@ -564,12 +752,36 @@
       </div>
     </div>
 
-    <!-- HISTORIQUE -->
+    <!-- HISTORIQUE BONUS -->
     <div class="section-title anim d4">
-      Historique des activations
-      <span class="count-badge" id="histCount">0</span>
+      <div class="title-left">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+        </svg>
+        Historique des bonus
+      </div>
+      <span class="badge-gold" id="bonusCount">0</span>
     </div>
-    <div id="histList" class="anim d4">
+    <div id="bonusList" class="anim d4">
+      <div class="empty">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <div>Chargement...</div>
+      </div>
+    </div>
+
+    <!-- HISTORIQUE ACTIVATIONS -->
+    <div class="section-title anim d5">
+      <div class="title-left">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+        </svg>
+        Historique des activations
+      </div>
+      <span class="badge-count" id="histCount">0</span>
+    </div>
+    <div id="histList" class="anim d5">
       <div class="empty">
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
           <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
@@ -581,7 +793,7 @@
   </main>
 
   <nav class="bottom-nav">
-    <a href="dashboard.html" class="nav-item">
+    <a href="lancer.html" class="nav-item">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
         <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
@@ -616,7 +828,6 @@
   </div>
 
 <script>
-  // ================= SUPABASE =================
   const SUPABASE_URL = 'https://ydwjvvlcnqsftciedpqm.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2p2dmxjbnFzZnRjaWVkcHFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMDQyNDAsImV4cCI6MjEwNTY4MDI0MH0.4uQwBGedMBjUZErd8lUM5YfA26gw96RvHdo_J-3PZCY';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
@@ -626,141 +837,226 @@
   // ================= INIT =================
   (async function init() {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) {
-      window.location.replace('inscription.html');
-      return;
-    }
+    if (!session) { window.location.replace('inscription.html'); return; }
     CURRENT_USER = session.user;
 
     await Promise.all([
       loadProfile(),
-      loadHistory()
+      loadStreak(),
+      loadBonus(),
+      loadHistory(),
+      loadBonusHistory()
     ]);
 
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
   })();
 
-  // ================= CHARGER PROFIL =================
+  // ================= PROFIL =================
   async function loadProfile() {
-    const { data, error } = await sb
-      .from('profiles')
+    const { data } = await sb.from('profiles')
       .select('nom, pseudo, email, solde, created_at')
       .eq('id', CURRENT_USER.id)
       .maybeSingle();
 
-    if (error) {
-      console.warn('Erreur profil:', error);
-      return;
-    }
+    if (!data) return;
 
-    const nom = data?.nom || 'Utilisateur';
-    const pseudo = data?.pseudo || CURRENT_USER.email.split('@')[0];
-    const email = data?.email || CURRENT_USER.email;
-    const solde = Number(data?.solde ?? 0);
-    const dateInscription = data?.created_at || CURRENT_USER.created_at;
+    const nom = data.nom || 'Utilisateur';
+    const pseudo = data.pseudo || CURRENT_USER.email.split('@')[0];
+    const email = data.email || CURRENT_USER.email;
+    const solde = Number(data.solde ?? 0);
+    const dateInscription = data.created_at || CURRENT_USER.created_at;
 
-    // Avatar (initiales)
     const initiales = nom.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
     document.getElementById('avatar').textContent = initiales || '?';
 
-    // Profil
     document.getElementById('profileNom').textContent = nom;
     document.getElementById('profilePseudo').textContent = '@' + pseudo;
     document.getElementById('profileSolde').textContent = formatF(solde);
 
-    // Infos
     document.getElementById('infoNom').textContent = nom;
     document.getElementById('infoPseudo').textContent = '@' + pseudo;
     document.getElementById('infoEmail').textContent = email;
     document.getElementById('infoDate').textContent = formatDate(dateInscription);
   }
 
-  // ================= CHARGER HISTORIQUE =================
+  // ================= STREAK =================
+  async function loadStreak() {
+    const { data, error } = await sb.from('streaks')
+      .select('*').eq('user_id', CURRENT_USER.id).maybeSingle();
+
+    if (error || !data) return;
+
+    document.getElementById('streakVal').textContent = data.streak_actuel || 0;
+    document.getElementById('streakUnit').textContent = (data.streak_actuel > 1) ? 'jours' : 'jour';
+    document.getElementById('streakRecord').textContent = data.record || 0;
+
+    if (data.dernier_check) {
+      const last = new Date(data.dernier_check);
+      const today = new Date();
+      const diffDays = Math.floor((today - last) / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) {
+        document.getElementById('streakSub').textContent = '✓ Déjà validé aujourd\'hui';
+      } else if (diffDays === 1) {
+        document.getElementById('streakSub').textContent = 'Reviens demain pour +25 F';
+      } else {
+        document.getElementById('streakSub').textContent = 'Ouvre l\'app chaque jour';
+      }
+    }
+  }
+
+  // ================= BONUS TOTAL =================
+  async function loadBonus() {
+    const { data } = await sb.from('bonus_utilisateurs')
+      .select('montant').eq('user_id', CURRENT_USER.id);
+
+    const total = (data || []).reduce((sum, b) => sum + Number(b.montant || 0), 0);
+    document.getElementById('bonusTotal').textContent = formatF(total);
+  }
+
+  // ================= HISTORIQUE BONUS =================
+  async function loadBonusHistory() {
+    const list = document.getElementById('bonusList');
+    const badge = document.getElementById('bonusCount');
+
+    const { data, error } = await sb.from('bonus_utilisateurs')
+      .select('*').eq('user_id', CURRENT_USER.id)
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    if (error || !data || data.length === 0) {
+      badge.textContent = '0';
+      list.innerHTML = `
+        <div class="empty">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+            <path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+          </svg>
+          <div>Aucun bonus pour le moment</div>
+          <div style="font-size:12px;margin-top:6px;opacity:.7">Reviens chaque jour pour gagner des bonus</div>
+        </div>`;
+      return;
+    }
+
+    badge.textContent = data.length;
+
+    list.innerHTML = data.map((b, i) => {
+      const typeClass = getBonusClass(b.type);
+      const icone = getBonusIcon(b.type);
+
+      return `
+        <div class="bonus-item" style="animation-delay:${i * .04}s">
+          <div class="bi-icon ${typeClass}">${icone}</div>
+          <div class="bi-body">
+            <div class="bi-title">${escapeHtml(b.description || getBonusTitle(b.type))}</div>
+            <div class="bi-sub">${timeAgo(b.created_at)}</div>
+          </div>
+          <div class="bi-gain">+${formatF(b.montant)}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function getBonusClass(type) {
+    if (type === 'bienvenue') return 'bienvenue';
+    if (type === 'streak') return 'streak';
+    if (type && type.startsWith('palier_')) return 'palier';
+    if (type && type.includes('recharge')) return 'recharge';
+    if (type && type.startsWith('mission_')) return 'mission';
+    return 'bienvenue';
+  }
+
+  function getBonusIcon(type) {
+    if (type === 'bienvenue') return '🎁';
+    if (type === 'streak') return '🔥';
+    if (type && type.startsWith('palier_')) return '🏅';
+    if (type && type.includes('recharge')) return '💰';
+    if (type && type.startsWith('mission_')) return '🎯';
+    return '✨';
+  }
+
+  function getBonusTitle(type) {
+    if (type === 'bienvenue') return 'Bonus de bienvenue';
+    if (type === 'streak') return 'Streak quotidien';
+    if (type && type.startsWith('palier_')) return 'Palier de parrainage';
+    if (type && type.includes('recharge')) return 'Bonus filleuls rechargés';
+    if (type && type.startsWith('mission_')) return 'Mission accomplie';
+    return 'Bonus';
+  }
+
+  // ================= HISTORIQUE ACTIVATIONS =================
   async function loadHistory() {
     const list = document.getElementById('histList');
     const countBadge = document.getElementById('histCount');
 
     const { data, error } = await sb
-      .from('activations')
+      .from('activations_plans')
       .select(`
-        id, plantation_nom, montant_activation, gain_journalier,
-        periode_jours, gains_totaux, total_a_percevoir,
-        statut, date_debut, date_fin, created_at,
-        plantations (image_url)
+        id, plan_nom, montant_activation, gain_journalier,
+        periode_jours, duree_jours, gains_totaux, gains_percus,
+        jours_credites, statut, date_fin, created_at
       `)
       .eq('user_id', CURRENT_USER.id)
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.warn('Erreur historique:', error);
-      list.innerHTML = `
-        <div class="empty">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
-            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
-          <div>Erreur de chargement</div>
-        </div>`;
+      list.innerHTML = `<div class="empty"><div>Erreur de chargement</div></div>`;
       return;
     }
 
+    const items = data || [];
+    countBadge.textContent = items.length;
+
     // Stats
-    const total = data.length;
-    const actives = data.filter(a => {
-      const fin = a.date_fin ? new Date(a.date_fin) : null;
-      return a.statut === 'active' && (!fin || fin > new Date());
-    }).length;
-    const gainsTotal = data.reduce((sum, a) => sum + Number(a.gains_totaux || 0), 0);
+    const total = items.length;
+    const actives = items.filter(a => a.statut === 'active').length;
+    const gainsTotal = items.reduce((sum, a) => sum + Number(a.gains_percus || 0), 0);
 
     document.getElementById('statTotal').textContent = total;
     document.getElementById('statActive').textContent = actives;
     document.getElementById('statGains').textContent = formatF(gainsTotal);
-    countBadge.textContent = total;
 
-    // Liste
     if (total === 0) {
       list.innerHTML = `
         <div class="empty">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
-            <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+            <rect x="2" y="7" width="20" height="14" rx="2"/>
           </svg>
           <div>Aucune activation pour le moment</div>
-          <div style="font-size:12px;margin-top:6px;opacity:.7">Va dans Travail pour activer ta première plantation</div>
+          <div style="font-size:12px;margin-top:6px;opacity:.7">Va dans Lancer pour activer ton premier plan</div>
         </div>`;
       return;
     }
 
-    list.innerHTML = '';
-    data.forEach((a, i) => {
-      const img = a.plantations?.image_url || 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=200';
-      const fin = a.date_fin ? new Date(a.date_fin) : null;
-      const estActive = a.statut === 'active' && (!fin || fin > new Date());
-      const statutLabel = estActive ? 'Active' : 'Terminé';
-      const statutClass = estActive ? 'active' : 'termine';
+    list.innerHTML = items.map((a, i) => {
+      const isDone = a.statut === 'termine' || a.jours_credites >= a.duree_jours;
+      const statusLabel = isDone ? 'Terminé' : 'Actif';
+      const statusClass = isDone ? 'termine' : 'active';
+      const duree = a.duree_jours || a.periode_jours || 45;
 
-      const item = document.createElement('div');
-      item.className = 'hist-item';
-      item.style.animationDelay = (i * 0.05) + 's';
-      item.innerHTML = `
-        <img class="hist-img" src="${img}" alt="${escapeHtml(a.plantation_nom)}">
-        <div class="hist-body">
-          <div class="hist-top">
-            <div class="hist-nom">${escapeHtml(a.plantation_nom)}</div>
-            <div class="hist-status ${statutClass}">${statutLabel}</div>
+      return `
+        <div class="hist-item" style="animation-delay:${i * .04}s">
+          <div class="hist-img" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--wa-dark),var(--wa-green));color:#fff;font-weight:800;">
+            ${(a.plan_nom || '?')[0].toUpperCase()}
           </div>
-          <div class="hist-meta">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-            </svg>
-            ${a.periode_jours} j · ${formatDate(a.created_at, true)}
+          <div class="hist-body">
+            <div class="hist-top">
+              <div class="hist-nom">${escapeHtml(a.plan_nom)}</div>
+              <div class="hist-status ${statusClass}">${statusLabel}</div>
+            </div>
+            <div class="hist-meta">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              </svg>
+              ${a.jours_credites}/${duree} j · ${formatDate(a.created_at, true)}
+            </div>
           </div>
-        </div>
-        <div class="hist-gain">
-          +${formatF(a.gains_totaux)}
-          <small>débité ${formatF(a.montant_activation)}</small>
+          <div class="hist-gain">
+            +${formatF(a.gains_percus)}
+            <small>débité ${formatF(a.montant_activation)}</small>
+          </div>
         </div>
       `;
-      list.appendChild(item);
-    });
+    }).join('');
   }
 
   // ================= UTILITAIRES =================
@@ -775,13 +1071,23 @@
       : { day: '2-digit', month: 'long', year: 'numeric' };
     return d.toLocaleDateString('fr-FR', options);
   }
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  function timeAgo(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+    if (diff < 60) return 'À l\'instant';
+    if (diff < 3600) return `Il y a ${Math.floor(diff/60)} min`;
+    if (diff < 86400) return `Il y a ${Math.floor(diff/3600)} h`;
+    if (diff < 604800) return `Il y a ${Math.floor(diff/86400)} j`;
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
   }
-  function showToast(msg, isError = false) {
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function showToast(msg) {
     const t = document.getElementById('toast');
     document.getElementById('toastText').textContent = msg;
-    t.className = 'toast show' + (isError ? ' error' : '');
+    t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2600);
   }
   function toggleMenu() {
