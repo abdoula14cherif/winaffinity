@@ -7,10 +7,27 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#075E54">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Affinity">
-<meta name="description" content="Accomplis des tâches, gagne de l'argent et grandis avec ton réseau.">
+<link rel="icon" type="image/png" href="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png">
+<link rel="apple-touch-icon" href="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  (function() {
+    document.addEventListener('click', function(e) {
+      const link = e.target.closest('a');
+      if (!link) return;
+      let href = link.getAttribute('href');
+      if (!href) return;
+      if (href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) return;
+      if (href.endsWith('.html')) {
+        e.preventDefault();
+        window.location.href = href.replace(/\.html$/, '');
+      }
+    }, true);
+    if (window.location.pathname.endsWith('.html')) {
+      window.history.replaceState(null, '', window.location.pathname.replace(/\.html$/, '') + window.location.search);
+    }
+  })();
+</script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root {
@@ -19,9 +36,8 @@
     --bg: #f7f9f8; --text: #1a1a1a; --muted: #6b7280; --border: #e5e7eb;
   }
   body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 72px; min-height: 100vh; overflow-x: hidden; -webkit-user-select: none; user-select: none; }
-  input, textarea { -webkit-user-select: text; user-select: text; }
+  input { -webkit-user-select: text; user-select: text; }
 
-  /* LOADER */
   .loader { position: fixed; inset: 0; z-index: 9999; background: var(--wa-deep); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; transition: opacity .6s ease, visibility .6s ease; }
   .loader.hidden { opacity: 0; visibility: hidden; }
   .loader-logo { font-size: 24px; font-weight: 700; color: #fff; letter-spacing: 1px; }
@@ -29,27 +45,28 @@
   .spinner { width: 46px; height: 46px; border: 4px solid rgba(255,255,255,.2); border-top-color: var(--wa-green); border-radius: 50%; animation: spin .9s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   @keyframes fadeInUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes pulse { 0%,100% { transform: scale(1); opacity: .8; } 50% { transform: scale(1.15); opacity: 1; } }
   @keyframes firePulse { 0%,100% { transform: scale(1) rotate(0deg); } 50% { transform: scale(1.15) rotate(-5deg); } }
+  @keyframes shine { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
   .anim { opacity: 0; animation: fadeInUp .5s ease forwards; }
   .d1 { animation-delay: .05s; } .d2 { animation-delay: .12s; } .d3 { animation-delay: .2s; }
   .d4 { animation-delay: .28s; } .d5 { animation-delay: .34s; } .d6 { animation-delay: .4s; }
 
   /* HEADER */
   .header { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--wa-deep); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.15); padding-top: max(14px, env(safe-area-inset-top)); }
-  .burger { cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,.12); transition: background .2s, transform .2s; position: relative; }
+  .burger { cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,.12); position: relative; transition: background .2s, transform .2s; }
   .burger:active { background: rgba(255,255,255,.25); transform: scale(.92); }
   .burger svg { stroke: #fff; }
   .burger .notif-badge { position: absolute; top: 2px; right: 2px; background: #DC2626; color: #fff; font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 8px; min-width: 16px; text-align: center; display: none; border: 2px solid var(--wa-deep); }
   .burger .notif-badge.show { display: block; }
-  .logo { font-weight: 700; font-size: 18px; letter-spacing: .5px; }
-  .logo span { color: var(--wa-green); }
+  .header-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 17px; letter-spacing: .3px; }
+  .header-logo img { width: 30px; height: 30px; border-radius: 8px; background: #fff; }
+  .header-logo span { color: var(--wa-green); }
 
   /* MENU */
   .menu { position: fixed; top: 0; left: 0; height: 100%; width: 280px; background: #fff; z-index: 200; transform: translateX(-100%); transition: transform .35s cubic-bezier(.4,0,.2,1); box-shadow: 4px 0 20px rgba(0,0,0,.2); padding-top: 18px; display: flex; flex-direction: column; overflow-y: auto; padding-top: max(18px, env(safe-area-inset-top)); }
   .menu.open { transform: translateX(0); }
   .menu-header { padding: 8px 20px 18px; border-bottom: 1px solid #eee; margin-bottom: 10px; font-weight: 700; color: var(--wa-deep); font-size: 17px; display: flex; align-items: center; gap: 10px; }
-  .menu-header svg { stroke: var(--wa-green); }
+  .menu-header img { width: 32px; height: 32px; border-radius: 8px; }
   .menu-item { display: flex; align-items: center; gap: 14px; padding: 15px 22px; cursor: pointer; font-size: 15px; color: #333; transition: background .2s, padding-left .2s; position: relative; }
   .menu-item:active { background: #e7f9ee; padding-left: 26px; }
   .menu-item svg { stroke: var(--wa-dark); flex-shrink: 0; }
@@ -68,99 +85,381 @@
   .overlay.open { opacity: 1; pointer-events: auto; }
 
   /* CONTENU */
-  .content { padding: 18px 16px; }
-  .welcome { background: #fff; border-radius: 16px; padding: 18px; box-shadow: 0 2px 10px rgba(0,0,0,.06); margin-bottom: 16px; }
-  .welcome h2 { font-size: 19px; color: var(--wa-deep); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
-  .welcome h2 .pseudo-badge { color: var(--wa-green); font-weight: 800; }
-  .welcome p { font-size: 14px; color: var(--muted); }
+  .content { padding: 16px; }
 
-  .solde { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; border-radius: 16px; padding: 22px 20px; margin-bottom: 12px; box-shadow: 0 4px 14px rgba(18,140,126,.35); position: relative; overflow: hidden; }
-  .solde::after { content: ''; position: absolute; right: -30px; top: -30px; width: 140px; height: 140px; border-radius: 50%; background: rgba(255,255,255,.08); animation: pulse 3s ease-in-out infinite; }
-  .solde .label { font-size: 13px; opacity: .9; }
-  .solde .montant { font-size: 32px; font-weight: 700; margin: 6px 0; }
-  .solde .sub { font-size: 12px; opacity: .85; }
+  /* ========== CARTE FUSIONNÉE PROFIL + SOLDE ========== */
+  .profile-solde-card {
+    background: linear-gradient(135deg, var(--wa-deep) 0%, var(--wa-dark) 50%, var(--wa-green) 100%);
+    color: #fff;
+    border-radius: 22px;
+    padding: 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 8px 28px rgba(7,94,84,.35);
+    position: relative;
+    overflow: hidden;
+  }
+  .profile-solde-card::before {
+    content: ''; position: absolute;
+    right: -40px; top: -40px;
+    width: 180px; height: 180px; border-radius: 50%;
+    background: rgba(255,255,255,.08);
+  }
+  .profile-solde-card::after {
+    content: ''; position: absolute;
+    left: -60px; bottom: -80px;
+    width: 200px; height: 200px; border-radius: 50%;
+    background: rgba(37,211,102,.15);
+  }
+  .ps-top {
+    display: flex; align-items: center; gap: 14px;
+    position: relative; z-index: 2;
+    margin-bottom: 16px;
+  }
+  .ps-avatar {
+    width: 54px; height: 54px; border-radius: 50%;
+    background: rgba(255,255,255,.25);
+    border: 2.5px solid rgba(255,255,255,.5);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 800; color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,.2);
+  }
+  .ps-info { flex: 1; min-width: 0; }
+  .ps-hello { font-size: 13px; opacity: .9; margin-bottom: 3px; }
+  .ps-name {
+    font-size: 19px; font-weight: 800;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .ps-name small { font-size: 13px; opacity: .85; font-weight: 600; }
+  .ps-icon {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: rgba(255,255,255,.15);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .ps-icon svg { stroke: #fff; }
 
-  .streak-card { background: linear-gradient(135deg, #FF4500, #FF6B35); color: #fff; border-radius: 16px; padding: 14px 18px; margin-bottom: 12px; box-shadow: 0 4px 14px rgba(255,69,0,.3); display: flex; align-items: center; gap: 14px; position: relative; overflow: hidden; }
-  .streak-card::after { content: ''; position: absolute; right: -20px; top: -20px; width: 100px; height: 100px; border-radius: 50%; background: rgba(255,255,255,.1); }
-  .streak-icon { width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 26px; animation: firePulse 1.5s ease-in-out infinite; position: relative; z-index: 2; }
-  .streak-body { flex: 1; position: relative; z-index: 2; }
-  .streak-body .st-top { font-size: 11px; opacity: .9; text-transform: uppercase; letter-spacing: .5px; font-weight: 700; margin-bottom: 3px; }
-  .streak-body .st-val { font-size: 22px; font-weight: 800; display: flex; align-items: baseline; gap: 6px; }
-  .streak-body .st-val small { font-size: 12px; opacity: .85; font-weight: 600; }
-  .streak-body .st-sub { font-size: 11px; opacity: .85; margin-top: 2px; }
-  .streak-bonus { background: rgba(255,255,255,.25); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 800; position: relative; z-index: 2; flex-shrink: 0; }
-  .streak-card.done { background: linear-gradient(135deg, #6b7280, #9ca3af); box-shadow: 0 4px 14px rgba(107,114,128,.3); }
-  .streak-card.done .streak-icon { animation: none; }
+  .ps-solde {
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 16px;
+    padding: 16px 18px;
+    position: relative; z-index: 2;
+    backdrop-filter: blur(10px);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .ps-solde .ps-label {
+    font-size: 11px; opacity: .9;
+    text-transform: uppercase; font-weight: 700;
+    letter-spacing: .5px; margin-bottom: 4px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .ps-solde .ps-label svg { stroke: #fff; }
+  .ps-solde .ps-val {
+    font-size: 28px; font-weight: 800;
+    letter-spacing: -.5px;
+    text-shadow: 0 2px 8px rgba(0,0,0,.2);
+  }
+  .ps-solde .ps-arrow {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: rgba(255,255,255,.25);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0;
+    transition: transform .15s;
+  }
+  .ps-solde .ps-arrow:active { transform: scale(.92); }
+  .ps-solde .ps-arrow svg { stroke: #fff; }
 
-  /* TOP CARD */
-  .top-card { background: linear-gradient(135deg, #1a1a1a, #2d2d2d); color: #fff; border-radius: 16px; padding: 16px 18px; margin-bottom: 20px; box-shadow: 0 4px 18px rgba(0,0,0,.3); position: relative; overflow: hidden; }
-  .top-card::before { content: ''; position: absolute; right: -30px; top: -30px; width: 130px; height: 130px; border-radius: 50%; background: radial-gradient(circle, rgba(255,184,0,.3), transparent 70%); }
-  .top-card .tc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; position: relative; z-index: 2; }
-  .top-card .tc-title { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; letter-spacing: .3px; }
+  /* SECTION TITLE */
+  .section-title {
+    font-size: 15px; font-weight: 700; color: var(--wa-deep);
+    margin: 22px 0 12px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .section-title .title-left { display: flex; align-items: center; gap: 8px; }
+  .section-title svg { stroke: var(--wa-green); }
+  .section-title .badge-count {
+    background: rgba(18,140,126,.12); color: var(--wa-dark);
+    font-size: 11px; padding: 3px 10px; border-radius: 10px;
+    font-weight: 700;
+  }
+
+  /* ========== CARROUSEL ========== */
+  .carousel-wrap {
+    overflow: hidden;
+    border-radius: 18px;
+    position: relative;
+    box-shadow: 0 6px 20px rgba(0,0,0,.12);
+  }
+  .carousel {
+    display: flex;
+    transition: transform .7s cubic-bezier(.4,0,.2,1);
+  }
+  .plant-card {
+    flex: 0 0 100%;
+    background: #fff;
+    position: relative;
+    height: 240px;
+  }
+  .plant-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .plant-card .overlay-grad {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.85) 5%, rgba(0,0,0,.3) 50%, transparent 75%);
+  }
+  .plant-card .tag {
+    position: absolute; top: 14px; right: 14px;
+    background: var(--alibaba); color: #fff;
+    font-size: 12px; font-weight: 800;
+    padding: 6px 14px; border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(255,106,0,.5);
+  }
+  .plant-card .info {
+    position: absolute; bottom: 18px; left: 18px; right: 18px;
+    color: #fff;
+  }
+  .plant-card .nom {
+    font-size: 24px; font-weight: 800;
+    margin-bottom: 4px;
+    text-shadow: 0 2px 8px rgba(0,0,0,.5);
+    letter-spacing: -.3px;
+  }
+  .plant-card .prix {
+    font-size: 14px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .plant-card .prix .dot-live {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--wa-green);
+    box-shadow: 0 0 0 3px rgba(37,211,102,.3);
+    animation: firePulse 1.5s ease-in-out infinite;
+  }
+  .dots { display: flex; justify-content: center; gap: 6px; margin-top: 14px; }
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #d1d5db; transition: all .3s;
+  }
+  .dot.active { background: var(--wa-green); width: 22px; border-radius: 4px; }
+
+  /* ========== TOP DU MOIS ========== */
+  .top-card {
+    background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+    color: #fff; border-radius: 16px;
+    padding: 16px 18px; margin-bottom: 20px;
+    box-shadow: 0 4px 18px rgba(0,0,0,.3);
+    position: relative; overflow: hidden;
+  }
+  .top-card::before {
+    content: ''; position: absolute;
+    right: -30px; top: -30px;
+    width: 130px; height: 130px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,184,0,.3), transparent 70%);
+  }
+  .top-card .tc-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px; position: relative; z-index: 2;
+  }
+  .top-card .tc-title {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 800;
+    letter-spacing: .3px;
+  }
   .top-card .tc-title svg { stroke: var(--gold); }
-  .top-card .tc-jackpot { background: linear-gradient(135deg, var(--gold), #FFD966); color: #1a1a1a; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 12px; box-shadow: 0 3px 10px rgba(255,184,0,.4); }
-  .top-card .tc-body { display: flex; align-items: center; gap: 14px; position: relative; z-index: 2; }
-  .top-card .tc-icon { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), #FFD966); display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; box-shadow: 0 4px 14px rgba(255,184,0,.4); }
+  .top-card .tc-jackpot {
+    background: linear-gradient(135deg, var(--gold), #FFD966);
+    color: #1a1a1a; font-size: 11px; font-weight: 800;
+    padding: 4px 10px; border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(255,184,0,.4);
+  }
+  .top-card .tc-body {
+    display: flex; align-items: center; gap: 14px;
+    position: relative; z-index: 2;
+  }
+  .top-card .tc-icon {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), #FFD966);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; flex-shrink: 0;
+    box-shadow: 0 4px 14px rgba(255,184,0,.4);
+  }
   .top-card .tc-info { flex: 1; }
-  .top-card .tc-lbl { font-size: 11px; opacity: .8; text-transform: uppercase; font-weight: 700; letter-spacing: .4px; margin-bottom: 3px; }
-  .top-card .tc-val { font-size: 22px; font-weight: 800; display: flex; align-items: baseline; gap: 6px; }
+  .top-card .tc-lbl {
+    font-size: 11px; opacity: .8;
+    text-transform: uppercase; font-weight: 700;
+    letter-spacing: .4px; margin-bottom: 3px;
+  }
+  .top-card .tc-val {
+    font-size: 22px; font-weight: 800;
+    display: flex; align-items: baseline; gap: 6px;
+  }
   .top-card .tc-val small { font-size: 12px; opacity: .85; font-weight: 600; }
   .top-card .tc-sub { font-size: 11px; opacity: .75; margin-top: 3px; }
-  .top-card .tc-btn { width: 100%; margin-top: 14px; background: linear-gradient(135deg, var(--gold), #FFD966); color: #1a1a1a; border: none; border-radius: 12px; padding: 12px; font-size: 13.5px; font-weight: 800; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; position: relative; z-index: 2; transition: transform .15s; box-shadow: 0 4px 12px rgba(255,184,0,.3); }
+  .top-card .tc-btn {
+    width: 100%; margin-top: 14px;
+    background: linear-gradient(135deg, var(--gold), #FFD966);
+    color: #1a1a1a; border: none; border-radius: 12px;
+    padding: 12px; font-size: 13.5px; font-weight: 800;
+    cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    position: relative; z-index: 2;
+    transition: transform .15s;
+    box-shadow: 0 4px 12px rgba(255,184,0,.3);
+  }
   .top-card .tc-btn:active { transform: scale(.97); }
   .top-card .tc-btn svg { stroke: #1a1a1a; }
   .top-card.eligible { background: linear-gradient(135deg, #B45309, var(--gold)); }
   .top-card.eligible .tc-icon { background: #fff; }
 
-  .section-title { font-size: 15px; font-weight: 700; color: var(--wa-deep); margin: 22px 0 12px; display: flex; align-items: center; justify-content: space-between; }
-  .section-title .title-left { display: flex; align-items: center; gap: 8px; }
-  .section-title .badge-count { background: rgba(18,140,126,.12); color: var(--wa-dark); font-size: 11px; padding: 3px 10px; border-radius: 10px; font-weight: 700; }
+  /* ========== STREAK ========== */
+  .streak-card {
+    background: linear-gradient(135deg, #FF4500, #FF6B35);
+    color: #fff; border-radius: 16px;
+    padding: 14px 18px; margin-bottom: 16px;
+    box-shadow: 0 4px 14px rgba(255,69,0,.3);
+    display: flex; align-items: center; gap: 14px;
+    position: relative; overflow: hidden;
+  }
+  .streak-card::after {
+    content: ''; position: absolute;
+    right: -20px; top: -20px;
+    width: 100px; height: 100px; border-radius: 50%;
+    background: rgba(255,255,255,.1);
+  }
+  .streak-icon {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: rgba(255,255,255,.2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 26px;
+    animation: firePulse 1.5s ease-in-out infinite;
+    position: relative; z-index: 2;
+  }
+  .streak-body { flex: 1; position: relative; z-index: 2; }
+  .streak-body .st-top {
+    font-size: 11px; opacity: .9;
+    text-transform: uppercase; letter-spacing: .5px;
+    font-weight: 700; margin-bottom: 3px;
+  }
+  .streak-body .st-val {
+    font-size: 22px; font-weight: 800;
+    display: flex; align-items: baseline; gap: 6px;
+  }
+  .streak-body .st-val small { font-size: 12px; opacity: .85; font-weight: 600; }
+  .streak-body .st-sub { font-size: 11px; opacity: .85; margin-top: 2px; }
+  .streak-bonus {
+    background: rgba(255,255,255,.25);
+    padding: 6px 12px; border-radius: 20px;
+    font-size: 12px; font-weight: 800;
+    position: relative; z-index: 2; flex-shrink: 0;
+  }
+  .streak-card.done {
+    background: linear-gradient(135deg, #6b7280, #9ca3af);
+    box-shadow: 0 4px 14px rgba(107,114,128,.3);
+  }
+  .streak-card.done .streak-icon { animation: none; }
 
-  .carousel-wrap { overflow: hidden; border-radius: 16px; position: relative; }
-  .carousel { display: flex; transition: transform .7s cubic-bezier(.4,0,.2,1); }
-  .plant-card { flex: 0 0 100%; background: #fff; position: relative; height: 220px; }
-  .plant-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .plant-card .overlay-grad { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.75), transparent 60%); }
-  .plant-card .tag { position: absolute; top: 12px; right: 12px; background: var(--alibaba); color: #fff; font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 20px; box-shadow: 0 2px 8px rgba(255,106,0,.4); }
-  .plant-card .info { position: absolute; bottom: 14px; left: 16px; right: 16px; color: #fff; }
-  .plant-card .nom { font-size: 20px; font-weight: 700; margin-bottom: 2px; text-shadow: 0 1px 4px rgba(0,0,0,.5); }
-  .plant-card .prix { font-size: 13px; opacity: .9; }
-  .dots { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
-  .dot { width: 7px; height: 7px; border-radius: 50%; background: #d1d5db; transition: all .3s; }
-  .dot.active { background: var(--wa-green); width: 20px; border-radius: 4px; }
-
-  .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
-  .qa-btn { border: none; border-radius: 14px; padding: 16px 10px; cursor: pointer; font-family: inherit; display: flex; flex-direction: column; align-items: center; gap: 10px; transition: transform .15s; }
+  /* ========== BOUTONS RAPIDES ========== */
+  .quick-actions {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-bottom: 6px;
+  }
+  .qa-btn {
+    border: none; border-radius: 14px;
+    padding: 16px 10px; cursor: pointer; font-family: inherit;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 10px; transition: transform .15s;
+  }
   .qa-btn:active { transform: scale(.96); }
-  .qa-btn.invite { background: linear-gradient(135deg, #FF8A3D, var(--alibaba)); color: #fff; box-shadow: 0 4px 14px rgba(255,106,0,.35); }
+  .qa-btn.invite {
+    background: linear-gradient(135deg, #FF8A3D, var(--alibaba));
+    color: #fff; box-shadow: 0 4px 14px rgba(255,106,0,.35);
+  }
   .qa-btn.invite svg { stroke: #fff; }
-  .qa-btn.recharge { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; box-shadow: 0 4px 14px rgba(18,140,126,.35); }
+  .qa-btn.recharge {
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    color: #fff; box-shadow: 0 4px 14px rgba(18,140,126,.35);
+  }
   .qa-btn.recharge svg { stroke: #fff; }
-  .qa-btn .qa-icon { width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; }
+  .qa-btn .qa-icon {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: rgba(255,255,255,.2);
+    display: flex; align-items: center; justify-content: center;
+  }
   .qa-btn .qa-label { font-size: 13px; font-weight: 800; }
   .qa-btn .qa-sub { font-size: 10.5px; opacity: .9; margin-top: -4px; }
 
-  .missions-card { background: #fff; border-radius: 16px; padding: 16px; box-shadow: 0 3px 14px rgba(0,0,0,.07); margin-top: 16px; }
-  .mission-item { padding: 12px; background: #f7faf8; border-radius: 12px; margin-bottom: 10px; }
+  /* ========== MISSIONS ========== */
+  .missions-card {
+    background: #fff; border-radius: 16px;
+    padding: 16px; box-shadow: 0 3px 14px rgba(0,0,0,.07);
+  }
+  .mission-item {
+    padding: 12px; background: #f7faf8;
+    border-radius: 12px; margin-bottom: 10px;
+  }
   .mission-item:last-child { margin-bottom: 0; }
-  .mission-item.complete { background: linear-gradient(135deg, rgba(37,211,102,.08), rgba(18,140,126,.1)); border: 1px solid rgba(37,211,102,.3); }
-  .mission-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+  .mission-item.complete {
+    background: linear-gradient(135deg, rgba(37,211,102,.08), rgba(18,140,126,.1));
+    border: 1px solid rgba(37,211,102,.3);
+  }
+  .mission-top {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; margin-bottom: 8px;
+  }
   .mission-info { flex: 1; min-width: 0; }
-  .mission-info .mi-title { font-size: 13px; font-weight: 800; color: var(--text); margin-bottom: 2px; }
+  .mission-info .mi-title {
+    font-size: 13px; font-weight: 800; color: var(--text); margin-bottom: 2px;
+  }
   .mission-info .mi-sub { font-size: 11px; color: var(--muted); }
-  .mission-reward { background: linear-gradient(135deg, var(--alibaba), #FF8A3D); color: #fff; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(255,106,0,.3); }
-  .mission-item.complete .mission-reward { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); box-shadow: 0 2px 8px rgba(18,140,126,.3); }
-  .mission-progress-bar { height: 8px; background: #e5e7eb; border-radius: 5px; overflow: hidden; margin-bottom: 6px; }
-  .mission-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, var(--alibaba), #FF8A3D); transition: width .8s ease; }
-  .mission-item.complete .mission-fill { background: linear-gradient(90deg, var(--wa-dark), var(--wa-green)); }
-  .mission-bottom { display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--muted); }
+  .mission-reward {
+    background: linear-gradient(135deg, var(--alibaba), #FF8A3D);
+    color: #fff; font-size: 11px; font-weight: 800;
+    padding: 4px 10px; border-radius: 20px; flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(255,106,0,.3);
+  }
+  .mission-item.complete .mission-reward {
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    box-shadow: 0 2px 8px rgba(18,140,126,.3);
+  }
+  .mission-progress-bar {
+    height: 8px; background: #e5e7eb;
+    border-radius: 5px; overflow: hidden; margin-bottom: 6px;
+  }
+  .mission-fill {
+    height: 100%; border-radius: 5px;
+    background: linear-gradient(90deg, var(--alibaba), #FF8A3D);
+    transition: width .8s ease;
+  }
+  .mission-item.complete .mission-fill {
+    background: linear-gradient(90deg, var(--wa-dark), var(--wa-green));
+  }
+  .mission-bottom {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11px; color: var(--muted);
+  }
   .mission-bottom .mb-count { font-weight: 800; color: var(--text); }
-  .mission-item.complete .mission-bottom .mb-status { color: var(--wa-dark); font-weight: 800; }
+  .mission-item.complete .mission-bottom .mb-status {
+    color: var(--wa-dark); font-weight: 800;
+  }
 
-  .actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 16px; }
-  .action-btn { background: #fff; border-radius: 14px; padding: 18px 10px; display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.06); transition: transform .2s; border: 1px solid #f0f0f0; position: relative; }
+  /* ========== 4 BOUTONS ========== */
+  .actions {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 10px; margin-top: 16px;
+  }
+  .action-btn {
+    background: #fff; border-radius: 14px;
+    padding: 18px 10px;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 10px; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    transition: transform .2s;
+    border: 1px solid #f0f0f0;
+    position: relative;
+  }
   .action-btn:active { transform: scale(.95); }
-  .action-btn .icon-circle { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .action-btn .icon-circle {
+    width: 46px; height: 46px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
   .action-btn .label { font-size: 13px; font-weight: 700; color: #333; }
   .action-btn.home .icon-circle { background: rgba(7,94,84,.1); }
   .action-btn.home svg { stroke: var(--wa-deep); }
@@ -170,18 +469,55 @@
   .action-btn.ticket svg { stroke: var(--wa-dark); }
   .action-btn.news .icon-circle { background: rgba(37,211,102,.15); }
   .action-btn.news svg { stroke: var(--wa-green); }
-  .action-btn.current::before { content: 'Actuel'; position: absolute; top: 8px; right: 8px; background: var(--wa-green); color: #fff; font-size: 9px; font-weight: 800; padding: 2px 7px; border-radius: 10px; text-transform: uppercase; letter-spacing: .3px; }
+  .action-btn.current::before {
+    content: 'Actuel'; position: absolute; top: 8px; right: 8px;
+    background: var(--wa-green); color: #fff;
+    font-size: 9px; font-weight: 800;
+    padding: 2px 7px; border-radius: 10px;
+    text-transform: uppercase; letter-spacing: .3px;
+  }
 
   /* BOTTOM NAV */
-  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: #fff; border-top: 1px solid #e5e7eb; box-shadow: 0 -2px 12px rgba(0,0,0,.06); z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
-  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 9px 0 10px; cursor: pointer; color: #9ca3af; font-size: 11px; gap: 4px; font-weight: 500; text-decoration: none; position: relative; }
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    display: flex; background: #fff;
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 -2px 12px rgba(0,0,0,.06);
+    z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    padding: 9px 0 10px; cursor: pointer;
+    color: #9ca3af; font-size: 11px; gap: 4px;
+    font-weight: 500; text-decoration: none;
+    position: relative;
+  }
   .nav-item svg { stroke: #9ca3af; }
   .nav-item.active { color: var(--wa-dark); font-weight: 700; }
   .nav-item.active svg { stroke: var(--wa-green); }
-  .nav-item .notif-badge { position: absolute; top: 4px; right: 22%; background: #DC2626; color: #fff; font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 8px; min-width: 16px; text-align: center; display: none; }
+  .nav-item .notif-badge {
+    position: absolute; top: 4px; right: 22%;
+    background: #DC2626; color: #fff;
+    font-size: 9px; font-weight: 800;
+    padding: 1px 5px; border-radius: 8px;
+    min-width: 16px; text-align: center;
+    display: none;
+  }
   .nav-item .notif-badge.show { display: block; }
 
-  .toast { position: fixed; left: 50%; bottom: 100px; transform: translateX(-50%) translateY(20px); background: var(--wa-deep); color: #fff; padding: 12px 22px; border-radius: 30px; font-size: 14px; font-weight: 600; box-shadow: 0 6px 20px rgba(0,0,0,.25); opacity: 0; pointer-events: none; transition: all .3s; z-index: 1000; display: flex; align-items: center; gap: 8px; max-width: 90%; }
+  .toast {
+    position: fixed; left: 50%; bottom: 100px;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--wa-deep); color: #fff;
+    padding: 12px 22px; border-radius: 30px;
+    font-size: 14px; font-weight: 600;
+    box-shadow: 0 6px 20px rgba(0,0,0,.25);
+    opacity: 0; pointer-events: none;
+    transition: all .3s; z-index: 1000;
+    display: flex; align-items: center; gap: 8px;
+    max-width: 90%;
+  }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast svg { stroke: var(--wa-green); flex-shrink: 0; }
   .toast.streak { background: linear-gradient(135deg, #FF4500, #FF6B35); box-shadow: 0 6px 24px rgba(255,69,0,.5); }
@@ -204,42 +540,39 @@
       </svg>
       <span class="notif-badge" id="burgerBadge"></span>
     </div>
-    <div class="logo">Affinity<span> Network</span></div>
+    <div class="header-logo">
+      <img src="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png" alt="">
+      Affinity<span> Network</span>
+    </div>
     <div style="width:40px"></div>
   </header>
 
   <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
   <nav class="menu" id="menu">
     <div class="menu-header">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <path d="M3 21h18M5 21V7l7-4 7 4v14"/>
-      </svg>
+      <img src="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png" alt="">
       Affinity Network
     </div>
-
-    <div class="menu-item invite" onclick="go('parrainage.html')">
+    <div class="menu-item invite" onclick="go('parrainage')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/>
         <line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>
       </svg>
       Inviter un ami
     </div>
-
-    <div class="menu-item recharge" onclick="go('recharge.html')">
+    <div class="menu-item recharge" onclick="go('recharge')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
       </svg>
       Recharger mon solde
     </div>
-
-    <div class="menu-item roue" onclick="go('roue.html')">
+    <div class="menu-item roue" onclick="go('roue')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
       </svg>
       Roue de la fortune
     </div>
-
-    <div class="menu-item missions" onclick="go('missions.html')">
+    <div class="menu-item missions" onclick="go('missions')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
         <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
@@ -248,8 +581,7 @@
       </svg>
       Missions du mois
     </div>
-
-    <div class="menu-item notifs" onclick="go('notifications.html')">
+    <div class="menu-item notifs" onclick="go('notifications')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
         <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
@@ -257,35 +589,30 @@
       Notifications
       <span class="menu-badge" id="menuNotifBadge"></span>
     </div>
-
-    <div class="menu-item" onclick="go('travail.html')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+    <div class="menu-item" onclick="go('travail')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
       </svg>
       Travail
     </div>
-
-    <div class="menu-item" onclick="go('support.html')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+    <div class="menu-item" onclick="go('support')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
       </svg>
       Support
     </div>
-
-    <div class="menu-item" onclick="go('faq.html')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+    <div class="menu-item" onclick="go('faq')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"/>
       </svg>
       FAQ
     </div>
-
-    <div class="menu-item" onclick="go('entreprise.html')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <path d="M3 21h18M5 21V7l7-4 7 4v14M10 9h4M10 13h4"/>
+    <div class="menu-item" onclick="go('entreprise')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 21h18M5 21V7l7-4 7 4v14"/>
       </svg>
       Notre entreprise
     </div>
-
     <div class="menu-footer">
       <button class="btn-logout" onclick="logout()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -299,31 +626,119 @@
   </nav>
 
   <main class="content">
-    <div class="welcome anim d1">
-      <h2>Bonjour <span class="pseudo-badge" id="userPseudo">...</span></h2>
-      <p>Prêt à accomplir des tâches et gagner aujourd'hui ?</p>
-    </div>
 
-    <div class="solde anim d2">
-      <div class="label">Solde disponible</div>
-      <div class="montant" id="userSolde">0 FCFA</div>
-      <div class="sub">Retirez dès 1 000 FCFA</div>
-    </div>
-
-    <div class="streak-card anim d2" id="streakCard">
-      <div class="streak-icon">🔥</div>
-      <div class="streak-body">
-        <div class="st-top">Streak quotidien</div>
-        <div class="st-val">
-          <span id="streakVal">0</span>
-          <small id="streakUnit">jour</small>
+    <!-- ========== CARTE FUSIONNÉE PROFIL + SOLDE ========== -->
+    <div class="profile-solde-card anim d1">
+      <div class="ps-top">
+        <div class="ps-avatar" id="psAvatar">?</div>
+        <div class="ps-info">
+          <div class="ps-hello">Bonjour 👋</div>
+          <div class="ps-name" id="userPseudo">...</div>
         </div>
-        <div class="st-sub" id="streakSub">Ouvre l'app chaque jour pour gagner</div>
+        <div class="ps-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18M5 21V7l7-4 7 4v14"/>
+          </svg>
+        </div>
       </div>
-      <div class="streak-bonus" id="streakBonus">+25 F</div>
+      <div class="ps-solde" onclick="go('moi')">
+        <div>
+          <div class="ps-label">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+            </svg>
+            Solde disponible
+          </div>
+          <div class="ps-val" id="userSolde">0 F</div>
+        </div>
+        <div class="ps-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </div>
+      </div>
     </div>
 
-    <div class="top-card anim d2" id="topCard">
+    <!-- ========== CARROUSEL ========== -->
+    <div class="section-title anim d2">
+      <div class="title-left">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 20h10M10 20c5.5-2.5.8-6.4 3-10"/>
+        </svg>
+        Plantations & cultures
+      </div>
+    </div>
+    <div class="carousel-wrap anim d2">
+      <div class="carousel" id="carousel">
+        <div class="plant-card">
+          <img src="https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=600" alt="Maïs">
+          <div class="overlay-grad"></div>
+          <span class="tag">+250 F / jour</span>
+          <div class="info">
+            <div class="nom">Maïs</div>
+            <div class="prix"><span class="dot-live"></span> Disponible maintenant</div>
+          </div>
+        </div>
+        <div class="plant-card">
+          <img src="https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=600" alt="Cacao">
+          <div class="overlay-grad"></div>
+          <span class="tag">+600 F / jour</span>
+          <div class="info">
+            <div class="nom">Cacao</div>
+            <div class="prix"><span class="dot-live"></span> Disponible maintenant</div>
+          </div>
+        </div>
+        <div class="plant-card">
+          <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=600" alt="Café">
+          <div class="overlay-grad"></div>
+          <span class="tag">+1 250 F / jour</span>
+          <div class="info">
+            <div class="nom">Café</div>
+            <div class="prix"><span class="dot-live"></span> Disponible maintenant</div>
+          </div>
+        </div>
+        <div class="plant-card">
+          <img src="https://images.unsplash.com/photo-1591892150205-4a5d4a2a0e8c?w=600" alt="Palmier">
+          <div class="overlay-grad"></div>
+          <span class="tag">+1 700 F / jour</span>
+          <div class="info">
+            <div class="nom">Palmier à huile</div>
+            <div class="prix"><span class="dot-live"></span> Disponible maintenant</div>
+          </div>
+        </div>
+        <div class="plant-card">
+          <img src="https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=600" alt="Banane">
+          <div class="overlay-grad"></div>
+          <span class="tag">+2 200 F / jour</span>
+          <div class="info">
+            <div class="nom">Banane</div>
+            <div class="prix"><span class="dot-live"></span> Disponible maintenant</div>
+          </div>
+        </div>
+        <div class="plant-card">
+          <img src="https://images.unsplash.com/photo-1508747703725-719777637510?w=600" alt="Arachide">
+          <div class="overlay-grad"></div>
+          <span class="tag">+3 200 F / jour</span>
+          <div class="info">
+            <div class="nom">Arachide</div>
+            <div class="prix"><span class="dot-live"></span> Disponible maintenant</div>
+          </div>
+        </div>
+        <div class="plant-card">
+          <img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600" alt="Riz">
+          <div class="overlay-grad"></div>
+          <span class="tag">+5 200 F / jour</span>
+          <div class="info">
+            <div class="nom">Riz</div>
+            <div class="prix"><span class="dot-live"></span> Disponible maintenant</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dots" id="dots"></div>
+
+    <!-- ========== TOP DU MOIS ========== -->
+    <div class="top-card anim d3" id="topCard" style="margin-top:22px;">
       <div class="tc-head">
         <div class="tc-title">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -344,7 +759,7 @@
           <div class="tc-sub" id="tcSub">—</div>
         </div>
       </div>
-      <button class="tc-btn" onclick="go('parrainage.html')">
+      <button class="tc-btn" onclick="go('parrainage')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
         </svg>
@@ -352,24 +767,23 @@
       </button>
     </div>
 
-    <div class="section-title anim d3">
-      <div class="title-left">Plantations & cultures</div>
-    </div>
-    <div class="carousel-wrap anim d3">
-      <div class="carousel" id="carousel">
-        <div class="plant-card"><img src="https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=600" alt="Maïs"><div class="overlay-grad"></div><span class="tag">+250 F</span><div class="info"><div class="nom">Maïs</div><div class="prix">Disponible maintenant</div></div></div>
-        <div class="plant-card"><img src="https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=600" alt="Cacao"><div class="overlay-grad"></div><span class="tag">+600 F</span><div class="info"><div class="nom">Cacao</div><div class="prix">Disponible maintenant</div></div></div>
-        <div class="plant-card"><img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=600" alt="Café"><div class="overlay-grad"></div><span class="tag">+1 250 F</span><div class="info"><div class="nom">Café</div><div class="prix">Disponible maintenant</div></div></div>
-        <div class="plant-card"><img src="https://images.unsplash.com/photo-1591892150205-4a5d4a2a0e8c?w=600" alt="Palmier"><div class="overlay-grad"></div><span class="tag">+1 700 F</span><div class="info"><div class="nom">Palmier à huile</div><div class="prix">Disponible maintenant</div></div></div>
-        <div class="plant-card"><img src="https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=600" alt="Banane"><div class="overlay-grad"></div><span class="tag">+2 200 F</span><div class="info"><div class="nom">Banane</div><div class="prix">Disponible maintenant</div></div></div>
-        <div class="plant-card"><img src="https://images.unsplash.com/photo-1508747703725-719777637510?w=600" alt="Arachide"><div class="overlay-grad"></div><span class="tag">+3 200 F</span><div class="info"><div class="nom">Arachide</div><div class="prix">Disponible maintenant</div></div></div>
-        <div class="plant-card"><img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600" alt="Riz"><div class="overlay-grad"></div><span class="tag">+5 200 F</span><div class="info"><div class="nom">Riz</div><div class="prix">Disponible maintenant</div></div></div>
+    <!-- ========== STREAK ========== -->
+    <div class="streak-card anim d3" id="streakCard">
+      <div class="streak-icon">🔥</div>
+      <div class="streak-body">
+        <div class="st-top">Streak quotidien</div>
+        <div class="st-val">
+          <span id="streakVal">0</span>
+          <small id="streakUnit">jour</small>
+        </div>
+        <div class="st-sub" id="streakSub">Ouvre l'app chaque jour pour gagner</div>
       </div>
+      <div class="streak-bonus" id="streakBonus">+25 F</div>
     </div>
-    <div class="dots" id="dots"></div>
 
+    <!-- ========== BOUTONS RAPIDES ========== -->
     <div class="quick-actions anim d4">
-      <button class="qa-btn invite" onclick="go('parrainage.html')">
+      <button class="qa-btn invite" onclick="go('parrainage')">
         <div class="qa-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/>
@@ -379,7 +793,7 @@
         <div class="qa-label">Inviter</div>
         <div class="qa-sub">Gagne 20%</div>
       </button>
-      <button class="qa-btn recharge" onclick="go('recharge.html')">
+      <button class="qa-btn recharge" onclick="go('recharge')">
         <div class="qa-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
@@ -390,7 +804,8 @@
       </button>
     </div>
 
-    <div class="section-title anim d4">
+    <!-- ========== MISSIONS ========== -->
+    <div class="section-title anim d5">
       <div class="title-left">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
@@ -402,13 +817,13 @@
       </div>
       <span class="badge-count" id="missionsBadge">0/2</span>
     </div>
-
-    <div class="missions-card anim d4" id="missionsCard">
+    <div class="missions-card anim d5" id="missionsCard">
       <div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">Chargement des missions...</div>
     </div>
 
-    <div class="actions anim d5">
-      <div class="action-btn home current" onclick="go('dashboard.html')">
+    <!-- ========== 4 BOUTONS ========== -->
+    <div class="actions anim d6">
+      <div class="action-btn home current" onclick="go('dashboard')">
         <div class="icon-circle">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
@@ -416,7 +831,7 @@
         </div>
         <div class="label">Accueil</div>
       </div>
-      <div class="action-btn rank" onclick="go('classement.html')">
+      <div class="action-btn rank" onclick="go('classement')">
         <div class="icon-circle">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/>
@@ -425,7 +840,7 @@
         </div>
         <div class="label">Classement</div>
       </div>
-      <div class="action-btn ticket" onclick="go('ticket.html')">
+      <div class="action-btn ticket" onclick="go('ticket')">
         <div class="icon-circle">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v14"/>
@@ -433,7 +848,7 @@
         </div>
         <div class="label">Ticket</div>
       </div>
-      <div class="action-btn news" onclick="go('actualites.html')">
+      <div class="action-btn news" onclick="go('actualites')">
         <div class="icon-circle">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/>
@@ -446,26 +861,26 @@
   </main>
 
   <nav class="bottom-nav">
-    <a href="lancer.html" class="nav-item">
+    <a href="lancer" class="nav-item">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
         <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
       </svg>
       Lancer
     </a>
-    <a href="retirer.html" class="nav-item">
+    <a href="retirer" class="nav-item">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/>
       </svg>
       Retirer
     </a>
-    <a href="travail.html" class="nav-item">
+    <a href="travail" class="nav-item">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
       </svg>
       Travail
     </a>
-    <a href="moi.html" class="nav-item">
+    <a href="moi" class="nav-item">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
       </svg>
@@ -487,15 +902,11 @@
 
   let CURRENT_USER = null;
 
-  // ================= SERVICE WORKER =================
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  }
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 
-  // ================= INIT =================
   (async function init() {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) { window.location.replace('inscription.html'); return; }
+    if (!session) { window.location.replace('inscription'); return; }
     CURRENT_USER = session.user;
 
     await loadProfile();
@@ -508,19 +919,30 @@
     await loadProfile();
 
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
-
-    // Rafraîchir le badge toutes les 60 secondes
     setInterval(loadNotifBadge, 60000);
   })();
 
   // ================= PROFIL =================
   async function loadProfile() {
-    const { data: profile } = await sb.from('profiles').select('nom, pseudo, solde').eq('id', CURRENT_USER.id).maybeSingle();
+    const { data: profile } = await sb.from('profiles')
+      .select('nom, pseudo, solde').eq('id', CURRENT_USER.id).maybeSingle();
+    
+    const nom = profile?.nom || '';
     const pseudo = profile?.pseudo || CURRENT_USER.email.split('@')[0];
     const solde = profile?.solde ?? 0;
-    document.getElementById('userPseudo').textContent = pseudo;
+    
+    // Avatar avec initiales
+    const initiales = nom.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase() || '?';
+    document.getElementById('psAvatar').textContent = initiales;
+    
+    // Pseudo
+    document.getElementById('userPseudo').innerHTML = `${escapeHtml(pseudo)} <small>·</small>`;
+    
+    // Solde
     document.getElementById('userSolde').textContent = formatF(solde);
   }
+
+  function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
   // ================= STREAK =================
   async function checkStreak() {
@@ -577,7 +999,6 @@
     const m2 = data.mission_10_amis;
     const completeCount = (m1.complete ? 1 : 0) + (m2.complete ? 1 : 0);
     document.getElementById('missionsBadge').textContent = `${completeCount}/2`;
-
     card.innerHTML = `
       ${renderMission('🎯', 'Active 3 plans ce mois', 'Objectif : 3 plans activés', m1)}
       ${renderMission('👥', '10 amis actifs', '10 amis ayant activé ≥ 6 000 F', m2)}
@@ -599,8 +1020,7 @@
         <div class="mission-progress-bar"><div class="mission-fill" style="width:${progress}%"></div></div>
         <div class="mission-bottom">
           <span class="mb-count">${m.progression} / ${m.objectif}</span>
-          ${m.complete ? '<span class="mb-status">✓ Terminé</span>'
-            : `<span>${restant} restant${restant > 1 ? 's' : ''}</span>`}
+          ${m.complete ? '<span class="mb-status">✓ Terminé</span>' : `<span>${restant} restant${restant > 1 ? 's' : ''}</span>`}
         </div>
       </div>
     `;
@@ -630,10 +1050,8 @@
   async function loadNotifBadge() {
     const { data, error } = await sb.rpc('get_mes_notifications');
     if (error || !data) return;
-
     const badge = document.getElementById('burgerBadge');
     const menuBadge = document.getElementById('menuNotifBadge');
-
     if (data.non_lues > 0) {
       badge.textContent = data.non_lues > 9 ? '9+' : data.non_lues;
       badge.classList.add('show');
@@ -659,11 +1077,14 @@
     document.getElementById('menu').classList.toggle('open');
     document.getElementById('overlay').classList.toggle('open');
   }
-  function go(page) { window.location.href = page; }
+  function go(page) {
+    const cleanPage = page.replace(/\.html$/, '');
+    window.location.href = cleanPage;
+  }
   async function logout() {
     if (!confirm('Veux-tu vraiment te déconnecter ?')) return;
     await sb.auth.signOut();
-    window.location.replace('inscription.html');
+    window.location.replace('inscription');
   }
 
   // ================= CARROUSEL =================
