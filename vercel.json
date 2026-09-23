@@ -1,0 +1,39 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/dashboard", "destination": "/dashboard.html" },
+    { "source": "/travail", "destination": "/travail.html" },
+    { "source": "/lancer", "destination": "/lancer.html" },
+    { "source": "/retirer", "destination": "/retirer.html" },
+    { "source": "/recharge", "destination": "/recharge.html" },
+    { "source": "/parrainage", "destination": "/parrainage.html" },
+    { "source": "/ticket", "destination": "/ticket.html" },
+    { "source": "/classement", "destination": "/classement.html" },
+    { "source": "/actualites", "destination": "/actualites.html" },
+    { "source": "/entreprise", "destination": "/entreprise.html" },
+    { "source": "/faq", "destination": "/faq.html" },
+    { "source": "/support", "destination": "/support.html" },
+    { "source": "/moi", "destination": "/moi.html" },
+    { "source": "/inscription", "destination": "/inscription.html" },
+    { "source": "/admin", "destination": "/admin.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
+  ]
+}
