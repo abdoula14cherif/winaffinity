@@ -4,451 +4,155 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Affinity Network — Travail</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#075E54">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root {
-    --wa-green: #25D366;
-    --wa-dark: #128C7E;
-    --wa-deep: #075E54;
-    --alibaba: #FF6A00;
-    --white: #ffffff;
-    --bg: #f7f9f8;
-    --text: #1a1a1a;
-    --muted: #6b7280;
-    --border: #e5e7eb;
-    --danger: #dc2626;
+    --wa-green: #25D366; --wa-dark: #128C7E; --wa-deep: #075E54;
+    --alibaba: #FF6A00; --bg: #f7f9f8; --text: #1a1a1a; --muted: #6b7280; --border: #e5e7eb; --danger: #dc2626;
   }
-  body {
-    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
-    background: var(--bg); color: var(--text);
-    padding-bottom: 80px; min-height: 100vh; overflow-x: hidden;
-  }
+  body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 80px; min-height: 100vh; overflow-x: hidden; -webkit-user-select: none; user-select: none; }
+  input { -webkit-user-select: text; user-select: text; }
 
-  /* LOADER */
-  .loader {
-    position: fixed; inset: 0; z-index: 9999;
-    background: var(--wa-deep);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 22px;
-    transition: opacity .6s ease, visibility .6s ease;
-  }
+  .loader { position: fixed; inset: 0; z-index: 9999; background: var(--wa-deep); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; transition: opacity .6s ease, visibility .6s ease; }
   .loader.hidden { opacity: 0; visibility: hidden; }
-  .loader-logo {
-    font-size: 24px; font-weight: 700; color: #fff;
-    letter-spacing: 1px; animation: fadeUp .8s ease;
-  }
+  .loader-logo { font-size: 24px; font-weight: 700; color: #fff; letter-spacing: 1px; }
   .loader-logo span { color: var(--wa-green); }
-  .spinner {
-    width: 46px; height: 46px;
-    border: 4px solid rgba(255,255,255,.2);
-    border-top-color: var(--wa-green);
-    border-radius: 50%;
-    animation: spin .9s linear infinite;
-  }
+  .spinner { width: 46px; height: 46px; border: 4px solid rgba(255,255,255,.2); border-top-color: var(--wa-green); border-radius: 50%; animation: spin .9s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(18px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes shimmer { to { background-position: -200% 0; } }
   .anim { opacity: 0; animation: fadeInUp .5s ease forwards; }
 
-  /* HEADER */
-  .header {
-    position: sticky; top: 0; z-index: 100;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 18px;
-    background: var(--wa-deep); color: #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,.15);
-  }
-  .burger {
-    cursor: pointer; width: 40px; height: 40px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 50%; background: rgba(255,255,255,.12);
-    transition: background .2s, transform .2s;
-  }
-  .burger:active { background: rgba(255,255,255,.25); transform: scale(.92); }
+  .header { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--wa-deep); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.15); padding-top: max(14px, env(safe-area-inset-top)); }
+  .burger { cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,.12); }
   .burger svg { stroke: #fff; }
   .logo { font-weight: 700; font-size: 18px; letter-spacing: .5px; }
   .logo span { color: var(--wa-green); }
 
-  /* MENU */
-  .menu {
-    position: fixed; top: 0; left: 0; height: 100%; width: 280px;
-    background: #fff; z-index: 200;
-    transform: translateX(-100%);
-    transition: transform .35s cubic-bezier(.4,0,.2,1);
-    box-shadow: 4px 0 20px rgba(0,0,0,.2);
-    padding-top: 18px;
-    display: flex; flex-direction: column;
-  }
+  .menu { position: fixed; top: 0; left: 0; height: 100%; width: 280px; background: #fff; z-index: 200; transform: translateX(-100%); transition: transform .35s cubic-bezier(.4,0,.2,1); box-shadow: 4px 0 20px rgba(0,0,0,.2); padding-top: 18px; display: flex; flex-direction: column; overflow-y: auto; padding-top: max(18px, env(safe-area-inset-top)); }
   .menu.open { transform: translateX(0); }
-  .menu-header {
-    padding: 8px 20px 18px; border-bottom: 1px solid #eee; margin-bottom: 10px;
-    font-weight: 700; color: var(--wa-deep); font-size: 17px;
-    display: flex; align-items: center; gap: 10px;
-  }
+  .menu-header { padding: 8px 20px 18px; border-bottom: 1px solid #eee; margin-bottom: 10px; font-weight: 700; color: var(--wa-deep); font-size: 17px; display: flex; align-items: center; gap: 10px; }
   .menu-header svg { stroke: var(--wa-green); }
-  .menu-item {
-    display: flex; align-items: center; gap: 14px;
-    padding: 15px 22px; cursor: pointer; font-size: 15px;
-    color: #333; transition: background .2s, padding-left .2s;
-  }
+  .menu-item { display: flex; align-items: center; gap: 14px; padding: 15px 22px; cursor: pointer; font-size: 15px; color: #333; transition: background .2s, padding-left .2s; }
   .menu-item:active { background: #e7f9ee; padding-left: 26px; }
   .menu-item svg { stroke: var(--wa-dark); flex-shrink: 0; }
   .menu-item.active { background: #e7f9ee; color: var(--wa-deep); font-weight: 700; }
-  .menu-footer {
-    margin-top: auto; padding: 16px 20px 22px;
-    border-top: 1px solid #eee;
-  }
-  .btn-logout {
-    width: 100%; padding: 14px;
-    background: #fee2e2; color: #b91c1c;
-    border: none; border-radius: 12px;
-    font-size: 14px; font-weight: 700;
-    cursor: pointer; font-family: inherit;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: background .2s, transform .15s;
-  }
-  .btn-logout:active { transform: scale(.97); }
+  .menu-footer { margin-top: auto; padding: 16px 20px 22px; border-top: 1px solid #eee; padding-bottom: max(22px, env(safe-area-inset-bottom)); }
+  .btn-logout { width: 100%; padding: 14px; background: #fee2e2; color: #b91c1c; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .btn-logout svg { stroke: #b91c1c; }
-  .overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,.45);
-    z-index: 150; opacity: 0; pointer-events: none; transition: opacity .3s;
-  }
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 150; opacity: 0; pointer-events: none; transition: opacity .3s; }
   .overlay.open { opacity: 1; pointer-events: auto; }
 
-  /* CONTENU */
   .content { padding: 18px 16px; }
-  .page-title {
-    font-size: 22px; font-weight: 700; color: var(--wa-deep);
-    margin-bottom: 4px;
-  }
-  .page-sub { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+  .page-title { font-size: 22px; font-weight: 700; color: var(--wa-deep); margin-bottom: 4px; }
+  .page-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
 
-  /* BANNIÈRE SOLDE */
-  .solde-banner {
-    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
-    color: #fff; border-radius: 14px;
-    padding: 14px 18px; margin-bottom: 20px;
-    display: flex; align-items: center; justify-content: space-between;
-    box-shadow: 0 4px 14px rgba(18,140,126,.3);
-  }
-  .solde-banner .lbl {
-    font-size: 12px; opacity: .9;
-    display: flex; align-items: center; gap: 6px;
-  }
+  .solde-banner { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; border-radius: 14px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 14px rgba(18,140,126,.3); }
+  .solde-banner .lbl { font-size: 12px; opacity: .9; display: flex; align-items: center; gap: 6px; }
   .solde-banner .lbl svg { stroke: #fff; }
-  .solde-banner .val {
-    font-size: 22px; font-weight: 800;
-  }
+  .solde-banner .val { font-size: 22px; font-weight: 800; }
 
-  /* SKELETON */
-  .skeleton {
-    background: #fff; border-radius: 18px; overflow: hidden;
-    margin-bottom: 16px; box-shadow: 0 3px 14px rgba(0,0,0,.06);
-  }
-  .skeleton .sk-img {
-    height: 130px; background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
-    background-size: 200% 100%; animation: shimmer 1.4s infinite;
-  }
-  .skeleton .sk-body {
-    padding: 14px 16px; display: flex;
-    align-items: center; justify-content: space-between;
-  }
-  .skeleton .sk-line {
-    height: 12px; border-radius: 6px;
-    background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
-    background-size: 200% 100%; animation: shimmer 1.4s infinite;
-    margin-bottom: 8px;
-  }
+  .skeleton { background: #fff; border-radius: 18px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 3px 14px rgba(0,0,0,.06); }
+  .skeleton .sk-img { height: 130px; background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
+  .skeleton .sk-body { padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; }
+  .skeleton .sk-line { height: 12px; border-radius: 6px; background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; margin-bottom: 8px; }
   .skeleton .sk-line.w1 { width: 100px; }
   .skeleton .sk-line.w2 { width: 60px; }
-  .skeleton .sk-btn {
-    width: 80px; height: 36px; border-radius: 12px;
-    background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
-    background-size: 200% 100%; animation: shimmer 1.4s infinite;
-  }
-  @keyframes shimmer { to { background-position: -200% 0; } }
+  .skeleton .sk-btn { width: 80px; height: 36px; border-radius: 12px; background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
 
-  /* CARTE PLANTATION */
-  .plant-card {
-    background: #fff; border-radius: 18px; overflow: hidden;
-    box-shadow: 0 3px 14px rgba(0,0,0,.07);
-    margin-bottom: 16px;
-    transition: transform .2s, box-shadow .2s;
-    opacity: 0; animation: fadeInUp .5s ease forwards;
-  }
+  .plant-card { background: #fff; border-radius: 18px; overflow: hidden; box-shadow: 0 3px 14px rgba(0,0,0,.07); margin-bottom: 16px; transition: transform .2s, box-shadow .2s; opacity: 0; animation: fadeInUp .5s ease forwards; }
   .plant-card:active { transform: scale(.99); }
-  .plant-card .photo {
-    position: relative; height: 130px; overflow: hidden;
-  }
-  .plant-card .photo img {
-    width: 100%; height: 100%; object-fit: cover; display: block;
-    transition: transform .4s;
-  }
-  .plant-card .photo::after {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,.55), transparent 60%);
-  }
-  .plant-card .badge {
-    position: absolute; top: 12px; right: 12px;
-    background: var(--alibaba); color: #fff;
-    font-size: 11px; font-weight: 700;
-    padding: 5px 11px; border-radius: 20px;
-    box-shadow: 0 2px 8px rgba(255,106,0,.4);
-    display: flex; align-items: center; gap: 4px;
-  }
-  .plant-card .plant-name {
-    position: absolute; bottom: 12px; left: 16px;
-    color: #fff; font-size: 18px; font-weight: 700;
-    text-shadow: 0 1px 4px rgba(0,0,0,.5);
-    display: flex; align-items: center; gap: 8px;
-  }
+  .plant-card .photo { position: relative; height: 130px; overflow: hidden; }
+  .plant-card .photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
+  .plant-card .photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.55), transparent 60%); }
+  .plant-card .badge { position: absolute; top: 12px; right: 12px; background: var(--alibaba); color: #fff; font-size: 11px; font-weight: 700; padding: 5px 11px; border-radius: 20px; box-shadow: 0 2px 8px rgba(255,106,0,.4); display: flex; align-items: center; gap: 4px; }
+  .plant-card .plant-name { position: absolute; bottom: 12px; left: 16px; color: #fff; font-size: 18px; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,.5); display: flex; align-items: center; gap: 8px; }
   .plant-card .plant-name svg { stroke: #fff; }
-  .plant-card .body {
-    padding: 14px 16px;
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 10px;
-  }
+  .plant-card .body { padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
   .plant-card .info-col { display: flex; flex-direction: column; gap: 2px; }
-  .plant-card .label-sm {
-    font-size: 11px; color: var(--muted); text-transform: uppercase;
-    letter-spacing: .5px; font-weight: 600;
-  }
-  .plant-card .revenu {
-    font-size: 19px; font-weight: 700; color: var(--wa-dark);
-  }
+  .plant-card .label-sm { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
+  .plant-card .revenu { font-size: 19px; font-weight: 700; color: var(--wa-dark); }
   .plant-card .revenu small { font-size: 12px; color: var(--muted); font-weight: 500; }
 
-  .btn-voir {
-    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
-    color: #fff; border: none;
-    padding: 10px 22px; border-radius: 12px;
-    font-size: 14px; font-weight: 700;
-    cursor: pointer; font-family: inherit;
-    box-shadow: 0 3px 10px rgba(18,140,126,.3);
-    transition: transform .15s, box-shadow .2s;
-    display: flex; align-items: center; gap: 6px;
-  }
+  .btn-voir { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; border: none; padding: 10px 22px; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; box-shadow: 0 3px 10px rgba(18,140,126,.3); transition: transform .15s; display: flex; align-items: center; gap: 6px; }
   .btn-voir:active { transform: scale(.95); }
   .btn-voir svg { stroke: #fff; }
 
-  /* EMPTY STATE */
-  .empty {
-    text-align: center; padding: 60px 20px;
-    color: var(--muted); font-size: 14px;
-  }
+  .empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 14px; }
   .empty svg { stroke: #d1d5db; margin-bottom: 12px; }
 
-  /* MODAL */
-  .modal-overlay {
-    position: fixed; inset: 0; z-index: 500;
-    background: rgba(0,0,0,.55);
-    display: flex; align-items: flex-end; justify-content: center;
-    opacity: 0; pointer-events: none;
-    transition: opacity .3s; backdrop-filter: blur(3px);
-  }
+  .modal-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,.55); display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .3s; backdrop-filter: blur(3px); }
   .modal-overlay.open { opacity: 1; pointer-events: auto; }
-  .modal {
-    background: #fff; width: 100%; max-width: 480px;
-    border-radius: 24px 24px 0 0;
-    padding: 22px 20px 28px;
-    transform: translateY(100%);
-    transition: transform .4s cubic-bezier(.4,0,.2,1);
-    max-height: 90vh; overflow-y: auto;
-  }
+  .modal { background: #fff; width: 100%; max-width: 480px; border-radius: 24px 24px 0 0; padding: 22px 20px 28px; transform: translateY(100%); transition: transform .4s cubic-bezier(.4,0,.2,1); max-height: 90vh; overflow-y: auto; padding-bottom: max(28px, env(safe-area-inset-bottom)); }
   .modal-overlay.open .modal { transform: translateY(0); }
-  .modal-handle {
-    width: 42px; height: 5px; border-radius: 5px;
-    background: #d1d5db; margin: 0 auto 16px;
-  }
-  .modal-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 18px;
-  }
-  .modal-title {
-    font-size: 19px; font-weight: 700; color: var(--wa-deep);
-    display: flex; align-items: center; gap: 8px;
-  }
+  .modal-handle { width: 42px; height: 5px; border-radius: 5px; background: #d1d5db; margin: 0 auto 16px; }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .modal-title { font-size: 19px; font-weight: 700; color: var(--wa-deep); display: flex; align-items: center; gap: 8px; }
   .modal-title svg { stroke: var(--wa-green); }
-  .modal-close {
-    width: 34px; height: 34px; border-radius: 50%;
-    background: #f3f4f6; border: none; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .modal-close:active { background: #e5e7eb; }
+  .modal-close { width: 34px; height: 34px; border-radius: 50%; background: #f3f4f6; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
   .modal-close svg { stroke: var(--muted); }
-  .modal-photo {
-    height: 130px; border-radius: 14px; overflow: hidden;
-    margin-bottom: 16px; position: relative;
-  }
-  .modal-photo img { width: 100%; height: 100%; object-fit: cover; }
-  .modal-photo::after {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(to top, rgba(7,94,84,.75), transparent 60%);
-  }
-  .modal-photo .tag-plant {
-    position: absolute; bottom: 12px; left: 14px;
-    color: #fff; font-weight: 700; font-size: 17px;
-    z-index: 2; display: flex; align-items: center; gap: 8px;
-  }
-  .modal-photo .tag-plant svg { stroke: #fff; }
 
-  /* SOLDE UTILISATEUR DANS MODAL */
-  .user-solde-box {
-    background: linear-gradient(135deg, rgba(18,140,126,.1), rgba(37,211,102,.14));
-    border-radius: 12px; padding: 12px 16px;
-    margin-bottom: 14px;
-    display: flex; align-items: center; justify-content: space-between;
-    border: 1px solid rgba(18,140,126,.2);
-  }
-  .user-solde-box .lbl {
-    font-size: 12px; font-weight: 600; color: var(--wa-deep);
-    display: flex; align-items: center; gap: 6px;
-  }
+  .user-solde-box { background: linear-gradient(135deg, rgba(18,140,126,.1), rgba(37,211,102,.14)); border-radius: 12px; padding: 12px 16px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(18,140,126,.2); }
+  .user-solde-box .lbl { font-size: 12px; font-weight: 600; color: var(--wa-deep); display: flex; align-items: center; gap: 6px; }
   .user-solde-box .lbl svg { stroke: var(--wa-dark); }
-  .user-solde-box .val {
-    font-size: 17px; font-weight: 800; color: var(--wa-dark);
-  }
-  .user-solde-box.insufficient {
-    background: linear-gradient(135deg, rgba(220,38,38,.08), rgba(220,38,38,.14));
-    border-color: rgba(220,38,38,.3);
-  }
+  .user-solde-box .val { font-size: 17px; font-weight: 800; color: var(--wa-dark); }
+  .user-solde-box.insufficient { background: linear-gradient(135deg, rgba(220,38,38,.08), rgba(220,38,38,.14)); border-color: rgba(220,38,38,.3); }
   .user-solde-box.insufficient .lbl { color: var(--danger); }
   .user-solde-box.insufficient .lbl svg { stroke: var(--danger); }
   .user-solde-box.insufficient .val { color: var(--danger); }
 
-  .details {
-    background: #f7faf8; border-radius: 14px;
-    padding: 14px 16px; margin-bottom: 18px;
-    display: flex; flex-direction: column; gap: 10px;
-  }
-  .detail-row {
-    display: flex; align-items: center; justify-content: space-between;
-    font-size: 14px;
-  }
+  .modal-photo { height: 130px; border-radius: 14px; overflow: hidden; margin-bottom: 16px; position: relative; }
+  .modal-photo img { width: 100%; height: 100%; object-fit: cover; }
+  .modal-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(7,94,84,.75), transparent 60%); }
+  .modal-photo .tag-plant { position: absolute; bottom: 12px; left: 14px; color: #fff; font-weight: 700; font-size: 17px; z-index: 2; display: flex; align-items: center; gap: 8px; }
+  .modal-photo .tag-plant svg { stroke: #fff; }
+
+  .details { background: #f7faf8; border-radius: 14px; padding: 14px 16px; margin-bottom: 18px; display: flex; flex-direction: column; gap: 10px; }
+  .detail-row { display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
   .detail-row .lbl { color: var(--muted); display: flex; align-items: center; gap: 7px; }
   .detail-row .lbl svg { stroke: var(--muted); }
   .detail-row .val { font-weight: 700; }
   .detail-row .val.green { color: var(--wa-dark); }
   .detail-row .val.orange { color: var(--alibaba); }
 
-  .period-title {
-    font-size: 14px; font-weight: 700; color: var(--wa-deep);
-    margin-bottom: 10px;
-  }
-  .periods {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 8px; margin-bottom: 18px;
-  }
-  .period-btn {
-    background: #fff; border: 1.5px solid var(--border);
-    border-radius: 12px; padding: 12px 4px;
-    text-align: center; cursor: pointer;
-    transition: all .2s; font-family: inherit;
-  }
+  .period-title { font-size: 14px; font-weight: 700; color: var(--wa-deep); margin-bottom: 10px; }
+  .periods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 18px; }
+  .period-btn { background: #fff; border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 4px; text-align: center; cursor: pointer; transition: all .2s; font-family: inherit; }
   .period-btn .num { font-size: 17px; font-weight: 700; color: var(--text); }
-  .period-btn .unit {
-    font-size: 10px; color: var(--muted); margin-top: 2px;
-    text-transform: uppercase; font-weight: 600;
-  }
-  .period-btn.active {
-    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
-    border-color: transparent;
-    box-shadow: 0 4px 12px rgba(18,140,126,.3);
-    transform: translateY(-2px);
-  }
-  .period-btn.active .num,
-  .period-btn.active .unit { color: #fff; }
+  .period-btn .unit { font-size: 10px; color: var(--muted); margin-top: 2px; text-transform: uppercase; font-weight: 600; }
+  .period-btn.active { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); border-color: transparent; box-shadow: 0 4px 12px rgba(18,140,126,.3); transform: translateY(-2px); }
+  .period-btn.active .num, .period-btn.active .unit { color: #fff; }
 
-  .calc-box {
-    background: linear-gradient(135deg, rgba(18,140,126,.08), rgba(37,211,102,.12));
-    border-radius: 14px; padding: 16px;
-    margin-bottom: 18px; border: 1px dashed rgba(18,140,126,.35);
-  }
-  .calc-row {
-    display: flex; align-items: center; justify-content: space-between;
-    font-size: 13px; margin-bottom: 8px;
-  }
-  .calc-row:last-child {
-    margin-bottom: 0; padding-top: 10px;
-    border-top: 1px solid rgba(18,140,126,.25);
-    font-size: 16px; font-weight: 700;
-  }
+  .calc-box { background: linear-gradient(135deg, rgba(18,140,126,.08), rgba(37,211,102,.12)); border-radius: 14px; padding: 16px; margin-bottom: 18px; border: 1px dashed rgba(18,140,126,.35); }
+  .calc-row { display: flex; align-items: center; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
+  .calc-row:last-child { margin-bottom: 0; padding-top: 10px; border-top: 1px solid rgba(18,140,126,.25); font-size: 16px; font-weight: 700; }
   .calc-row .k { color: #4b5563; }
   .calc-row .v { color: var(--text); font-weight: 600; }
   .calc-row.total .v { color: var(--alibaba); font-size: 20px; font-weight: 800; }
   .calc-row.total .k { color: var(--wa-deep); font-weight: 700; }
 
-  .btn-activate {
-    width: 100%; border: none;
-    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
-    color: #fff; padding: 16px;
-    border-radius: 14px; font-size: 16px; font-weight: 700;
-    cursor: pointer; font-family: inherit;
-    box-shadow: 0 4px 14px rgba(18,140,126,.35);
-    transition: transform .15s, box-shadow .2s, background .2s;
-    display: flex; align-items: center; justify-content: center;
-    gap: 8px;
-  }
+  .btn-activate { width: 100%; border: none; background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; box-shadow: 0 4px 14px rgba(18,140,126,.35); transition: transform .15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .btn-activate:active { transform: scale(.97); }
   .btn-activate svg { stroke: #fff; }
-  .btn-activate:disabled {
-    background: #d1d5db; cursor: not-allowed;
-    box-shadow: none; opacity: .9;
-  }
+  .btn-activate:disabled { background: #d1d5db; cursor: not-allowed; box-shadow: none; }
   .btn-activate:disabled svg { stroke: #6b7280; }
   .btn-activate:disabled .txt { color: #4b5563; }
   .btn-activate.loading { opacity: .85; pointer-events: none; }
-  .btn-activate .spin-small {
-    width: 18px; height: 18px;
-    border: 2.5px solid rgba(255,255,255,.4);
-    border-top-color: #fff; border-radius: 50%;
-    animation: spin .7s linear infinite;
-    display: none;
-  }
+  .btn-activate .spin-small { width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; display: none; }
   .btn-activate.loading .spin-small { display: inline-block; }
   .btn-activate.loading .icon-check { display: none; }
 
-  /* BOTTOM NAV */
-  .bottom-nav {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    display: flex; background: #fff;
-    border-top: 1px solid #e5e7eb;
-    box-shadow: 0 -2px 12px rgba(0,0,0,.06);
-    z-index: 100;
-  }
-  .nav-item {
-    flex: 1; display: flex; flex-direction: column; align-items: center;
-    padding: 9px 0 10px; cursor: pointer;
-    color: #9ca3af; font-size: 11px; gap: 4px;
-    transition: color .2s, transform .2s; font-weight: 500;
-    text-decoration: none;
-  }
-  .nav-item svg { stroke: #9ca3af; transition: stroke .2s, transform .2s; }
-  .nav-item:active { transform: scale(.92); }
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: #fff; border-top: 1px solid #e5e7eb; box-shadow: 0 -2px 12px rgba(0,0,0,.06); z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 9px 0 10px; cursor: pointer; color: #9ca3af; font-size: 11px; gap: 4px; font-weight: 500; text-decoration: none; }
+  .nav-item svg { stroke: #9ca3af; }
   .nav-item.active { color: var(--wa-dark); font-weight: 700; }
-  .nav-item.active svg { stroke: var(--wa-green); transform: translateY(-1px); }
+  .nav-item.active svg { stroke: var(--wa-green); }
 
-  /* TOAST */
-  .toast {
-    position: fixed; left: 50%; bottom: 100px;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--wa-deep); color: #fff;
-    padding: 12px 22px; border-radius: 30px;
-    font-size: 14px; font-weight: 600;
-    box-shadow: 0 6px 20px rgba(0,0,0,.25);
-    opacity: 0; pointer-events: none;
-    transition: all .3s; z-index: 1000;
-    display: flex; align-items: center; gap: 8px;
-    max-width: 90%;
-  }
+  .toast { position: fixed; left: 50%; bottom: 100px; transform: translateX(-50%) translateY(20px); background: var(--wa-deep); color: #fff; padding: 12px 22px; border-radius: 30px; font-size: 14px; font-weight: 600; box-shadow: 0 6px 20px rgba(0,0,0,.25); opacity: 0; pointer-events: none; transition: all .3s; z-index: 1000; display: flex; align-items: center; gap: 8px; max-width: 90%; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast svg { stroke: var(--wa-green); flex-shrink: 0; }
   .toast.error { background: #b91c1c; }
@@ -465,9 +169,7 @@
   <header class="header">
     <div class="burger" onclick="toggleMenu()">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round">
-        <line x1="3" y1="6" x2="21" y2="6"/>
-        <line x1="3" y1="12" x2="21" y2="12"/>
-        <line x1="3" y1="18" x2="21" y2="18"/>
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
       </svg>
     </div>
     <div class="logo">Affinity<span> Network</span></div>
@@ -482,6 +184,38 @@
       </svg>
       Affinity Network
     </div>
+    <div class="menu-item" onclick="go('parrainage.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+      </svg>
+      Inviter un ami
+    </div>
+    <div class="menu-item" onclick="go('recharge.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Recharger mon solde
+    </div>
+    <div class="menu-item" onclick="go('roue.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+      </svg>
+      Roue de la fortune
+    </div>
+    <div class="menu-item" onclick="go('missions.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+        <path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+      </svg>
+      Missions
+    </div>
+    <div class="menu-item" onclick="go('notifications.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      Notifications
+    </div>
     <div class="menu-item active" onclick="go('travail.html')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
         <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
@@ -490,13 +224,13 @@
     </div>
     <div class="menu-item" onclick="go('support.html')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+        <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
       </svg>
       Support
     </div>
     <div class="menu-item" onclick="go('faq.html')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        <circle cx="12" cy="12" r="10"/>
       </svg>
       FAQ
     </div>
@@ -506,7 +240,6 @@
       </svg>
       Notre entreprise
     </div>
-
     <div class="menu-footer">
       <button class="btn-logout" onclick="logout()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -523,15 +256,16 @@
     <h1 class="page-title">Travail</h1>
     <p class="page-sub">Active une plantation et gagne chaque jour</p>
 
-    <!-- BANNIÈRE SOLDE -->
     <div class="solde-banner anim">
-      <div class="lbl">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
-        </svg>
-        Solde disponible
+      <div>
+        <div class="lbl">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+          </svg>
+          Solde disponible
+        </div>
+        <div class="val" id="userSolde">0 F</div>
       </div>
-      <div class="val" id="userSolde">0 F</div>
     </div>
 
     <div id="plantsList">
@@ -553,7 +287,7 @@
   </main>
 
   <nav class="bottom-nav">
-    <a href="dashboard.html" class="nav-item">
+    <a href="lancer.html" class="nav-item">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
         <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
@@ -580,15 +314,13 @@
     </a>
   </nav>
 
-  <!-- MODAL -->
   <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
     <div class="modal" id="modal">
       <div class="modal-handle"></div>
-
       <div class="modal-header">
         <div class="modal-title">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M7 20h10M10 20c5.5-2.5.8-6.4 3-10M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/>
+            <path d="M7 20h10M10 20c5.5-2.5.8-6.4 3-10"/>
           </svg>
           <span id="modalPlantName">—</span>
         </div>
@@ -598,8 +330,6 @@
           </svg>
         </button>
       </div>
-
-      <!-- SOLDE UTILISATEUR -->
       <div class="user-solde-box" id="userSoldeBox">
         <div class="lbl">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -609,17 +339,15 @@
         </div>
         <div class="val" id="modalUserSolde">0 F</div>
       </div>
-
       <div class="modal-photo">
         <img id="modalImg" src="" alt="">
         <div class="tag-plant">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M7 20h10M10 20c5.5-2.5.8-6.4 3-10M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/>
+            <path d="M7 20h10M10 20c5.5-2.5.8-6.4 3-10"/>
           </svg>
           <span id="modalPhotoName">—</span>
         </div>
       </div>
-
       <div class="details">
         <div class="detail-row">
           <div class="lbl">
@@ -640,38 +368,18 @@
           <div class="val green" id="detailGain">—</div>
         </div>
       </div>
-
       <div class="period-title">Période d'activation</div>
       <div class="periods" id="periods">
-        <button class="period-btn active" data-days="1" onclick="selectPeriod(this,1)">
-          <div class="num">1</div><div class="unit">jour</div>
-        </button>
-        <button class="period-btn" data-days="7" onclick="selectPeriod(this,7)">
-          <div class="num">7</div><div class="unit">jours</div>
-        </button>
-        <button class="period-btn" data-days="14" onclick="selectPeriod(this,14)">
-          <div class="num">14</div><div class="unit">jours</div>
-        </button>
-        <button class="period-btn" data-days="28" onclick="selectPeriod(this,28)">
-          <div class="num">28</div><div class="unit">jours</div>
-        </button>
+        <button class="period-btn active" data-days="1" onclick="selectPeriod(this,1)"><div class="num">1</div><div class="unit">jour</div></button>
+        <button class="period-btn" data-days="7" onclick="selectPeriod(this,7)"><div class="num">7</div><div class="unit">jours</div></button>
+        <button class="period-btn" data-days="14" onclick="selectPeriod(this,14)"><div class="num">14</div><div class="unit">jours</div></button>
+        <button class="period-btn" data-days="28" onclick="selectPeriod(this,28)"><div class="num">28</div><div class="unit">jours</div></button>
       </div>
-
       <div class="calc-box">
-        <div class="calc-row">
-          <span class="k">Activation (débitée)</span>
-          <span class="v" id="calcActivation">—</span>
-        </div>
-        <div class="calc-row">
-          <span class="k">Gains sur <b id="calcDaysLabel">1 jour</b></span>
-          <span class="v" id="calcGains">—</span>
-        </div>
-        <div class="calc-row total">
-          <span class="k">Total à percevoir</span>
-          <span class="v" id="calcTotal">—</span>
-        </div>
+        <div class="calc-row"><span class="k">Activation (débitée)</span><span class="v" id="calcActivation">—</span></div>
+        <div class="calc-row"><span class="k">Gains sur <b id="calcDaysLabel">1 jour</b></span><span class="v" id="calcGains">—</span></div>
+        <div class="calc-row total"><span class="k">Total à percevoir</span><span class="v" id="calcTotal">—</span></div>
       </div>
-
       <button class="btn-activate" id="btnActivate" onclick="activate()">
         <span class="spin-small"></span>
         <svg class="icon-check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -690,7 +398,6 @@
   </div>
 
 <script>
-  // ================= SUPABASE =================
   const SUPABASE_URL = 'https://ydwjvvlcnqsftciedpqm.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2p2dmxjbnFzZnRjaWVkcHFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMDQyNDAsImV4cCI6MjEwNTY4MDI0MH0.4uQwBGedMBjUZErd8lUM5YfA26gw96RvHdo_J-3PZCY';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
@@ -701,72 +408,36 @@
   let currentPlant = null;
   let currentDays = 1;
 
-  // ================= INIT =================
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+
   (async function init() {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) {
-      window.location.replace('inscription.html');
-      return;
-    }
+    if (!session) { window.location.replace('inscription.html'); return; }
     CURRENT_USER = session.user;
-
     await Promise.all([loadProfile(), loadPlantations()]);
-
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
   })();
 
-  // ================= CHARGER PROFIL =================
   async function loadProfile() {
-    const { data, error } = await sb
-      .from('profiles')
-      .select('solde')
-      .eq('id', CURRENT_USER.id)
-      .maybeSingle();
-
-    if (error) {
-      console.warn('Erreur profil:', error);
-      return;
-    }
-
+    const { data } = await sb.from('profiles').select('solde').eq('id', CURRENT_USER.id).maybeSingle();
     USER_SOLDE = Number(data?.solde ?? 0);
     document.getElementById('userSolde').textContent = formatF(USER_SOLDE);
   }
 
-  // ================= CHARGER PLANTATIONS =================
   async function loadPlantations() {
     const list = document.getElementById('plantsList');
-
-    const { data, error } = await sb
-      .from('plantations')
-      .select('id, slug, nom, image_url, montant_activation, gain_journalier, ordre')
-      .eq('actif', true)
-      .order('ordre', { ascending: true });
-
-    if (error) {
-      list.innerHTML = `
-        <div class="empty">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
-            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
-          <div>Erreur de chargement</div>
-        </div>`;
+    const { data, error } = await sb.from('plantations').select('*').eq('actif', true).order('ordre', { ascending: true });
+    if (error || !data || data.length === 0) {
+      list.innerHTML = `<div class="empty">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+          <path d="M7 20h10M10 20c5.5-2.5.8-6.4 3-10"/>
+        </svg>
+        <div>Aucune plantation disponible</div>
+      </div>`;
       return;
     }
-
-    if (!data || data.length === 0) {
-      list.innerHTML = `
-        <div class="empty">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
-            <path d="M7 20h10M10 20c5.5-2.5.8-6.4 3-10"/>
-          </svg>
-          <div>Aucune plantation disponible</div>
-        </div>`;
-      return;
-    }
-
     PLANTS = data;
     list.innerHTML = '';
-
     data.forEach((p, i) => {
       const card = document.createElement('div');
       card.className = 'plant-card';
@@ -782,7 +453,7 @@
           </span>
           <div class="plant-name">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M7 20h10M10 20c5.5-2.5.8-6.4 3-10M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/>
+              <path d="M7 20h10M10 20c5.5-2.5.8-6.4 3-10"/>
             </svg>
             ${escapeHtml(p.nom)}
           </div>
@@ -802,70 +473,49 @@
       `;
       list.appendChild(card);
     });
-
     document.querySelectorAll('.btn-voir').forEach(btn => {
       btn.addEventListener('click', () => openModal(btn.dataset.id));
     });
   }
 
-  // ================= OUVRIR MODAL =================
   function openModal(id) {
     const p = PLANTS.find(x => x.id === id);
     if (!p) return;
-
     currentPlant = p;
     currentDays = 1;
-
     document.getElementById('modalPlantName').textContent = p.nom;
     document.getElementById('modalPhotoName').textContent = p.nom;
     document.getElementById('modalImg').src = p.image_url;
     document.getElementById('detailActivation').textContent = formatF(p.montant_activation);
     document.getElementById('detailGain').textContent = formatF(p.gain_journalier);
     document.getElementById('modalUserSolde').textContent = formatF(USER_SOLDE);
-
     document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
     document.querySelector('.period-btn[data-days="1"]').classList.add('active');
-
     updateCalc();
-
     document.getElementById('modalOverlay').classList.add('open');
     document.body.style.overflow = 'hidden';
   }
-
-  function closeModal() {
-    document.getElementById('modalOverlay').classList.remove('open');
-    document.body.style.overflow = '';
-  }
-  function closeModalOutside(e) {
-    if (e.target.id === 'modalOverlay') closeModal();
-  }
-
+  function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); document.body.style.overflow = ''; }
+  function closeModalOutside(e) { if (e.target.id === 'modalOverlay') closeModal(); }
   function selectPeriod(btn, days) {
     document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentDays = days;
     updateCalc();
   }
-
-  // ================= CALCUL + VÉRIF SOLDE =================
   function updateCalc() {
     if (!currentPlant) return;
-
     const act = Number(currentPlant.montant_activation);
     const gain = Number(currentPlant.gain_journalier);
     const gainsTotal = gain * currentDays;
     const total = act + gainsTotal;
-
     document.getElementById('calcActivation').textContent = formatF(act);
     document.getElementById('calcGains').textContent = formatF(gainsTotal);
     document.getElementById('calcDaysLabel').textContent = currentDays + (currentDays === 1 ? ' jour' : ' jours');
     document.getElementById('calcTotal').textContent = formatF(total);
-
-    // === VÉRIFICATION DU SOLDE ===
     const box = document.getElementById('userSoldeBox');
     const btn = document.getElementById('btnActivate');
     const btnText = document.getElementById('btnActivateText');
-
     if (USER_SOLDE < act) {
       box.classList.add('insufficient');
       btn.disabled = true;
@@ -877,69 +527,41 @@
     }
   }
 
-  // ================= ACTIVER (RPC) =================
   async function activate() {
     if (!currentPlant || !CURRENT_USER) return;
-
     const act = Number(currentPlant.montant_activation);
-
-    // Double vérification côté client
-    if (USER_SOLDE < act) {
-      showToast('Solde insuffisant', true);
-      return;
-    }
-
+    if (USER_SOLDE < act) return showToast('Solde insuffisant', true);
     const btn = document.getElementById('btnActivate');
     btn.classList.add('loading');
     document.getElementById('btnActivateText').textContent = 'Activation...';
-
-    // === Appel de la fonction Postgres atomique ===
     const { data, error } = await sb.rpc('activer_plantation', {
       p_plantation_id: currentPlant.id,
       p_periode_jours: currentDays
     });
-
     btn.classList.remove('loading');
-
     if (error) {
-      // Extraire un message propre
-      let msg = error.message || 'Erreur inconnue';
-      if (msg.includes('Solde insuffisant')) {
-        msg = 'Solde insuffisant pour cette activation.';
-      }
+      let msg = error.message || 'Erreur';
+      if (msg.includes('Solde insuffisant')) msg = 'Solde insuffisant pour cette activation.';
       showToast(msg, true);
-      document.getElementById('btnActivateText').textContent = 'Activer maintenant';
-      // Rafraîchir le solde au cas où
       await loadProfile();
       updateCalc();
       return;
     }
-
-    // Succès
-    USER_SOLDE = Number(data.nouveau_solde ?? USER_SOLDE - act);
+    USER_SOLDE = Number(data.nouveau_solde ?? USER_SOLDE);
     document.getElementById('userSolde').textContent = formatF(USER_SOLDE);
-
     closeModal();
     showToast(`${currentPlant.nom} activé pour ${currentDays} jour${currentDays > 1 ? 's' : ''} !`);
   }
 
-  // ================= UTILITAIRES =================
-  function formatF(n) {
-    return Math.round(Number(n)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F';
-  }
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
-  }
+  function formatF(n) { return Math.round(Number(n || 0)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F'; }
+  function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   function showToast(msg, isError = false) {
     const t = document.getElementById('toast');
     document.getElementById('toastText').textContent = msg;
     t.className = 'toast show' + (isError ? ' error' : '');
-    setTimeout(() => t.classList.remove('show'), 2800);
+    setTimeout(() => t.classList.remove('show'), 3000);
   }
-  function toggleMenu() {
-    document.getElementById('menu').classList.toggle('open');
-    document.getElementById('overlay').classList.toggle('open');
-  }
+  function toggleMenu() { document.getElementById('menu').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
   function go(page) { window.location.href = page; }
   async function logout() {
     if (!confirm('Veux-tu vraiment te déconnecter ?')) return;
