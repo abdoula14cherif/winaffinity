@@ -164,6 +164,22 @@
   .sk-line.w1 { width: 40%; height: 16px; }
   .sk-line.w2 { width: 70%; }
 
+  .link-input-wrap {
+    display: flex; gap: 8px; align-items: stretch;
+  }
+  .link-input-wrap input {
+    flex: 1; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px;
+    font-size: 12.5px; font-family: monospace; background: #f7faf8; outline: none; min-width: 0;
+  }
+  .link-input-wrap input:focus { border-color: var(--wa-green); background: #fff; }
+  .link-input-wrap button {
+    padding: 0 16px; border: none; border-radius: 10px; background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    color: #fff; font-weight: 800; cursor: pointer; font-family: inherit; font-size: 13px;
+    display: flex; align-items: center; gap: 6px; box-shadow: 0 3px 10px rgba(18,140,126,.3);
+  }
+  .link-input-wrap button:active { transform: scale(.96); }
+  .link-input-wrap button svg { stroke: #fff; }
+
   .toast { position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px); background: var(--wa-deep); color: #fff; padding: 12px 22px; border-radius: 30px; font-size: 14px; font-weight: 600; box-shadow: 0 6px 20px rgba(0,0,0,.25); opacity: 0; pointer-events: none; transition: all .3s; z-index: 1000; display: flex; align-items: center; gap: 8px; max-width: 90%; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast svg { stroke: var(--wa-green); flex-shrink: 0; }
@@ -215,6 +231,13 @@
         <circle cx="7" cy="7" r="3"/>
       </svg>
       Types
+    </button>
+    <button class="tab" data-tab="recharges">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Recharges
+      <span class="tab-badge" id="rechargesBadge"></span>
     </button>
     <button class="tab" data-tab="retraits">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -306,6 +329,53 @@
         <h2>Types de partenaires</h2>
       </div>
       <div id="typesList"></div>
+    </div>
+
+    <!-- RECHARGES -->
+    <div class="panel" id="panel-recharges">
+      <div class="admin-toolbar">
+        <h2>Recharges</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="badge orange" id="rechargesPendingBadge">— en attente</span>
+          <button class="btn-add" onclick="openAjoutRechargeModal()" style="padding:8px 12px;font-size:12px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Ajouter
+          </button>
+        </div>
+      </div>
+
+      <!-- Carte lien de paiement -->
+      <div class="config-group" style="margin-bottom:16px;border:1px solid rgba(255,106,0,.25);background:linear-gradient(135deg,rgba(255,106,0,.04),rgba(255,184,0,.04));">
+        <div class="config-group-title" style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--alibaba);">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </svg>
+          Lien de paiement
+        </div>
+        <div class="link-input-wrap">
+          <input type="url" id="lienPaiementInput" placeholder="https://pay.exemple.com/link/..." autocomplete="off" spellcheck="false">
+          <button onclick="saveLienPaiement()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Enregistrer
+          </button>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5;">
+          🔗 Ce lien est utilisé par la page <b>Recharger</b> des utilisateurs. Tu peux le modifier à tout moment.
+        </div>
+      </div>
+
+      <div class="filter-row" id="rechargesFilters">
+        <button class="filter-chip active" data-filter="all">Toutes</button>
+        <button class="filter-chip" data-filter="en_attente">En attente</button>
+        <button class="filter-chip" data-filter="paye">Payées</button>
+        <button class="filter-chip" data-filter="rejete">Rejetées</button>
+      </div>
+      <div id="rechargesList"></div>
     </div>
 
     <!-- RETRAITS -->
@@ -479,9 +549,11 @@
     retraits: [], users: [], plans: [], plantations: [], actualites: [],
     pays: [], loteries: [], bonusConfig: [], bonusHistory: [],
     topConfig: [], topHistory: [],
-    candidatures: [], typesPartenaires: []
+    candidatures: [], typesPartenaires: [],
+    recharges: []
   };
   let CAND_FILTER = 'all';
+  let RECHARGE_FILTER = 'all';
 
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 
@@ -508,7 +580,8 @@
       loadStats(), loadRetraits(), loadUsers(), loadPlans(), loadPlantations(),
       loadActualites(), loadLoteries(), loadPays(), loadBonusConfig(), loadBonusHistory(),
       loadTopConfig(), loadTopHistory(),
-      loadCandidatures(), loadTypesPartenaires()
+      loadCandidatures(), loadTypesPartenaires(),
+      loadRecharges(), loadLienPaiement()
     ]);
 
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
@@ -545,6 +618,271 @@
     `).join('');
   }
 
+  // ================= LIEN DE PAIEMENT =================
+  async function loadLienPaiement() {
+    const { data, error } = await sb
+      .from('parametres')
+      .select('valeur')
+      .eq('cle', 'lien_paiement')
+      .maybeSingle();
+    if (!error && data?.valeur) {
+      document.getElementById('lienPaiementInput').value = data.valeur;
+    }
+  }
+
+  async function saveLienPaiement() {
+    const input = document.getElementById('lienPaiementInput');
+    const valeur = input.value.trim();
+    if (!valeur) return showToast('Lien vide', true);
+    if (!/^https?:\/\//i.test(valeur)) return showToast('Le lien doit commencer par http:// ou https://', true);
+
+    // Upsert : insère si absent, met à jour sinon
+    const { error } = await sb
+      .from('parametres')
+      .upsert({ cle: 'lien_paiement', valeur, updated_at: new Date().toISOString() }, { onConflict: 'cle' });
+
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('✅ Lien de paiement mis à jour');
+  }
+
+  // ================= RECHARGES =================
+  async function loadRecharges() {
+    const { data, error } = await sb
+      .from('recharges')
+      .select('*, profiles(nom, pseudo, email)')
+      .order('created_at', { ascending: false })
+      .limit(200);
+    if (error) { console.warn('Recharges:', error); return; }
+    DATA.recharges = data || [];
+
+    const pending = DATA.recharges.filter(r => r.statut === 'en_attente').length;
+    document.getElementById('rechargesPendingBadge').textContent = pending + ' en attente';
+
+    const badge = document.getElementById('rechargesBadge');
+    if (pending > 0) {
+      badge.textContent = pending;
+      badge.classList.add('show');
+    } else {
+      badge.classList.remove('show');
+    }
+
+    renderRecharges();
+  }
+
+  function renderRecharges() {
+    const list = document.getElementById('rechargesList');
+    const filtered = RECHARGE_FILTER === 'all'
+      ? DATA.recharges
+      : DATA.recharges.filter(r => r.statut === RECHARGE_FILTER);
+
+    if (filtered.length === 0) {
+      list.innerHTML = emptyBox('Aucune recharge');
+      return;
+    }
+
+    const statusInfo = {
+      en_attente: { label: 'En attente', classe: 'orange' },
+      valide: { label: 'Validé', classe: 'blue' },
+      paye: { label: 'Crédité', classe: 'green' },
+      rejete: { label: 'Rejeté', classe: 'red' }
+    };
+
+    list.innerHTML = filtered.map((r, i) => {
+      const info = statusInfo[r.statut] || { label: r.statut, classe: 'gray' };
+      const userName = r.profiles?.nom || r.profiles?.pseudo || 'Utilisateur';
+      const userEmail = r.profiles?.email || '';
+      const noteHTML = r.note_admin ? `<div class="ic-desc">📝 ${escapeHtml(r.note_admin)}</div>` : '';
+
+      return `
+        <div class="item-card" style="animation-delay:${i * .025}s">
+          <div class="ic-img">${r.mode === 'lien' ? '💳' : (r.mode === 'crypto' ? '₿' : '📱')}</div>
+          <div class="ic-body">
+            <div class="ic-name">
+              +${formatF(r.montant)}
+              <span class="badge ${info.classe}">${info.label}</span>
+            </div>
+            <div class="ic-meta">
+              <span>👤 ${escapeHtml(userName)}</span>
+              ${userEmail ? `<span class="dot">•</span><span>${escapeHtml(userEmail)}</span>` : ''}
+            </div>
+            <div class="ic-meta">
+              ${r.mode === 'lien' ? '<span>💳 Paiement en ligne</span>' : ''}
+              ${r.mode !== 'lien' && r.pays_nom ? `<span>${escapeHtml(r.pays_nom)}</span>` : ''}
+              ${r.operateur_nom ? `<span class="dot">•</span><span>${escapeHtml(r.operateur_nom)}</span>` : ''}
+              <span class="dot">•</span>
+              <span>${timeAgo(r.created_at)}</span>
+            </div>
+            ${r.numero && r.numero !== '-' ? `<div class="ic-meta" style="font-size:10.5px;">N° ${escapeHtml(r.numero)}</div>` : ''}
+            ${noteHTML}
+          </div>
+          <div class="ic-actions">
+            ${r.statut === 'en_attente' ? `
+              <button class="icon-btn check" onclick="validerRecharge('${r.id}')" title="Créditer le solde">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </button>
+              <button class="icon-btn close-x" onclick="rejeterRecharge('${r.id}')" title="Rejeter">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            ` : ''}
+            <button class="icon-btn delete" onclick="supprimerRecharge('${r.id}')" title="Supprimer">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  document.getElementById('rechargesFilters').addEventListener('click', (e) => {
+    const chip = e.target.closest('.filter-chip');
+    if (!chip) return;
+    document.querySelectorAll('#rechargesFilters .filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    RECHARGE_FILTER = chip.dataset.filter;
+    renderRecharges();
+  });
+
+  async function validerRecharge(id) {
+    const r = DATA.recharges.find(x => x.id === id);
+    if (!r) return;
+    const note = prompt('Note interne (optionnel) :', '');
+    if (note === null) return;
+
+    const userName = r.profiles?.nom || r.profiles?.pseudo || 'cet utilisateur';
+    if (!confirm(`Créditer ${formatF(r.montant)} à ${userName} ?`)) return;
+
+    // 1️⃣ Créditer le solde (utilise la RPC existante)
+    const { error: errSolde } = await sb.rpc('ajuster_solde_user', {
+      p_user_id: r.user_id,
+      p_montant: Number(r.montant),
+      p_note: 'Recharge validée'
+    });
+    if (errSolde) return showToast('Erreur crédit : ' + errSolde.message, true);
+
+    // 2️⃣ Mettre à jour le statut de la recharge
+    const { error: errUpdate } = await sb.from('recharges').update({
+      statut: 'paye',
+      note_admin: note || null
+    }).eq('id', id);
+    if (errUpdate) return showToast('Erreur statut : ' + errUpdate.message, true);
+
+    showToast(`✅ ${formatF(r.montant)} crédités à ${userName}`);
+    await loadRecharges();
+    await loadUsers();
+    await loadStats();
+  }
+
+  async function rejeterRecharge(id) {
+    const r = DATA.recharges.find(x => x.id === id);
+    if (!r) return;
+    const note = prompt('Motif du rejet :', '');
+    if (note === null) return;
+    if (!note.trim()) return showToast('Motif requis', true);
+
+    const { error } = await sb.from('recharges').update({
+      statut: 'rejete',
+      note_admin: note
+    }).eq('id', id);
+
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('Recharge rejetée');
+    await loadRecharges();
+  }
+
+  async function supprimerRecharge(id) {
+    if (!confirm('Supprimer définitivement cette recharge ? (le solde n\'est PAS retiré si déjà crédité)')) return;
+    const { error } = await sb.from('recharges').delete().eq('id', id);
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('Recharge supprimée');
+    await loadRecharges();
+  }
+
+  // Ajout manuel d'une recharge (crédit direct du solde d'un user)
+  function openAjoutRechargeModal() {
+    if (!DATA.users || DATA.users.length === 0) return showToast('Aucun utilisateur chargé', true);
+    const options = DATA.users
+      .slice(0, 500)
+      .map(u => `<option value="${u.id}">${escapeHtml(u.nom || u.pseudo || u.email)} — ${formatF(u.solde)}</option>`)
+      .join('');
+
+    openModal('Ajouter une recharge manuelle', `
+      <div style="font-size:12.5px;color:var(--muted);line-height:1.55;margin-bottom:14px;">
+        Le montant sera <b style="color:var(--wa-dark);">immédiatement crédité</b> au solde de l'utilisateur et une recharge marquée <b>payée</b> sera créée dans l'historique.
+      </div>
+      <div class="form-group">
+        <label>Utilisateur</label>
+        <select id="arUser" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;background:#f7faf8;outline:none;">
+          <option value="">— Choisir un utilisateur —</option>
+          ${options}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Montant (FCFA)</label>
+        <input type="number" id="arMontant" placeholder="Ex: 5000" min="1">
+      </div>
+      <div class="btn-row" style="margin-bottom:10px;">
+        <button class="btn-warn" onclick="document.getElementById('arMontant').value=1000">1 000</button>
+        <button class="btn-warn" onclick="document.getElementById('arMontant').value=5000">5 000</button>
+        <button class="btn-warn" onclick="document.getElementById('arMontant').value=10000">10 000</button>
+      </div>
+      <div class="form-group">
+        <label>Note (optionnel)</label>
+        <input type="text" id="arNote" placeholder="Ex: Recharge manuelle admin">
+      </div>
+      <button class="btn-primary" onclick="ajouterRechargeManuelle()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Créditer maintenant
+      </button>
+    `);
+  }
+
+  async function ajouterRechargeManuelle() {
+    const userId = document.getElementById('arUser').value;
+    const montant = Number(document.getElementById('arMontant').value);
+    const note = document.getElementById('arNote').value.trim();
+
+    if (!userId) return showToast('Choisis un utilisateur', true);
+    if (!montant || montant <= 0) return showToast('Montant invalide', true);
+
+    const u = DATA.users.find(x => x.id === userId);
+    const userName = u?.nom || u?.pseudo || 'utilisateur';
+
+    // 1️⃣ Créer la recharge (déjà payée)
+    const { error: errInsert } = await sb.from('recharges').insert({
+      user_id: userId,
+      mode: 'manuel',
+      montant: montant,
+      numero: '-',
+      pays_nom: 'Crédit admin',
+      operateur_nom: 'Manuel',
+      statut: 'paye',
+      note_admin: note || 'Crédit manuel admin'
+    });
+    if (errInsert) return showToast('Erreur création : ' + errInsert.message, true);
+
+    // 2️⃣ Créditer le solde
+    const { error: errSolde } = await sb.rpc('ajuster_solde_user', {
+      p_user_id: userId,
+      p_montant: montant,
+      p_note: note || 'Recharge manuelle admin'
+    });
+    if (errSolde) return showToast('Erreur crédit : ' + errSolde.message, true);
+
+    showToast(`✅ ${formatF(montant)} crédités à ${userName}`);
+    closeModal();
+    await loadRecharges();
+    await loadUsers();
+    await loadStats();
+  }
+
   // ================= CANDIDATURES PARTENAIRES =================
   async function loadCandidatures() {
     const { data, error } = await sb.from('partenaires_candidatures')
@@ -556,7 +894,6 @@
 
     const pending = DATA.candidatures.filter(c => c.statut === 'nouveau').length;
     document.getElementById('candPendingBadge').textContent = pending + ' en attente';
-    document.getElementById('retraitsPendingBadge') && (document.getElementById('retraitsPendingBadge').textContent = pending + ' nouvelles');
 
     const badge = document.getElementById('candBadge');
     if (pending > 0) {
@@ -730,8 +1067,6 @@
   function openTypeModal(id) {
     const t = DATA.typesPartenaires.find(x => x.id === id);
     if (!t) return;
-
-    // Format critères en JSON pretty pour édition
     const criteresStr = JSON.stringify(t.criteres || [], null, 2);
 
     openModal('Modifier : ' + t.nom, `
@@ -875,7 +1210,7 @@
 
   // ================= USERS =================
   async function loadUsers() {
-    const { data } = await sb.from('profiles').select('id, nom, pseudo, email, solde, is_admin, niveau_vip, type_partenaire, created_at').order('created_at', { ascending: false }).limit(200);
+    const { data } = await sb.from('profiles').select('id, nom, pseudo, email, solde, is_admin, niveau_vip, type_partenaire, created_at').order('created_at', { ascending: false }).limit(500);
     DATA.users = data || [];
     renderUsers();
   }
@@ -984,6 +1319,8 @@
   }
 
   async function saveUserEdit(userId) {
+    const u = DATA.users.find(x => x.id === userId);
+    if (!u) return;
     const payload = {
       p_user_id: userId,
       p_nom: document.getElementById('euNom').value.trim(),
@@ -1000,7 +1337,6 @@
     const { error } = await sb.rpc('admin_update_user', payload);
     if (error) return showToast('Erreur : ' + error.message, true);
 
-    // Mettre à jour VIP + partenariat
     const vip = Number(document.getElementById('euVip').value);
     const partenaire = document.getElementById('euPartenaire').value.trim();
     if (vip !== u.niveau_vip || partenaire !== (u.type_partenaire || '')) {
