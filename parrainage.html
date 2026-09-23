@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Affinity Network — Parrainage</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --wa-green: #25D366;
+    --wa-dark: #128C7E;
+    --wa-deep: #075E54;
+    --alibaba: #FF6A00;
+    --gold: #FFB800;
+    --bg: #f7f9f8;
+    --text: #1a1a1a;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+  }
+  body {
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    padding-bottom: 80px; min-height: 100vh; overflow-x: hidden;
+  }
+  .loader {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--wa-deep);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 22px;
+    transition: opacity .6s ease, visibility .6s ease;
+  }
+  .loader.hidden { opacity: 0; visibility: hidden; }
+  .loader-logo { font-size: 24px; font-weight: 700; color: #fff; }
+  .loader-logo span { color: var(--wa-green); }
+  .spinner {
+    width: 46px; height: 46px;
+    border: 4px solid rgba(255,255,255,.2);
+    border-top-color: var(--wa-green);
+    border-radius: 50%;
+    animation: spin .9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+  @keyframes pulse {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+  .anim { opacity: 0; animation: fadeInUp .5s ease forwards; }
+  .d1 { animation-delay: .05s; }
+  .d2 { animation-delay: .1s; }
+  .d3 { animation-delay: .15s; }
+
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px;
+    background: var(--wa-deep); color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+  .burger {
+    cursor: pointer; width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: rgba(255,255,255,.12);
+  }
+  .burger svg { stroke: #fff; }
+  .logo { font-weight: 700; font-size: 18px; }
+  .logo span { color: var(--wa-green); }
+
+  .menu {
+    position: fixed; top: 0; left: 0; height: 100%; width: 280px;
+    background: #fff; z-index: 200;
+    transform: translateX(-100%);
+    transition: transform .35s cubic-bezier(.4,0,.2,1);
+    box-shadow: 4px 0 20px rgba(0,0,0,.2);
+    padding-top: 18px;
+    display: flex; flex-direction: column;
+  }
+  .menu.open { transform: translateX(0); }
+  .menu-header {
+    padding: 8px 20px 18px; border-bottom: 1px solid #eee; margin-bottom: 10px;
+    font-weight: 700; color: var(--wa-deep); font-size: 17px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .menu-header svg { stroke: var(--wa-green); }
+  .menu-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 15px 22px; cursor: pointer; font-size: 15px; color: #333;
+  }
+  .menu-item svg { stroke: var(--wa-dark); flex-shrink: 0; }
+  .menu-footer {
+    margin-top: auto; padding: 16px 20px 22px;
+    border-top: 1px solid #eee;
+  }
+  .btn-logout {
+    width: 100%; padding: 14px;
+    background: #fee2e2; color: #b91c1c;
+    border: none; border-radius: 12px;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-logout svg { stroke: #b91c1c; }
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.45);
+    z-index: 150; opacity: 0; pointer-events: none; transition: opacity .3s;
+  }
+  .overlay.open { opacity: 1; pointer-events: auto; }
+
+  .content { padding: 0 0 20px; }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, var(--wa-deep), var(--wa-dark));
+    color: #fff; padding: 26px 20px 30px;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute;
+    width: 220px; height: 220px; border-radius: 50%;
+    background: rgba(37,211,102,.15);
+    top: -100px; right: -70px;
+  }
+  .hero::after {
+    content: ''; position: absolute;
+    width: 160px; height: 160px; border-radius: 50%;
+    background: rgba(255,106,0,.1);
+    bottom: -80px; left: -50px;
+  }
+  .hero-content { position: relative; z-index: 2; }
+  .hero-icon {
+    width: 52px; height: 52px; border-radius: 16px;
+    background: rgba(37,211,102,.2);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px;
+  }
+  .hero-icon svg { stroke: var(--wa-green); }
+  .hero h1 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
+  .hero p { font-size: 13.5px; opacity: .9; line-height: 1.5; }
+
+  /* CODE PARRAINAGE */
+  .code-card {
+    background: #fff; border-radius: 18px;
+    padding: 20px; margin: -20px 20px 20px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.12);
+    position: relative; z-index: 3;
+  }
+  .code-card .cc-lbl {
+    font-size: 11px; color: var(--muted);
+    text-transform: uppercase; font-weight: 700;
+    letter-spacing: .5px; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .code-card .cc-lbl svg { stroke: var(--wa-dark); }
+  .code-card .cc-code {
+    font-family: 'Courier New', monospace;
+    font-size: 26px; font-weight: 800;
+    color: var(--wa-deep); letter-spacing: 2px;
+    margin-bottom: 14px;
+    padding: 12px;
+    background: linear-gradient(135deg, rgba(18,140,126,.08), rgba(37,211,102,.12));
+    border-radius: 12px;
+    text-align: center;
+    border: 2px dashed rgba(18,140,126,.35);
+  }
+  .code-card .cc-actions {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .btn-copy, .btn-share {
+    padding: 12px;
+    border-radius: 10px; border: none;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px;
+    transition: transform .15s;
+  }
+  .btn-copy {
+    background: #f7faf8; color: var(--wa-deep);
+    border: 1.5px solid var(--border);
+  }
+  .btn-copy svg { stroke: var(--wa-dark); }
+  .btn-share {
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(18,140,126,.3);
+  }
+  .btn-share svg { stroke: #fff; }
+  .btn-copy:active, .btn-share:active { transform: scale(.96); }
+
+  /* STATS */
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 8px; padding: 0 20px;
+    margin-bottom: 20px;
+  }
+  .stat-mini {
+    background: #fff; border-radius: 14px;
+    padding: 14px 8px; text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,.05);
+    animation: fadeInUp .5s ease forwards; opacity: 0;
+    border-top: 3px solid var(--wa-green);
+  }
+  .stat-mini:nth-child(2) { border-color: var(--alibaba); }
+  .stat-mini:nth-child(3) { border-color: var(--gold); }
+  .stat-mini .k {
+    font-size: 10px; color: var(--muted);
+    text-transform: uppercase; font-weight: 700;
+    letter-spacing: .3px; margin-bottom: 6px;
+  }
+  .stat-mini .v {
+    font-size: 20px; font-weight: 800; color: var(--text);
+  }
+  .stat-mini .sub {
+    font-size: 10.5px; color: var(--wa-dark);
+    font-weight: 700; margin-top: 4px;
+  }
+
+  /* GAINS TOTAL */
+  .gains-banner {
+    margin: 0 20px 20px;
+    background: linear-gradient(135deg, var(--alibaba), #FF8A3D);
+    color: #fff;
+    border-radius: 16px;
+    padding: 18px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 6px 20px rgba(255,106,0,.3);
+    position: relative; overflow: hidden;
+  }
+  .gains-banner::after {
+    content: ''; position: absolute; right: -30px; top: -30px;
+    width: 120px; height: 120px; border-radius: 50%;
+    background: rgba(255,255,255,.1);
+  }
+  .gains-banner .gb-lbl {
+    font-size: 12px; opacity: .95;
+    text-transform: uppercase; font-weight: 700;
+    letter-spacing: .5px; margin-bottom: 4px;
+  }
+  .gains-banner .gb-val {
+    font-size: 28px; font-weight: 800;
+  }
+  .gains-banner .gb-ic {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: rgba(255,255,255,.2);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; z-index: 2;
+  }
+  .gains-banner .gb-ic svg { stroke: #fff; }
+
+  /* NIVEAUX */
+  .section-title {
+    padding: 0 20px;
+    font-size: 15px; font-weight: 700; color: var(--wa-deep);
+    margin: 22px 0 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title svg { stroke: var(--wa-green); }
+
+  .level-card {
+    margin: 0 20px 12px;
+    background: #fff; border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.06);
+    display: flex; align-items: center; gap: 14px;
+    animation: fadeInUp .5s ease forwards; opacity: 0;
+    border-left: 5px solid var(--wa-green);
+  }
+  .level-card.n2 { border-left-color: var(--alibaba); }
+  .level-card.n3 { border-left-color: var(--gold); }
+
+  .level-badge {
+    width: 52px; height: 52px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 800;
+    flex-shrink: 0;
+    background: rgba(37,211,102,.15); color: var(--wa-dark);
+  }
+  .level-card.n2 .level-badge {
+    background: rgba(255,106,0,.15); color: var(--alibaba);
+  }
+  .level-card.n3 .level-badge {
+    background: rgba(255,184,0,.15); color: var(--gold);
+  }
+  .level-body { flex: 1; }
+  .level-body h3 {
+    font-size: 15px; font-weight: 800; color: var(--wa-deep);
+    margin-bottom: 4px;
+  }
+  .level-body p {
+    font-size: 12px; color: var(--muted);
+    line-height: 1.5;
+  }
+  .level-percent {
+    font-size: 22px; font-weight: 800;
+    color: var(--wa-dark);
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .level-card.n2 .level-percent { color: var(--alibaba); }
+  .level-card.n3 .level-percent { color: var(--gold); }
+
+  /* FILLEULS */
+  .filleul-item {
+    margin: 0 20px 8px;
+    background: #fff; border-radius: 12px;
+    padding: 12px 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    display: flex; align-items: center; gap: 12px;
+    animation: fadeInUp .4s ease forwards; opacity: 0;
+  }
+  .filleul-item .fi-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 800; font-size: 15px;
+    flex-shrink: 0;
+  }
+  .filleul-item .fi-body { flex: 1; min-width: 0; }
+  .filleul-item .fi-name {
+    font-size: 14px; font-weight: 800;
+    color: var(--text); margin-bottom: 3px;
+  }
+  .filleul-item .fi-meta {
+    font-size: 11px; color: var(--muted);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .filleul-item .fi-gain {
+    font-size: 14px; font-weight: 800; color: var(--wa-dark);
+    text-align: right; flex-shrink: 0;
+  }
+  .lvl-tag {
+    display: inline-flex;
+    font-size: 9px; font-weight: 800;
+    padding: 2px 7px; border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+  }
+  .lvl-tag.n1 { background: rgba(37,211,102,.15); color: #166534; }
+  .lvl-tag.n2 { background: rgba(255,106,0,.15); color: var(--alibaba); }
+  .lvl-tag.n3 { background: rgba(255,184,0,.15); color: #B45309; }
+
+  /* HISTORIQUE */
+  .hist-item {
+    margin: 0 20px 8px;
+    background: #fff; border-radius: 12px;
+    padding: 12px 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .hist-item .hi-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: rgba(37,211,102,.12);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .hist-item .hi-icon svg { stroke: var(--wa-dark); }
+  .hist-item .hi-body { flex: 1; min-width: 0; }
+  .hist-item .hi-top {
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 3px;
+  }
+  .hist-item .hi-title {
+    font-size: 13px; font-weight: 700; color: var(--text);
+  }
+  .hist-item .hi-sub {
+    font-size: 11px; color: var(--muted);
+  }
+  .hist-item .hi-gain {
+    font-size: 14px; font-weight: 800; color: var(--wa-dark);
+    flex-shrink: 0;
+  }
+
+  .empty {
+    margin: 0 20px;
+    text-align: center; padding: 30px 20px;
+    color: var(--muted); font-size: 13px;
+    background: #fff; border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  }
+  .empty svg { stroke: #d1d5db; margin-bottom: 10px; }
+
+  .sk-item {
+    margin: 0 20px 10px;
+    background: #fff; border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  }
+  .sk-line {
+    height: 12px; border-radius: 6px;
+    background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+    background-size: 200% 100%; animation: shimmer 1.4s infinite;
+    margin-bottom: 8px;
+  }
+  .sk-line.w1 { width: 60%; height: 16px; }
+  .sk-line.w2 { width: 85%; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    display: flex; background: #fff;
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 -2px 12px rgba(0,0,0,.06);
+    z-index: 100;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    padding: 9px 0 10px; cursor: pointer;
+    color: #9ca3af; font-size: 11px; gap: 4px;
+    text-decoration: none; font-weight: 500;
+  }
+  .nav-item svg { stroke: #9ca3af; }
+  .nav-item.active { color: var(--wa-dark); font-weight: 700; }
+  .nav-item.active svg { stroke: var(--wa-green); }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 100px;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--wa-deep); color: #fff;
+    padding: 12px 22px; border-radius: 30px;
+    font-size: 14px; font-weight: 600;
+    box-shadow: 0 6px 20px rgba(0,0,0,.25);
+    opacity: 0; pointer-events: none;
+    transition: all .3s; z-index: 1000;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast svg { stroke: var(--wa-green); }
+</style>
+</head>
+<body>
+
+  <div class="loader" id="loader">
+    <div class="loader-logo">Affinity<span> Network</span></div>
+    <div class="spinner"></div>
+  </div>
+
+  <header class="header">
+    <div class="burger" onclick="toggleMenu()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </div>
+    <div class="logo">Affinity<span> Network</span></div>
+    <div style="width:40px"></div>
+  </header>
+
+  <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+  <nav class="menu" id="menu">
+    <div class="menu-header">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M3 21h18M5 21V7l7-4 7 4v14"/>
+      </svg>
+      Affinity Network
+    </div>
+    <div class="menu-item" onclick="go('travail.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <rect x="2" y="7" width="20" height="14" rx="2"/>
+      </svg>
+      Travail
+    </div>
+    <div class="menu-item" onclick="go('parrainage.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      Parrainage
+    </div>
+    <div class="menu-item" onclick="go('support.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+      </svg>
+      Support
+    </div>
+    <div class="menu-item" onclick="go('faq.html')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="10"/>
+      </svg>
+      FAQ
+    </div>
+    <div class="menu-footer">
+      <button class="btn-logout" onclick="logout()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Se déconnecter
+      </button>
+    </div>
+  </nav>
+
+  <main class="content">
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-content">
+        <div class="hero-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <h1>Parrainage</h1>
+        <p>Invite tes amis et gagne sur 3 niveaux à chaque activation.</p>
+      </div>
+    </div>
+
+    <!-- CODE -->
+    <div class="code-card anim d1">
+      <div class="cc-lbl">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2v6M12 22v-4M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M22 12h-4"/>
+        </svg>
+        Mon code de parrainage
+      </div>
+      <div class="cc-code" id="myCode">—</div>
+      <div class="cc-actions">
+        <button class="btn-copy" onclick="copyCode()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          Copier
+        </button>
+        <button class="btn-share" onclick="shareCode()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+          Partager
+        </button>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-mini" style="animation-delay:.1s">
+        <div class="k">Niveau 1</div>
+        <div class="v" id="statN1">0</div>
+        <div class="sub" id="gainN1">0 F</div>
+      </div>
+      <div class="stat-mini" style="animation-delay:.15s">
+        <div class="k">Niveau 2</div>
+        <div class="v" id="statN2">0</div>
+        <div class="sub" id="gainN2">0 F</div>
+      </div>
+      <div class="stat-mini" style="animation-delay:.2s">
+        <div class="k">Niveau 3</div>
+        <div class="v" id="statN3">0</div>
+        <div class="sub" id="gainN3">0 F</div>
+      </div>
+    </div>
+
+    <!-- GAINS TOTAUX -->
+    <div class="gains-banner anim d2">
+      <div>
+        <div class="gb-lbl">Gains de parrainage</div>
+        <div class="gb-val" id="totalGains">0 F</div>
+      </div>
+      <div class="gb-ic">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- COMMENT ÇA MARCHE -->
+    <div class="section-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+      Comment ça marche ?
+    </div>
+
+    <div class="level-card n1 anim d2">
+      <div class="level-badge">1</div>
+      <div class="level-body">
+        <h3>Filleuls directs</h3>
+        <p>Chaque fois qu'un de tes filleuls active un plan, tu reçois une commission.</p>
+      </div>
+      <div class="level-percent">20%</div>
+    </div>
+
+    <div class="level-card n2 anim d3">
+      <div class="level-badge">2</div>
+      <div class="level-body">
+        <h3>Filleuls de tes filleuls</h3>
+        <p>Tu gagnes aussi sur les activations des personnes invitées par tes filleuls.</p>
+      </div>
+      <div class="level-percent">2%</div>
+    </div>
+
+    <div class="level-card n3 anim d3">
+      <div class="level-badge">3</div>
+      <div class="level-body">
+        <h3>Niveau 3</h3>
+        <p>Et même sur les activations du 3ᵉ niveau de ton réseau.</p>
+      </div>
+      <div class="level-percent">1%</div>
+    </div>
+
+    <!-- MES FILLEULS -->
+    <div class="section-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+      </svg>
+      Mes filleuls
+    </div>
+    <div id="filleulsList">
+      <div class="sk-item"><div class="sk-line w1"></div><div class="sk-line w2"></div></div>
+    </div>
+
+    <!-- HISTORIQUE -->
+    <div class="section-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+      </svg>
+      Historique des commissions
+    </div>
+    <div id="histList">
+      <div class="sk-item"><div class="sk-line w1"></div><div class="sk-line w2"></div></div>
+    </div>
+
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="lancer.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+      </svg>
+      Lancer
+    </a>
+    <a href="retirer.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+      </svg>
+      Retirer
+    </a>
+    <a href="travail.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="7" width="20" height="14" rx="2"/>
+      </svg>
+      Travail
+    </a>
+    <a href="moi.html" class="nav-item">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+      </svg>
+      Moi
+    </a>
+  </nav>
+
+  <div class="toast" id="toast">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+    <span id="toastText">—</span>
+  </div>
+
+<script>
+  const SUPABASE_URL = 'https://ydwjvvlcnqsftciedpqm.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2p2dmxjbnFzZnRjaWVkcHFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMDQyNDAsImV4cCI6MjEwNTY4MDI0MH0.4uQwBGedMBjUZErd8lUM5YfA26gw96RvHdo_J-3PZCY';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  let CURRENT_USER = null;
+  let MY_CODE = '';
+
+  (async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.replace('inscription.html'); return; }
+    CURRENT_USER = session.user;
+
+    // Charger le profil (code parrainage)
+    const { data: profile } = await sb.from('profiles')
+      .select('code_parrainage').eq('id', session.user.id).maybeSingle();
+
+    MY_CODE = profile?.code_parrainage || '—';
+    document.getElementById('myCode').textContent = MY_CODE;
+
+    await Promise.all([
+      loadStats(),
+      loadFilleuls(),
+      loadCommissions()
+    ]);
+
+    setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
+  })();
+
+  // ================= STATS =================
+  async function loadStats() {
+    const { data, error } = await sb.rpc('get_stats_parrainage');
+    if (error || !data) return;
+
+    document.getElementById('statN1').textContent = data.total_n1;
+    document.getElementById('statN2').textContent = data.total_n2;
+    document.getElementById('statN3').textContent = data.total_n3;
+    document.getElementById('gainN1').textContent = formatF(data.gains_n1);
+    document.getElementById('gainN2').textContent = formatF(data.gains_n2);
+    document.getElementById('gainN3').textContent = formatF(data.gains_n3);
+    document.getElementById('totalGains').textContent = formatF(data.gains_total);
+  }
+
+  // ================= FILLEULS =================
+  async function loadFilleuls() {
+    const list = document.getElementById('filleulsList');
+    const { data, error } = await sb.rpc('get_mes_filleuls');
+
+    if (error || !data || data.length === 0) {
+      list.innerHTML = emptyBox('Aucun filleul pour le moment');
+      return;
+    }
+
+    list.innerHTML = data.map((f, i) => {
+      const initiale = (f.nom || f.pseudo || '?')[0].toUpperCase();
+      return `
+        <div class="filleul-item" style="animation-delay:${i * .04}s">
+          <div class="fi-avatar">${initiale}</div>
+          <div class="fi-body">
+            <div class="fi-name">${escapeHtml(f.nom || f.pseudo || 'Anonyme')}</div>
+            <div class="fi-meta">
+              <span class="lvl-tag n${f.niveau}">Niveau ${f.niveau}</span>
+              <span>Depuis ${timeAgo(f.created_at)}</span>
+            </div>
+          </div>
+          <div class="fi-gain">${f.total_commission > 0 ? '+' + formatF(f.total_commission) : '—'}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ================= COMMISSIONS =================
+  async function loadCommissions() {
+    const list = document.getElementById('histList');
+    const { data, error } = await sb.from('commissions')
+      .select('*').eq('parrain_id', CURRENT_USER.id)
+      .order('created_at', { ascending: false }).limit(20);
+
+    if (error || !data || data.length === 0) {
+      list.innerHTML = emptyBox('Aucune commission pour le moment');
+      return;
+    }
+
+    list.innerHTML = data.map((c, i) => `
+      <div class="hist-item" style="animation-delay:${i * .03}s">
+        <div class="hi-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <div class="hi-body">
+          <div class="hi-top">
+            <span class="hi-title">Niveau ${c.niveau}</span>
+            <span class="lvl-tag n${c.niveau}">${c.pourcentage}%</span>
+          </div>
+          <div class="hi-sub">Base : ${formatF(c.montant_base)} · ${timeAgo(c.created_at)}</div>
+        </div>
+        <div class="hi-gain">+${formatF(c.montant_commission)}</div>
+      </div>
+    `).join('');
+  }
+
+  // ================= PARTAGE =================
+  function copyCode() {
+    navigator.clipboard.writeText(MY_CODE).then(() => {
+      showToast('Code copié !');
+    });
+  }
+
+  function shareCode() {
+    const texte = `Rejoins Affinity Network avec mon code de parrainage : ${MY_CODE}\n\nGagne de l'argent en activant des plans et parraine à ton tour !`;
+    if (navigator.share) {
+      navigator.share({ title: 'Affinity Network', text: texte }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(texte).then(() => showToast('Message copié !'));
+    }
+  }
+
+  // ================= UTILITAIRES =================
+  function formatF(n) {
+    return Math.round(Number(n || 0)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F';
+  }
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function emptyBox(msg) {
+    return `<div class="empty">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+      </svg>
+      <div>${msg}</div>
+    </div>`;
+  }
+  function timeAgo(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+    if (diff < 60) return 'À l\'instant';
+    if (diff < 3600) return `Il y a ${Math.floor(diff/60)} min`;
+    if (diff < 86400) return `Il y a ${Math.floor(diff/3600)} h`;
+    if (diff < 604800) return `Il y a ${Math.floor(diff/86400)} j`;
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+  }
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastText').textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2600);
+  }
+  function toggleMenu() {
+    document.getElementById('menu').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('open');
+  }
+  function go(page) { window.location.href = page; }
+  async function logout() {
+    if (!confirm('Veux-tu vraiment te déconnecter ?')) return;
+    await sb.auth.signOut();
+    window.location.replace('inscription.html');
+  }
+</script>
+</body>
+</html>
