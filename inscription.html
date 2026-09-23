@@ -9,8 +9,27 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Affinity">
-<meta name="description" content="Rejoins Affinity Network et commence à gagner.">
+<link rel="icon" type="image/png" href="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png">
+<link rel="apple-touch-icon" href="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  (function() {
+    document.addEventListener('click', function(e) {
+      const link = e.target.closest('a');
+      if (!link) return;
+      let href = link.getAttribute('href');
+      if (!href) return;
+      if (href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) return;
+      if (href.endsWith('.html')) {
+        e.preventDefault();
+        window.location.href = href.replace(/\.html$/, '');
+      }
+    }, true);
+    if (window.location.pathname.endsWith('.html')) {
+      window.history.replaceState(null, '', window.location.pathname.replace(/\.html$/, '') + window.location.search);
+    }
+  })();
+</script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root {
@@ -18,11 +37,13 @@
     --wa-dark: #128C7E;
     --wa-deep: #075E54;
     --alibaba: #FF6A00;
+    --gold: #FFB800;
     --white: #ffffff;
     --bg: #f7f9f8;
     --text: #1a1a1a;
     --muted: #6b7280;
     --border: #e5e7eb;
+    --danger: #dc2626;
   }
   body {
     font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -32,21 +53,27 @@
   }
   input { -webkit-user-select: text; user-select: text; }
 
-  /* LOADER */
+  /* ============ LOADER ============ */
   .loader {
     position: fixed; inset: 0; z-index: 9999;
-    background: var(--wa-deep);
+    background: linear-gradient(135deg, var(--wa-deep) 0%, var(--wa-dark) 100%);
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    gap: 22px;
+    gap: 24px;
     transition: opacity .6s ease, visibility .6s ease;
   }
   .loader.hidden { opacity: 0; visibility: hidden; }
-  .loader-logo {
-    font-size: 24px; font-weight: 700; color: #fff;
-    letter-spacing: 1px; animation: fadeUp .8s ease;
+  .loader-logo-img {
+    width: 100px; height: 100px;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 24px rgba(0,0,0,.3));
+    animation: scaleIn .8s ease;
   }
-  .loader-logo span { color: var(--wa-green); }
+  .loader-logo-txt {
+    font-size: 22px; font-weight: 800; color: #fff;
+    letter-spacing: 1.5px;
+  }
+  .loader-logo-txt span { color: var(--wa-green); }
   .spinner {
     width: 46px; height: 46px;
     border: 4px solid rgba(255,255,255,.2);
@@ -55,12 +82,14 @@
     animation: spin .9s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(.7); }
+    to { opacity: 1; transform: scale(1); }
   }
+
+  /* ============ ANIMATIONS ============ */
   @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(18px); }
+    from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
   }
   @keyframes shake {
@@ -70,63 +99,105 @@
   }
   @keyframes glow {
     0%,100% { box-shadow: 0 0 0 0 rgba(37,211,102,.4); }
-    50% { box-shadow: 0 0 0 6px rgba(37,211,102,0); }
+    50% { box-shadow: 0 0 0 8px rgba(37,211,102,0); }
+  }
+  @keyframes float {
+    0%,100% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(20px,-20px) scale(1.08); }
   }
   .anim { opacity: 0; animation: fadeInUp .5s ease forwards; }
-  .d1 { animation-delay: .05s; }
-  .d2 { animation-delay: .12s; }
-  .d3 { animation-delay: .20s; }
-  .d4 { animation-delay: .28s; }
-  .d5 { animation-delay: .36s; }
-  .d6 { animation-delay: .44s; }
-  .d7 { animation-delay: .52s; }
-  .d8 { animation-delay: .60s; }
+  .d1 { animation-delay: .05s; } .d2 { animation-delay: .12s; }
+  .d3 { animation-delay: .20s; } .d4 { animation-delay: .28s; }
+  .d5 { animation-delay: .36s; } .d6 { animation-delay: .44s; }
+  .d7 { animation-delay: .52s; } .d8 { animation-delay: .60s; }
 
-  /* PAGE */
+  /* ============ DÉCOR ============ */
+  .bg-shape {
+    position: fixed; border-radius: 50%;
+    z-index: -1; filter: blur(70px); opacity: .3;
+    pointer-events: none;
+  }
+  .bg-shape.a {
+    width: 300px; height: 300px; background: var(--wa-green);
+    top: -100px; right: -100px;
+    animation: float 9s ease-in-out infinite;
+  }
+  .bg-shape.b {
+    width: 260px; height: 260px; background: var(--alibaba);
+    bottom: -80px; left: -100px;
+    animation: float 11s ease-in-out infinite reverse;
+  }
+
+  /* ============ PAGE ============ */
   .page {
     min-height: 100vh;
     display: flex; flex-direction: column;
-    padding: 30px 22px;
-    padding-top: max(30px, env(safe-area-inset-top));
-    padding-bottom: max(30px, env(safe-area-inset-bottom));
-    max-width: 460px; margin: 0 auto;
+    padding: 24px 20px 32px;
+    padding-top: max(24px, env(safe-area-inset-top));
+    padding-bottom: max(32px, env(safe-area-inset-bottom));
+    max-width: 480px; margin: 0 auto;
+    width: 100%;
   }
 
-  /* BRAND */
+  /* ============ LOGO EN HAUT ============ */
   .brand {
-    display: flex; align-items: center; justify-content: center;
-    gap: 10px; margin-bottom: 26px;
+    display: flex; flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 22px;
+    text-align: center;
   }
-  .brand-icon {
-    width: 46px; height: 46px; border-radius: 14px;
-    background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+  .brand-img-wrap {
+    width: 96px; height: 96px;
+    background: #fff;
+    border-radius: 26px;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 14px rgba(18,140,126,.3);
+    box-shadow: 0 10px 30px rgba(7,94,84,.15), 0 2px 8px rgba(0,0,0,.05);
+    padding: 8px;
+    position: relative;
+    overflow: hidden;
   }
-  .brand-icon svg { stroke: #fff; }
-  .brand-name { font-size: 20px; font-weight: 700; color: var(--wa-deep); }
+  .brand-img-wrap::before {
+    content: ''; position: absolute;
+    inset: 0; border-radius: 26px;
+    background: linear-gradient(135deg, rgba(37,211,102,.08), rgba(255,106,0,.05));
+    pointer-events: none;
+  }
+  .brand-img-wrap img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    position: relative; z-index: 2;
+  }
+  .brand-name {
+    font-size: 22px; font-weight: 800;
+    color: var(--wa-deep);
+    letter-spacing: .5px;
+  }
   .brand-name span { color: var(--wa-green); }
-
-  /* TITRE */
-  .title {
-    font-size: 26px; font-weight: 700; color: var(--wa-deep);
-    text-align: center; margin-bottom: 6px;
-  }
-  .subtitle {
-    font-size: 14px; color: var(--muted);
-    text-align: center; margin-bottom: 26px;
+  .brand-tagline {
+    font-size: 12.5px; color: var(--muted);
+    font-weight: 500;
   }
 
-  /* TABS */
+  /* ============ CARTE FORM ============ */
+  .form-card {
+    background: #fff;
+    border-radius: 28px;
+    padding: 24px 22px;
+    box-shadow: 0 12px 40px rgba(7,94,84,.1), 0 4px 12px rgba(0,0,0,.04);
+    position: relative;
+  }
+
+  /* ============ TABS ============ */
   .tabs {
-    display: flex; background: #eef2f0;
-    border-radius: 14px; padding: 5px;
+    display: flex; background: #f0f4f2;
+    border-radius: 16px; padding: 5px;
     margin-bottom: 22px; position: relative;
   }
   .tab {
     flex: 1; text-align: center;
     padding: 12px 0; cursor: pointer;
-    font-size: 14px; font-weight: 600;
+    font-size: 14px; font-weight: 700;
     color: var(--muted); z-index: 2;
     transition: color .3s; position: relative;
   }
@@ -135,28 +206,30 @@
     position: absolute; top: 5px; bottom: 5px;
     width: calc(50% - 5px); left: 5px;
     background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
-    border-radius: 10px;
+    border-radius: 12px;
     transition: transform .35s cubic-bezier(.4,0,.2,1);
-    box-shadow: 0 2px 8px rgba(18,140,126,.3);
+    box-shadow: 0 4px 12px rgba(18,140,126,.3);
   }
   .tab-indicator.right { transform: translateX(100%); }
 
-  /* FORM */
+  /* ============ FORM ============ */
   .form { display: flex; flex-direction: column; gap: 14px; }
   .field { position: relative; }
   .field label {
-    display: block; font-size: 13px; font-weight: 600;
-    color: var(--wa-deep); margin-bottom: 6px;
+    display: block; font-size: 12.5px; font-weight: 700;
+    color: var(--wa-deep); margin-bottom: 7px;
+    letter-spacing: .2px;
   }
   .field .input-wrap {
     display: flex; align-items: center;
-    background: #fff; border: 1.5px solid var(--border);
-    border-radius: 12px; padding: 0 14px;
-    transition: border-color .2s, box-shadow .2s;
+    background: #f7faf8; border: 1.5px solid #eef2f0;
+    border-radius: 14px; padding: 0 14px;
+    transition: border-color .2s, box-shadow .2s, background .2s;
   }
   .field .input-wrap:focus-within {
     border-color: var(--wa-green);
-    box-shadow: 0 0 0 3px rgba(37,211,102,.15);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(37,211,102,.12);
   }
   .field .input-wrap.prefilled {
     background: linear-gradient(135deg, rgba(37,211,102,.08), rgba(18,140,126,.1));
@@ -174,238 +247,273 @@
     padding: 14px 10px; font-size: 15px;
     background: transparent; color: var(--text);
     font-family: inherit;
+    font-weight: 500;
   }
-  .field input::placeholder { color: #b0b7be; }
-  .field input.uppercase { text-transform: uppercase; letter-spacing: 1px; }
+  .field input::placeholder { color: #b0b7be; font-weight: 400; }
+  .field input.uppercase { text-transform: uppercase; letter-spacing: 1.2px; font-weight: 700; }
 
   .toggle-pass {
     cursor: pointer; padding: 6px;
     display: flex; align-items: center;
+    border-radius: 8px;
+    transition: background .2s;
   }
+  .toggle-pass:active { background: #eef2f0; }
   .toggle-pass svg { stroke: var(--muted); }
 
-  /* BADGE PARRAINAGE */
+  /* ============ BADGE PARRAINAGE ============ */
   .ref-badge {
-    position: absolute; right: 12px; top: 50%;
+    position: absolute; right: 14px; top: 50%;
     transform: translateY(-50%);
     background: var(--wa-green); color: #fff;
     font-size: 10px; font-weight: 800;
-    padding: 3px 8px; border-radius: 10px;
+    padding: 4px 9px; border-radius: 10px;
     text-transform: uppercase; letter-spacing: .3px;
     display: none;
     pointer-events: none;
   }
   .ref-badge.show { display: inline-block; }
 
-  /* INFO PARRAINAGE */
   .ref-info {
     background: linear-gradient(135deg, rgba(37,211,102,.08), rgba(18,140,126,.1));
     border: 1px solid rgba(37,211,102,.3);
-    border-radius: 12px;
-    padding: 12px 14px;
-    display: flex; align-items: center; gap: 10px;
-    font-size: 12px; color: var(--wa-deep);
-    line-height: 1.4;
-    margin-top: -4px;
+    border-radius: 14px;
+    padding: 13px 15px;
     display: none;
+    align-items: center; gap: 10px;
+    font-size: 12px; color: var(--wa-deep);
+    line-height: 1.5;
+    margin-top: -6px;
   }
   .ref-info.show { display: flex; animation: fadeInUp .4s ease; }
   .ref-info svg { stroke: var(--wa-green); flex-shrink: 0; }
 
-  /* BOUTON */
+  /* ============ BOUTON PRINCIPAL ============ */
   .btn-primary {
-    margin-top: 8px;
+    margin-top: 10px;
     background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
     color: #fff; border: none;
-    padding: 16px; border-radius: 14px;
-    font-size: 16px; font-weight: 700;
+    padding: 17px; border-radius: 16px;
+    font-size: 16px; font-weight: 800;
     cursor: pointer; font-family: inherit;
-    box-shadow: 0 4px 14px rgba(18,140,126,.35);
+    box-shadow: 0 8px 24px rgba(18,140,126,.35);
     transition: transform .15s, box-shadow .2s;
     position: relative;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    letter-spacing: .3px;
   }
-  .btn-primary:active { transform: scale(.97); }
+  .btn-primary:active { transform: scale(.97); box-shadow: 0 4px 12px rgba(18,140,126,.4); }
   .btn-primary:disabled { opacity: .7; cursor: not-allowed; }
   .btn-primary .btn-loader {
-    display: none; width: 18px; height: 18px;
+    display: none; width: 20px; height: 20px;
     border: 2.5px solid rgba(255,255,255,.4);
     border-top-color: #fff; border-radius: 50%;
     animation: spin .7s linear infinite;
   }
   .btn-primary.loading .btn-loader { display: inline-block; }
-  .btn-primary.loading .btn-text { opacity: .85; }
+  .btn-primary.loading .btn-text { opacity: .9; }
 
-  /* SWITCH */
+  /* ============ SWITCH ============ */
   .switch-line {
     text-align: center; font-size: 14px;
     color: var(--muted); margin-top: 22px;
+    padding-top: 20px;
+    border-top: 1px dashed #eef2f0;
   }
   .switch-line b {
     color: var(--wa-dark); cursor: pointer;
-    font-weight: 700;
+    font-weight: 800;
   }
+  .switch-line b:active { opacity: .7; }
 
-  /* TERMS */
+  /* ============ TERMS ============ */
   .terms {
     display: flex; align-items: flex-start; gap: 10px;
     font-size: 12px; color: var(--muted);
-    margin-top: 4px; line-height: 1.5;
+    margin-top: 4px; line-height: 1.55;
+    padding: 4px 0;
   }
-  .terms input { margin-top: 2px; accent-color: var(--wa-green); }
-  .terms a { color: var(--alibaba); text-decoration: none; font-weight: 600; }
+  .terms input {
+    margin-top: 2px; accent-color: var(--wa-green);
+    width: 18px; height: 18px; cursor: pointer;
+    flex-shrink: 0;
+  }
+  .terms a {
+    color: var(--alibaba); text-decoration: none;
+    font-weight: 700;
+  }
 
-  /* MESSAGE */
+  /* ============ MESSAGE ============ */
   .msg {
-    padding: 12px 14px; border-radius: 10px;
-    font-size: 13px; font-weight: 500;
+    padding: 13px 15px; border-radius: 12px;
+    font-size: 13px; font-weight: 600;
     display: none;
+    line-height: 1.4;
   }
   .msg.show { display: block; animation: shake .4s ease; }
   .msg.error { background: #fee2e2; color: #b91c1c; }
-  .msg.success { background: #dcfce7; color: #166534; animation: fadeInUp .4s ease; }
+  .msg.success {
+    background: #dcfce7; color: #166534;
+    animation: fadeInUp .4s ease;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .msg.success svg { stroke: #166534; flex-shrink: 0; }
 
-  /* DÉCOR */
-  .bg-shape {
-    position: fixed; border-radius: 50%;
-    z-index: -1; filter: blur(60px); opacity: .25;
+  /* ============ FOOTER ============ */
+  .bottom-note {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.6;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
   }
-  .bg-shape.a {
-    width: 260px; height: 260px; background: var(--wa-green);
-    top: -80px; right: -80px;
-    animation: float 8s ease-in-out infinite;
-  }
-  .bg-shape.b {
-    width: 220px; height: 220px; background: var(--alibaba);
-    bottom: -60px; left: -80px;
-    animation: float 10s ease-in-out infinite reverse;
-  }
-  @keyframes float {
-    0%,100% { transform: translate(0,0) scale(1); }
-    50% { transform: translate(20px,-20px) scale(1.1); }
-  }
+  .bottom-note svg { stroke: var(--wa-green); flex-shrink: 0; }
 
   .hidden { display: none !important; }
 </style>
 </head>
 <body>
 
+  <!-- LOADER -->
   <div class="loader" id="loader">
-    <div class="loader-logo">Affinity<span> Network</span></div>
+    <img src="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png" alt="Affinity Network" class="loader-logo-img">
+    <div class="loader-logo-txt">Affinity<span> Network</span></div>
     <div class="spinner"></div>
   </div>
 
+  <!-- DÉCOR -->
   <div class="bg-shape a"></div>
   <div class="bg-shape b"></div>
 
   <div class="page">
 
+    <!-- LOGO EN HAUT -->
     <div class="brand anim d1">
-      <div class="brand-icon">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2v6M12 22v-4M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M22 12h-4M4.93 19.07l4.24-4.24M14.83 9.17l4.24-4.24"/>
-        </svg>
+      <div class="brand-img-wrap">
+        <img src="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png" alt="Affinity Network">
       </div>
       <div class="brand-name">Affinity<span> Network</span></div>
+      <div class="brand-tagline" id="brandTagline">Rejoins la communauté et commence à gagner</div>
     </div>
 
-    <div class="title anim d2" id="mainTitle">Créer un compte</div>
-    <div class="subtitle anim d2" id="mainSubtitle">Rejoins la communauté et commence à gagner</div>
+    <!-- CARTE FORMULAIRE -->
+    <div class="form-card anim d2">
 
-    <div class="tabs anim d3">
-      <div class="tab-indicator" id="tabIndicator"></div>
-      <div class="tab active" id="tabSignup" onclick="switchTab('signup')">Inscription</div>
-      <div class="tab" id="tabLogin" onclick="switchTab('login')">Connexion</div>
-    </div>
-
-    <div class="msg" id="msgBox"></div>
-
-    <form class="form" id="authForm" onsubmit="return handleSubmit(event)">
-
-      <div class="field anim d4" id="fieldNom">
-        <label>Nom complet</label>
-        <div class="input-wrap">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
-          </svg>
-          <input type="text" id="nom" placeholder="Ex: Jean Kamga" autocomplete="name">
-        </div>
+      <!-- TABS -->
+      <div class="tabs">
+        <div class="tab-indicator" id="tabIndicator"></div>
+        <div class="tab active" id="tabSignup" onclick="switchTab('signup')">Inscription</div>
+        <div class="tab" id="tabLogin" onclick="switchTab('login')">Connexion</div>
       </div>
 
-      <div class="field anim d5" id="fieldPseudo">
-        <label>Pseudo</label>
-        <div class="input-wrap">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-            <circle cx="12" cy="7" r="4"/>
-          </svg>
-          <input type="text" id="pseudo" placeholder="Ex: jeankamga" autocomplete="username">
-        </div>
-      </div>
+      <!-- MESSAGE -->
+      <div class="msg" id="msgBox"></div>
 
-      <div class="field anim d6">
-        <label>Email</label>
-        <div class="input-wrap">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="4" width="20" height="16" rx="2"/>
-            <path d="m22 7-10 6L2 7"/>
-          </svg>
-          <input type="email" id="email" placeholder="ton@email.com" autocomplete="email">
-        </div>
-      </div>
+      <!-- FORM -->
+      <form class="form" id="authForm" onsubmit="return handleSubmit(event)">
 
-      <div class="field anim d6">
-        <label>Mot de passe</label>
-        <div class="input-wrap">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2"/>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-          </svg>
-          <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
-          <div class="toggle-pass" onclick="togglePassword()">
-            <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-              <circle cx="12" cy="12" r="3"/>
+        <!-- Nom (inscription uniquement) -->
+        <div class="field" id="fieldNom">
+          <label>Nom complet</label>
+          <div class="input-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
             </svg>
+            <input type="text" id="nom" placeholder="Ex: Jean Kamga" autocomplete="name">
           </div>
         </div>
-      </div>
 
-      <!-- CHAMP CODE PARRAINAGE -->
-      <div class="field anim d7" id="fieldParrainage">
-        <label>Code de parrainage (optionnel)</label>
-        <div class="input-wrap" id="wrapParrainage">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
-          </svg>
-          <input type="text" id="codeParrainage" placeholder="Ex: AFF123ABC" class="uppercase" maxlength="20" oninput="onRefInput()">
-          <span class="ref-badge" id="refBadge">Détecté</span>
+        <!-- Pseudo -->
+        <div class="field">
+          <label>Pseudo</label>
+          <div class="input-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <input type="text" id="pseudo" placeholder="Ex: jeankamga" autocomplete="username">
+          </div>
         </div>
-        <div class="ref-info" id="refInfo">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"/>
-          </svg>
-          <span>Tu as été invité par un parrain. Active un plan et fais-lui gagner <b>20%</b> de commission.</span>
+
+        <!-- Email -->
+        <div class="field">
+          <label>Email</label>
+          <div class="input-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="4" width="20" height="16" rx="2"/>
+              <path d="m22 7-10 6L2 7"/>
+            </svg>
+            <input type="email" id="email" placeholder="ton@email.com" autocomplete="email">
+          </div>
         </div>
+
+        <!-- Mot de passe -->
+        <div class="field">
+          <label>Mot de passe</label>
+          <div class="input-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+            <div class="toggle-pass" onclick="togglePassword()">
+              <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Code parrainage -->
+        <div class="field" id="fieldParrainage">
+          <label>Code de parrainage <span style="color:var(--muted);font-weight:500;">(optionnel)</span></label>
+          <div class="input-wrap" id="wrapParrainage">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            <input type="text" id="codeParrainage" placeholder="Ex: AFF123ABC" class="uppercase" maxlength="20" oninput="onRefInput()">
+            <span class="ref-badge" id="refBadge">Détecté</span>
+          </div>
+          <div class="ref-info" id="refInfo">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span>Tu as été invité par un parrain. Active un plan et fais-lui gagner <b>20%</b> de commission.</span>
+          </div>
+        </div>
+
+        <!-- Conditions -->
+        <div class="terms" id="fieldTerms">
+          <input type="checkbox" id="terms">
+          <label for="terms" style="margin:0;text-transform:none;letter-spacing:0;font-weight:500;">
+            J'accepte les <a href="#">conditions d'utilisation</a> et la <a href="#">politique de confidentialité</a> d'Affinity Network.
+          </label>
+        </div>
+
+        <!-- Bouton -->
+        <button type="submit" class="btn-primary" id="submitBtn">
+          <span class="btn-loader"></span>
+          <span class="btn-text" id="btnText">Créer mon compte</span>
+        </button>
+      </form>
+
+      <!-- Switch -->
+      <div class="switch-line" id="switchLine">
+        Déjà un compte ? <b onclick="switchTab('login')">Se connecter</b>
       </div>
 
-      <div class="terms anim d8" id="fieldTerms">
-        <input type="checkbox" id="terms">
-        <label for="terms">
-          J'accepte les <a href="#">conditions d'utilisation</a> et la <a href="#">politique de confidentialité</a> d'Affinity Network.
-        </label>
-      </div>
+    </div>
 
-      <button type="submit" class="btn-primary anim d8" id="submitBtn">
-        <span class="btn-loader"></span>
-        <span class="btn-text" id="btnText">S'inscrire</span>
-      </button>
-    </form>
-
-    <div class="switch-line anim d8" id="switchLine">
-      Déjà un compte ? <b onclick="switchTab('login')">Se connecter</b>
+    <!-- NOTE BAS DE PAGE -->
+    <div class="bottom-note anim d3">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+      Tes données sont chiffrées et sécurisées
     </div>
 
   </div>
@@ -464,7 +572,7 @@
     setTimeout(() => {
       document.getElementById('loader').classList.add('hidden');
       if (session) {
-        window.location.replace('dashboard.html');
+        window.location.replace('dashboard');
       }
     }, 1200);
   });
@@ -477,8 +585,7 @@
     const indicator = document.getElementById('tabIndicator');
     const tabSignup = document.getElementById('tabSignup');
     const tabLogin = document.getElementById('tabLogin');
-    const title = document.getElementById('mainTitle');
-    const subtitle = document.getElementById('mainSubtitle');
+    const brandTagline = document.getElementById('brandTagline');
     const fieldNom = document.getElementById('fieldNom');
     const fieldParrainage = document.getElementById('fieldParrainage');
     const fieldTerms = document.getElementById('fieldTerms');
@@ -490,20 +597,18 @@
       indicator.classList.remove('right');
       tabSignup.classList.add('active');
       tabLogin.classList.remove('active');
-      title.textContent = 'Créer un compte';
-      subtitle.textContent = 'Rejoins la communauté et commence à gagner';
+      brandTagline.textContent = 'Rejoins la communauté et commence à gagner';
       fieldNom.classList.remove('hidden');
       fieldParrainage.classList.remove('hidden');
       fieldTerms.classList.remove('hidden');
-      btnText.textContent = "S'inscrire";
+      btnText.textContent = 'Créer mon compte';
       switchLine.innerHTML = 'Déjà un compte ? <b onclick="switchTab(\'login\')">Se connecter</b>';
       password.autocomplete = 'new-password';
     } else {
       indicator.classList.add('right');
       tabLogin.classList.add('active');
       tabSignup.classList.remove('active');
-      title.textContent = 'Bon retour';
-      subtitle.textContent = 'Connecte-toi pour continuer à gagner';
+      brandTagline.textContent = 'Ravi de te revoir !';
       fieldNom.classList.add('hidden');
       fieldParrainage.classList.add('hidden');
       fieldTerms.classList.add('hidden');
@@ -530,11 +635,16 @@
   // ================= MESSAGES =================
   function showMsg(text, type = 'error') {
     const e = document.getElementById('msgBox');
-    e.textContent = text;
+    if (type === 'success') {
+      e.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>${text}</span>`;
+    } else {
+      e.textContent = text;
+    }
     e.className = 'msg show ' + type;
   }
   function hideMsg() {
     document.getElementById('msgBox').className = 'msg';
+    document.getElementById('msgBox').innerHTML = '';
   }
 
   // ================= SOUMISSION =================
@@ -554,9 +664,8 @@
       if (nom.length < 3) return showMsg('Entre ton nom complet (3 caractères min).'), false;
       if (pseudo.length < 3) return showMsg('Le pseudo doit contenir au moins 3 caractères.'), false;
       if (!/^[a-z0-9._-]+$/.test(pseudo)) return showMsg('Pseudo : lettres minuscules, chiffres, . _ - seulement.'), false;
-    } else {
-      if (!email) return showMsg('Entre ton email.'), false;
     }
+    if (!email) return showMsg('Entre ton email.'), false;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showMsg('Entre un email valide.'), false;
     if (password.length < 6) return showMsg('Le mot de passe doit contenir au moins 6 caractères.'), false;
     if (mode === 'signup' && !terms) return showMsg('Tu dois accepter les conditions.'), false;
@@ -575,7 +684,7 @@
       showMsg(err.message || 'Une erreur est survenue.');
       btn.classList.remove('loading');
       btn.disabled = false;
-      document.getElementById('btnText').textContent = mode === 'signup' ? "S'inscrire" : 'Se connecter';
+      document.getElementById('btnText').textContent = mode === 'signup' ? 'Créer mon compte' : 'Se connecter';
     }
 
     return false;
@@ -592,12 +701,8 @@
     let parrainId = null;
     if (codeRef && codeRef.length > 0) {
       const { data: pid, error: refErr } = await sb.rpc('resoudre_code_parrainage', { p_code: codeRef });
-      if (refErr) {
-        console.warn('Erreur résolution code:', refErr);
-      }
-      if (!pid) {
-        throw new Error('Code de parrainage invalide ou inexistant.');
-      }
+      if (refErr) console.warn('Erreur résolution code:', refErr);
+      if (!pid) throw new Error('Code de parrainage invalide ou inexistant.');
       parrainId = pid;
     }
 
@@ -605,15 +710,13 @@
     const { data, error } = await sb.auth.signUp({
       email: email,
       password: password,
-      options: {
-        data: { nom, pseudo }
-      }
+      options: { data: { nom, pseudo } }
     });
 
     if (error) throw new Error(traduireErreur(error.message));
 
     if (!data.session) {
-      showMsg('✅ Compte créé ! Vérifie ta boîte mail pour confirmer ton adresse.', 'success');
+      showMsg('Compte créé ! Vérifie ta boîte mail pour confirmer ton adresse.', 'success');
       setTimeout(() => {
         switchTab('login');
         document.getElementById('btnText').textContent = 'Se connecter';
@@ -621,7 +724,7 @@
       return;
     }
 
-    // 4. Insérer le profil (avec parrain_id si code valide)
+    // 4. Insérer le profil
     const { error: profileError } = await sb
       .from('profiles')
       .insert({
@@ -633,13 +736,11 @@
         parrain_id: parrainId
       });
 
-    if (profileError) {
-      console.warn('Erreur insertion profil:', profileError);
-    }
+    if (profileError) console.warn('Erreur insertion profil:', profileError);
 
     // 5. Redirection
-    showMsg('✅ Inscription réussie ! Redirection...', 'success');
-    setTimeout(() => window.location.href = 'dashboard.html', 1200);
+    showMsg('Inscription réussie ! Redirection...', 'success');
+    setTimeout(() => window.location.href = 'dashboard', 1200);
   }
 
   // ================= CONNEXION =================
@@ -648,8 +749,8 @@
       email: email, password: password
     });
     if (error) throw new Error(traduireErreur(error.message));
-    showMsg('✅ Connexion réussie ! Redirection...', 'success');
-    setTimeout(() => window.location.href = 'dashboard.html', 900);
+    showMsg('Connexion réussie ! Redirection...', 'success');
+    setTimeout(() => window.location.href = 'dashboard', 900);
   }
 
   // ================= TRADUCTION =================
