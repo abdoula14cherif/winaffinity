@@ -7,7 +7,26 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#075E54">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="icon" type="image/png" href="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  (function() {
+    document.addEventListener('click', function(e) {
+      const link = e.target.closest('a');
+      if (!link) return;
+      let href = link.getAttribute('href');
+      if (!href) return;
+      if (href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) return;
+      if (href.endsWith('.html')) {
+        e.preventDefault();
+        window.location.href = href.replace(/\.html$/, '');
+      }
+    }, true);
+    if (window.location.pathname.endsWith('.html')) {
+      window.history.replaceState(null, '', window.location.pathname.replace(/\.html$/, '') + window.location.search);
+    }
+  })();
+</script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root { --wa-green: #25D366; --wa-dark: #128C7E; --wa-deep: #075E54; --alibaba: #FF6A00; --bg: #f7f9f8; --text: #1a1a1a; --muted: #6b7280; --border: #e5e7eb; --danger: #dc2626; }
@@ -30,7 +49,7 @@
   .logo { font-weight: 700; font-size: 18px; }
   .logo span { color: var(--wa-green); }
 
-  .menu { position: fixed; top: 0; left: 0; height: 100%; width: 280px; background: #fff; z-index: 200; transform: translateX(-100%); transition: transform .35s cubic-bezier(.4,0,.2,1); box-shadow: 4px 0 20px rgba(0,0,0,.2); padding-top: 18px; display: flex; flex-direction: column; overflow-y: auto; padding-top: max(18px, env(safe-area-inset-top)); }
+  .menu { position: fixed; top: 0; left: 0; height: 100%; width: 280px; background: #fff; z-index: 200; transform: translateX(-100%); transition: transform .35s cubic-bezier(.4,0,.2,1); box-shadow: 4px 0 20px rgba(0,0,0,.2); display: flex; flex-direction: column; overflow-y: auto; padding-top: max(18px, env(safe-area-inset-top)); }
   .menu.open { transform: translateX(0); }
   .menu-header { padding: 8px 20px 18px; border-bottom: 1px solid #eee; margin-bottom: 10px; font-weight: 700; color: var(--wa-deep); font-size: 17px; display: flex; align-items: center; gap: 10px; }
   .menu-header svg { stroke: var(--wa-green); }
@@ -175,51 +194,51 @@
       </svg>
       Affinity Network
     </div>
-    <div class="menu-item" onclick="go('parrainage.html')">
+    <div class="menu-item" onclick="go('parrainage')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
       </svg>
       Inviter un ami
     </div>
-    <div class="menu-item" onclick="go('recharge.html')">
+    <div class="menu-item" onclick="go('recharge')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
         <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
       </svg>
       Recharger mon solde
     </div>
-    <div class="menu-item" onclick="go('roue.html')">
+    <div class="menu-item" onclick="go('roue')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
         <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
       </svg>
       Roue de la fortune
     </div>
-    <div class="menu-item" onclick="go('missions.html')">
+    <div class="menu-item" onclick="go('missions')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
         <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
         <path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
       </svg>
       Missions
     </div>
-    <div class="menu-item" onclick="go('notifications.html')">
+    <div class="menu-item" onclick="go('notifications')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
         <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
       </svg>
       Notifications
     </div>
-    <div class="menu-item" onclick="go('travail.html')">
+    <div class="menu-item" onclick="go('travail')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
         <rect x="2" y="7" width="20" height="14" rx="2"/>
       </svg>
       Travail
     </div>
-    <div class="menu-item" onclick="go('support.html')">
+    <div class="menu-item" onclick="go('support')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
         <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
       </svg>
       Support
     </div>
-    <div class="menu-item" onclick="go('faq.html')">
+    <div class="menu-item" onclick="go('faq')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
         <circle cx="12" cy="12" r="10"/>
       </svg>
@@ -363,25 +382,25 @@
   </main>
 
   <nav class="bottom-nav">
-    <a href="lancer.html" class="nav-item">
+    <a href="lancer" class="nav-item">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
       </svg>
       Lancer
     </a>
-    <a href="retirer.html" class="nav-item active">
+    <a href="retirer" class="nav-item active">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
       </svg>
       Retirer
     </a>
-    <a href="travail.html" class="nav-item">
+    <a href="travail" class="nav-item">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="2" y="7" width="20" height="14" rx="2"/>
       </svg>
       Travail
     </a>
-    <a href="moi.html" class="nav-item">
+    <a href="moi" class="nav-item">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
       </svg>
@@ -417,21 +436,35 @@
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2p2dmxjbnFzZnRjaWVkcHFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMDQyNDAsImV4cCI6MjEwNTY4MDI0MH0.4uQwBGedMBjUZErd8lUM5YfA26gw96RvHdo_J-3PZCY';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-  let CURRENT_USER = null, USER_SOLDE = 0, COUNTRIES = [], OPERATORS = [], SELECTED_COUNTRY = null, SELECTED_OPERATOR = null, HIST = [], FRAIS_PCT = 8, FRAIS_MIN = 100;
+  let CURRENT_USER = null;
+  let USER_SOLDE = 0;
+  let COUNTRIES = [], OPERATORS = [];
+  let SELECTED_COUNTRY = null, SELECTED_OPERATOR = null;
+  let HIST = [];
+  let FRAIS_PCT = 8, FRAIS_MIN = 100;
+  let A_PLAN_ACTIF = false;
+
+  // Plage horaire autorisée pour les retraits
+  const HEURE_DEBUT = 8;
+  const HEURE_FIN = 18;
 
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 
   (async function init() {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) { window.location.replace('inscription.html'); return; }
+    if (!session) { window.location.replace('inscription'); return; }
     CURRENT_USER = session.user;
-    const { data: config } = await sb.from('bonus_config').select('*').in('cle', ['frais_retrait_pourcentage', 'frais_retrait_minimum']);
+
+    const { data: config } = await sb.from('bonus_config')
+      .select('*')
+      .in('cle', ['frais_retrait_pourcentage', 'frais_retrait_minimum']);
     const c1 = config?.find(c => c.cle === 'frais_retrait_pourcentage');
     const c2 = config?.find(c => c.cle === 'frais_retrait_minimum');
     if (c1) FRAIS_PCT = Number(c1.valeur);
     if (c2) FRAIS_MIN = Number(c2.valeur);
     document.getElementById('fbPct').textContent = FRAIS_PCT;
-    await Promise.all([loadProfile(), loadCountries(), loadHistory()]);
+
+    await Promise.all([loadProfile(), loadCountries(), loadHistory(), checkPlanActif()]);
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
   })();
 
@@ -444,6 +477,28 @@
   async function loadCountries() {
     const { data } = await sb.from('pays_retrait').select('*').eq('actif', true).order('ordre');
     COUNTRIES = data || [];
+  }
+
+  // Vérifie si le user a au moins 1 plan actif
+  async function checkPlanActif() {
+    const { data, error } = await sb
+      .from('activations_plans')
+      .select('id')
+      .eq('user_id', CURRENT_USER.id)
+      .eq('statut', 'actif')
+      .limit(1);
+    A_PLAN_ACTIF = !error && data && data.length > 0;
+  }
+
+  // Vérifie si on est dans la plage horaire autorisée (8h - 18h)
+  function estDansPlageHoraire() {
+    const h = new Date().getHours();
+    return h >= HEURE_DEBUT && h < HEURE_FIN;
+  }
+
+  // Libellé de la plage horaire
+  function libellePlage() {
+    return `${HEURE_DEBUT}h à ${HEURE_FIN}h`;
   }
 
   function openCountryModal() {
@@ -502,7 +557,11 @@
     closeCountryModal();
   }
 
-  function setAmount(n) { document.getElementById('amountInput').value = n; onAmountChange(); document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('selected')); }
+  function setAmount(n) {
+    document.getElementById('amountInput').value = n;
+    onAmountChange();
+    document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('selected'));
+  }
   function setAmountMax() {
     if (!SELECTED_COUNTRY) return;
     const max = Math.floor(USER_SOLDE);
@@ -530,6 +589,18 @@
   }
 
   async function submitRetrait() {
+    // 1️⃣ Vérifier que le user a un plan actif
+    await checkPlanActif();
+    if (!A_PLAN_ACTIF) {
+      return showToast('Investis dans un plan pour débloquer les retraits', true);
+    }
+
+    // 2️⃣ Vérifier la plage horaire (8h - 18h)
+    if (!estDansPlageHoraire()) {
+      return showToast(`Les retraits sont possibles de ${libellePlage()}`, true);
+    }
+
+    // 3️⃣ Vérifications habituelles
     const montant = Number(document.getElementById('amountInput').value || 0);
     const numero = document.getElementById('numeroInput').value.trim();
     if (!SELECTED_COUNTRY) return showToast('Choisis un pays', true);
@@ -537,12 +608,21 @@
     if (!montant || montant < Number(SELECTED_COUNTRY.minimum_retrait)) return showToast(`Minimum ${formatF(SELECTED_COUNTRY.minimum_retrait)}`, true);
     if (montant > USER_SOLDE) return showToast('Solde insuffisant', true);
     if (numero.length < 4) return showToast('Numéro ou adresse invalide', true);
+
     const btn = document.getElementById('btnSubmit');
     btn.classList.add('loading');
     document.getElementById('btnSubmitText').textContent = 'Envoi...';
-    const { data, error } = await sb.rpc('demander_retrait', { p_pays_id: SELECTED_COUNTRY.id, p_operateur_id: SELECTED_OPERATOR.id, p_montant: montant, p_numero: numero });
+
+    const { data, error } = await sb.rpc('demander_retrait', {
+      p_pays_id: SELECTED_COUNTRY.id,
+      p_operateur_id: SELECTED_OPERATOR.id,
+      p_montant: montant,
+      p_numero: numero
+    });
+
     btn.classList.remove('loading');
     document.getElementById('btnSubmitText').textContent = 'Valider le retrait';
+
     if (error) {
       let msg = error.message || 'Erreur';
       if (msg.includes('Solde insuffisant')) msg = 'Solde insuffisant.';
@@ -550,6 +630,7 @@
       await loadProfile();
       return;
     }
+
     USER_SOLDE = Number(data.nouveau_solde ?? USER_SOLDE);
     document.getElementById('userSolde').textContent = formatF(USER_SOLDE);
     const frais = data.frais || 0;
@@ -627,11 +708,11 @@
     setTimeout(() => t.classList.remove('show'), 3500);
   }
   function toggleMenu() { document.getElementById('menu').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
-  function go(page) { window.location.href = page; }
+  function go(page) { window.location.href = page.replace(/\.html$/, ''); }
   async function logout() {
     if (!confirm('Veux-tu vraiment te déconnecter ?')) return;
     await sb.auth.signOut();
-    window.location.replace('inscription.html');
+    window.location.replace('inscription');
   }
 </script>
 </body>
