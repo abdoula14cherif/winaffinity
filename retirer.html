@@ -322,7 +322,7 @@
           <span id="minHintText">Sélectionne un pays pour voir le minimum</span>
         </div>
         <div class="amount-quick" id="quickAmounts">
-          <button class="quick-btn" onclick="setAmount(1000)">1 000</button>
+          <button class="quick-btn" onclick="setAmount(1500)">1 500</button>
           <button class="quick-btn" onclick="setAmount(5000)">5 000</button>
           <button class="quick-btn" onclick="setAmount(10000)">10 000</button>
           <button class="quick-btn" onclick="setAmount(25000)">25 000</button>
@@ -444,6 +444,9 @@
   let FRAIS_PCT = 8, FRAIS_MIN = 100;
   let A_PLAN_ACTIF = false;
 
+  // ⬇️ Minimum de retrait global (plancher)
+  const MIN_RETRAIT_GLOBAL = 1500;
+
   // Plage horaire autorisée pour les retraits
   const HEURE_DEBUT = 8;
   const HEURE_FIN = 18;
@@ -543,7 +546,9 @@
     select.onchange = () => { SELECTED_OPERATOR = OPERATORS.find(x => x.id === select.value) || null; };
     document.getElementById('operatorField').style.opacity = '1';
     document.getElementById('operatorField').style.pointerEvents = 'auto';
-    document.getElementById('minHintText').textContent = `Minimum : ${formatF(c.minimum_retrait)}`;
+    // ⬇️ Applique le minimum global (1500) si le pays a moins
+    const minRetrait = Math.max(Number(c.minimum_retrait) || 0, MIN_RETRAIT_GLOBAL);
+    document.getElementById('minHintText').textContent = `Minimum : ${formatF(minRetrait)}`;
     document.getElementById('minHint').classList.remove('min-warn');
     if (c.mode === 'mobile_money') {
       document.getElementById('numeroLabel').textContent = 'Numéro Mobile Money';
@@ -565,14 +570,16 @@
   function setAmountMax() {
     if (!SELECTED_COUNTRY) return;
     const max = Math.floor(USER_SOLDE);
-    if (max < SELECTED_COUNTRY.minimum_retrait) return showToast('Solde insuffisant', true);
+    const minRetrait = Math.max(Number(SELECTED_COUNTRY.minimum_retrait) || 0, MIN_RETRAIT_GLOBAL);
+    if (max < minRetrait) return showToast('Solde insuffisant', true);
     document.getElementById('amountInput').value = max;
     onAmountChange();
   }
   function onAmountChange() {
     const v = Number(document.getElementById('amountInput').value || 0);
     if (!SELECTED_COUNTRY) return;
-    const min = Number(SELECTED_COUNTRY.minimum_retrait);
+    // ⬇️ Applique le minimum global
+    const min = Math.max(Number(SELECTED_COUNTRY.minimum_retrait) || 0, MIN_RETRAIT_GLOBAL);
     const hint = document.getElementById('minHint');
     const hintText = document.getElementById('minHintText');
     if (v > 0 && v < min) { hint.classList.add('min-warn'); hintText.textContent = `Minimum requis : ${formatF(min)}`; }
@@ -605,7 +612,9 @@
     const numero = document.getElementById('numeroInput').value.trim();
     if (!SELECTED_COUNTRY) return showToast('Choisis un pays', true);
     if (!SELECTED_OPERATOR) return showToast('Choisis un opérateur', true);
-    if (!montant || montant < Number(SELECTED_COUNTRY.minimum_retrait)) return showToast(`Minimum ${formatF(SELECTED_COUNTRY.minimum_retrait)}`, true);
+    // ⬇️ Applique le minimum global
+    const minRetrait = Math.max(Number(SELECTED_COUNTRY.minimum_retrait) || 0, MIN_RETRAIT_GLOBAL);
+    if (!montant || montant < minRetrait) return showToast(`Minimum ${formatF(minRetrait)}`, true);
     if (montant > USER_SOLDE) return showToast('Solde insuffisant', true);
     if (numero.length < 4) return showToast('Numéro ou adresse invalide', true);
 
