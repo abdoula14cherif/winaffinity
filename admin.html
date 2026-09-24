@@ -251,6 +251,23 @@
       </svg>
       Users
     </button>
+    <button class="tab" data-tab="support">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+        <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+      </svg>
+      Support
+      <span class="tab-badge" id="supportBadge"></span>
+    </button>
+    <button class="tab" data-tab="parrainage">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      Parrainage
+    </button>
     <button class="tab" data-tab="plans">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
@@ -346,7 +363,6 @@
         </div>
       </div>
 
-      <!-- Carte lien de paiement -->
       <div class="config-group" style="margin-bottom:16px;border:1px solid rgba(255,106,0,.25);background:linear-gradient(135deg,rgba(255,106,0,.04),rgba(255,184,0,.04));">
         <div class="config-group-title" style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--alibaba);">
@@ -394,6 +410,41 @@
         <input type="text" placeholder="Rechercher..." class="search-input" id="userSearch" oninput="renderUsers()">
       </div>
       <div id="usersList"></div>
+    </div>
+
+    <!-- SUPPORT -->
+    <div class="panel" id="panel-support">
+      <div class="admin-toolbar">
+        <h2>Tickets Support</h2>
+        <span class="badge orange" id="supportPendingBadge">— ouverts</span>
+      </div>
+
+      <div class="filter-row" id="supportFilters">
+        <button class="filter-chip active" data-filter="all">Tous</button>
+        <button class="filter-chip" data-filter="ouvert">Ouverts</button>
+        <button class="filter-chip" data-filter="en_cours">En cours</button>
+        <button class="filter-chip" data-filter="resolu">Résolus</button>
+      </div>
+
+      <div id="supportList"></div>
+    </div>
+
+    <!-- PARRAINAGE -->
+    <div class="panel" id="panel-parrainage">
+      <div class="admin-toolbar">
+        <h2>Réseau de parrainage</h2>
+        <input type="text" placeholder="Rechercher..." class="search-input" id="parrainSearch" oninput="renderParrainage()">
+      </div>
+
+      <div class="stats-grid" id="parrainStats" style="margin-bottom:16px;"></div>
+
+      <div class="filter-row" id="parrainFilters">
+        <button class="filter-chip active" data-filter="all">Tous les parrains</button>
+        <button class="filter-chip" data-filter="with_filleuls">Avec filleuls</button>
+        <button class="filter-chip" data-filter="top">Top 20</button>
+      </div>
+
+      <div id="parrainList"></div>
     </div>
 
     <!-- PLANS -->
@@ -554,6 +605,10 @@
   };
   let CAND_FILTER = 'all';
   let RECHARGE_FILTER = 'all';
+  let SUPPORT_FILTER = 'all';
+  let SUPPORT_TICKETS = [];
+  let PARRAIN_FILTER = 'all';
+  let PARRAIN_DATA = [];
 
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 
@@ -581,7 +636,8 @@
       loadActualites(), loadLoteries(), loadPays(), loadBonusConfig(), loadBonusHistory(),
       loadTopConfig(), loadTopHistory(),
       loadCandidatures(), loadTypesPartenaires(),
-      loadRecharges(), loadLienPaiement()
+      loadRecharges(), loadLienPaiement(),
+      loadSupport(), loadParrainage()
     ]);
 
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
@@ -646,7 +702,6 @@
 
   // ================= RECHARGES =================
   async function loadRecharges() {
-    // ⬇️ Plus de JOIN — les infos utilisateur sont directement dans la table
     const { data, error } = await sb
       .from('recharges')
       .select('*')
@@ -696,7 +751,6 @@
 
     list.innerHTML = filtered.map((r, i) => {
       const info = statusInfo[r.statut] || { label: r.statut, classe: 'gray' };
-      // ⬇️ Lecture directe depuis les colonnes dénormalisées
       const userName = r.user_nom || r.user_pseudo || 'Utilisateur';
       const userEmail = r.user_email || '';
       const noteHTML = r.note_admin ? `<div class="ic-desc">📝 ${escapeHtml(r.note_admin)}</div>` : '';
@@ -766,7 +820,6 @@
     const userName = r.user_nom || r.user_pseudo || 'cet utilisateur';
     if (!confirm(`Créditer ${formatF(r.montant)} à ${userName} ?`)) return;
 
-    // 1️⃣ Créditer le solde
     const { error: errSolde } = await sb.rpc('ajuster_solde_user', {
       p_user_id: r.user_id,
       p_montant: Number(r.montant),
@@ -774,7 +827,6 @@
     });
     if (errSolde) return showToast('Erreur crédit : ' + errSolde.message, true);
 
-    // 2️⃣ Mettre à jour le statut
     const { error: errUpdate } = await sb.from('recharges').update({
       statut: 'paye',
       note_admin: note || null
@@ -812,7 +864,6 @@
     await loadRecharges();
   }
 
-  // Ajout manuel d'une recharge (crédit direct du solde d'un user)
   function openAjoutRechargeModal() {
     if (!DATA.users || DATA.users.length === 0) return showToast('Aucun utilisateur chargé', true);
     const options = DATA.users
@@ -864,7 +915,6 @@
     const u = DATA.users.find(x => x.id === userId);
     const userName = u?.nom || u?.pseudo || 'utilisateur';
 
-    // 1️⃣ Créer la recharge (avec infos user dénormalisées)
     const { error: errInsert } = await sb.from('recharges').insert({
       user_id: userId,
       mode: 'manuel',
@@ -880,7 +930,6 @@
     });
     if (errInsert) return showToast('Erreur création : ' + errInsert.message, true);
 
-    // 2️⃣ Créditer le solde
     const { error: errSolde } = await sb.rpc('ajuster_solde_user', {
       p_user_id: userId,
       p_montant: montant,
@@ -894,6 +943,366 @@
     await loadUsers();
     await loadStats();
   }
+
+  // ================= SUPPORT =================
+  async function loadSupport() {
+    const { data, error } = await sb
+      .from('support_tickets')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(200);
+
+    if (error) {
+      console.warn('Support:', error);
+      document.getElementById('supportList').innerHTML = emptyBox('Erreur de chargement');
+      return;
+    }
+
+    SUPPORT_TICKETS = data || [];
+
+    const userIds = [...new Set(SUPPORT_TICKETS.map(t => t.user_id))];
+    let profilesMap = {};
+    if (userIds.length > 0) {
+      const { data: profs } = await sb
+        .from('profiles')
+        .select('id, nom, pseudo, email')
+        .in('id', userIds);
+      (profs || []).forEach(p => { profilesMap[p.id] = p; });
+    }
+
+    SUPPORT_TICKETS = SUPPORT_TICKETS.map(t => ({
+      ...t,
+      profile: profilesMap[t.user_id] || null
+    }));
+
+    const ouverts = SUPPORT_TICKETS.filter(t => t.statut === 'ouvert').length;
+    document.getElementById('supportPendingBadge').textContent = ouverts + ' ouverts';
+
+    const badge = document.getElementById('supportBadge');
+    if (ouverts > 0) {
+      badge.textContent = ouverts;
+      badge.classList.add('show');
+    } else {
+      badge.classList.remove('show');
+    }
+
+    renderSupport();
+  }
+
+  function renderSupport() {
+    const list = document.getElementById('supportList');
+    const filtered = SUPPORT_FILTER === 'all'
+      ? SUPPORT_TICKETS
+      : SUPPORT_TICKETS.filter(t => t.statut === SUPPORT_FILTER);
+
+    if (filtered.length === 0) {
+      list.innerHTML = emptyBox('Aucun ticket');
+      return;
+    }
+
+    const statusInfo = {
+      ouvert: { label: 'Ouvert', classe: 'orange' },
+      en_cours: { label: 'En cours', classe: 'blue' },
+      resolu: { label: 'Résolu', classe: 'green' }
+    };
+
+    list.innerHTML = filtered.map((t, i) => {
+      const info = statusInfo[t.statut] || { label: t.statut, classe: 'gray' };
+      const userName = t.profile?.nom || t.profile?.pseudo || 'Utilisateur';
+      const userEmail = t.profile?.email || '';
+
+      return `
+        <div class="item-card" style="animation-delay:${i * .03}s">
+          <div class="ic-img" style="background:${t.statut === 'ouvert' ? 'rgba(255,106,0,.15)' : t.statut === 'en_cours' ? 'rgba(59,130,246,.15)' : 'rgba(37,211,102,.15)'}">
+            ${t.statut === 'ouvert' ? '📨' : t.statut === 'en_cours' ? '💬' : '✅'}
+          </div>
+          <div class="ic-body">
+            <div class="ic-name">
+              ${escapeHtml(t.sujet)}
+              <span class="badge ${info.classe}">${info.label}</span>
+            </div>
+            <div class="ic-meta">
+              <span>👤 ${escapeHtml(userName)}</span>
+              ${userEmail ? `<span class="dot">•</span><span>${escapeHtml(userEmail)}</span>` : ''}
+              <span class="dot">•</span>
+              <span>${timeAgo(t.created_at)}</span>
+            </div>
+            <div class="ic-desc">${escapeHtml(t.message)}</div>
+            ${t.reponse_admin ? `
+              <div style="margin-top:8px;padding:10px 12px;background:rgba(37,211,102,.08);border-left:3px solid var(--wa-green);border-radius:8px;font-size:12px;color:#166534;line-height:1.5;">
+                <b>Réponse admin :</b><br>${escapeHtml(t.reponse_admin)}
+              </div>
+            ` : ''}
+            ${t.note_admin ? `<div style="font-size:11px;color:var(--muted);margin-top:6px;">📝 ${escapeHtml(t.note_admin)}</div>` : ''}
+          </div>
+          <div class="ic-actions">
+            <button class="icon-btn edit" onclick="repondreTicket('${t.id}')" title="Répondre">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+            </button>
+            ${t.statut !== 'resolu' ? `
+              <button class="icon-btn check" onclick="marquerResolu('${t.id}')" title="Marquer résolu">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </button>
+            ` : ''}
+            <button class="icon-btn delete" onclick="supprimerTicket('${t.id}')" title="Supprimer">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  document.getElementById('supportFilters').addEventListener('click', (e) => {
+    const chip = e.target.closest('.filter-chip');
+    if (!chip) return;
+    document.querySelectorAll('#supportFilters .filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    SUPPORT_FILTER = chip.dataset.filter;
+    renderSupport();
+  });
+
+  function repondreTicket(id) {
+    const t = SUPPORT_TICKETS.find(x => x.id === id);
+    if (!t) return;
+    const userName = t.profile?.nom || t.profile?.pseudo || 'Utilisateur';
+
+    openModal('Répondre au ticket', `
+      <div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;">
+        <b style="color:var(--wa-deep);">${escapeHtml(userName)}</b> · ${timeAgo(t.created_at)}
+      </div>
+      <div style="background:#f7faf8;border-radius:10px;padding:12px 14px;margin-bottom:14px;">
+        <div style="font-size:12px;font-weight:800;color:var(--wa-deep);margin-bottom:6px;">Sujet : ${escapeHtml(t.sujet)}</div>
+        <div style="font-size:12.5px;color:#4b5563;line-height:1.6;">${escapeHtml(t.message)}</div>
+      </div>
+      <div class="form-group">
+        <label>Réponse</label>
+        <textarea id="repTexte" style="min-height:120px;" placeholder="Écris ta réponse ici...">${t.reponse_admin ? escapeHtml(t.reponse_admin) : ''}</textarea>
+      </div>
+      <div class="form-group">
+        <label>Statut</label>
+        <select id="repStatut">
+          <option value="en_cours" ${t.statut === 'en_cours' ? 'selected' : ''}>En cours</option>
+          <option value="resolu" ${t.statut === 'resolu' ? 'selected' : ''}>Résolu</option>
+          <option value="ouvert" ${t.statut === 'ouvert' ? 'selected' : ''}>Ouvert</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Note interne (optionnelle)</label>
+        <input type="text" id="repNote" value="${t.note_admin ? escapeHtml(t.note_admin) : ''}" placeholder="Visible uniquement par les admins">
+      </div>
+      <button class="btn-primary" onclick="envoyerReponse('${id}')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+        Envoyer la réponse
+      </button>
+    `);
+  }
+
+  async function envoyerReponse(id) {
+    const reponse = document.getElementById('repTexte').value.trim();
+    const statut = document.getElementById('repStatut').value;
+    const note = document.getElementById('repNote').value.trim();
+
+    if (!reponse) return showToast('Réponse vide', true);
+
+    const { error } = await sb.from('support_tickets').update({
+      reponse_admin: reponse,
+      statut: statut,
+      note_admin: note || null,
+      updated_at: new Date().toISOString()
+    }).eq('id', id);
+
+    if (error) return showToast('Erreur : ' + error.message, true);
+
+    showToast('✅ Réponse envoyée');
+    closeModal();
+    await loadSupport();
+  }
+
+  async function marquerResolu(id) {
+    const { error } = await sb.from('support_tickets').update({
+      statut: 'resolu',
+      updated_at: new Date().toISOString()
+    }).eq('id', id);
+
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('Ticket marqué résolu');
+    await loadSupport();
+  }
+
+  async function supprimerTicket(id) {
+    if (!confirm('Supprimer ce ticket ?')) return;
+    const { error } = await sb.from('support_tickets').delete().eq('id', id);
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('Ticket supprimé');
+    await loadSupport();
+  }
+
+  // ================= PARRAINAGE =================
+  async function loadParrainage() {
+    const { data, error } = await sb
+      .from('profiles')
+      .select('id, nom, pseudo, email, parrain_id, code_parrainage, solde, created_at')
+      .order('created_at', { ascending: false })
+      .limit(1000);
+
+    if (error) {
+      console.warn('Parrainage:', error);
+      document.getElementById('parrainList').innerHTML = emptyBox('Erreur de chargement');
+      return;
+    }
+
+    const profiles = data || [];
+    const map = {};
+    profiles.forEach(p => { map[p.id] = p; });
+
+    const groups = {};
+    profiles.forEach(p => {
+      if (!p.parrain_id) return;
+      if (!groups[p.parrain_id]) {
+        const parrain = map[p.parrain_id];
+        groups[p.parrain_id] = {
+          parrain: parrain || { id: p.parrain_id, nom: 'Inconnu', pseudo: '—', email: '—' },
+          filleuls: []
+        };
+      }
+      groups[p.parrain_id].filleuls.push(p);
+    });
+
+    PARRAIN_DATA = Object.values(groups)
+      .sort((a, b) => b.filleuls.length - a.filleuls.length);
+
+    const totalParrains = PARRAIN_DATA.length;
+    const totalFilleuls = profiles.filter(p => p.parrain_id).length;
+    const moyFilleuls = totalParrains > 0 ? Math.round(totalFilleuls / totalParrains) : 0;
+
+    document.getElementById('parrainStats').innerHTML = `
+      <div class="stat-box" style="border-color:var(--wa-dark);animation-delay:0s;">
+        <div class="lbl">Parrains actifs</div>
+        <div class="val">${totalParrains}</div>
+      </div>
+      <div class="stat-box" style="border-color:var(--wa-green);animation-delay:.06s;">
+        <div class="lbl">Total filleuls</div>
+        <div class="val">${totalFilleuls}</div>
+      </div>
+      <div class="stat-box" style="border-color:var(--alibaba);animation-delay:.12s;">
+        <div class="lbl">Moyenne/parrain</div>
+        <div class="val">${moyFilleuls}</div>
+      </div>
+      <div class="stat-box" style="border-color:#3b82f6;animation-delay:.18s;">
+        <div class="lbl">Sans parrain</div>
+        <div class="val">${profiles.filter(p => !p.parrain_id).length}</div>
+      </div>
+    `;
+
+    renderParrainage();
+  }
+
+  function renderParrainage() {
+    const list = document.getElementById('parrainList');
+    const q = (document.getElementById('parrainSearch')?.value || '').toLowerCase();
+
+    let filtered = PARRAIN_DATA;
+
+    if (PARRAIN_FILTER === 'with_filleuls') {
+      filtered = filtered.filter(g => g.filleuls.length > 0);
+    } else if (PARRAIN_FILTER === 'top') {
+      filtered = filtered.slice(0, 20);
+    }
+
+    if (q) {
+      filtered = filtered.filter(g => {
+        const p = g.parrain;
+        const matchParrain = (p.nom || '').toLowerCase().includes(q)
+          || (p.pseudo || '').toLowerCase().includes(q)
+          || (p.email || '').toLowerCase().includes(q)
+          || (p.code_parrainage || '').toLowerCase().includes(q);
+        const matchFilleul = g.filleuls.some(f =>
+          (f.nom || '').toLowerCase().includes(q)
+          || (f.pseudo || '').toLowerCase().includes(q)
+          || (f.email || '').toLowerCase().includes(q)
+        );
+        return matchParrain || matchFilleul;
+      });
+    }
+
+    if (filtered.length === 0) {
+      list.innerHTML = emptyBox('Aucun parrain trouvé');
+      return;
+    }
+
+    list.innerHTML = filtered.map((g, i) => {
+      const p = g.parrain;
+      const count = g.filleuls.length;
+      const badgeClass = count >= 10 ? 'gold' : count >= 5 ? 'green' : 'blue';
+
+      return `
+        <div class="item-card" style="animation-delay:${i * .03}s;flex-direction:column;align-items:stretch;">
+          <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="toggleFilleuls('${p.id}')">
+            <div class="ic-img" style="background:linear-gradient(135deg,var(--wa-dark),var(--wa-green));color:#fff;font-weight:800;font-size:16px;">
+              ${escapeHtml((p.nom || p.pseudo || '?').charAt(0).toUpperCase())}
+            </div>
+            <div style="flex:1;min-width:0;">
+              <div class="ic-name">
+                ${escapeHtml(p.nom || '—')}
+                <span class="badge ${badgeClass}">${count} filleul${count > 1 ? 's' : ''}</span>
+              </div>
+              <div class="ic-meta">
+                <span>@${escapeHtml(p.pseudo || '—')}</span>
+                <span class="dot">•</span>
+                <span>${escapeHtml(p.email || '—')}</span>
+              </div>
+              ${p.code_parrainage ? `<div class="ic-meta" style="margin-top:3px;"><span style="font-size:10.5px;color:var(--wa-dark);font-weight:700;">🔗 Code : ${escapeHtml(p.code_parrainage)}</span></div>` : ''}
+            </div>
+            <div style="font-size:20px;color:var(--muted);">▾</div>
+          </div>
+
+          <div id="filleuls-${p.id}" style="display:none;margin-top:12px;padding-top:12px;border-top:1px dashed #e5e7eb;">
+            <div style="font-size:11.5px;font-weight:800;color:var(--wa-deep);text-transform:uppercase;letter-spacing:.3px;margin-bottom:8px;">
+              Ses filleuls (${count})
+            </div>
+            ${g.filleuls.map(f => `
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f3f4f6;">
+                <div style="width:32px;height:32px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:var(--wa-dark);flex-shrink:0;">
+                  ${escapeHtml((f.nom || f.pseudo || '?').charAt(0).toUpperCase())}
+                </div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:12.5px;font-weight:700;color:var(--text);">${escapeHtml(f.nom || '—')}</div>
+                  <div style="font-size:10.5px;color:var(--muted);">@${escapeHtml(f.pseudo || '—')} · ${escapeHtml(f.email || '')}</div>
+                </div>
+                <div style="font-size:11px;color:var(--wa-dark);font-weight:800;flex-shrink:0;">
+                  ${formatF(f.solde)}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function toggleFilleuls(parrainId) {
+    const el = document.getElementById('filleuls-' + parrainId);
+    if (!el) return;
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  }
+
+  document.getElementById('parrainFilters').addEventListener('click', (e) => {
+    const chip = e.target.closest('.filter-chip');
+    if (!chip) return;
+    document.querySelectorAll('#parrainFilters .filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    PARRAIN_FILTER = chip.dataset.filter;
+    renderParrainage();
+  });
 
   // ================= CANDIDATURES PARTENAIRES =================
   async function loadCandidatures() {
