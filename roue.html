@@ -77,16 +77,13 @@
   .hero p { font-size: 13.5px; opacity: .95; line-height: 1.5; }
   .hero p b { color: #fff; }
 
-  .tours-badge { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; padding: 8px 14px; background: rgba(255,255,255,.22); border-radius: 20px; font-size: 13px; font-weight: 700; position: relative; z-index: 2; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.3); }
-  .tours-badge svg { stroke: #fff; }
-
   .wheel-section { padding: 20px; text-align: center; }
-  .wheel-wrap { position: relative; width: 280px; height: 280px; margin: 0 auto 24px; }
+  .wheel-wrap { position: relative; width: 300px; height: 300px; margin: 0 auto 24px; }
   .wheel-pointer { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 16px solid transparent; border-right: 16px solid transparent; border-top: 26px solid #DC2626; z-index: 10; filter: drop-shadow(0 4px 8px rgba(220,38,38,.5)); }
   .wheel-pointer::after { content: ''; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); width: 12px; height: 12px; border-radius: 50%; background: #DC2626; box-shadow: 0 0 0 4px rgba(255,255,255,.9); }
   .wheel-container { position: relative; width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 10px 40px rgba(0,0,0,.25), inset 0 0 0 8px #fff, inset 0 0 0 14px var(--gold); }
-  .wheel-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), #FFD966); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #1a1a1a; font-size: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.3), inset 0 -3px 8px rgba(0,0,0,.1); border: 3px solid #fff; z-index: 5; line-height: 1.1; text-align: center; }
-  .secteur { position: absolute; top: 50%; left: 50%; transform-origin: 0 0; font-size: 14px; font-weight: 800; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.5); pointer-events: none; }
+  .wheel-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 76px; height: 76px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), #FFD966); display: flex; align-items: center; justify-content: center; font-weight: 800; color: #1a1a1a; font-size: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.3), inset 0 -3px 8px rgba(0,0,0,.1); border: 3px solid #fff; z-index: 5; line-height: 1.1; text-align: center; }
+  .secteur { position: absolute; top: 50%; left: 50%; transform-origin: 0 0; font-size: 12px; font-weight: 800; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.6); pointer-events: none; white-space: nowrap; }
 
   .btn-spin { width: 240px; height: 56px; margin: 0 auto; display: flex; background: linear-gradient(135deg, #FF8A3D, var(--alibaba)); color: #fff; border: none; border-radius: 30px; font-size: 17px; font-weight: 800; cursor: pointer; font-family: inherit; box-shadow: 0 8px 24px rgba(255,106,0,.4); align-items: center; justify-content: center; gap: 10px; transition: transform .15s; animation: glow 2s ease-in-out infinite; }
   .btn-spin:active { transform: scale(.96); }
@@ -96,15 +93,6 @@
 
   .spin-info { margin-top: 14px; font-size: 12.5px; color: var(--muted); text-align: center; line-height: 1.5; }
   .spin-info b { color: var(--wa-deep); }
-
-  .cta-invite { margin: 16px 20px 0; padding: 16px 18px; background: linear-gradient(135deg, rgba(37,211,102,.1), rgba(18,140,126,.1)); border: 1.5px solid rgba(37,211,102,.3); border-radius: 14px; display: flex; align-items: center; gap: 12px; }
-  .cta-invite-icon { width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .cta-invite-icon svg { stroke: #fff; }
-  .cta-invite-text { flex: 1; }
-  .cta-invite-title { font-size: 13.5px; font-weight: 800; color: var(--wa-deep); margin-bottom: 3px; }
-  .cta-invite-sub { font-size: 11.5px; color: var(--muted); line-height: 1.4; }
-  .cta-invite-btn { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; border: none; padding: 10px 16px; border-radius: 10px; font-size: 12px; font-weight: 800; cursor: pointer; font-family: inherit; flex-shrink: 0; box-shadow: 0 3px 10px rgba(18,140,126,.3); }
-  .cta-invite-btn:active { transform: scale(.95); }
 
   .section-title { padding: 0 20px; font-size: 15px; font-weight: 700; color: var(--wa-deep); margin: 22px 0 12px; display: flex; align-items: center; gap: 8px; }
   .section-title svg { stroke: var(--wa-green); }
@@ -238,13 +226,7 @@
       <div class="hero-content">
         <div class="hero-icon">🎡</div>
         <h1>Roue de la fortune</h1>
-        <p>Chaque <b>filleul actif</b> = <b>1 tour gratuit par jour</b> ! Gagne jusqu'à <b>2 000 F</b>.</p>
-        <div class="tours-badge" id="toursBadge">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
-          </svg>
-          <span id="toursBadgeText">Chargement...</span>
-        </div>
+        <p>Tente ta chance et remporte jusqu'à <b>30 000 F</b> en un clic !</p>
       </div>
     </div>
 
@@ -260,24 +242,10 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 2v6M12 22v-4M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M22 12h-4"/>
         </svg>
-        <span id="btnSpinText">Chargement...</span>
+        <span id="btnSpinText">Tourner gratuitement</span>
       </button>
 
       <div class="spin-info" id="spinInfo">Chargement...</div>
-    </div>
-
-    <div class="cta-invite" id="ctaInvite" style="display:none;">
-      <div class="cta-invite-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/>
-          <line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>
-        </svg>
-      </div>
-      <div class="cta-invite-text">
-        <div class="cta-invite-title">Besoin de plus de tours ?</div>
-        <div class="cta-invite-sub">Invite des amis actifs pour débloquer plus de tours chaque jour.</div>
-      </div>
-      <button class="cta-invite-btn" onclick="go('parrainage')">Inviter</button>
     </div>
 
     <div class="section-title">
@@ -358,8 +326,16 @@
   })();
 
   async function loadConfig() {
-    const { data } = await sb.from('roue_config').select('*').eq('actif', true).order('ordre');
-    SECTEURS = data || [];
+    // On affiche toujours ces 7 secteurs (les gros montants sont purement visuels)
+    SECTEURS = [
+      { montant: 50,    couleur: '#16A34A', secteur: '50' },
+      { montant: 100,   couleur: '#0EA5E9', secteur: '100' },
+      { montant: 200,   couleur: '#F59E0B', secteur: '200' },
+      { montant: 10000, couleur: '#7C3AED', secteur: '10000' },
+      { montant: 500,   couleur: '#EF4444', secteur: '500' },
+      { montant: 30000, couleur: '#EA580C', secteur: '30000' },
+      { montant: 1000,  couleur: '#DC2626', secteur: '1000' }
+    ];
   }
 
   async function drawWheel() {
@@ -368,14 +344,20 @@
     const total = SECTEURS.length;
     if (total === 0) return;
     const angleStep = 360 / total;
+
     SECTEURS.forEach((s, i) => {
       const angle = i * angleStep + angleStep / 2;
       const el = document.createElement('div');
       el.className = 'secteur';
-      el.textContent = s.montant + 'F';
-      el.style.transform = `rotate(${angle - 90}deg) translate(90px) rotate(${90 - angle}deg)`;
+      // Format avec espace pour les gros montants
+      const label = s.montant >= 1000
+        ? (s.montant / 1000) + 'k'
+        : s.montant.toString();
+      el.textContent = label;
+      el.style.transform = `rotate(${angle - 90}deg) translate(100px) rotate(${90 - angle}deg)`;
       wheel.appendChild(el);
     });
+
     const stops = [];
     SECTEURS.forEach((s, i) => {
       const start = i * angleStep;
@@ -385,52 +367,28 @@
     wheel.style.background = `conic-gradient(${stops.join(',')})`;
   }
 
-  // ⬇️ MODIFIÉ : affiche filleuls actifs + tours restants
   async function checkCanSpin() {
     const { data, error } = await sb.rpc('peut_tourner_roue');
     const btn = document.getElementById('btnSpin');
     const btnText = document.getElementById('btnSpinText');
     const info = document.getElementById('spinInfo');
-    const badge = document.getElementById('toursBadgeText');
-    const cta = document.getElementById('ctaInvite');
 
     if (error || !data) {
       btn.disabled = true;
       btnText.textContent = 'Erreur';
-      info.textContent = 'Impossible de vérifier tes tours';
-      badge.textContent = 'Erreur';
+      info.textContent = 'Impossible de charger. Réessaie plus tard.';
       return;
     }
 
-    const filleuls = data.filleuls_actifs || 0;
-    const restants = data.tours_restants || 0;
-
-    // Badge du hero
-    badge.textContent = `${filleuls} filleul${filleuls > 1 ? 's' : ''} actif${filleuls > 1 ? 's' : ''} · ${restants} tour${restants > 1 ? 's' : ''} dispo`;
-
-    if (filleuls === 0) {
-      // Aucun filleul actif
+    if (data.peut) {
+      btn.disabled = false;
+      btnText.textContent = 'Tourner gratuitement';
+      info.innerHTML = `🎁 <b>Ton tour est disponible !</b> Tente ta chance maintenant.`;
+    } else {
       btn.disabled = true;
-      btnText.textContent = 'Aucun tour disponible';
-      info.innerHTML = `🚫 <b>Aucun filleul actif</b><br>Invite des amis et fais-les rejoindre pour débloquer des tours gratuits.`;
-      cta.style.display = 'flex';
-      return;
+      btnText.textContent = 'Reviens bientôt';
+      info.innerHTML = `🚫 <b>${data.raison || 'Tu as déjà tourné'}</b>`;
     }
-
-    if (!data.peut) {
-      // Tous les tours utilisés aujourd'hui
-      btn.disabled = true;
-      btnText.textContent = 'Reviens demain';
-      info.innerHTML = `🚫 <b>${data.raison || 'Tous tes tours ont été utilisés'}</b><br>Tu as utilisé tes <b>${filleuls}</b> tour(s) aujourd'hui. Reviens demain !`;
-      cta.style.display = 'none';
-      return;
-    }
-
-    // Peut tourner
-    btn.disabled = false;
-    btnText.textContent = 'Tourner gratuitement';
-    info.innerHTML = `🎁 Tu as <b>${restants}</b> tour${restants > 1 ? 's' : ''} gratuit${restants > 1 ? 's' : ''} disponible${restants > 1 ? 's' : ''} aujourd'hui`;
-    cta.style.display = filleuls < 3 ? 'flex' : 'none';
   }
 
   async function spin() {
@@ -456,10 +414,10 @@
     const angleStep = 360 / total;
     const indexGagnant = SECTEURS.findIndex(s => s.secteur === data.secteur);
     const angleCible = 360 - (indexGagnant * angleStep) - angleStep / 2;
-    const tours = 5;
+    const tours = 6;
     const angleFinal = angleCible + (360 * tours) + (Math.random() * (angleStep - 8)) - (angleStep / 2 - 4);
 
-    wheel.style.transition = 'transform 4s cubic-bezier(.17,.67,.16,1)';
+    wheel.style.transition = 'transform 4.5s cubic-bezier(.17,.67,.16,1)';
     wheel.style.transform = `rotate(${angleFinal}deg)`;
 
     setTimeout(async () => {
@@ -471,7 +429,7 @@
       }, 300);
       await checkCanSpin();
       await loadGains();
-    }, 4100);
+    }, 4600);
   }
 
   function showWinModal(montant) {
