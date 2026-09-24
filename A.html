@@ -1,0 +1,2065 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Affinity Network — Admin</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#075E54">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="icon" type="image/png" href="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --wa-green: #25D366; --wa-dark: #128C7E; --wa-deep: #075E54;
+    --alibaba: #FF6A00; --gold: #FFB800; --vip: #9333EA;
+    --bg: #f7f9f8; --text: #1a1a1a; --muted: #6b7280; --border: #e5e7eb;
+    --danger: #dc2626; --warn: #f59e0b;
+  }
+  body { font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 30px; min-height: 100vh; overflow-x: hidden; -webkit-user-select: none; user-select: none; }
+  input, textarea, select { -webkit-user-select: text; user-select: text; }
+
+  .loader { position: fixed; inset: 0; z-index: 9999; background: var(--wa-deep); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; transition: opacity .6s ease, visibility .6s ease; }
+  .loader.hidden { opacity: 0; visibility: hidden; }
+  .loader-logo { font-size: 24px; font-weight: 700; color: #fff; }
+  .loader-logo span { color: var(--wa-green); }
+  .spinner { width: 46px; height: 46px; border: 4px solid rgba(255,255,255,.2); border-top-color: var(--wa-green); border-radius: 50%; animation: spin .9s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+  .anim { opacity: 0; animation: fadeInUp .4s ease forwards; }
+
+  .header { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: linear-gradient(135deg, #1a1a1a, var(--wa-deep)); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.2); padding-top: max(14px, env(safe-area-inset-top)); }
+  .header-logo-wrap { display: flex; align-items: center; gap: 10px; }
+  .header-logo-wrap img { width: 36px; height: 36px; border-radius: 10px; background: #fff; padding: 3px; object-fit: contain; }
+  .logo { font-weight: 700; font-size: 17px; display: flex; align-items: center; gap: 8px; }
+  .logo .badge-admin { background: var(--alibaba); color: #fff; font-size: 9px; padding: 2px 8px; border-radius: 8px; text-transform: uppercase; letter-spacing: .5px; font-weight: 800; }
+  .btn-exit { background: rgba(255,255,255,.15); border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .btn-exit svg { stroke: #fff; }
+
+  .tabs { background: #fff; padding: 8px 10px; display: flex; gap: 6px; overflow-x: auto; border-bottom: 1px solid var(--border); position: sticky; top: 64px; z-index: 99; -ms-overflow-style: none; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { padding: 10px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; background: #f7faf8; color: var(--muted); border: none; cursor: pointer; font-family: inherit; white-space: nowrap; display: flex; align-items: center; gap: 6px; transition: all .2s; position: relative; }
+  .tab svg { stroke: currentColor; }
+  .tab.active { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; box-shadow: 0 3px 10px rgba(18,140,126,.3); }
+  .tab .tab-badge { background: var(--danger); color: #fff; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 8px; min-width: 18px; text-align: center; display: none; }
+  .tab .tab-badge.show { display: inline-block; }
+
+  .content { padding: 16px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+  .stat-box { background: #fff; border-radius: 14px; padding: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.05); border-left: 4px solid var(--wa-green); animation: fadeInUp .4s ease forwards; opacity: 0; }
+  .stat-box:nth-child(2) { border-color: var(--alibaba); }
+  .stat-box:nth-child(3) { border-color: var(--wa-dark); }
+  .stat-box:nth-child(4) { border-color: #3b82f6; }
+  .stat-box:nth-child(5) { border-color: var(--warn); }
+  .stat-box:nth-child(6) { border-color: var(--danger); }
+  .stat-box .lbl { font-size: 10.5px; color: var(--muted); text-transform: uppercase; font-weight: 700; letter-spacing: .3px; margin-bottom: 6px; }
+  .stat-box .val { font-size: 20px; font-weight: 800; color: var(--text); }
+
+  .admin-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 10px; flex-wrap: wrap; }
+  .admin-toolbar h2 { font-size: 17px; font-weight: 800; color: var(--wa-deep); }
+  .btn-add { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; border: none; padding: 10px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 6px; box-shadow: 0 3px 10px rgba(18,140,126,.3); transition: transform .15s; }
+  .btn-add:active { transform: scale(.95); }
+  .btn-add svg { stroke: #fff; }
+
+  .item-card { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.05); display: flex; align-items: flex-start; gap: 12px; animation: fadeInUp .35s ease forwards; opacity: 0; }
+  .item-card .ic-img { width: 52px; height: 52px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .item-card .ic-body { flex: 1; min-width: 0; }
+  .item-card .ic-name { font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 4px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+  .item-card .ic-meta { font-size: 11.5px; color: var(--muted); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+  .item-card .ic-meta .dot { color: #d1d5db; }
+  .item-card .ic-desc { font-size: 12px; color: #4b5563; line-height: 1.5; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #f3f4f6; }
+  .item-card .ic-actions { display: flex; gap: 4px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+  .icon-btn { width: 32px; height: 32px; border-radius: 9px; background: #f7faf8; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s, transform .15s; }
+  .icon-btn:active { transform: scale(.9); }
+  .icon-btn.edit svg { stroke: var(--wa-dark); }
+  .icon-btn.edit:hover { background: rgba(18,140,126,.1); }
+  .icon-btn.delete svg { stroke: var(--danger); }
+  .icon-btn.delete:hover { background: rgba(220,38,38,.1); }
+  .icon-btn.view svg { stroke: var(--alibaba); }
+  .icon-btn.view:hover { background: rgba(255,106,0,.1); }
+  .icon-btn.check svg { stroke: #166534; }
+  .icon-btn.check:hover { background: rgba(37,211,102,.15); }
+  .icon-btn.close-x svg { stroke: var(--danger); }
+  .icon-btn.close-x:hover { background: rgba(220,38,38,.1); }
+
+  .badge { display: inline-flex; align-items: center; gap: 3px; font-size: 9.5px; font-weight: 800; padding: 3px 8px; border-radius: 8px; text-transform: uppercase; letter-spacing: .3px; }
+  .badge.green { background: rgba(37,211,102,.15); color: #166534; }
+  .badge.orange { background: rgba(255,106,0,.15); color: var(--alibaba); }
+  .badge.red { background: rgba(220,38,38,.15); color: var(--danger); }
+  .badge.blue { background: rgba(59,130,246,.15); color: #2563eb; }
+  .badge.gray { background: rgba(107,114,128,.15); color: #4b5563; }
+  .badge.gold { background: rgba(255,184,0,.15); color: #B45309; }
+  .badge.vip { background: linear-gradient(135deg, rgba(147,51,234,.15), rgba(217,70,239,.15)); color: var(--vip); }
+
+  .empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; background: #fff; border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+  .empty svg { stroke: #d1d5db; margin-bottom: 10px; }
+
+  .modal-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,.6); display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .3s; backdrop-filter: blur(3px); }
+  .modal-overlay.open { opacity: 1; pointer-events: auto; }
+  .modal { background: #fff; width: 100%; max-width: 520px; border-radius: 24px 24px 0 0; padding: 20px 20px 28px; transform: translateY(100%); transition: transform .4s cubic-bezier(.4,0,.2,1); max-height: 92vh; overflow-y: auto; padding-bottom: max(28px, env(safe-area-inset-bottom)); }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-handle { width: 42px; height: 5px; border-radius: 5px; background: #d1d5db; margin: 0 auto 16px; }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .modal-title { font-size: 18px; font-weight: 800; color: var(--wa-deep); }
+  .modal-close { width: 34px; height: 34px; border-radius: 50%; background: #f3f4f6; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .modal-close svg { stroke: var(--muted); }
+
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 12.5px; font-weight: 700; color: var(--wa-deep); margin-bottom: 6px; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; font-family: inherit; background: #f7faf8; outline: none; transition: border-color .2s, background .2s; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--wa-green); background: #fff; }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .form-check { display: flex; align-items: center; gap: 8px; padding: 10px 0; }
+  .form-check input { width: auto; }
+  .form-check label { margin: 0; font-size: 13px; font-weight: 600; }
+
+  .btn-primary, .btn-danger, .btn-warn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform .15s; }
+  .btn-primary { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; box-shadow: 0 4px 14px rgba(18,140,126,.3); }
+  .btn-primary:active { transform: scale(.97); }
+  .btn-primary svg { stroke: #fff; }
+  .btn-danger { background: linear-gradient(135deg, #b91c1c, #dc2626); color: #fff; box-shadow: 0 4px 14px rgba(185,28,28,.3); }
+  .btn-danger:active { transform: scale(.97); }
+  .btn-danger svg { stroke: #fff; }
+  .btn-warn { background: #f3f4f6; color: #374151; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: transform .15s; }
+  .btn-warn:active { transform: scale(.97); }
+  .btn-row { display: flex; gap: 8px; margin-top: 8px; }
+  .btn-row .btn-primary, .btn-row .btn-danger, .btn-row .btn-warn { flex: 1; }
+
+  .config-group { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+  .config-group-title { font-size: 12.5px; font-weight: 800; color: var(--wa-deep); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 12px; }
+  .config-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
+  .config-row:last-child { border-bottom: none; }
+  .config-row .cr-info { flex: 1; min-width: 0; }
+  .config-row .cr-label { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .config-row .cr-cle { font-size: 10.5px; color: var(--muted); font-family: monospace; }
+  .config-row input { width: 100px; padding: 9px 10px; border: 1.5px solid var(--border); border-radius: 9px; font-size: 14px; font-weight: 700; text-align: right; font-family: inherit; outline: none; background: #f7faf8; }
+  .config-row input:focus { border-color: var(--wa-green); background: #fff; }
+
+  .search-input { padding: 8px 12px; border-radius: 8px; border: 1.5px solid var(--border); font-family: inherit; font-size: 13px; max-width: 180px; outline: none; }
+  .search-input:focus { border-color: var(--wa-green); }
+
+  .filter-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; -ms-overflow-style: none; scrollbar-width: none; }
+  .filter-row::-webkit-scrollbar { display: none; }
+  .filter-chip { padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; background: #fff; border: 1.5px solid var(--border); color: var(--muted); cursor: pointer; font-family: inherit; white-space: nowrap; }
+  .filter-chip.active { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; border-color: transparent; }
+
+  .candidature-reponses {
+    background: #f7faf8; border-radius: 10px; padding: 10px 12px; margin-top: 8px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .candidature-reponses .rep-row {
+    display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px;
+  }
+  .candidature-reponses .rep-row .k { color: var(--muted); font-weight: 600; }
+  .candidature-reponses .rep-row .v { color: var(--text); font-weight: 700; text-align: right; word-break: break-word; max-width: 60%; }
+
+  .sk-item { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+  .sk-line { height: 12px; border-radius: 6px; background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; margin-bottom: 8px; }
+  .sk-line.w1 { width: 40%; height: 16px; }
+  .sk-line.w2 { width: 70%; }
+
+  .link-input-wrap {
+    display: flex; gap: 8px; align-items: stretch;
+  }
+  .link-input-wrap input {
+    flex: 1; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px;
+    font-size: 12.5px; font-family: monospace; background: #f7faf8; outline: none; min-width: 0;
+  }
+  .link-input-wrap input:focus { border-color: var(--wa-green); background: #fff; }
+  .link-input-wrap button {
+    padding: 0 16px; border: none; border-radius: 10px; background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
+    color: #fff; font-weight: 800; cursor: pointer; font-family: inherit; font-size: 13px;
+    display: flex; align-items: center; gap: 6px; box-shadow: 0 3px 10px rgba(18,140,126,.3);
+  }
+  .link-input-wrap button:active { transform: scale(.96); }
+  .link-input-wrap button svg { stroke: #fff; }
+
+  .toast { position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px); background: var(--wa-deep); color: #fff; padding: 12px 22px; border-radius: 30px; font-size: 14px; font-weight: 600; box-shadow: 0 6px 20px rgba(0,0,0,.25); opacity: 0; pointer-events: none; transition: all .3s; z-index: 1000; display: flex; align-items: center; gap: 8px; max-width: 90%; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast svg { stroke: var(--wa-green); flex-shrink: 0; }
+  .toast.error { background: #b91c1c; }
+  .toast.error svg { stroke: #fff; }
+</style>
+</head>
+<body>
+
+  <div class="loader" id="loader">
+    <div class="loader-logo">Affinity<span> Admin</span></div>
+    <div class="spinner"></div>
+  </div>
+
+  <header class="header">
+    <div class="header-logo-wrap">
+      <img src="https://i.ibb.co/996nZCn7/file-000000000e4481f49ce58934aa6b6a51.png" alt="">
+      <div class="logo">
+        Affinity <span class="badge-admin">Admin</span>
+      </div>
+    </div>
+    <button class="btn-exit" onclick="go('dashboard')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-tab="stats">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+      Stats
+    </button>
+    <button class="tab" data-tab="candidatures">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+      </svg>
+      Partenaires
+      <span class="tab-badge" id="candBadge"></span>
+    </button>
+    <button class="tab" data-tab="types">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 7h-9M14 17H5"/>
+        <circle cx="17" cy="17" r="3"/>
+        <circle cx="7" cy="7" r="3"/>
+      </svg>
+      Types
+    </button>
+    <button class="tab" data-tab="recharges">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Recharges
+      <span class="tab-badge" id="rechargesBadge"></span>
+    </button>
+    <button class="tab" data-tab="retraits">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+      </svg>
+      Retraits
+    </button>
+    <button class="tab" data-tab="users">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+      </svg>
+      Users
+    </button>
+    <button class="tab" data-tab="plans">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+      </svg>
+      Plans
+    </button>
+    <button class="tab" data-tab="plantations">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M7 20h10M10 20c5.5-2.5.8-6.4 3-10"/>
+      </svg>
+      Plantations
+    </button>
+    <button class="tab" data-tab="actualites">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Z"/>
+      </svg>
+      Actus
+    </button>
+    <button class="tab" data-tab="loteries">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
+      </svg>
+      Loterie
+    </button>
+    <button class="tab" data-tab="pays">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+      </svg>
+      Pays
+    </button>
+    <button class="tab" data-tab="bonus">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+      </svg>
+      Bonus
+    </button>
+    <button class="tab" data-tab="top">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+        <path d="M4 22h16"/>
+        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+      </svg>
+      Top
+    </button>
+  </nav>
+
+  <main class="content">
+
+    <!-- STATS -->
+    <div class="panel active" id="panel-stats">
+      <div class="stats-grid" id="statsGrid">
+        <div class="sk-item"><div class="sk-line w1"></div><div class="sk-line w2"></div></div>
+        <div class="sk-item"><div class="sk-line w1"></div><div class="sk-line w2"></div></div>
+      </div>
+    </div>
+
+    <!-- CANDIDATURES PARTENAIRES -->
+    <div class="panel" id="panel-candidatures">
+      <div class="admin-toolbar">
+        <h2>Candidatures partenaires</h2>
+        <span class="badge orange" id="candPendingBadge">— en attente</span>
+      </div>
+      <div class="filter-row" id="candFilters">
+        <button class="filter-chip active" data-filter="all">Toutes</button>
+        <button class="filter-chip" data-filter="nouveau">Nouvelles</button>
+        <button class="filter-chip" data-filter="approuve">Approuvées</button>
+        <button class="filter-chip" data-filter="rejete">Rejetées</button>
+      </div>
+      <div id="candList"></div>
+    </div>
+
+    <!-- TYPES PARTENAIRES -->
+    <div class="panel" id="panel-types">
+      <div class="admin-toolbar">
+        <h2>Types de partenaires</h2>
+      </div>
+      <div id="typesList"></div>
+    </div>
+
+    <!-- RECHARGES -->
+    <div class="panel" id="panel-recharges">
+      <div class="admin-toolbar">
+        <h2>Recharges</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="badge orange" id="rechargesPendingBadge">— en attente</span>
+          <button class="btn-add" onclick="openAjoutRechargeModal()" style="padding:8px 12px;font-size:12px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Ajouter
+          </button>
+        </div>
+      </div>
+
+      <!-- Carte lien de paiement -->
+      <div class="config-group" style="margin-bottom:16px;border:1px solid rgba(255,106,0,.25);background:linear-gradient(135deg,rgba(255,106,0,.04),rgba(255,184,0,.04));">
+        <div class="config-group-title" style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--alibaba);">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </svg>
+          Lien de paiement
+        </div>
+        <div class="link-input-wrap">
+          <input type="url" id="lienPaiementInput" placeholder="https://pay.exemple.com/link/..." autocomplete="off" spellcheck="false">
+          <button onclick="saveLienPaiement()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Enregistrer
+          </button>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5;">
+          🔗 Ce lien est utilisé par la page <b>Recharger</b> des utilisateurs. Tu peux le modifier à tout moment.
+        </div>
+      </div>
+
+      <div class="filter-row" id="rechargesFilters">
+        <button class="filter-chip active" data-filter="all">Toutes</button>
+        <button class="filter-chip" data-filter="en_attente">En attente</button>
+        <button class="filter-chip" data-filter="paye">Payées</button>
+        <button class="filter-chip" data-filter="rejete">Rejetées</button>
+      </div>
+      <div id="rechargesList"></div>
+    </div>
+
+    <!-- RETRAITS -->
+    <div class="panel" id="panel-retraits">
+      <div class="admin-toolbar">
+        <h2>Retraits</h2>
+        <span class="badge orange" id="retraitsPendingBadge">— en attente</span>
+      </div>
+      <div id="retraitsList"></div>
+    </div>
+
+    <!-- USERS -->
+    <div class="panel" id="panel-users">
+      <div class="admin-toolbar">
+        <h2>Utilisateurs</h2>
+        <input type="text" placeholder="Rechercher..." class="search-input" id="userSearch" oninput="renderUsers()">
+      </div>
+      <div id="usersList"></div>
+    </div>
+
+    <!-- PLANS -->
+    <div class="panel" id="panel-plans">
+      <div class="admin-toolbar">
+        <h2>Plans d'investissement</h2>
+        <button class="btn-add" onclick="openPlanModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Ajouter
+        </button>
+      </div>
+      <div id="plansList"></div>
+    </div>
+
+    <!-- PLANTATIONS -->
+    <div class="panel" id="panel-plantations">
+      <div class="admin-toolbar">
+        <h2>Plantations</h2>
+        <button class="btn-add" onclick="openPlantationModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Ajouter
+        </button>
+      </div>
+      <div id="plantationsList"></div>
+    </div>
+
+    <!-- ACTUALITES -->
+    <div class="panel" id="panel-actualites">
+      <div class="admin-toolbar">
+        <h2>Actualités</h2>
+        <button class="btn-add" onclick="openActualiteModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Publier
+        </button>
+      </div>
+      <div id="actualitesList"></div>
+    </div>
+
+    <!-- LOTERIES -->
+    <div class="panel" id="panel-loteries">
+      <div class="admin-toolbar">
+        <h2>Tirages Loterie</h2>
+        <button class="btn-add" onclick="openLoterieModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Créer
+        </button>
+      </div>
+      <div id="loteriesList"></div>
+    </div>
+
+    <!-- PAYS -->
+    <div class="panel" id="panel-pays">
+      <div class="admin-toolbar">
+        <h2>Pays &amp; Opérateurs</h2>
+      </div>
+      <div id="paysList"></div>
+    </div>
+
+    <!-- BONUS -->
+    <div class="panel" id="panel-bonus">
+      <div class="admin-toolbar">
+        <h2>Configuration des bonus</h2>
+        <button class="btn-add" onclick="saveAllBonusConfig()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Enregistrer tout
+        </button>
+      </div>
+      <div id="bonusConfigList"></div>
+      <div class="admin-toolbar" style="margin-top:24px;">
+        <h2>Derniers bonus distribués</h2>
+        <span class="badge orange" id="bonusTotalBadge">— F</span>
+      </div>
+      <div id="bonusHistoryList"></div>
+    </div>
+
+    <!-- TOP DU MOIS -->
+    <div class="panel" id="panel-top">
+      <div class="admin-toolbar">
+        <h2>Configuration Top</h2>
+        <button class="btn-add" onclick="saveTopConfig()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Enregistrer
+        </button>
+      </div>
+      <div id="topConfigList" style="margin-bottom:20px;"></div>
+      <div class="admin-toolbar">
+        <h2>Calculer le top du mois</h2>
+      </div>
+      <div style="background:#fff;border-radius:14px;padding:18px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.05);">
+        <div style="font-size:13px;line-height:1.6;color:var(--muted);margin-bottom:14px;">
+          Cette action va <b style="color:#dc2626;">désigner les gagnants</b>, créditer leurs soldes et enregistrer les résultats.
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:12.5px;font-weight:700;color:var(--wa-deep);margin-bottom:6px;">Mois à calculer</label>
+          <input type="month" id="topMoisInput" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;outline:none;background:#f7faf8;">
+        </div>
+        <button class="btn-add" onclick="lancerCalculTop()" style="width:100%;padding:14px;justify-content:center;font-size:14px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v6M12 22v-4M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M22 12h-4"/>
+          </svg>
+          Lancer le calcul
+        </button>
+      </div>
+      <div class="admin-toolbar">
+        <h2>Historique des tops</h2>
+      </div>
+      <div id="topHistoryList"></div>
+    </div>
+
+  </main>
+
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+    <div class="modal" id="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-head">
+        <div class="modal-title" id="modalTitle">Titre</div>
+        <button class="modal-close" onclick="closeModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+    <span id="toastText">—</span>
+  </div>
+
+<script>
+  const SUPABASE_URL = 'https://ydwjvvlcnqsftciedpqm.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlkd2p2dmxjbnFzZnRjaWVkcHFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMDQyNDAsImV4cCI6MjEwNTY4MDI0MH0.4uQwBGedMBjUZErd8lUM5YfA26gw96RvHdo_J-3PZCY';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  let CURRENT_USER = null;
+  let DATA = {
+    retraits: [], users: [], plans: [], plantations: [], actualites: [],
+    pays: [], loteries: [], bonusConfig: [], bonusHistory: [],
+    topConfig: [], topHistory: [],
+    candidatures: [], typesPartenaires: [],
+    recharges: []
+  };
+  let CAND_FILTER = 'all';
+  let RECHARGE_FILTER = 'all';
+
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+
+  // ================= INIT =================
+  (async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.replace('inscription'); return; }
+    CURRENT_USER = session.user;
+
+    const { data: profile } = await sb.from('profiles').select('is_admin').eq('id', session.user.id).maybeSingle();
+    if (!profile?.is_admin) {
+      document.body.innerHTML = `
+        <div style="padding:80px 30px;text-align:center;font-family:sans-serif;">
+          <h1 style="color:#dc2626;margin-bottom:12px;">Accès refusé</h1>
+          <p style="color:#666;">Tu n'es pas administrateur.</p>
+          <button onclick="window.location.replace('dashboard')" style="margin-top:24px;padding:12px 24px;background:#25D366;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;">
+            Retour
+          </button>
+        </div>`;
+      return;
+    }
+
+    await Promise.all([
+      loadStats(), loadRetraits(), loadUsers(), loadPlans(), loadPlantations(),
+      loadActualites(), loadLoteries(), loadPays(), loadBonusConfig(), loadBonusHistory(),
+      loadTopConfig(), loadTopHistory(),
+      loadCandidatures(), loadTypesPartenaires(),
+      loadRecharges(), loadLienPaiement()
+    ]);
+
+    setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
+  })();
+
+  // ================= TABS =================
+  document.getElementById('tabs').addEventListener('click', (e) => {
+    const t = e.target.closest('.tab');
+    if (!t) return;
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('panel-' + t.dataset.tab).classList.add('active');
+  });
+
+  // ================= STATS =================
+  async function loadStats() {
+    const { data, error } = await sb.from('admin_stats').select('*').maybeSingle();
+    if (error || !data) return;
+    const grid = document.getElementById('statsGrid');
+    const stats = [
+      { lbl: 'Utilisateurs totaux', val: data.total_users },
+      { lbl: 'Nouveaux (7j)', val: data.users_7j },
+      { lbl: 'Plans actifs', val: data.plans_actifs },
+      { lbl: 'Retraits en attente', val: data.retraits_attente },
+      { lbl: 'Solde total plateforme', val: formatF(data.solde_total) },
+      { lbl: 'Total payé', val: formatF(data.total_paye) }
+    ];
+    grid.innerHTML = stats.map((s, i) => `
+      <div class="stat-box" style="animation-delay:${i * .06}s">
+        <div class="lbl">${s.lbl}</div>
+        <div class="val">${s.val}</div>
+      </div>
+    `).join('');
+  }
+
+  // ================= LIEN DE PAIEMENT =================
+  async function loadLienPaiement() {
+    const { data, error } = await sb
+      .from('parametres')
+      .select('valeur')
+      .eq('cle', 'lien_paiement')
+      .maybeSingle();
+    if (!error && data?.valeur) {
+      document.getElementById('lienPaiementInput').value = data.valeur;
+    }
+  }
+
+  async function saveLienPaiement() {
+    const input = document.getElementById('lienPaiementInput');
+    const valeur = input.value.trim();
+    if (!valeur) return showToast('Lien vide', true);
+    if (!/^https?:\/\//i.test(valeur)) return showToast('Le lien doit commencer par http:// ou https://', true);
+
+    const { error } = await sb
+      .from('parametres')
+      .upsert({ cle: 'lien_paiement', valeur, updated_at: new Date().toISOString() }, { onConflict: 'cle' });
+
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('✅ Lien de paiement mis à jour');
+  }
+
+  // ================= RECHARGES =================
+  async function loadRecharges() {
+    // ⬇️ Plus de JOIN — les infos utilisateur sont directement dans la table
+    const { data, error } = await sb
+      .from('recharges')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(200);
+
+    if (error) {
+      console.warn('Erreur recharges:', error);
+      document.getElementById('rechargesList').innerHTML =
+        `<div class="empty"><div>Erreur : ${escapeHtml(error.message)}</div></div>`;
+      return;
+    }
+
+    DATA.recharges = data || [];
+
+    const pending = DATA.recharges.filter(r => r.statut === 'en_attente').length;
+    document.getElementById('rechargesPendingBadge').textContent = pending + ' en attente';
+
+    const badge = document.getElementById('rechargesBadge');
+    if (pending > 0) {
+      badge.textContent = pending;
+      badge.classList.add('show');
+    } else {
+      badge.classList.remove('show');
+    }
+
+    renderRecharges();
+  }
+
+  function renderRecharges() {
+    const list = document.getElementById('rechargesList');
+    const filtered = RECHARGE_FILTER === 'all'
+      ? DATA.recharges
+      : DATA.recharges.filter(r => r.statut === RECHARGE_FILTER);
+
+    if (filtered.length === 0) {
+      list.innerHTML = emptyBox('Aucune recharge');
+      return;
+    }
+
+    const statusInfo = {
+      en_attente: { label: 'En attente', classe: 'orange' },
+      valide: { label: 'Validé', classe: 'blue' },
+      paye: { label: 'Crédité', classe: 'green' },
+      rejete: { label: 'Rejeté', classe: 'red' }
+    };
+
+    list.innerHTML = filtered.map((r, i) => {
+      const info = statusInfo[r.statut] || { label: r.statut, classe: 'gray' };
+      // ⬇️ Lecture directe depuis les colonnes dénormalisées
+      const userName = r.user_nom || r.user_pseudo || 'Utilisateur';
+      const userEmail = r.user_email || '';
+      const noteHTML = r.note_admin ? `<div class="ic-desc">📝 ${escapeHtml(r.note_admin)}</div>` : '';
+
+      return `
+        <div class="item-card" style="animation-delay:${i * .025}s">
+          <div class="ic-img">${r.mode === 'lien' ? '💳' : (r.mode === 'crypto' ? '₿' : (r.mode === 'manuel' ? '✍️' : '📱'))}</div>
+          <div class="ic-body">
+            <div class="ic-name">
+              +${formatF(r.montant)}
+              <span class="badge ${info.classe}">${info.label}</span>
+            </div>
+            <div class="ic-meta">
+              <span>👤 ${escapeHtml(userName)}</span>
+              ${userEmail ? `<span class="dot">•</span><span>${escapeHtml(userEmail)}</span>` : ''}
+            </div>
+            <div class="ic-meta">
+              ${r.mode === 'lien' ? '<span>💳 Paiement en ligne</span>' : ''}
+              ${r.mode === 'manuel' ? '<span>✍️ Crédit manuel</span>' : ''}
+              ${r.mode !== 'lien' && r.mode !== 'manuel' && r.pays_nom ? `<span>${escapeHtml(r.pays_nom)}</span>` : ''}
+              ${r.operateur_nom ? `<span class="dot">•</span><span>${escapeHtml(r.operateur_nom)}</span>` : ''}
+              <span class="dot">•</span>
+              <span>${timeAgo(r.created_at)}</span>
+            </div>
+            ${r.numero && r.numero !== '-' ? `<div class="ic-meta" style="font-size:10.5px;">N° ${escapeHtml(r.numero)}</div>` : ''}
+            ${noteHTML}
+          </div>
+          <div class="ic-actions">
+            ${r.statut === 'en_attente' ? `
+              <button class="icon-btn check" onclick="validerRecharge('${r.id}')" title="Créditer le solde">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </button>
+              <button class="icon-btn close-x" onclick="rejeterRecharge('${r.id}')" title="Rejeter">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            ` : ''}
+            <button class="icon-btn delete" onclick="supprimerRecharge('${r.id}')" title="Supprimer">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  document.getElementById('rechargesFilters').addEventListener('click', (e) => {
+    const chip = e.target.closest('.filter-chip');
+    if (!chip) return;
+    document.querySelectorAll('#rechargesFilters .filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    RECHARGE_FILTER = chip.dataset.filter;
+    renderRecharges();
+  });
+
+  async function validerRecharge(id) {
+    const r = DATA.recharges.find(x => x.id === id);
+    if (!r) return;
+    const note = prompt('Note interne (optionnel) :', '');
+    if (note === null) return;
+
+    const userName = r.user_nom || r.user_pseudo || 'cet utilisateur';
+    if (!confirm(`Créditer ${formatF(r.montant)} à ${userName} ?`)) return;
+
+    // 1️⃣ Créditer le solde
+    const { error: errSolde } = await sb.rpc('ajuster_solde_user', {
+      p_user_id: r.user_id,
+      p_montant: Number(r.montant),
+      p_note: 'Recharge validée'
+    });
+    if (errSolde) return showToast('Erreur crédit : ' + errSolde.message, true);
+
+    // 2️⃣ Mettre à jour le statut
+    const { error: errUpdate } = await sb.from('recharges').update({
+      statut: 'paye',
+      note_admin: note || null
+    }).eq('id', id);
+    if (errUpdate) return showToast('Erreur statut : ' + errUpdate.message, true);
+
+    showToast(`✅ ${formatF(r.montant)} crédités à ${userName}`);
+    await loadRecharges();
+    await loadUsers();
+    await loadStats();
+  }
+
+  async function rejeterRecharge(id) {
+    const r = DATA.recharges.find(x => x.id === id);
+    if (!r) return;
+    const note = prompt('Motif du rejet :', '');
+    if (note === null) return;
+    if (!note.trim()) return showToast('Motif requis', true);
+
+    const { error } = await sb.from('recharges').update({
+      statut: 'rejete',
+      note_admin: note
+    }).eq('id', id);
+
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('Recharge rejetée');
+    await loadRecharges();
+  }
+
+  async function supprimerRecharge(id) {
+    if (!confirm('Supprimer définitivement cette recharge ? (le solde n\'est PAS retiré si déjà crédité)')) return;
+    const { error } = await sb.from('recharges').delete().eq('id', id);
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('Recharge supprimée');
+    await loadRecharges();
+  }
+
+  // Ajout manuel d'une recharge (crédit direct du solde d'un user)
+  function openAjoutRechargeModal() {
+    if (!DATA.users || DATA.users.length === 0) return showToast('Aucun utilisateur chargé', true);
+    const options = DATA.users
+      .slice(0, 500)
+      .map(u => `<option value="${u.id}">${escapeHtml(u.nom || u.pseudo || u.email)} — ${formatF(u.solde)}</option>`)
+      .join('');
+
+    openModal('Ajouter une recharge manuelle', `
+      <div style="font-size:12.5px;color:var(--muted);line-height:1.55;margin-bottom:14px;">
+        Le montant sera <b style="color:var(--wa-dark);">immédiatement crédité</b> au solde de l'utilisateur et une recharge marquée <b>payée</b> sera créée dans l'historique.
+      </div>
+      <div class="form-group">
+        <label>Utilisateur</label>
+        <select id="arUser" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;background:#f7faf8;outline:none;">
+          <option value="">— Choisir un utilisateur —</option>
+          ${options}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Montant (FCFA)</label>
+        <input type="number" id="arMontant" placeholder="Ex: 5000" min="1">
+      </div>
+      <div class="btn-row" style="margin-bottom:10px;">
+        <button class="btn-warn" onclick="document.getElementById('arMontant').value=1000">1 000</button>
+        <button class="btn-warn" onclick="document.getElementById('arMontant').value=5000">5 000</button>
+        <button class="btn-warn" onclick="document.getElementById('arMontant').value=10000">10 000</button>
+      </div>
+      <div class="form-group">
+        <label>Note (optionnel)</label>
+        <input type="text" id="arNote" placeholder="Ex: Recharge manuelle admin">
+      </div>
+      <button class="btn-primary" onclick="ajouterRechargeManuelle()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Créditer maintenant
+      </button>
+    `);
+  }
+
+  async function ajouterRechargeManuelle() {
+    const userId = document.getElementById('arUser').value;
+    const montant = Number(document.getElementById('arMontant').value);
+    const note = document.getElementById('arNote').value.trim();
+
+    if (!userId) return showToast('Choisis un utilisateur', true);
+    if (!montant || montant <= 0) return showToast('Montant invalide', true);
+
+    const u = DATA.users.find(x => x.id === userId);
+    const userName = u?.nom || u?.pseudo || 'utilisateur';
+
+    // 1️⃣ Créer la recharge (avec infos user dénormalisées)
+    const { error: errInsert } = await sb.from('recharges').insert({
+      user_id: userId,
+      mode: 'manuel',
+      montant: montant,
+      numero: '-',
+      pays_nom: 'Crédit admin',
+      operateur_nom: 'Manuel',
+      statut: 'paye',
+      note_admin: note || 'Crédit manuel admin',
+      user_nom: u?.nom || '',
+      user_pseudo: u?.pseudo || '',
+      user_email: u?.email || ''
+    });
+    if (errInsert) return showToast('Erreur création : ' + errInsert.message, true);
+
+    // 2️⃣ Créditer le solde
+    const { error: errSolde } = await sb.rpc('ajuster_solde_user', {
+      p_user_id: userId,
+      p_montant: montant,
+      p_note: note || 'Recharge manuelle admin'
+    });
+    if (errSolde) return showToast('Erreur crédit : ' + errSolde.message, true);
+
+    showToast(`✅ ${formatF(montant)} crédités à ${userName}`);
+    closeModal();
+    await loadRecharges();
+    await loadUsers();
+    await loadStats();
+  }
+
+  // ================= CANDIDATURES PARTENAIRES =================
+  async function loadCandidatures() {
+    const { data, error } = await sb.from('partenaires_candidatures')
+      .select('*, profiles(nom, pseudo)')
+      .order('created_at', { ascending: false })
+      .limit(100);
+    if (error) { console.warn(error); return; }
+    DATA.candidatures = data || [];
+
+    const pending = DATA.candidatures.filter(c => c.statut === 'nouveau').length;
+    document.getElementById('candPendingBadge').textContent = pending + ' en attente';
+
+    const badge = document.getElementById('candBadge');
+    if (pending > 0) {
+      badge.textContent = pending;
+      badge.classList.add('show');
+    } else {
+      badge.classList.remove('show');
+    }
+
+    renderCandidatures();
+  }
+
+  function renderCandidatures() {
+    const list = document.getElementById('candList');
+    const filtered = CAND_FILTER === 'all'
+      ? DATA.candidatures
+      : DATA.candidatures.filter(c => c.statut === CAND_FILTER);
+
+    if (filtered.length === 0) {
+      list.innerHTML = emptyBox('Aucune candidature');
+      return;
+    }
+
+    const statutInfo = {
+      nouveau: { label: 'Nouveau', classe: 'orange' },
+      approuve: { label: 'Approuvé', classe: 'green' },
+      rejete: { label: 'Rejeté', classe: 'red' }
+    };
+
+    list.innerHTML = filtered.map((c, i) => {
+      const info = statutInfo[c.statut] || { label: c.statut, classe: 'gray' };
+      const reponses = c.reponses || {};
+      const reponsesHTML = Object.keys(reponses).length > 0
+        ? `<div class="candidature-reponses">
+            ${Object.entries(reponses).map(([k, v]) => `
+              <div class="rep-row">
+                <span class="k">${escapeHtml(k.replace(/_/g, ' '))}</span>
+                <span class="v">${escapeHtml(String(v).substring(0, 100))}</span>
+              </div>
+            `).join('')}
+          </div>`
+        : '';
+
+      return `
+        <div class="item-card" style="animation-delay:${i * .03}s">
+          <div class="ic-img">${getTypeIcon(c.type_code)}</div>
+          <div class="ic-body">
+            <div class="ic-name">
+              ${escapeHtml(c.nom)}
+              <span class="badge ${info.classe}">${info.label}</span>
+              ${c.type_nom ? `<span class="badge gray">${escapeHtml(c.type_nom)}</span>` : ''}
+            </div>
+            <div class="ic-meta">
+              <span>📞 ${escapeHtml(c.telephone)}</span>
+              <span class="dot">•</span>
+              <span>${escapeHtml(c.pays_region)}</span>
+              <span class="dot">•</span>
+              <span>${timeAgo(c.created_at)}</span>
+            </div>
+            <div class="ic-meta">
+              <span>${escapeHtml(c.email)}</span>
+              ${c.recompense_attendue > 0 ? `<span class="dot">•</span><span style="color:var(--gold);font-weight:800;">+${formatF(c.recompense_attendue)}</span>` : ''}
+              ${c.niveau_vip_attendu > 0 ? `<span class="dot">•</span><span style="color:var(--vip);font-weight:800;">VIP ${c.niveau_vip_attendu}</span>` : ''}
+            </div>
+            ${c.message ? `<div class="ic-desc">${escapeHtml(c.message)}</div>` : ''}
+            ${reponsesHTML}
+          </div>
+          <div class="ic-actions">
+            ${c.statut === 'nouveau' ? `
+              <button class="icon-btn check" onclick="approuverCandidature('${c.id}')" title="Approuver">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </button>
+              <button class="icon-btn close-x" onclick="rejeterCandidature('${c.id}')" title="Rejeter">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  document.getElementById('candFilters').addEventListener('click', (e) => {
+    const chip = e.target.closest('.filter-chip');
+    if (!chip) return;
+    document.querySelectorAll('#candFilters .filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    CAND_FILTER = chip.dataset.filter;
+    renderCandidatures();
+  });
+
+  async function approuverCandidature(id) {
+    const note = prompt('Note interne (optionnel) :', '');
+    if (note === null) return;
+
+    const { data, error } = await sb.rpc('approuver_candidature_partenaire', {
+      p_candidature_id: id,
+      p_note: note || null
+    });
+
+    if (error) return showToast('Erreur : ' + error.message, true);
+
+    showToast(`✅ Approuvé ! +${formatF(data.recompense)} crédités · VIP ${data.vip}`);
+    await loadCandidatures();
+  }
+
+  async function rejeterCandidature(id) {
+    const note = prompt('Motif du rejet :', '');
+    if (note === null) return;
+    if (!note.trim()) return showToast('Motif requis', true);
+
+    const { error } = await sb.rpc('rejeter_candidature_partenaire', {
+      p_candidature_id: id,
+      p_note: note
+    });
+
+    if (error) return showToast('Erreur : ' + error.message, true);
+
+    showToast('Candidature rejetée');
+    await loadCandidatures();
+  }
+
+  // ================= TYPES PARTENAIRES =================
+  async function loadTypesPartenaires() {
+    const { data, error } = await sb.from('types_partenaires').select('*').order('ordre');
+    if (error) { console.warn(error); return; }
+    DATA.typesPartenaires = data || [];
+    renderTypesPartenaires();
+  }
+
+  function renderTypesPartenaires() {
+    const list = document.getElementById('typesList');
+    if (DATA.typesPartenaires.length === 0) {
+      list.innerHTML = emptyBox('Aucun type de partenaire');
+      return;
+    }
+
+    list.innerHTML = DATA.typesPartenaires.map((t, i) => {
+      const criteres = (t.criteres || []).length;
+      return `
+        <div class="item-card" style="animation-delay:${i * .04}s">
+          <div class="ic-img">${t.icone || '🌟'}</div>
+          <div class="ic-body">
+            <div class="ic-name">
+              ${escapeHtml(t.nom)}
+              ${t.actif ? '' : '<span class="badge red">Inactif</span>'}
+            </div>
+            <div class="ic-meta">
+              <span>${criteres} condition${criteres > 1 ? 's' : ''}</span>
+              ${t.recompense_fcfa > 0 ? `<span class="dot">•</span><span style="color:var(--gold);font-weight:800;">+${formatF(t.recompense_fcfa)}</span>` : ''}
+              ${t.niveau_vip > 0 ? `<span class="dot">•</span><span style="color:var(--vip);font-weight:800;">VIP ${t.niveau_vip}</span>` : ''}
+            </div>
+            ${t.description ? `<div class="ic-desc">${escapeHtml(t.description)}</div>` : ''}
+          </div>
+          <div class="ic-actions">
+            <button class="icon-btn edit" onclick="openTypeModal('${t.id}')" title="Modifier">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function openTypeModal(id) {
+    const t = DATA.typesPartenaires.find(x => x.id === id);
+    if (!t) return;
+    const criteresStr = JSON.stringify(t.criteres || [], null, 2);
+
+    openModal('Modifier : ' + t.nom, `
+      <div class="form-group">
+        <label>Nom</label>
+        <input id="tpNom" value="${escapeHtml(t.nom)}">
+      </div>
+      <div class="form-group">
+        <label>Icône (emoji)</label>
+        <input id="tpIcone" value="${escapeHtml(t.icone || '🌟')}" maxlength="4">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="tpDesc">${escapeHtml(t.description || '')}</textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Récompense (FCFA)</label>
+          <input id="tpFcfa" type="number" value="${t.recompense_fcfa || 0}">
+        </div>
+        <div class="form-group">
+          <label>Niveau VIP</label>
+          <input id="tpVip" type="number" value="${t.niveau_vip || 0}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Critères (JSON)</label>
+        <textarea id="tpCriteres" style="font-family:monospace;font-size:11px;min-height:200px;">${escapeHtml(criteresStr)}</textarea>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5;">
+          Format : <code>[{"key":"filleuls_actifs","label":"Filleuls actifs","type":"number","min":2,"placeholder":"Ex: 2","required":true}]</code>
+        </div>
+      </div>
+      <div class="form-check">
+        <input type="checkbox" id="tpActif" ${t.actif ? 'checked' : ''}>
+        <label for="tpActif">Actif</label>
+      </div>
+      <button class="btn-primary" onclick="saveType('${id}')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Enregistrer
+      </button>
+    `);
+  }
+
+  async function saveType(id) {
+    let criteres;
+    try {
+      criteres = JSON.parse(document.getElementById('tpCriteres').value);
+    } catch (e) {
+      return showToast('JSON invalide : ' + e.message, true);
+    }
+
+    const payload = {
+      nom: document.getElementById('tpNom').value.trim(),
+      icone: document.getElementById('tpIcone').value.trim() || '🌟',
+      description: document.getElementById('tpDesc').value.trim() || null,
+      recompense_fcfa: Number(document.getElementById('tpFcfa').value),
+      niveau_vip: Number(document.getElementById('tpVip').value),
+      criteres: criteres,
+      actif: document.getElementById('tpActif').checked
+    };
+
+    const { error } = await sb.from('types_partenaires').update(payload).eq('id', id);
+    if (error) return showToast('Erreur : ' + error.message, true);
+
+    showToast('Type mis à jour');
+    closeModal();
+    await loadTypesPartenaires();
+  }
+
+  function getTypeIcon(code) {
+    const icons = { promoteur: '📣', manager: '👔', pp: '💎', autre: '🌟' };
+    return icons[code] || '🌟';
+  }
+
+  // ================= RETRAITS =================
+  async function loadRetraits() {
+    const { data } = await sb.from('retraits').select('*').order('created_at', { ascending: false }).limit(100);
+    DATA.retraits = data || [];
+    const pending = DATA.retraits.filter(r => r.statut === 'en_attente').length;
+    document.getElementById('retraitsPendingBadge').textContent = pending + ' en attente';
+    renderRetraits();
+  }
+
+  function renderRetraits() {
+    const list = document.getElementById('retraitsList');
+    if (DATA.retraits.length === 0) { list.innerHTML = emptyBox('Aucun retrait'); return; }
+    list.innerHTML = DATA.retraits.map((r, i) => {
+      const statusLabel = { en_attente: 'En attente', valide: 'Validé', paye: 'Payé', rejete: 'Rejeté' }[r.statut] || r.statut;
+      const statusClass = { en_attente: 'orange', valide: 'blue', paye: 'green', rejete: 'red' }[r.statut] || 'gray';
+      return `
+        <div class="item-card" style="animation-delay:${i * .04}s">
+          <div class="ic-body">
+            <div class="ic-name">${formatF(r.montant)} <span class="badge ${statusClass}">${statusLabel}</span></div>
+            <div class="ic-meta">
+              <span>${escapeHtml(r.pays_nom || '')}</span><span class="dot">•</span>
+              <span>${escapeHtml(r.operateur_nom || '')}</span><span class="dot">•</span>
+              <span>${escapeHtml(r.numero || '')}</span>
+            </div>
+          </div>
+          <div class="ic-actions">
+            ${r.statut === 'en_attente' ? `
+              <button class="icon-btn edit" onclick="payRetrait('${r.id}')" title="Marquer payé">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </button>
+              <button class="icon-btn delete" onclick="rejectRetrait('${r.id}')" title="Rejeter">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function payRetrait(id) {
+    const note = prompt('Note (optionnelle) :', '');
+    if (note === null) return;
+    const { error } = await sb.rpc('marquer_retrait_paye', { p_retrait_id: id, p_note: note || null });
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('Retrait marqué payé');
+    await loadRetraits();
+    await loadStats();
+  }
+
+  async function rejectRetrait(id) {
+    const note = prompt('Motif du rejet :', '');
+    if (note === null) return;
+    if (!note.trim()) return showToast('Motif requis', true);
+    const { error } = await sb.rpc('rejeter_retrait', { p_retrait_id: id, p_note: note });
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('Retrait rejeté et remboursé');
+    await loadRetraits();
+    await loadStats();
+  }
+
+  // ================= USERS =================
+  async function loadUsers() {
+    const { data } = await sb.from('profiles').select('id, nom, pseudo, email, solde, is_admin, niveau_vip, type_partenaire, created_at').order('created_at', { ascending: false }).limit(500);
+    DATA.users = data || [];
+    renderUsers();
+  }
+
+  function renderUsers() {
+    const q = (document.getElementById('userSearch')?.value || '').toLowerCase();
+    const list = document.getElementById('usersList');
+    const filtered = q ? DATA.users.filter(u => u.nom?.toLowerCase().includes(q) || u.pseudo?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q)) : DATA.users;
+    if (filtered.length === 0) { list.innerHTML = emptyBox('Aucun utilisateur'); return; }
+    list.innerHTML = filtered.map((u, i) => `
+      <div class="item-card" style="animation-delay:${i * .03}s">
+        <div class="ic-body">
+          <div class="ic-name">
+            ${escapeHtml(u.nom || '—')}
+            ${u.is_admin ? '<span class="badge orange">Admin</span>' : ''}
+            ${u.niveau_vip > 0 ? `<span class="badge vip">VIP ${u.niveau_vip}</span>` : ''}
+            ${u.type_partenaire ? `<span class="badge gold">${escapeHtml(u.type_partenaire)}</span>` : ''}
+          </div>
+          <div class="ic-meta">
+            <span>@${escapeHtml(u.pseudo || '—')}</span><span class="dot">•</span>
+            <span>${escapeHtml(u.email)}</span><span class="dot">•</span>
+            <span style="color:var(--wa-dark);font-weight:800;">${formatF(u.solde)}</span>
+          </div>
+        </div>
+        <div class="ic-actions">
+          <button class="icon-btn edit" onclick="editUser('${u.id}')" title="Modifier">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+          </button>
+          <button class="icon-btn view" onclick="adjustUserBalance('${u.id}', '${escapeHtml(u.nom || u.pseudo)}', ${u.solde})" title="Ajuster solde">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </button>
+          <button class="icon-btn delete" onclick="deleteUser('${u.id}', '${escapeHtml(u.nom || u.pseudo)}')" title="Supprimer">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function adjustUserBalance(userId, name, currentSolde) {
+    openModal(`Ajuster le solde de ${name}`, `
+      <div class="form-group">
+        <label>Solde actuel</label>
+        <input type="text" value="${formatF(currentSolde)}" disabled style="background:#f3f4f6;">
+      </div>
+      <div class="form-group">
+        <label>Montant à ajouter (négatif pour retirer)</label>
+        <input type="number" id="adjAmount" placeholder="Ex: 5000 ou -2000">
+      </div>
+      <div class="btn-row">
+        <button class="btn-warn" onclick="setAdjAmount(5000)">+5 000</button>
+        <button class="btn-warn" onclick="setAdjAmount(10000)">+10 000</button>
+        <button class="btn-warn" onclick="setAdjAmount(-1000)">-1 000</button>
+      </div>
+      <div style="height:10px"></div>
+      <button class="btn-primary" onclick="applyAdj('${userId}')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Appliquer
+      </button>
+    `);
+  }
+
+  function setAdjAmount(v) { document.getElementById('adjAmount').value = v; }
+
+  async function applyAdj(userId) {
+    const m = Number(document.getElementById('adjAmount').value);
+    if (!m) return showToast('Montant requis', true);
+    const { error } = await sb.rpc('ajuster_solde_user', { p_user_id: userId, p_montant: m, p_note: null });
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('Solde ajusté');
+    closeModal();
+    await loadUsers();
+    await loadStats();
+  }
+
+  function editUser(userId) {
+    const u = DATA.users.find(x => x.id === userId);
+    if (!u) return;
+    openModal('Modifier l\'utilisateur', `
+      <div class="form-group"><label>Nom complet</label><input id="euNom" value="${escapeHtml(u.nom || '')}"></div>
+      <div class="form-group"><label>Pseudo</label><input id="euPseudo" value="${escapeHtml(u.pseudo || '')}"></div>
+      <div class="form-group"><label>Email</label><input id="euEmail" type="email" value="${escapeHtml(u.email || '')}"></div>
+      <div class="form-group"><label>Solde (FCFA)</label><input id="euSolde" type="number" value="${u.solde || 0}" min="0"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Niveau VIP</label><input id="euVip" type="number" value="${u.niveau_vip || 0}" min="0"></div>
+        <div class="form-group"><label>Type partenaire</label><input id="euPartenaire" value="${escapeHtml(u.type_partenaire || '')}"></div>
+      </div>
+      <div class="form-check"><input type="checkbox" id="euAdmin" ${u.is_admin ? 'checked' : ''}><label for="euAdmin">Administrateur</label></div>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="saveUserEdit('${userId}')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Enregistrer
+        </button>
+      </div>
+    `);
+  }
+
+  async function saveUserEdit(userId) {
+    const u = DATA.users.find(x => x.id === userId);
+    if (!u) return;
+    const payload = {
+      p_user_id: userId,
+      p_nom: document.getElementById('euNom').value.trim(),
+      p_pseudo: document.getElementById('euPseudo').value.trim(),
+      p_email: document.getElementById('euEmail').value.trim(),
+      p_solde: Number(document.getElementById('euSolde').value),
+      p_is_admin: document.getElementById('euAdmin').checked
+    };
+    if (!payload.p_nom) return showToast('Nom requis', true);
+    if (!payload.p_pseudo || payload.p_pseudo.length < 3) return showToast('Pseudo (3 caractères min)', true);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.p_email)) return showToast('Email invalide', true);
+    if (payload.p_solde < 0) return showToast('Solde négatif interdit', true);
+
+    const { error } = await sb.rpc('admin_update_user', payload);
+    if (error) return showToast('Erreur : ' + error.message, true);
+
+    const vip = Number(document.getElementById('euVip').value);
+    const partenaire = document.getElementById('euPartenaire').value.trim();
+    if (vip !== u.niveau_vip || partenaire !== (u.type_partenaire || '')) {
+      await sb.from('profiles').update({ niveau_vip: vip, type_partenaire: partenaire || null }).eq('id', userId);
+    }
+
+    showToast('Utilisateur mis à jour');
+    closeModal();
+    await loadUsers();
+    await loadStats();
+  }
+
+  function deleteUser(userId, name) {
+    openModal('Supprimer cet utilisateur ?', `
+      <div style="text-align:center;padding:12px 0 20px;">
+        <div style="width:70px;height:70px;border-radius:50%;background:rgba(220,38,38,.1);margin:0 auto 14px;display:flex;align-items:center;justify-content:center;">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke:#dc2626;">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+        <div style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:8px;">${escapeHtml(name)}</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.6;">
+          Cette action est <strong style="color:#dc2626;">irréversible</strong>.
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-warn" onclick="closeModal()">Annuler</button>
+        <button class="btn-danger" onclick="confirmDeleteUser('${userId}')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/>
+          </svg>
+          Supprimer
+        </button>
+      </div>
+    `);
+  }
+
+  async function confirmDeleteUser(userId) {
+    const { error } = await sb.rpc('admin_delete_user', { p_user_id: userId });
+    if (error) {
+      if (error.message.includes('propre compte')) return showToast('Tu ne peux pas te supprimer toi-même', true);
+      return showToast('Erreur : ' + error.message, true);
+    }
+    showToast('Utilisateur supprimé');
+    closeModal();
+    await loadUsers();
+    await loadStats();
+  }
+
+  // ================= PLANS =================
+  async function loadPlans() {
+    const { data } = await sb.from('plans').select('*').order('ordre');
+    DATA.plans = data || [];
+    renderPlans();
+  }
+
+  function renderPlans() {
+    const list = document.getElementById('plansList');
+    if (DATA.plans.length === 0) return list.innerHTML = emptyBox('Aucun plan');
+    list.innerHTML = DATA.plans.map((p, i) => `
+      <div class="item-card" style="animation-delay:${i * .04}s">
+        <img class="ic-img" src="${p.image_url || ''}" alt="">
+        <div class="ic-body">
+          <div class="ic-name">${escapeHtml(p.nom)} ${p.actif ? '' : '<span class="badge red">Inactif</span>'}</div>
+          <div class="ic-meta">
+            <span>${formatF(p.montant_activation)}</span><span class="dot">•</span>
+            <span style="color:var(--wa-dark);font-weight:700;">+${formatF(p.gain_journalier)}/j</span><span class="dot">•</span>
+            <span>${p.duree_jours} j</span>
+          </div>
+        </div>
+        <div class="ic-actions">
+          <button class="icon-btn edit" onclick="openPlanModal('${p.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+          </button>
+          <button class="icon-btn delete" onclick="deletePlan('${p.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function openPlanModal(id = null) {
+    const p = id ? DATA.plans.find(x => x.id === id) : null;
+    openModal(p ? 'Modifier le plan' : 'Nouveau plan', `
+      <div class="form-group"><label>Nom</label><input id="fNom" value="${p ? escapeHtml(p.nom) : ''}" placeholder="Ex: Starter"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Activation (F)</label><input id="fAct" type="number" value="${p ? p.montant_activation : ''}"></div>
+        <div class="form-group"><label>Gain/jour (F)</label><input id="fGain" type="number" value="${p ? p.gain_journalier : ''}"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Durée (jours)</label><input id="fDuree" type="number" value="${p ? p.duree_jours : 45}"></div>
+        <div class="form-group"><label>Ordre</label><input id="fOrdre" type="number" value="${p ? p.ordre : 0}"></div>
+      </div>
+      <div class="form-group"><label>Image (URL)</label><input id="fImg" value="${p ? escapeHtml(p.image_url || '') : ''}"></div>
+      <div class="form-group"><label>Description</label><textarea id="fDesc">${p ? escapeHtml(p.description || '') : ''}</textarea></div>
+      <div class="form-check"><input type="checkbox" id="fActif" ${!p || p.actif ? 'checked' : ''}><label for="fActif">Actif</label></div>
+      <button class="btn-primary" onclick="savePlan('${id || ''}')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        ${p ? 'Mettre à jour' : 'Créer'}
+      </button>
+    `);
+  }
+
+  async function savePlan(id) {
+    const payload = {
+      nom: document.getElementById('fNom').value.trim(),
+      montant_activation: Number(document.getElementById('fAct').value),
+      gain_journalier: Number(document.getElementById('fGain').value),
+      duree_jours: Number(document.getElementById('fDuree').value),
+      ordre: Number(document.getElementById('fOrdre').value),
+      image_url: document.getElementById('fImg').value.trim() || null,
+      description: document.getElementById('fDesc').value.trim() || null,
+      actif: document.getElementById('fActif').checked
+    };
+    if (!payload.nom || !payload.montant_activation || !payload.gain_journalier) return showToast('Champs requis', true);
+    const { error } = id ? await sb.from('plans').update(payload).eq('id', id) : await sb.from('plans').insert(payload);
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast(id ? 'Plan mis à jour' : 'Plan créé');
+    closeModal();
+    await loadPlans();
+  }
+
+  async function deletePlan(id) {
+    if (!confirm('Supprimer ce plan ?')) return;
+    const { error } = await sb.from('plans').delete().eq('id', id);
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('Plan supprimé');
+    await loadPlans();
+  }
+
+  // ================= PLANTATIONS =================
+  async function loadPlantations() {
+    const { data } = await sb.from('plantations').select('*').order('ordre');
+    DATA.plantations = data || [];
+    renderPlantations();
+  }
+
+  function renderPlantations() {
+    const list = document.getElementById('plantationsList');
+    if (DATA.plantations.length === 0) return list.innerHTML = emptyBox('Aucune plantation');
+    list.innerHTML = DATA.plantations.map((p, i) => `
+      <div class="item-card" style="animation-delay:${i * .04}s">
+        <img class="ic-img" src="${p.image_url}" alt="">
+        <div class="ic-body">
+          <div class="ic-name">${escapeHtml(p.nom)} ${p.actif ? '' : '<span class="badge red">Inactif</span>'}</div>
+          <div class="ic-meta">
+            <span>${formatF(p.montant_activation)}</span><span class="dot">•</span>
+            <span style="color:var(--wa-dark);font-weight:700;">+${formatF(p.gain_journalier)}/j</span>
+          </div>
+        </div>
+        <div class="ic-actions">
+          <button class="icon-btn edit" onclick="openPlantationModal('${p.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+          </button>
+          <button class="icon-btn delete" onclick="deletePlantation('${p.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function openPlantationModal(id = null) {
+    const p = id ? DATA.plantations.find(x => x.id === id) : null;
+    openModal(p ? 'Modifier la plantation' : 'Nouvelle plantation', `
+      <div class="form-group"><label>Nom</label><input id="pfNom" value="${p ? escapeHtml(p.nom) : ''}"></div>
+      <div class="form-group"><label>Slug (unique)</label><input id="pfSlug" value="${p ? escapeHtml(p.slug) : ''}" placeholder="Ex: mais"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Activation (F)</label><input id="pfAct" type="number" value="${p ? p.montant_activation : ''}"></div>
+        <div class="form-group"><label>Gain/jour (F)</label><input id="pfGain" type="number" value="${p ? p.gain_journalier : ''}"></div>
+      </div>
+      <div class="form-group"><label>Ordre</label><input id="pfOrdre" type="number" value="${p ? p.ordre : 0}"></div>
+      <div class="form-group"><label>Image (URL)</label><input id="pfImg" value="${p ? escapeHtml(p.image_url) : ''}"></div>
+      <div class="form-check"><input type="checkbox" id="pfActif" ${!p || p.actif ? 'checked' : ''}><label for="pfActif">Actif</label></div>
+      <button class="btn-primary" onclick="savePlantation('${id || ''}')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        ${p ? 'Mettre à jour' : 'Créer'}
+      </button>
+    `);
+  }
+
+  async function savePlantation(id) {
+    const payload = {
+      nom: document.getElementById('pfNom').value.trim(),
+      slug: document.getElementById('pfSlug').value.trim().toLowerCase(),
+      montant_activation: Number(document.getElementById('pfAct').value),
+      gain_journalier: Number(document.getElementById('pfGain').value),
+      ordre: Number(document.getElementById('pfOrdre').value),
+      image_url: document.getElementById('pfImg').value.trim(),
+      actif: document.getElementById('pfActif').checked
+    };
+    if (!payload.nom || !payload.slug || !payload.image_url) return showToast('Champs requis', true);
+    const { error } = id ? await sb.from('plantations').update(payload).eq('id', id) : await sb.from('plantations').insert(payload);
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast(id ? 'Plantation mise à jour' : 'Plantation créée');
+    closeModal();
+    await loadPlantations();
+  }
+
+  async function deletePlantation(id) {
+    if (!confirm('Supprimer cette plantation ?')) return;
+    const { error } = await sb.from('plantations').delete().eq('id', id);
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('Plantation supprimée');
+    await loadPlantations();
+  }
+
+  // ================= ACTUALITES =================
+  async function loadActualites() {
+    const { data } = await sb.from('actualites').select('*').order('created_at', { ascending: false });
+    DATA.actualites = data || [];
+    renderActualites();
+  }
+
+  function renderActualites() {
+    const list = document.getElementById('actualitesList');
+    if (DATA.actualites.length === 0) return list.innerHTML = emptyBox('Aucune actualité');
+    list.innerHTML = DATA.actualites.map((a, i) => `
+      <div class="item-card" style="animation-delay:${i * .04}s">
+        <img class="ic-img" src="${a.image_url || ''}" alt="">
+        <div class="ic-body">
+          <div class="ic-name">${escapeHtml(a.titre)}</div>
+          <div class="ic-meta">
+            <span class="badge green">${escapeHtml(a.categorie || 'Info')}</span>
+            ${a.epingle ? '<span class="badge orange">Épinglé</span>' : ''}
+            ${a.publie ? '' : '<span class="badge gray">Brouillon</span>'}
+          </div>
+        </div>
+        <div class="ic-actions">
+          <button class="icon-btn edit" onclick="openActualiteModal('${a.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+          </button>
+          <button class="icon-btn delete" onclick="deleteActualite('${a.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function openActualiteModal(id = null) {
+    const a = id ? DATA.actualites.find(x => x.id === id) : null;
+    openModal(a ? 'Modifier' : 'Publier une actualité', `
+      <div class="form-group"><label>Titre</label><input id="afTitre" value="${a ? escapeHtml(a.titre) : ''}"></div>
+      <div class="form-group"><label>Contenu</label><textarea id="afContenu" style="min-height:120px;">${a ? escapeHtml(a.contenu) : ''}</textarea></div>
+      <div class="form-group"><label>Image (URL)</label><input id="afImg" value="${a ? escapeHtml(a.image_url || '') : ''}"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Catégorie</label>
+          <select id="afCat">${['Marché','Innovation','Export','Prix','Météo','Info'].map(c => `<option ${a && a.categorie === c ? 'selected' : ''}>${c}</option>`).join('')}</select>
+        </div>
+        <div class="form-group"><label>Auteur</label><input id="afAuteur" value="${a ? escapeHtml(a.auteur || '') : 'Affinity Network'}"></div>
+      </div>
+      <div class="form-check"><input type="checkbox" id="afEping" ${a && a.epingle ? 'checked' : ''}><label for="afEping">Épingler</label></div>
+      <div class="form-check"><input type="checkbox" id="afPub" ${!a || a.publie ? 'checked' : ''}><label for="afPub">Publié</label></div>
+      <button class="btn-primary" onclick="saveActualite('${id || ''}')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        ${a ? 'Mettre à jour' : 'Publier'}
+      </button>
+    `);
+  }
+
+  async function saveActualite(id) {
+    const payload = {
+      titre: document.getElementById('afTitre').value.trim(),
+      contenu: document.getElementById('afContenu').value.trim(),
+      image_url: document.getElementById('afImg').value.trim() || null,
+      categorie: document.getElementById('afCat').value,
+      auteur: document.getElementById('afAuteur').value.trim() || 'Affinity Network',
+      epingle: document.getElementById('afEping').checked,
+      publie: document.getElementById('afPub').checked
+    };
+    if (!payload.titre || !payload.contenu) return showToast('Titre et contenu requis', true);
+    const { error } = id ? await sb.from('actualites').update(payload).eq('id', id) : await sb.from('actualites').insert(payload);
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast(id ? 'Actualité mise à jour' : 'Actualité publiée');
+    closeModal();
+    await loadActualites();
+  }
+
+  async function deleteActualite(id) {
+    if (!confirm('Supprimer cette actualité ?')) return;
+    const { error } = await sb.from('actualites').delete().eq('id', id);
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('Actualité supprimée');
+    await loadActualites();
+  }
+
+  // ================= LOTERIES =================
+  async function loadLoteries() {
+    const { data } = await sb.from('loteries').select('*').order('ordre');
+    DATA.loteries = data || [];
+    renderLoteries();
+  }
+
+  function renderLoteries() {
+    const list = document.getElementById('loteriesList');
+    if (DATA.loteries.length === 0) return list.innerHTML = emptyBox('Aucune loterie');
+    list.innerHTML = DATA.loteries.map((l, i) => {
+      const drawDate = new Date(l.date_tirage);
+      const isFinished = l.statut === 'termine' || drawDate < new Date();
+      const dateStr = drawDate.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      return `
+        <div class="item-card" style="animation-delay:${i * .04}s">
+          <img class="ic-img" src="${l.image_url || ''}" alt="">
+          <div class="ic-body">
+            <div class="ic-name">
+              ${escapeHtml(l.nom)}
+              <span class="badge ${isFinished ? 'gray' : 'green'}">${isFinished ? 'Terminé' : 'Actif'}</span>
+            </div>
+            <div class="ic-meta">
+              <span>Ticket: ${formatF(l.prix_ticket)}</span><span class="dot">•</span>
+              <span style="color:var(--alibaba);font-weight:700;">Lot: ${formatF(l.montant_lot)}</span>
+            </div>
+            <div class="ic-meta" style="margin-top:4px;">
+              <span style="font-size:10.5px;">📅 ${dateStr}</span>
+            </div>
+          </div>
+          <div class="ic-actions">
+            ${!isFinished ? `
+              <button class="icon-btn view" onclick="drawLoterie('${l.id}', '${escapeHtml(l.nom)}')" title="Tirer">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2v6M12 22v-4M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M22 12h-4"/>
+                </svg>
+              </button>
+            ` : ''}
+            <button class="icon-btn edit" onclick="openLoterieModal('${l.id}')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+              </svg>
+            </button>
+            <button class="icon-btn delete" onclick="deleteLoterie('${l.id}')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function openLoterieModal(id = null) {
+    const l = id ? DATA.loteries.find(x => x.id === id) : null;
+    const defaultDate = l ? new Date(l.date_tirage).toISOString().slice(0, 16) : new Date(Date.now() + 86400000).toISOString().slice(0, 16);
+    openModal(l ? 'Modifier la loterie' : 'Nouvelle loterie', `
+      <div class="form-group"><label>Nom</label><input id="loNom" value="${l ? escapeHtml(l.nom) : ''}"></div>
+      <div class="form-group"><label>Description</label><textarea id="loDesc">${l ? escapeHtml(l.description || '') : ''}</textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Prix du ticket (F)</label><input id="loPrix" type="number" value="${l ? l.prix_ticket : 500}"></div>
+        <div class="form-group"><label>Montant du lot (F)</label><input id="loLot" type="number" value="${l ? l.montant_lot : 50000}"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Nombre de gagnants</label><input id="loGagnants" type="number" value="${l ? l.nombre_gagnants : 1}"></div>
+        <div class="form-group"><label>Ordre</label><input id="loOrdre" type="number" value="${l ? l.ordre : 0}"></div>
+      </div>
+      <div class="form-group"><label>Date du tirage</label><input id="loDate" type="datetime-local" value="${defaultDate}"></div>
+      <div class="form-group"><label>Image (URL)</label><input id="loImg" value="${l ? escapeHtml(l.image_url || '') : ''}"></div>
+      <div class="form-check"><input type="checkbox" id="loActif" ${!l || l.actif ? 'checked' : ''}><label for="loActif">Actif</label></div>
+      <button class="btn-primary" onclick="saveLoterie('${id || ''}')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        ${l ? 'Mettre à jour' : 'Créer'}
+      </button>
+    `);
+  }
+
+  async function saveLoterie(id) {
+    const payload = {
+      nom: document.getElementById('loNom').value.trim(),
+      description: document.getElementById('loDesc').value.trim() || null,
+      prix_ticket: Number(document.getElementById('loPrix').value),
+      montant_lot: Number(document.getElementById('loLot').value),
+      nombre_gagnants: Number(document.getElementById('loGagnants').value),
+      ordre: Number(document.getElementById('loOrdre').value),
+      date_tirage: new Date(document.getElementById('loDate').value).toISOString(),
+      image_url: document.getElementById('loImg').value.trim() || null,
+      actif: document.getElementById('loActif').checked
+    };
+    if (!payload.nom) return showToast('Nom requis', true);
+    const { error } = id ? await sb.from('loteries').update(payload).eq('id', id) : await sb.from('loteries').insert(payload);
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast(id ? 'Loterie mise à jour' : 'Loterie créée');
+    closeModal();
+    await loadLoteries();
+  }
+
+  async function deleteLoterie(id) {
+    if (!confirm('Supprimer cette loterie ?')) return;
+    const { error } = await sb.from('loteries').delete().eq('id', id);
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('Loterie supprimée');
+    await loadLoteries();
+  }
+
+  async function drawLoterie(id, nom) {
+    if (!confirm(`Lancer le tirage "${nom}" ?\n\nCette action désignera les gagnants.`)) return;
+    const { data, error } = await sb.rpc('tirer_loterie', { p_loterie_id: id });
+    if (error) return showToast('Erreur : ' + error.message, true);
+    const gagnants = data.gagnants || [];
+    alert(`🎉 ${gagnants.length} gagnant(s) !\n\n` + gagnants.map(g => `${g.position}. ${g.nom || g.pseudo} (${g.numero_ticket})`).join('\n'));
+    showToast('Tirage effectué');
+    await loadLoteries();
+  }
+
+  // ================= PAYS =================
+  async function loadPays() {
+    const { data } = await sb.from('pays_retrait').select('*').order('ordre');
+    DATA.pays = data || [];
+    renderPays();
+  }
+
+  function renderPays() {
+    const list = document.getElementById('paysList');
+    if (DATA.pays.length === 0) return list.innerHTML = emptyBox('Aucun pays');
+    list.innerHTML = DATA.pays.map((p, i) => `
+      <div class="item-card" style="animation-delay:${i * .02}s">
+        <img class="ic-img" style="width:40px;height:28px;border-radius:4px;" src="https://flagcdn.com/w80/${p.code.toLowerCase()}.png" alt="">
+        <div class="ic-body">
+          <div class="ic-name">${escapeHtml(p.nom)} ${p.actif ? '' : '<span class="badge red">Inactif</span>'}</div>
+          <div class="ic-meta">
+            <span class="badge ${p.mode === 'mobile_money' ? 'green' : 'orange'}">${p.mode === 'mobile_money' ? 'Mobile Money' : 'Crypto'}</span>
+            <span class="dot">•</span>
+            <span>Min: ${formatF(p.minimum_retrait)}</span>
+          </div>
+        </div>
+        <div class="ic-actions">
+          <button class="icon-btn edit" onclick="openPaysModal('${p.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function openPaysModal(id) {
+    const p = DATA.pays.find(x => x.id === id);
+    if (!p) return;
+    openModal('Modifier ' + p.nom, `
+      <div class="form-group"><label>Nom</label><input id="pyNom" value="${escapeHtml(p.nom)}"></div>
+      <div class="form-group"><label>Mode</label>
+        <select id="pyMode">
+          <option value="mobile_money" ${p.mode === 'mobile_money' ? 'selected' : ''}>Mobile Money</option>
+          <option value="crypto" ${p.mode === 'crypto' ? 'selected' : ''}>Crypto</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Minimum (F)</label><input id="pyMin" type="number" value="${p.minimum_retrait}"></div>
+      <div class="form-group"><label>Ordre</label><input id="pyOrdre" type="number" value="${p.ordre}"></div>
+      <div class="form-check"><input type="checkbox" id="pyActif" ${p.actif ? 'checked' : ''}><label for="pyActif">Actif</label></div>
+      <button class="btn-primary" onclick="savePays('${id}')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Mettre à jour
+      </button>
+    `);
+  }
+
+  async function savePays(id) {
+    const payload = {
+      nom: document.getElementById('pyNom').value.trim(),
+      mode: document.getElementById('pyMode').value,
+      minimum_retrait: Number(document.getElementById('pyMin').value),
+      ordre: Number(document.getElementById('pyOrdre').value),
+      actif: document.getElementById('pyActif').checked
+    };
+    const { error } = await sb.from('pays_retrait').update(payload).eq('id', id);
+    if (error) return showToast('Erreur : ' + error.message, true);
+    showToast('Pays mis à jour');
+    closeModal();
+    await loadPays();
+  }
+
+  // ================= BONUS CONFIG =================
+  async function loadBonusConfig() {
+    const list = document.getElementById('bonusConfigList');
+    list.innerHTML = `<div class="sk-item"><div class="sk-line w1"></div><div class="sk-line w2"></div></div>`;
+    const { data, error } = await sb.from('bonus_config').select('*').order('cle');
+    if (error || !data) { list.innerHTML = emptyBox('Erreur de chargement'); return; }
+    DATA.bonusConfig = data;
+    const categories = {
+      'Bonus de base': ['bonus_bienvenue', 'bonus_streak_journalier'],
+      'Paliers parrainage': ['palier_1_filleuls','palier_1_bonus','palier_2_filleuls','palier_2_bonus','palier_3_filleuls','palier_3_bonus','palier_4_filleuls','palier_4_bonus'],
+      'Bonus recharges filleuls': ['seuil_recharge_filleul', 'bonus_5_filleuls_recharges'],
+      'Missions mensuelles': ['mission_3_plans_bonus', 'mission_10_amis_bonus', 'mission_10_amis_montant'],
+      'Frais de retrait': ['frais_retrait_pourcentage', 'frais_retrait_minimum'],
+      'Roue de la fortune': ['roue_tours_par_jour', 'roue_actif']
+    };
+    let html = '';
+    for (const [catName, keys] of Object.entries(categories)) {
+      const items = data.filter(c => keys.includes(c.cle));
+      if (items.length === 0) continue;
+      html += `<div class="config-group">
+        <div class="config-group-title">${catName}</div>
+        ${items.map(c => `
+          <div class="config-row">
+            <div class="cr-info">
+              <div class="cr-label">${escapeHtml(c.description || c.cle)}</div>
+              <div class="cr-cle">${c.cle}</div>
+            </div>
+            <input type="number" value="${c.valeur}" data-cle="${c.cle}" class="bonus-input">
+          </div>
+        `).join('')}
+      </div>`;
+    }
+    list.innerHTML = html;
+  }
+
+  async function saveAllBonusConfig() {
+    const inputs = document.querySelectorAll('.bonus-input');
+    if (inputs.length === 0) return showToast('Aucune donnée', true);
+    let updated = 0, errors = 0;
+    for (const input of inputs) {
+      const cle = input.dataset.cle;
+      const valeur = Number(input.value);
+      if (isNaN(valeur) || valeur < 0) { errors++; continue; }
+      const { error } = await sb.from('bonus_config').update({ valeur, updated_at: new Date().toISOString() }).eq('cle', cle);
+      if (error) errors++; else updated++;
+    }
+    if (errors > 0) showToast(`${updated} mis à jour, ${errors} erreur(s)`, true);
+    else showToast(`✅ ${updated} config(s) enregistrée(s)`);
+    await loadBonusConfig();
+  }
+
+  async function loadBonusHistory() {
+    const list = document.getElementById('bonusHistoryList');
+    const badge = document.getElementById('bonusTotalBadge');
+    list.innerHTML = `<div class="sk-item"><div class="sk-line w1"></div><div class="sk-line w2"></div></div>`;
+    const { data, error } = await sb.from('bonus_utilisateurs').select('*, profiles(nom, pseudo)').order('created_at', { ascending: false }).limit(50);
+    if (error || !data) { list.innerHTML = emptyBox('Erreur de chargement'); return; }
+    DATA.bonusHistory = data;
+    const total = data.reduce((sum, b) => sum + Number(b.montant || 0), 0);
+    badge.textContent = formatF(total) + ' distribués';
+    if (data.length === 0) { list.innerHTML = emptyBox('Aucun bonus distribué'); return; }
+    const typeInfo = {
+      'bienvenue': { icone: '🎁', label: 'Bienvenue', classe: 'green' },
+      'streak': { icone: '🔥', label: 'Streak', classe: 'orange' },
+      'palier_1': { icone: '🥉', label: 'Palier 1', classe: 'orange' },
+      'palier_2': { icone: '🥈', label: 'Palier 2', classe: 'blue' },
+      'palier_3': { icone: '🥇', label: 'Palier 3', classe: 'orange' },
+      'palier_4': { icone: '💎', label: 'Palier 4', classe: 'blue' },
+      'bonus_5_recharges': { icone: '💰', label: 'Recharges', classe: 'green' },
+      'mission_3_plans': { icone: '🎯', label: 'Mission 1', classe: 'orange' },
+      'mission_10_amis': { icone: '👥', label: 'Mission 2', classe: 'blue' },
+      'roue_fortune': { icone: '🎡', label: 'Roue', classe: 'gold' }
+    };
+    list.innerHTML = data.map((b, i) => {
+      const info = typeInfo[b.type] || { icone: '✨', label: b.type, classe: 'gray' };
+      const userNom = b.profiles?.nom || b.profiles?.pseudo || 'Utilisateur';
+      return `
+        <div class="item-card" style="animation-delay:${i * .02}s">
+          <div class="ic-img">${info.icone}</div>
+          <div class="ic-body">
+            <div class="ic-name">${escapeHtml(b.description || info.label)} <span class="badge ${info.classe}">${info.label}</span></div>
+            <div class="ic-meta">
+              <span>${escapeHtml(userNom)}</span><span class="dot">•</span>
+              <span>${timeAgo(b.created_at)}</span>
+            </div>
+          </div>
+          <div style="font-size:15px;font-weight:800;color:var(--wa-dark);flex-shrink:0;">+${formatF(b.montant)}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ================= TOP DU MOIS =================
+  async function loadTopConfig() {
+    const list = document.getElementById('topConfigList');
+    list.innerHTML = `<div class="sk-item"><div class="sk-line w1"></div><div class="sk-line w2"></div></div>`;
+    const { data, error } = await sb.from('top_parrains_config').select('*').order('cle');
+    if (error || !data) { list.innerHTML = emptyBox('Erreur de chargement'); return; }
+    DATA.topConfig = data;
+    const descriptions = {
+      'montant_a_partager': '💰 Montant du jackpot mensuel à partager',
+      'seuil_filleuls': '👥 Nombre de filleuls actifs requis',
+      'actif': '⚡ Activer le top mensuel (1 = oui / 0 = non)'
+    };
+    list.innerHTML = `<div class="config-group">${data.map(c => `
+      <div class="config-row">
+        <div class="cr-info">
+          <div class="cr-label">${descriptions[c.cle] || c.description || c.cle}</div>
+          <div class="cr-cle">${c.cle}</div>
+        </div>
+        <input type="number" value="${c.valeur}" data-cle="${c.cle}" class="top-config-input">
+      </div>
+    `).join('')}</div>`;
+  }
+
+  async function saveTopConfig() {
+    const inputs = document.querySelectorAll('.top-config-input');
+    if (inputs.length === 0) return;
+    let updated = 0;
+    for (const input of inputs) {
+      const cle = input.dataset.cle;
+      const valeur = Number(input.value);
+      if (isNaN(valeur)) continue;
+      const { error } = await sb.from('top_parrains_config').update({ valeur, updated_at: new Date().toISOString() }).eq('cle', cle);
+      if (!error) updated++;
+    }
+    showToast(`✅ ${updated} config(s) enregistrée(s)`);
+    await loadTopConfig();
+  }
+
+  async function lancerCalculTop() {
+    const mois = document.getElementById('topMoisInput').value || null;
+    if (!confirm(`Lancer le calcul du top pour ${mois || 'le mois précédent'} ?`)) return;
+    const { data, error } = await sb.rpc('calculer_top_parrains_mensuel', { p_mois: mois });
+    if (error) {
+      if (error.message.includes('déjà été calculé')) return showToast('Ce mois a déjà été calculé', true);
+      return showToast('Erreur : ' + error.message, true);
+    }
+    if (data.gagnants === 0) {
+      showToast(data.message || 'Aucun gagnant ce mois');
+      await loadTopHistory();
+      return;
+    }
+    let msg = `🎉 ${data.gagnants.length} gagnant(s) !\n\nChacun reçoit : ${formatF(data.par_gagnant)}\n\n`;
+    msg += data.gagnants.map(g => `${g.position}. ${g.nom || g.pseudo} (${g.filleuls} filleuls)`).join('\n');
+    alert(msg);
+    showToast(`🎉 Top ${data.mois} calculé`);
+    await loadTopHistory();
+    await loadStats();
+  }
+
+  async function loadTopHistory() {
+    const list = document.getElementById('topHistoryList');
+    list.innerHTML = `<div class="sk-item"><div class="sk-line w1"></div><div class="sk-line w2"></div></div>`;
+    const { data, error } = await sb.from('top_parrains_gagnants').select('*').order('created_at', { ascending: false }).limit(50);
+    if (error || !data) { list.innerHTML = emptyBox('Erreur'); return; }
+    DATA.topHistory = data;
+    if (data.length === 0) { list.innerHTML = emptyBox('Aucun top calculé'); return; }
+    list.innerHTML = data.map((g, i) => {
+      const moisLabel = new Date(g.mois + '-01').toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+      const posMedal = g.position <= 3 ? ['🥇', '🥈', '🥉'][g.position - 1] : '#' + g.position;
+      return `
+        <div class="item-card" style="animation-delay:${i * .03}s">
+          <div class="ic-img">${posMedal}</div>
+          <div class="ic-body">
+            <div class="ic-name">${escapeHtml(g.user_nom || g.user_pseudo || 'Anonyme')} <span class="badge orange">${moisLabel}</span></div>
+            <div class="ic-meta">
+              <span>${g.filleuls_actifs} filleuls</span><span class="dot">•</span>
+              <span>Position ${g.position}</span>
+            </div>
+          </div>
+          <div style="font-size:15px;font-weight:800;color:var(--gold);flex-shrink:0;">+${formatF(g.montant_gagne)}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ================= MODAL =================
+  function openModal(title, html) {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalContent').innerHTML = html;
+    document.getElementById('modalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); document.body.style.overflow = ''; }
+  function closeModalOutside(e) { if (e.target.id === 'modalOverlay') closeModal(); }
+
+  // ================= UTILITAIRES =================
+  function formatF(n) { return Math.round(Number(n || 0)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F'; }
+  function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function emptyBox(msg) {
+    return `<div class="empty">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
+      <div>${msg}</div>
+    </div>`;
+  }
+  function timeAgo(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+    if (diff < 60) return 'À l\'instant';
+    if (diff < 3600) return `Il y a ${Math.floor(diff/60)} min`;
+    if (diff < 86400) return `Il y a ${Math.floor(diff/3600)} h`;
+    if (diff < 604800) return `Il y a ${Math.floor(diff/86400)} j`;
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+  }
+  function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastText').textContent = msg;
+    t.className = 'toast show' + (isError ? ' error' : '');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+  function go(page) {
+    const cleanPage = page.replace(/\.html$/, '');
+    window.location.href = cleanPage;
+  }
+</script>
+</body>
+</html>
