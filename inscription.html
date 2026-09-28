@@ -246,15 +246,19 @@
   }
   .field .input-wrap:focus-within svg { stroke: var(--wa-dark); }
   .field .input-wrap.prefilled svg { stroke: var(--wa-green); }
-  .field input {
+  .field input, .field select {
     flex: 1; border: none; outline: none;
     padding: 14px 10px; font-size: 15px;
     background: transparent; color: var(--text);
     font-family: inherit;
     font-weight: 500;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
   }
   .field input::placeholder { color: #b0b7be; font-weight: 400; }
   .field input.uppercase { text-transform: uppercase; letter-spacing: 1.2px; font-weight: 700; }
+  .field select option { font-size: 15px; padding: 10px; }
 
   .toggle-pass {
     cursor: pointer; padding: 6px;
@@ -264,6 +268,20 @@
   }
   .toggle-pass:active { background: #eef2f0; }
   .toggle-pass svg { stroke: var(--muted); }
+
+  /* Select chevron */
+  .select-chevron {
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+  .select-chevron svg { stroke: var(--muted); }
+
+  /* Flag emoji dans le select */
+  .flag {
+    font-size: 20px;
+    margin-right: 4px;
+    line-height: 1;
+  }
 
   /* ============ BADGE PARRAINAGE ============ */
   .ref-badge {
@@ -553,6 +571,33 @@
           </div>
         </div>
 
+        <!-- Pays (inscription uniquement) -->
+        <div class="field" id="fieldPays">
+          <label>Pays</label>
+          <div class="input-wrap">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+            <select id="paysSelect" onchange="onPaysChange()">
+              <option value="">Choisis ton pays</option>
+              <option value="CI">🇨🇮 Côte d'Ivoire</option>
+              <option value="TG">🇹🇬 Togo</option>
+              <option value="CM">🇨🇲 Cameroun</option>
+              <option value="SN">🇸🇳 Sénégal</option>
+              <option value="BJ">🇧🇯 Bénin</option>
+              <option value="BF">🇧🇫 Burkina Faso</option>
+              <option value="NE">🇳🇪 Niger</option>
+            </select>
+            <span class="select-chevron">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
         <!-- Email -->
         <div class="field">
           <label>Email</label>
@@ -682,6 +727,17 @@
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
 
+  // ================= PAYS SUPPORTÉS =================
+  const PAYS_SUPPORTES = {
+    'CI': { nom: "Côte d'Ivoire", emoji: '🇨🇮' },
+    'TG': { nom: 'Togo', emoji: '🇹🇬' },
+    'CM': { nom: 'Cameroun', emoji: '🇨🇲' },
+    'SN': { nom: 'Sénégal', emoji: '🇸🇳' },
+    'BJ': { nom: 'Bénin', emoji: '🇧🇯' },
+    'BF': { nom: 'Burkina Faso', emoji: '🇧🇫' },
+    'NE': { nom: 'Niger', emoji: '🇳🇪' }
+  };
+
   // ================= CAPTURE CODE PARRAINAGE =================
   const urlParams = new URLSearchParams(window.location.search);
   const refFromURL = (urlParams.get('ref') || '').trim().toUpperCase();
@@ -717,9 +773,45 @@
     }
   }
 
+  // ================= PAYS =================
+  function onPaysChange() {
+    const code = document.getElementById('paysSelect').value;
+    if (!code) return;
+
+    // Sauvegarder le pays en localStorage (pas en BDD)
+    try {
+      localStorage.setItem('affinity_pays_user', JSON.stringify({
+        code: code,
+        nom: PAYS_SUPPORTES[code]?.nom || '',
+        emoji: PAYS_SUPPORTES[code]?.emoji || '',
+        saved_at: new Date().toISOString()
+      }));
+    } catch (e) {
+      console.warn('Impossible de sauvegarder le pays:', e);
+    }
+
+    // Feedback visuel
+    const wrap = document.getElementById('paysSelect').parentElement;
+    wrap.classList.add('prefilled');
+  }
+
+  // Pré-remplir le pays depuis localStorage (si l'utilisateur revient)
+  function prefillPays() {
+    try {
+      const saved = localStorage.getItem('affinity_pays_user');
+      if (!saved) return;
+      const data = JSON.parse(saved);
+      if (data.code && PAYS_SUPPORTES[data.code]) {
+        document.getElementById('paysSelect').value = data.code;
+        document.getElementById('paysSelect').parentElement.classList.add('prefilled');
+      }
+    } catch (e) { /* ignore */ }
+  }
+
   // ================= LOADER + SESSION =================
   window.addEventListener('load', async () => {
     applyRefFromURL();
+    prefillPays();
 
     const { data: { session } } = await sb.auth.getSession();
     setTimeout(() => {
@@ -740,6 +832,7 @@
     const tabLogin = document.getElementById('tabLogin');
     const brandTagline = document.getElementById('brandTagline');
     const fieldNom = document.getElementById('fieldNom');
+    const fieldPays = document.getElementById('fieldPays');
     const fieldParrainage = document.getElementById('fieldParrainage');
     const fieldTerms = document.getElementById('fieldTerms');
     const btnText = document.getElementById('btnText');
@@ -752,6 +845,7 @@
       tabLogin.classList.remove('active');
       brandTagline.textContent = 'Rejoins la communauté et commence à gagner';
       fieldNom.classList.remove('hidden');
+      fieldPays.classList.remove('hidden');
       fieldParrainage.classList.remove('hidden');
       fieldTerms.classList.remove('hidden');
       btnText.textContent = 'Créer mon compte';
@@ -763,6 +857,7 @@
       tabSignup.classList.remove('active');
       brandTagline.textContent = 'Ravi de te revoir !';
       fieldNom.classList.add('hidden');
+      fieldPays.classList.add('hidden');
       fieldParrainage.classList.add('hidden');
       fieldTerms.classList.add('hidden');
       btnText.textContent = 'Se connecter';
@@ -807,6 +902,7 @@
 
     const nom = document.getElementById('nom').value.trim();
     const pseudo = document.getElementById('pseudo').value.trim().toLowerCase();
+    const pays = document.getElementById('paysSelect').value;
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     const terms = document.getElementById('terms').checked;
@@ -817,6 +913,7 @@
       if (nom.length < 3) return showMsg('Entre ton nom complet (3 caractères min).'), false;
       if (pseudo.length < 3) return showMsg('Le pseudo doit contenir au moins 3 caractères.'), false;
       if (!/^[a-z0-9._-]+$/.test(pseudo)) return showMsg('Pseudo : lettres minuscules, chiffres, . _ - seulement.'), false;
+      if (!pays) return showMsg('Choisis ton pays.'), false;
     }
     if (!email) return showMsg('Entre ton email.'), false;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showMsg('Entre un email valide.'), false;
