@@ -447,6 +447,19 @@
   // ⬇️ Minimum de retrait global (plancher)
   const MIN_RETRAIT_GLOBAL = 1500;
 
+  // ⬇️ Pays autorisés (codes ISO) : Côte d'Ivoire, Togo, Cameroun, Sénégal, Bénin, Burkina, Niger
+  const PAYS_AUTORISES_CODES = ['CI', 'TG', 'CM', 'SN', 'BJ', 'BF', 'NE'];
+  // ⬇️ Fallback par nom (si les codes ISO ne sont pas fiables en base)
+  const PAYS_AUTORISES_NOMS = [
+    "côte d'ivoire", "cote d'ivoire", "cote d ivoire", "côte d ivoire",
+    "togo",
+    "cameroun",
+    "sénégal", "senegal",
+    "bénin", "benin",
+    "burkina", "burkina faso",
+    "niger"
+  ];
+
   // Plage horaire autorisée pour les retraits
   const HEURE_DEBUT = 8;
   const HEURE_FIN = 18;
@@ -479,7 +492,15 @@
 
   async function loadCountries() {
     const { data } = await sb.from('pays_retrait').select('*').eq('actif', true).order('ordre');
-    COUNTRIES = data || [];
+
+    // Filtre : garde uniquement les 7 pays autorisés (par code ISO ou par nom)
+    COUNTRIES = (data || []).filter(c => {
+      const code = (c.code || '').toUpperCase().trim();
+      const nom = (c.nom || '').toLowerCase().trim();
+      const matchCode = code && PAYS_AUTORISES_CODES.includes(code);
+      const matchNom = PAYS_AUTORISES_NOMS.some(n => nom === n || nom.includes(n));
+      return matchCode || matchNom;
+    });
   }
 
   // Vérifie si le user a au moins 1 plan actif
