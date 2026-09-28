@@ -191,6 +191,25 @@
   .period-btn .unit { font-size: 10px; color: var(--muted); margin-top: 2px; text-transform: uppercase; font-weight: 700; letter-spacing: .3px; }
   .period-btn.active { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); border-color: transparent; box-shadow: 0 6px 16px rgba(18,140,126,.3); transform: translateY(-2px); }
   .period-btn.active .num, .period-btn.active .unit { color: #fff; }
+  .period-btn:disabled { opacity: .4; cursor: not-allowed; background: #f3f4f6; }
+  .period-btn:disabled.active { transform: none; }
+
+  .starter-warning {
+    background: linear-gradient(135deg, rgba(220,38,38,.08), rgba(220,38,38,.14));
+    border: 1px solid rgba(220,38,38,.3);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--danger);
+    font-weight: 700;
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+  .starter-warning.show { display: flex; }
+  .starter-warning svg { stroke: var(--danger); flex-shrink: 0; }
 
   .calc-box { background: linear-gradient(135deg, rgba(18,140,126,.08), rgba(37,211,102,.12)); border-radius: 16px; padding: 16px; margin-bottom: 18px; border: 1.5px dashed rgba(18,140,126,.35); }
   .calc-row { display: flex; align-items: center; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
@@ -501,6 +520,15 @@
         </div>
       </div>
       <div class="period-title">Durée d'investissement</div>
+
+      <!-- Avertissement plan Starter requis -->
+      <div class="starter-warning" id="starterWarning">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span>Un <b>plan Starter actif</b> est requis pour choisir la durée de 1 jour.</span>
+      </div>
+
       <div class="periods" id="periods">
         <button class="period-btn active" data-days="1" onclick="selectPeriod(this,1)"><div class="num">1</div><div class="unit">jour</div></button>
         <button class="period-btn" data-days="7" onclick="selectPeriod(this,7)"><div class="num">7</div><div class="unit">jours</div></button>
@@ -546,6 +574,7 @@
   let MY_ACTIVATIONS = [];
   let currentPlant = null;
   let currentDays = 1;
+  let A_PLAN_STARTER_ACTIF = false;
 
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 
@@ -564,7 +593,7 @@
       }
     } catch (e) { console.warn(e); }
 
-    await Promise.all([loadProfile(), loadPlantations(), loadMyActivations()]);
+    await Promise.all([loadProfile(), loadPlantations(), loadMyActivations(), checkPlanStarterActif()]);
 
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 500);
   })();
@@ -573,6 +602,21 @@
     const { data } = await sb.from('profiles').select('solde').eq('id', CURRENT_USER.id).maybeSingle();
     USER_SOLDE = Number(data?.solde ?? 0);
     document.getElementById('userSolde').textContent = formatF(USER_SOLDE);
+  }
+
+  // ⬇️ Vérifie si l'utilisateur a au moins 1 plan Starter actif
+  async function checkPlanStarterActif() {
+    const { data, error } = await sb
+      .from('activations_plans')
+      .select('id, plan_nom, statut')
+      .eq('user_id', CURRENT_USER.id)
+      .eq('statut', 'active');
+
+    if (error) { A_PLAN_STARTER_ACTIF = false; return; }
+
+    A_PLAN_STARTER_ACTIF = (data || []).some(a =>
+      (a.plan_nom || '').toLowerCase().includes('starter')
+    );
   }
 
   async function loadPlantations() {
@@ -663,7 +707,7 @@
       const total = Number(a.montant_activation) + Number(a.gains_totaux);
       const joursRestants = isDone ? 0 : daysRemaining(a.date_fin);
       const dateFin = formatDate(a.date_fin, true);
-      
+
       const el = document.createElement('div');
       el.className = 'active-plan' + (isDone ? ' termine' : '');
       el.style.animationDelay = (i * 0.06) + 's';
@@ -706,7 +750,7 @@
   function formatDate(iso, short = false) {
     if (!iso) return '—';
     const d = new Date(iso);
-    const options = short 
+    const options = short
       ? { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }
       : { day: '2-digit', month: 'long', year: 'numeric' };
     return d.toLocaleDateString('fr-FR', options);
@@ -716,15 +760,40 @@
     const p = PLANTS.find(x => x.id === id);
     if (!p) return;
     currentPlant = p;
-    currentDays = 1;
+
+    // ⬇️ Si pas de plan Starter actif → pas de 1 jour par défaut, on met 7 jours
+    const hasStarter = A_PLAN_STARTER_ACTIF;
+    currentDays = hasStarter ? 1 : 7;
+
     document.getElementById('modalPlantName').textContent = p.nom;
     document.getElementById('modalPhotoName').textContent = p.nom;
     document.getElementById('modalImg').src = p.image_url;
     document.getElementById('detailActivation').textContent = formatF(p.montant_activation);
     document.getElementById('detailGain').textContent = formatF(p.gain_journalier);
     document.getElementById('modalUserSolde').textContent = formatF(USER_SOLDE);
+
+    // ⬇️ Activer/désactiver le bouton "1 jour"
+    const btn1j = document.querySelector('.period-btn[data-days="1"]');
+    if (!hasStarter) {
+      btn1j.disabled = true;
+      btn1j.title = 'Plan Starter requis';
+    } else {
+      btn1j.disabled = false;
+      btn1j.title = '';
+    }
+
+    // ⬇️ Afficher/masquer l'avertissement
+    const warning = document.getElementById('starterWarning');
+    if (hasStarter) {
+      warning.classList.remove('show');
+    } else {
+      warning.classList.add('show');
+    }
+
     document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector('.period-btn[data-days="1"]').classList.add('active');
+    const defaultBtn = document.querySelector(`.period-btn[data-days="${currentDays}"]`);
+    if (defaultBtn) defaultBtn.classList.add('active');
+
     updateCalc();
     document.getElementById('modalOverlay').classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -734,6 +803,11 @@
   function closeModalOutside(e) { if (e.target.id === 'modalOverlay') closeModal(); }
 
   function selectPeriod(btn, days) {
+    // ⬇️ Bloquer le plan 1 jour si pas de plan Starter actif
+    if (days === 1 && !A_PLAN_STARTER_ACTIF) {
+      showToast('Un plan Starter actif est requis pour la durée de 1 jour', true);
+      return;
+    }
     document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentDays = days;
@@ -766,6 +840,12 @@
 
   async function activate() {
     if (!currentPlant || !CURRENT_USER) return;
+
+    // ⬇️ Double sécurité : vérifier plan Starter pour durée 1 jour
+    if (currentDays === 1 && !A_PLAN_STARTER_ACTIF) {
+      return showToast('Un plan Starter actif est requis pour la durée de 1 jour', true);
+    }
+
     const act = Number(currentPlant.montant_activation);
     if (USER_SOLDE < act) return showToast('Solde insuffisant', true);
     const btn = document.getElementById('btnActivate');
