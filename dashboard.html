@@ -349,6 +349,45 @@
   .ps-solde:active .ps-arrow { transform: scale(.9); }
   .ps-solde .ps-arrow svg { stroke: #fff; }
 
+  /* ============ PETITS BOUTONS RECHARGER / RETIRER ============ */
+  .ps-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    position: relative;
+    z-index: 2;
+  }
+  .ps-btn {
+    flex: 1;
+    border: none;
+    border-radius: 14px;
+    padding: 11px 12px;
+    font-size: 12.5px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: transform .15s, background .2s;
+    letter-spacing: .2px;
+  }
+  .ps-btn:active { transform: scale(.95); }
+  .ps-btn.ps-recharge {
+    background: rgba(255,255,255,.22);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.35);
+    backdrop-filter: blur(10px);
+  }
+  .ps-btn.ps-recharge svg { stroke: #fff; }
+  .ps-btn.ps-retirer {
+    background: linear-gradient(135deg, var(--alibaba), #FF8A3D);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(255,106,0,.4);
+  }
+  .ps-btn.ps-retirer svg { stroke: #fff; }
+
   /* ============ SECTION TITLE ============ */
   .section-title {
     font-size: 15.5px; font-weight: 800; color: var(--wa-deep);
@@ -1127,6 +1166,23 @@
             <polyline points="9 18 15 12 9 6"/>
           </svg>
         </div>
+      </div>
+
+      <!-- Petits boutons Recharger / Retirer -->
+      <div class="ps-actions">
+        <button class="ps-btn ps-recharge" onclick="event.stopPropagation(); go('recharge')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Recharger
+        </button>
+        <button class="ps-btn ps-retirer" onclick="event.stopPropagation(); go('retirer')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+            <path d="M6 12h.01M18 12h.01"/>
+          </svg>
+          Retirer
+        </button>
       </div>
     </div>
 
