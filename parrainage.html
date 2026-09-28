@@ -543,8 +543,8 @@
             <div class="pb-name">C reçoit</div>
             <div class="pb-role">Parrain direct de D</div>
           </div>
-          <span class="payout-percent n1">20%</span>
-          <span class="payout-amount">+2 000 F</span>
+          <span class="payout-percent n1">26%</span>
+          <span class="payout-amount">+2 600 F</span>
         </div>
         <div class="payout-row">
           <div class="payout-avatar b">B</div>
@@ -552,8 +552,8 @@
             <div class="pb-name">B reçoit</div>
             <div class="pb-role">Parrain de C (niveau 2)</div>
           </div>
-          <span class="payout-percent n2">2%</span>
-          <span class="payout-amount">+200 F</span>
+          <span class="payout-percent n2">3%</span>
+          <span class="payout-amount">+300 F</span>
         </div>
         <div class="payout-row">
           <div class="payout-avatar a">A</div>
@@ -605,17 +605,17 @@
       <div class="level-badge">1</div>
       <div class="level-body">
         <h3>Filleuls directs</h3>
-        <p>Quand une personne que tu as invité active un plan, tu touches 20%.</p>
+        <p>Quand une personne que tu as invité active un plan, tu touches 26%.</p>
       </div>
-      <div class="level-percent">20%</div>
+      <div class="level-percent">26%</div>
     </div>
     <div class="level-card n2 anim d3">
       <div class="level-badge">2</div>
       <div class="level-body">
         <h3>Filleuls de tes filleuls</h3>
-        <p>Quand les personnes invitées par tes filleuls activent, tu touches 2%.</p>
+        <p>Quand les personnes invitées par tes filleuls activent, tu touches 3%.</p>
       </div>
-      <div class="level-percent">2%</div>
+      <div class="level-percent">3%</div>
     </div>
     <div class="level-card n3 anim d3">
       <div class="level-badge">3</div>
@@ -712,19 +712,19 @@
 
   function runSimulator() {
     const montant = Number(document.getElementById('simInput').value || 0);
-    const n1 = Math.round(montant * 0.20);
-    const n2 = Math.round(montant * 0.02);
+    const n1 = Math.round(montant * 0.26);
+    const n2 = Math.round(montant * 0.03);
     const n3 = Math.round(montant * 0.01);
     const total = n1 + n2 + n3;
     document.getElementById('simResults').innerHTML = `
       <div class="sim-row">
         <div class="sim-badge lvl1">N1</div>
-        <div class="sim-label">Filleul direct<small>20% du montant</small></div>
+        <div class="sim-label">Filleul direct<small>26% du montant</small></div>
         <div class="sim-value">+${formatF(n1)}</div>
       </div>
       <div class="sim-row">
         <div class="sim-badge lvl2">N2</div>
-        <div class="sim-label">Filleul du filleul<small>2% du montant</small></div>
+        <div class="sim-label">Filleul du filleul<small>3% du montant</small></div>
         <div class="sim-value">+${formatF(n2)}</div>
       </div>
       <div class="sim-row">
