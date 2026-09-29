@@ -460,9 +460,10 @@
     "niger"
   ];
 
-  // Plage horaire autorisée pour les retraits
-  const HEURE_DEBUT = 8;
-  const HEURE_FIN = 18;
+  // ⬇️ Plage horaire autorisée : 9h–17h UTC (= 10h–18h au Cameroun / 9h–17h en Côte d'Ivoire)
+  // Basé sur UTC pour être cohérent pour tous les utilisateurs, peu importe leur fuseau.
+  const HEURE_DEBUT_UTC = 9;
+  const HEURE_FIN_UTC = 17;
 
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 
@@ -481,6 +482,14 @@
     document.getElementById('fbPct').textContent = FRAIS_PCT;
 
     await Promise.all([loadProfile(), loadCountries(), loadHistory(), checkPlanActif()]);
+
+    // Désactiver le bouton si hors plage horaire
+    if (!estDansPlageHoraire()) {
+      const btn = document.getElementById('btnSubmit');
+      btn.disabled = true;
+      document.getElementById('btnSubmitText').textContent = `Hors horaire (${libellePlage()})`;
+    }
+
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
   })();
 
@@ -503,26 +512,36 @@
     });
   }
 
-  // Vérifie si le user a au moins 1 plan actif
+  // ⬇️ Vérifie si le user a au moins 1 plan/culture actif (dans LES DEUX tables)
   async function checkPlanActif() {
-    const { data, error } = await sb
+    // Table 1 : activations_plans (plans classiques) — statut 'actif'
+    const { data: d1 } = await sb
       .from('activations_plans')
       .select('id')
       .eq('user_id', CURRENT_USER.id)
       .eq('statut', 'actif')
       .limit(1);
-    A_PLAN_ACTIF = !error && data && data.length > 0;
+
+    // Table 2 : activations_cultures (nouvelles plantations) — statut 'active'
+    const { data: d2 } = await sb
+      .from('activations_cultures')
+      .select('id')
+      .eq('user_id', CURRENT_USER.id)
+      .eq('statut', 'active')
+      .limit(1);
+
+    A_PLAN_ACTIF = (d1 && d1.length > 0) || (d2 && d2.length > 0);
   }
 
-  // Vérifie si on est dans la plage horaire autorisée (8h - 18h)
+  // ⬇️ Vérifie si on est dans la plage horaire autorisée (9h–17h UTC)
   function estDansPlageHoraire() {
-    const h = new Date().getHours();
-    return h >= HEURE_DEBUT && h < HEURE_FIN;
+    const hUTC = new Date().getUTCHours();
+    return hUTC >= HEURE_DEBUT_UTC && hUTC < HEURE_FIN_UTC;
   }
 
-  // Libellé de la plage horaire
+  // Libellé de la plage horaire affichée à l'utilisateur
   function libellePlage() {
-    return `${HEURE_DEBUT}h à ${HEURE_FIN}h`;
+    return `10h à 18h (Cameroun) / 9h à 17h (Côte d'Ivoire)`;
   }
 
   function openCountryModal() {
@@ -617,13 +636,13 @@
   }
 
   async function submitRetrait() {
-    // 1️⃣ Vérifier que le user a un plan actif
+    // 1️⃣ Vérifier que le user a un plan actif (plans classiques OU cultures)
     await checkPlanActif();
     if (!A_PLAN_ACTIF) {
       return showToast('Investis dans un plan pour débloquer les retraits', true);
     }
 
-    // 2️⃣ Vérifier la plage horaire (8h - 18h)
+    // 2️⃣ Vérifier la plage horaire (9h–17h UTC)
     if (!estDansPlageHoraire()) {
       return showToast(`Les retraits sont possibles de ${libellePlage()}`, true);
     }
