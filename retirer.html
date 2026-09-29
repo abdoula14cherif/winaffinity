@@ -459,6 +459,10 @@
     "niger"
   ];
 
+  // ⬇️ Plage horaire autorisée : 9h–17h UTC (= 10h–18h Cameroun / 9h–17h Côte d'Ivoire)
+  const HEURE_DEBUT_UTC = 9;
+  const HEURE_FIN_UTC = 17;
+
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 
   (async function init() {
@@ -476,6 +480,14 @@
     document.getElementById('fbPct').textContent = FRAIS_PCT;
 
     await Promise.all([loadProfile(), loadCountries(), loadHistory(), checkPlan80jActif()]);
+
+    // ⬇️ Désactiver le bouton si hors plage horaire
+    if (!estDansPlageHoraire()) {
+      const btn = document.getElementById('btnSubmit');
+      btn.disabled = true;
+      document.getElementById('btnSubmitText').textContent = `Hors horaire (${libellePlage()})`;
+    }
+
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
   })();
 
@@ -507,6 +519,17 @@
       .limit(1);
 
     A_PLAN_80J_ACTIF = !error && data && data.length > 0;
+  }
+
+  // ⬇️ Vérifie si on est dans la plage horaire autorisée (9h–17h UTC)
+  function estDansPlageHoraire() {
+    const hUTC = new Date().getUTCHours();
+    return hUTC >= HEURE_DEBUT_UTC && hUTC < HEURE_FIN_UTC;
+  }
+
+  // Libellé de la plage horaire
+  function libellePlage() {
+    return `10h à 18h (Cameroun) / 9h à 17h (Côte d'Ivoire)`;
   }
 
   function openCountryModal() {
@@ -599,13 +622,18 @@
   }
 
   async function submitRetrait() {
-    // ⬇️ Vérifier que le user a au moins 1 plantation de 80 jours active
+    // 1️⃣ Vérifier que le user a au moins 1 plantation de 80 jours active
     await checkPlan80jActif();
     if (!A_PLAN_80J_ACTIF) {
       return showToast('Active une plantation de 80 jours pour débloquer les retraits', true);
     }
 
-    // Vérifications habituelles
+    // 2️⃣ Vérifier la plage horaire (9h–17h UTC)
+    if (!estDansPlageHoraire()) {
+      return showToast(`Les retraits sont possibles de ${libellePlage()}`, true);
+    }
+
+    // 3️⃣ Vérifications habituelles
     const montant = Number(document.getElementById('amountInput').value || 0);
     const numero = document.getElementById('numeroInput').value.trim();
     if (!SELECTED_COUNTRY) return showToast('Choisis un pays', true);
