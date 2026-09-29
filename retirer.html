@@ -442,14 +442,13 @@
   let SELECTED_COUNTRY = null, SELECTED_OPERATOR = null;
   let HIST = [];
   let FRAIS_PCT = 8, FRAIS_MIN = 100;
-  let A_PLAN_ACTIF = false;
+  let A_PLAN_80J_ACTIF = false;
 
   // ⬇️ Minimum de retrait global (plancher)
   const MIN_RETRAIT_GLOBAL = 1500;
 
-  // ⬇️ Pays autorisés (codes ISO) : Côte d'Ivoire, Togo, Cameroun, Sénégal, Bénin, Burkina, Niger
+  // ⬇️ Pays autorisés (codes ISO)
   const PAYS_AUTORISES_CODES = ['CI', 'TG', 'CM', 'SN', 'BJ', 'BF', 'NE'];
-  // ⬇️ Fallback par nom (si les codes ISO ne sont pas fiables en base)
   const PAYS_AUTORISES_NOMS = [
     "côte d'ivoire", "cote d'ivoire", "cote d ivoire", "côte d ivoire",
     "togo",
@@ -459,11 +458,6 @@
     "burkina", "burkina faso",
     "niger"
   ];
-
-  // ⬇️ Plage horaire autorisée : 9h–17h UTC (= 10h–18h au Cameroun / 9h–17h en Côte d'Ivoire)
-  // Basé sur UTC pour être cohérent pour tous les utilisateurs, peu importe leur fuseau.
-  const HEURE_DEBUT_UTC = 9;
-  const HEURE_FIN_UTC = 17;
 
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 
@@ -481,15 +475,7 @@
     if (c2) FRAIS_MIN = Number(c2.valeur);
     document.getElementById('fbPct').textContent = FRAIS_PCT;
 
-    await Promise.all([loadProfile(), loadCountries(), loadHistory(), checkPlanActif()]);
-
-    // Désactiver le bouton si hors plage horaire
-    if (!estDansPlageHoraire()) {
-      const btn = document.getElementById('btnSubmit');
-      btn.disabled = true;
-      document.getElementById('btnSubmitText').textContent = `Hors horaire (${libellePlage()})`;
-    }
-
+    await Promise.all([loadProfile(), loadCountries(), loadHistory(), checkPlan80jActif()]);
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 400);
   })();
 
@@ -501,8 +487,6 @@
 
   async function loadCountries() {
     const { data } = await sb.from('pays_retrait').select('*').eq('actif', true).order('ordre');
-
-    // Filtre : garde uniquement les 7 pays autorisés (par code ISO ou par nom)
     COUNTRIES = (data || []).filter(c => {
       const code = (c.code || '').toUpperCase().trim();
       const nom = (c.nom || '').toLowerCase().trim();
@@ -512,36 +496,17 @@
     });
   }
 
-  // ⬇️ Vérifie si le user a au moins 1 plan/culture actif (dans LES DEUX tables)
-  async function checkPlanActif() {
-    // Table 1 : activations_plans (plans classiques) — statut 'actif'
-    const { data: d1 } = await sb
-      .from('activations_plans')
-      .select('id')
-      .eq('user_id', CURRENT_USER.id)
-      .eq('statut', 'actif')
-      .limit(1);
-
-    // Table 2 : activations_cultures (nouvelles plantations) — statut 'active'
-    const { data: d2 } = await sb
+  // ⬇️ Vérifie si le user a au moins 1 plantation de 80 jours active
+  async function checkPlan80jActif() {
+    const { data, error } = await sb
       .from('activations_cultures')
-      .select('id')
+      .select('id, duree_jours, statut')
       .eq('user_id', CURRENT_USER.id)
       .eq('statut', 'active')
+      .eq('duree_jours', 80)
       .limit(1);
 
-    A_PLAN_ACTIF = (d1 && d1.length > 0) || (d2 && d2.length > 0);
-  }
-
-  // ⬇️ Vérifie si on est dans la plage horaire autorisée (9h–17h UTC)
-  function estDansPlageHoraire() {
-    const hUTC = new Date().getUTCHours();
-    return hUTC >= HEURE_DEBUT_UTC && hUTC < HEURE_FIN_UTC;
-  }
-
-  // Libellé de la plage horaire affichée à l'utilisateur
-  function libellePlage() {
-    return `10h à 18h (Cameroun) / 9h à 17h (Côte d'Ivoire)`;
+    A_PLAN_80J_ACTIF = !error && data && data.length > 0;
   }
 
   function openCountryModal() {
@@ -586,7 +551,6 @@
     select.onchange = () => { SELECTED_OPERATOR = OPERATORS.find(x => x.id === select.value) || null; };
     document.getElementById('operatorField').style.opacity = '1';
     document.getElementById('operatorField').style.pointerEvents = 'auto';
-    // ⬇️ Applique le minimum global (1500) si le pays a moins
     const minRetrait = Math.max(Number(c.minimum_retrait) || 0, MIN_RETRAIT_GLOBAL);
     document.getElementById('minHintText').textContent = `Minimum : ${formatF(minRetrait)}`;
     document.getElementById('minHint').classList.remove('min-warn');
@@ -618,7 +582,6 @@
   function onAmountChange() {
     const v = Number(document.getElementById('amountInput').value || 0);
     if (!SELECTED_COUNTRY) return;
-    // ⬇️ Applique le minimum global
     const min = Math.max(Number(SELECTED_COUNTRY.minimum_retrait) || 0, MIN_RETRAIT_GLOBAL);
     const hint = document.getElementById('minHint');
     const hintText = document.getElementById('minHintText');
@@ -636,23 +599,17 @@
   }
 
   async function submitRetrait() {
-    // 1️⃣ Vérifier que le user a un plan actif (plans classiques OU cultures)
-    await checkPlanActif();
-    if (!A_PLAN_ACTIF) {
-      return showToast('Investis dans un plan pour débloquer les retraits', true);
+    // ⬇️ Vérifier que le user a au moins 1 plantation de 80 jours active
+    await checkPlan80jActif();
+    if (!A_PLAN_80J_ACTIF) {
+      return showToast('Active une plantation de 80 jours pour débloquer les retraits', true);
     }
 
-    // 2️⃣ Vérifier la plage horaire (9h–17h UTC)
-    if (!estDansPlageHoraire()) {
-      return showToast(`Les retraits sont possibles de ${libellePlage()}`, true);
-    }
-
-    // 3️⃣ Vérifications habituelles
+    // Vérifications habituelles
     const montant = Number(document.getElementById('amountInput').value || 0);
     const numero = document.getElementById('numeroInput').value.trim();
     if (!SELECTED_COUNTRY) return showToast('Choisis un pays', true);
     if (!SELECTED_OPERATOR) return showToast('Choisis un opérateur', true);
-    // ⬇️ Applique le minimum global
     const minRetrait = Math.max(Number(SELECTED_COUNTRY.minimum_retrait) || 0, MIN_RETRAIT_GLOBAL);
     if (!montant || montant < minRetrait) return showToast(`Minimum ${formatF(minRetrait)}`, true);
     if (montant > USER_SOLDE) return showToast('Solde insuffisant', true);
