@@ -184,33 +184,6 @@
   .detail-row .val.green { color: var(--wa-dark); }
   .detail-row .val.orange { color: var(--alibaba); }
 
-  .period-title { font-size: 14px; font-weight: 800; color: var(--wa-deep); margin-bottom: 10px; }
-  .periods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 18px; }
-  .period-btn { background: #fff; border: 2px solid var(--border); border-radius: 14px; padding: 12px 4px; text-align: center; cursor: pointer; transition: all .2s; font-family: inherit; }
-  .period-btn .num { font-size: 18px; font-weight: 800; color: var(--text); }
-  .period-btn .unit { font-size: 10px; color: var(--muted); margin-top: 2px; text-transform: uppercase; font-weight: 700; letter-spacing: .3px; }
-  .period-btn.active { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); border-color: transparent; box-shadow: 0 6px 16px rgba(18,140,126,.3); transform: translateY(-2px); }
-  .period-btn.active .num, .period-btn.active .unit { color: #fff; }
-  .period-btn:disabled { opacity: .4; cursor: not-allowed; background: #f3f4f6; }
-  .period-btn:disabled.active { transform: none; }
-
-  .starter-warning {
-    background: linear-gradient(135deg, rgba(220,38,38,.08), rgba(220,38,38,.14));
-    border: 1px solid rgba(220,38,38,.3);
-    border-radius: 12px;
-    padding: 10px 14px;
-    display: none;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    color: var(--danger);
-    font-weight: 700;
-    margin-bottom: 12px;
-    line-height: 1.4;
-  }
-  .starter-warning.show { display: flex; }
-  .starter-warning svg { stroke: var(--danger); flex-shrink: 0; }
-
   .calc-box { background: linear-gradient(135deg, rgba(18,140,126,.08), rgba(37,211,102,.12)); border-radius: 16px; padding: 16px; margin-bottom: 18px; border: 1.5px dashed rgba(18,140,126,.35); }
   .calc-row { display: flex; align-items: center; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
   .calc-row:last-child { margin-bottom: 0; padding-top: 10px; border-top: 1px solid rgba(18,140,126,.25); font-size: 17px; font-weight: 800; }
@@ -380,7 +353,7 @@
 
   <main class="content">
     <h1 class="page-title">Travail</h1>
-    <p class="page-sub">Active une plantation et reçois ton capital + bénéfice à l'échéance</p>
+    <p class="page-sub">Active une plantation et reçois des gains chaque jour pendant 80 jours</p>
 
     <div class="solde-banner anim">
       <div>
@@ -518,33 +491,26 @@
           </div>
           <div class="val green" id="detailGain">—</div>
         </div>
-      </div>
-      <div class="period-title">Durée d'investissement</div>
-
-      <!-- Avertissement plan Starter requis -->
-      <div class="starter-warning" id="starterWarning">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-        <span>Un <b>plan Starter actif</b> est requis pour choisir la durée de 1 jour.</span>
-      </div>
-
-      <div class="periods" id="periods">
-        <button class="period-btn active" data-days="1" onclick="selectPeriod(this,1)"><div class="num">1</div><div class="unit">jour</div></button>
-        <button class="period-btn" data-days="7" onclick="selectPeriod(this,7)"><div class="num">7</div><div class="unit">jours</div></button>
-        <button class="period-btn" data-days="14" onclick="selectPeriod(this,14)"><div class="num">14</div><div class="unit">jours</div></button>
-        <button class="period-btn" data-days="28" onclick="selectPeriod(this,28)"><div class="num">28</div><div class="unit">jours</div></button>
+        <div class="detail-row">
+          <div class="lbl">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Durée
+          </div>
+          <div class="val" id="detailDuree">—</div>
+        </div>
       </div>
       <div class="calc-box">
         <div class="calc-row"><span class="k">Capital investi</span><span class="v" id="calcActivation">—</span></div>
-        <div class="calc-row"><span class="k">Bénéfice sur <b id="calcDaysLabel">1 jour</b></span><span class="v" id="calcGains">—</span></div>
+        <div class="calc-row"><span class="k">Gains sur 80 jours</span><span class="v" id="calcGains">—</span></div>
         <div class="calc-row total"><span class="k">Total à percevoir</span><span class="v" id="calcTotal">—</span></div>
       </div>
       <div class="info-echeance">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
         </svg>
-        <span>Ton capital + bénéfice seront <b>crédités automatiquement</b> sur ton solde à la fin de la période choisie.</span>
+        <span>Tes gains seront <b>crédités chaque jour automatiquement</b> sur ton solde pendant 80 jours.</span>
       </div>
       <button class="btn-activate" id="btnActivate" onclick="activate()">
         <span class="spin-small"></span>
@@ -570,11 +536,9 @@
 
   let CURRENT_USER = null;
   let USER_SOLDE = 0;
-  let PLANTS = [];
+  let CULTURES = [];
   let MY_ACTIVATIONS = [];
-  let currentPlant = null;
-  let currentDays = 1;
-  let A_PLAN_STARTER_ACTIF = false;
+  let currentCulture = null;
 
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 
@@ -583,17 +547,17 @@
     if (!session) { window.location.replace('inscription'); return; }
     CURRENT_USER = session.user;
 
-    // 1. Vérifier les échéances atteintes → créditer capital + bénéfices
+    // 1. Créditer les gains journaliers non encore versés
     try {
-      const { data: echeance } = await sb.rpc('verifier_echeances_plantations');
-      if (echeance?.total_credite > 0) {
+      const { data: credit } = await sb.rpc('crediter_gains_cultures_journaliers');
+      if (credit?.total_credite > 0) {
         setTimeout(() => {
-          showToast(`💰 ${echeance.nb_credite} plantation(s) arrivée(s) à échéance ! +${formatF(echeance.total_credite)} crédités`, 'win');
+          showToast(`💰 +${formatF(credit.total_credite)} de gains crédités (${credit.nb_credite} plantation${credit.nb_credite > 1 ? 's' : ''})`, 'win');
         }, 800);
       }
     } catch (e) { console.warn(e); }
 
-    await Promise.all([loadProfile(), loadPlantations(), loadMyActivations(), checkPlanStarterActif()]);
+    await Promise.all([loadProfile(), loadCultures(), loadMyActivations()]);
 
     setTimeout(() => document.getElementById('loader').classList.add('hidden'), 500);
   })();
@@ -604,24 +568,9 @@
     document.getElementById('userSolde').textContent = formatF(USER_SOLDE);
   }
 
-  // ⬇️ Vérifie si l'utilisateur a au moins 1 plan Starter actif
-  async function checkPlanStarterActif() {
-    const { data, error } = await sb
-      .from('activations_plans')
-      .select('id, plan_nom, statut')
-      .eq('user_id', CURRENT_USER.id)
-      .eq('statut', 'active');
-
-    if (error) { A_PLAN_STARTER_ACTIF = false; return; }
-
-    A_PLAN_STARTER_ACTIF = (data || []).some(a =>
-      (a.plan_nom || '').toLowerCase().includes('starter')
-    );
-  }
-
-  async function loadPlantations() {
+  async function loadCultures() {
     const list = document.getElementById('plantsList');
-    const { data, error } = await sb.from('plantations').select('*').eq('actif', true).order('ordre', { ascending: true });
+    const { data, error } = await sb.from('plans_cultures').select('*').eq('actif', true).order('ordre', { ascending: true });
     if (error || !data || data.length === 0) {
       list.innerHTML = `<div class="empty">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
@@ -631,7 +580,7 @@
       </div>`;
       return;
     }
-    PLANTS = data;
+    CULTURES = data;
     list.innerHTML = '';
     data.forEach((p, i) => {
       const card = document.createElement('div');
@@ -674,10 +623,9 @@
   }
 
   async function loadMyActivations() {
-    const { data, error } = await sb.from('activations_plans')
+    const { data, error } = await sb.from('activations_cultures')
       .select('*')
       .eq('user_id', CURRENT_USER.id)
-      .eq('type', 'plantation')
       .order('created_at', { ascending: false });
     if (error || !data) return;
     MY_ACTIVATIONS = data;
@@ -702,11 +650,9 @@
 
     container.innerHTML = '';
     MY_ACTIVATIONS.forEach((a, i) => {
-      const progress = calculateProgress(a.date_debut, a.date_fin);
-      const isDone = a.statut === 'termine' || progress >= 100;
-      const total = Number(a.montant_activation) + Number(a.gains_totaux);
-      const joursRestants = isDone ? 0 : daysRemaining(a.date_fin);
-      const dateFin = formatDate(a.date_fin, true);
+      const progress = Math.min(100, (a.jours_credites / a.duree_jours) * 100);
+      const isDone = a.statut === 'termine' || a.jours_credites >= a.duree_jours;
+      const joursRestants = isDone ? 0 : Math.max(0, a.duree_jours - a.jours_credites);
 
       const el = document.createElement('div');
       el.className = 'active-plan' + (isDone ? ' termine' : '');
@@ -714,120 +660,57 @@
       el.innerHTML = `
         <div class="ap-top">
           <div class="ap-nom">
-            ${escapeHtml(a.plan_nom)}
+            ${escapeHtml(a.culture_nom)}
             <span class="ap-badge ${isDone ? 'termine' : 'active'}">${isDone ? '✓ Terminé' : 'Actif'}</span>
           </div>
           <div class="ap-gains">
-            +${formatF(total)}
-            <small>${isDone ? 'crédités' : 'à percevoir'}</small>
+            +${formatF(a.gains_percus)}
+            <small>sur ${formatF(a.gains_totaux)}</small>
           </div>
         </div>
         <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
         <div class="ap-bottom">
-          <span>${isDone ? 'Échéance atteinte' : `Échéance : <b>${dateFin}</b>`}</span>
-          <span>${isDone ? '✓' : `⏱ ${joursRestants} j restant${joursRestants > 1 ? 's' : ''}`}</span>
+          <span><b>${a.jours_credites}</b> / ${a.duree_jours} jours crédités</span>
+          <span>${formatF(a.gain_journalier)} / jour</span>
         </div>
       `;
       container.appendChild(el);
     });
   }
 
-  function calculateProgress(dateDebut, dateFin) {
-    const start = new Date(dateDebut).getTime();
-    const end = new Date(dateFin).getTime();
-    const now = Date.now();
-    if (now >= end) return 100;
-    const total = end - start;
-    const elapsed = now - start;
-    return Math.min(100, Math.max(0, (elapsed / total) * 100));
-  }
-
-  function daysRemaining(dateFin) {
-    const diff = new Date(dateFin).getTime() - Date.now();
-    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-  }
-
-  function formatDate(iso, short = false) {
-    if (!iso) return '—';
-    const d = new Date(iso);
-    const options = short
-      ? { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }
-      : { day: '2-digit', month: 'long', year: 'numeric' };
-    return d.toLocaleDateString('fr-FR', options);
-  }
-
   function openModal(id) {
-    const p = PLANTS.find(x => x.id === id);
+    const p = CULTURES.find(x => x.id === id);
     if (!p) return;
-    currentPlant = p;
-
-    // ⬇️ Si pas de plan Starter actif → pas de 1 jour par défaut, on met 7 jours
-    const hasStarter = A_PLAN_STARTER_ACTIF;
-    currentDays = hasStarter ? 1 : 7;
+    currentCulture = p;
 
     document.getElementById('modalPlantName').textContent = p.nom;
     document.getElementById('modalPhotoName').textContent = p.nom;
     document.getElementById('modalImg').src = p.image_url;
     document.getElementById('detailActivation').textContent = formatF(p.montant_activation);
     document.getElementById('detailGain').textContent = formatF(p.gain_journalier);
+    document.getElementById('detailDuree').textContent = p.duree_jours + ' jours';
     document.getElementById('modalUserSolde').textContent = formatF(USER_SOLDE);
 
-    // ⬇️ Activer/désactiver le bouton "1 jour"
-    const btn1j = document.querySelector('.period-btn[data-days="1"]');
-    if (!hasStarter) {
-      btn1j.disabled = true;
-      btn1j.title = 'Plan Starter requis';
-    } else {
-      btn1j.disabled = false;
-      btn1j.title = '';
-    }
+    // Calculs
+    const act = Number(p.montant_activation);
+    const gainsTotal = Number(p.gain_journalier) * Number(p.duree_jours);
+    const total = act + gainsTotal;
 
-    // ⬇️ Afficher/masquer l'avertissement
-    const warning = document.getElementById('starterWarning');
-    if (hasStarter) {
-      warning.classList.remove('show');
-    } else {
-      warning.classList.add('show');
-    }
+    document.getElementById('calcActivation').textContent = formatF(act);
+    document.getElementById('calcGains').textContent = formatF(gainsTotal);
+    document.getElementById('calcTotal').textContent = formatF(total);
 
-    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-    const defaultBtn = document.querySelector(`.period-btn[data-days="${currentDays}"]`);
-    if (defaultBtn) defaultBtn.classList.add('active');
-
-    updateCalc();
+    updateBalanceCheck();
     document.getElementById('modalOverlay').classList.add('open');
     document.body.style.overflow = 'hidden';
   }
 
-  function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); document.body.style.overflow = ''; }
-  function closeModalOutside(e) { if (e.target.id === 'modalOverlay') closeModal(); }
-
-  function selectPeriod(btn, days) {
-    // ⬇️ Bloquer le plan 1 jour si pas de plan Starter actif
-    if (days === 1 && !A_PLAN_STARTER_ACTIF) {
-      showToast('Un plan Starter actif est requis pour la durée de 1 jour', true);
-      return;
-    }
-    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentDays = days;
-    updateCalc();
-  }
-
-  function updateCalc() {
-    if (!currentPlant) return;
-    const act = Number(currentPlant.montant_activation);
-    const gain = Number(currentPlant.gain_journalier);
-    const gainsTotal = gain * currentDays;
-    const total = act + gainsTotal;
-    document.getElementById('calcActivation').textContent = formatF(act);
-    document.getElementById('calcGains').textContent = formatF(gainsTotal);
-    document.getElementById('calcDaysLabel').textContent = currentDays + (currentDays === 1 ? ' jour' : ' jours');
-    document.getElementById('calcTotal').textContent = formatF(total);
+  function updateBalanceCheck() {
+    if (!currentCulture) return;
     const box = document.getElementById('userSoldeBox');
     const btn = document.getElementById('btnActivate');
     const btnText = document.getElementById('btnActivateText');
-    if (USER_SOLDE < act) {
+    if (USER_SOLDE < Number(currentCulture.montant_activation)) {
       box.classList.add('insufficient');
       btn.disabled = true;
       btnText.textContent = 'Solde insuffisant';
@@ -838,23 +721,19 @@
     }
   }
 
+  function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); document.body.style.overflow = ''; }
+  function closeModalOutside(e) { if (e.target.id === 'modalOverlay') closeModal(); }
+
   async function activate() {
-    if (!currentPlant || !CURRENT_USER) return;
-
-    // ⬇️ Double sécurité : vérifier plan Starter pour durée 1 jour
-    if (currentDays === 1 && !A_PLAN_STARTER_ACTIF) {
-      return showToast('Un plan Starter actif est requis pour la durée de 1 jour', true);
-    }
-
-    const act = Number(currentPlant.montant_activation);
+    if (!currentCulture || !CURRENT_USER) return;
+    const act = Number(currentCulture.montant_activation);
     if (USER_SOLDE < act) return showToast('Solde insuffisant', true);
     const btn = document.getElementById('btnActivate');
     btn.classList.add('loading');
     document.getElementById('btnActivateText').textContent = 'Activation...';
 
-    const { data, error } = await sb.rpc('activer_plantation', {
-      p_plantation_id: currentPlant.id,
-      p_periode_jours: currentDays
+    const { data, error } = await sb.rpc('activer_culture', {
+      p_culture_id: currentCulture.id
     });
 
     btn.classList.remove('loading');
@@ -864,14 +743,14 @@
       if (msg.includes('Solde insuffisant')) msg = 'Solde insuffisant pour cette plantation.';
       showToast(msg, true);
       await loadProfile();
-      updateCalc();
+      updateBalanceCheck();
       return;
     }
 
     USER_SOLDE = Number(data.nouveau_solde ?? USER_SOLDE);
     document.getElementById('userSolde').textContent = formatF(USER_SOLDE);
     closeModal();
-    showToast(`🌱 ${currentPlant.nom} activé ! +${formatF(data.total_a_percevoir)} à percevoir dans ${currentDays} jour${currentDays > 1 ? 's' : ''}`, 'win');
+    showToast(`🌱 ${currentCulture.nom} activée ! +${formatF(data.total_a_percevoir)} sur ${data.duree_jours} jours`, 'win');
 
     await Promise.all([loadMyActivations(), loadProfile()]);
   }
