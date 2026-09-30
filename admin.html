@@ -57,6 +57,7 @@
   .stat-box:nth-child(4) { border-color: #3b82f6; }
   .stat-box:nth-child(5) { border-color: var(--warn); }
   .stat-box:nth-child(6) { border-color: var(--danger); }
+  .stat-box:nth-child(7) { border-color: var(--vip); }
   .stat-box .lbl { font-size: 10.5px; color: var(--muted); text-transform: uppercase; font-weight: 700; letter-spacing: .3px; margin-bottom: 6px; }
   .stat-box .val { font-size: 20px; font-weight: 800; color: var(--text); }
 
@@ -143,40 +144,55 @@
 
   .search-input { padding: 8px 12px; border-radius: 8px; border: 1.5px solid var(--border); font-family: inherit; font-size: 13px; max-width: 180px; outline: none; }
   .search-input:focus { border-color: var(--wa-green); }
+  .search-full { width: 100%; max-width: 100%; margin-bottom: 12px; }
 
   .filter-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; -ms-overflow-style: none; scrollbar-width: none; }
   .filter-row::-webkit-scrollbar { display: none; }
   .filter-chip { padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; background: #fff; border: 1.5px solid var(--border); color: var(--muted); cursor: pointer; font-family: inherit; white-space: nowrap; }
   .filter-chip.active { background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; border-color: transparent; }
 
-  .candidature-reponses {
-    background: #f7faf8; border-radius: 10px; padding: 10px 12px; margin-top: 8px;
-    display: flex; flex-direction: column; gap: 6px;
-  }
-  .candidature-reponses .rep-row {
-    display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px;
-  }
+  .candidature-reponses { background: #f7faf8; border-radius: 10px; padding: 10px 12px; margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+  .candidature-reponses .rep-row { display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px; }
   .candidature-reponses .rep-row .k { color: var(--muted); font-weight: 600; }
   .candidature-reponses .rep-row .v { color: var(--text); font-weight: 700; text-align: right; word-break: break-word; max-width: 60%; }
+
+  /* Bloc détail retrait */
+  .retrait-finances {
+    background: linear-gradient(135deg, rgba(18,140,126,.06), rgba(37,211,102,.08));
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    border: 1px dashed rgba(18,140,126,.25);
+  }
+  .retrait-finances .rf-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+  }
+  .retrait-finances .rf-row .k { color: var(--muted); font-weight: 600; }
+  .retrait-finances .rf-row .v { color: var(--text); font-weight: 700; }
+  .retrait-finances .rf-row.frais .v { color: var(--alibaba); }
+  .retrait-finances .rf-row.net {
+    border-top: 1px solid rgba(18,140,126,.25);
+    padding-top: 6px;
+    margin-top: 3px;
+    font-size: 13.5px;
+  }
+  .retrait-finances .rf-row.net .k { color: var(--wa-deep); font-weight: 800; }
+  .retrait-finances .rf-row.net .v { color: var(--wa-dark); font-size: 16px; font-weight: 800; }
 
   .sk-item { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
   .sk-line { height: 12px; border-radius: 6px; background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; margin-bottom: 8px; }
   .sk-line.w1 { width: 40%; height: 16px; }
   .sk-line.w2 { width: 70%; }
 
-  .link-input-wrap {
-    display: flex; gap: 8px; align-items: stretch;
-  }
-  .link-input-wrap input {
-    flex: 1; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px;
-    font-size: 12.5px; font-family: monospace; background: #f7faf8; outline: none; min-width: 0;
-  }
+  .link-input-wrap { display: flex; gap: 8px; align-items: stretch; }
+  .link-input-wrap input { flex: 1; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 12.5px; font-family: monospace; background: #f7faf8; outline: none; min-width: 0; }
   .link-input-wrap input:focus { border-color: var(--wa-green); background: #fff; }
-  .link-input-wrap button {
-    padding: 0 16px; border: none; border-radius: 10px; background: linear-gradient(135deg, var(--wa-dark), var(--wa-green));
-    color: #fff; font-weight: 800; cursor: pointer; font-family: inherit; font-size: 13px;
-    display: flex; align-items: center; gap: 6px; box-shadow: 0 3px 10px rgba(18,140,126,.3);
-  }
+  .link-input-wrap button { padding: 0 16px; border: none; border-radius: 10px; background: linear-gradient(135deg, var(--wa-dark), var(--wa-green)); color: #fff; font-weight: 800; cursor: pointer; font-family: inherit; font-size: 13px; display: flex; align-items: center; gap: 6px; box-shadow: 0 3px 10px rgba(18,140,126,.3); }
   .link-input-wrap button:active { transform: scale(.96); }
   .link-input-wrap button svg { stroke: #fff; }
 
@@ -331,6 +347,7 @@
         <h2>Candidatures partenaires</h2>
         <span class="badge orange" id="candPendingBadge">— en attente</span>
       </div>
+      <input type="text" class="search-input search-full" id="candSearch" placeholder="🔍 Rechercher par nom, email, téléphone..." oninput="renderCandidatures()">
       <div class="filter-row" id="candFilters">
         <button class="filter-chip active" data-filter="all">Toutes</button>
         <button class="filter-chip" data-filter="nouveau">Nouvelles</button>
@@ -345,6 +362,7 @@
       <div class="admin-toolbar">
         <h2>Types de partenaires</h2>
       </div>
+      <input type="text" class="search-input search-full" id="typesSearch" placeholder="🔍 Rechercher un type..." oninput="renderTypesPartenaires()">
       <div id="typesList"></div>
     </div>
 
@@ -362,6 +380,8 @@
           </button>
         </div>
       </div>
+
+      <input type="text" class="search-input search-full" id="rechargesSearch" placeholder="🔍 Rechercher par nom, email, numéro..." oninput="renderRecharges()">
 
       <div class="config-group" style="margin-bottom:16px;border:1px solid rgba(255,106,0,.25);background:linear-gradient(135deg,rgba(255,106,0,.04),rgba(255,184,0,.04));">
         <div class="config-group-title" style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
@@ -381,7 +401,7 @@
           </button>
         </div>
         <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5;">
-          🔗 Ce lien est utilisé par la page <b>Recharger</b> des utilisateurs. Tu peux le modifier à tout moment.
+          🔗 Ce lien est utilisé par la page <b>Recharger</b> des utilisateurs.
         </div>
       </div>
 
@@ -400,6 +420,13 @@
         <h2>Retraits</h2>
         <span class="badge orange" id="retraitsPendingBadge">— en attente</span>
       </div>
+      <input type="text" class="search-input search-full" id="retraitsSearch" placeholder="🔍 Rechercher par nom, email, numéro..." oninput="renderRetraits()">
+      <div class="filter-row" id="retraitsFilters">
+        <button class="filter-chip active" data-filter="all">Tous</button>
+        <button class="filter-chip" data-filter="en_attente">En attente</button>
+        <button class="filter-chip" data-filter="paye">Payés</button>
+        <button class="filter-chip" data-filter="rejete">Rejetés</button>
+      </div>
       <div id="retraitsList"></div>
     </div>
 
@@ -407,8 +434,8 @@
     <div class="panel" id="panel-users">
       <div class="admin-toolbar">
         <h2>Utilisateurs</h2>
-        <input type="text" placeholder="Rechercher..." class="search-input" id="userSearch" oninput="renderUsers()">
       </div>
+      <input type="text" class="search-input search-full" id="userSearch" placeholder="🔍 Rechercher par nom, pseudo, email..." oninput="renderUsers()">
       <div id="usersList"></div>
     </div>
 
@@ -418,14 +445,13 @@
         <h2>Tickets Support</h2>
         <span class="badge orange" id="supportPendingBadge">— ouverts</span>
       </div>
-
+      <input type="text" class="search-input search-full" id="supportSearch" placeholder="🔍 Rechercher par nom, email, sujet..." oninput="renderSupport()">
       <div class="filter-row" id="supportFilters">
         <button class="filter-chip active" data-filter="all">Tous</button>
         <button class="filter-chip" data-filter="ouvert">Ouverts</button>
         <button class="filter-chip" data-filter="en_cours">En cours</button>
         <button class="filter-chip" data-filter="resolu">Résolus</button>
       </div>
-
       <div id="supportList"></div>
     </div>
 
@@ -433,17 +459,14 @@
     <div class="panel" id="panel-parrainage">
       <div class="admin-toolbar">
         <h2>Réseau de parrainage</h2>
-        <input type="text" placeholder="Rechercher..." class="search-input" id="parrainSearch" oninput="renderParrainage()">
       </div>
-
+      <input type="text" class="search-input search-full" id="parrainSearch" placeholder="🔍 Rechercher un parrain ou un filleul..." oninput="renderParrainage()">
       <div class="stats-grid" id="parrainStats" style="margin-bottom:16px;"></div>
-
       <div class="filter-row" id="parrainFilters">
         <button class="filter-chip active" data-filter="all">Tous les parrains</button>
         <button class="filter-chip" data-filter="with_filleuls">Avec filleuls</button>
         <button class="filter-chip" data-filter="top">Top 20</button>
       </div>
-
       <div id="parrainList"></div>
     </div>
 
@@ -458,6 +481,7 @@
           Ajouter
         </button>
       </div>
+      <input type="text" class="search-input search-full" id="plansSearch" placeholder="🔍 Rechercher un plan..." oninput="renderPlans()">
       <div id="plansList"></div>
     </div>
 
@@ -472,6 +496,7 @@
           Ajouter
         </button>
       </div>
+      <input type="text" class="search-input search-full" id="plantationsSearch" placeholder="🔍 Rechercher une plantation..." oninput="renderPlantations()">
       <div id="plantationsList"></div>
     </div>
 
@@ -486,6 +511,7 @@
           Publier
         </button>
       </div>
+      <input type="text" class="search-input search-full" id="actualitesSearch" placeholder="🔍 Rechercher par titre, catégorie..." oninput="renderActualites()">
       <div id="actualitesList"></div>
     </div>
 
@@ -500,6 +526,7 @@
           Créer
         </button>
       </div>
+      <input type="text" class="search-input search-full" id="loteriesSearch" placeholder="🔍 Rechercher une loterie..." oninput="renderLoteries()">
       <div id="loteriesList"></div>
     </div>
 
@@ -508,6 +535,7 @@
       <div class="admin-toolbar">
         <h2>Pays &amp; Opérateurs</h2>
       </div>
+      <input type="text" class="search-input search-full" id="paysSearch" placeholder="🔍 Rechercher un pays..." oninput="renderPays()">
       <div id="paysList"></div>
     </div>
 
@@ -527,6 +555,7 @@
         <h2>Derniers bonus distribués</h2>
         <span class="badge orange" id="bonusTotalBadge">— F</span>
       </div>
+      <input type="text" class="search-input search-full" id="bonusHistorySearch" placeholder="🔍 Rechercher..." oninput="renderBonusHistory()">
       <div id="bonusHistoryList"></div>
     </div>
 
@@ -606,6 +635,7 @@
   let CAND_FILTER = 'all';
   let RECHARGE_FILTER = 'all';
   let SUPPORT_FILTER = 'all';
+  let RETRAIT_FILTER = 'all';
   let SUPPORT_TICKETS = [];
   let PARRAIN_FILTER = 'all';
   let PARRAIN_DATA = [];
@@ -655,11 +685,24 @@
 
   // ================= STATS =================
   async function loadStats() {
+    const grid = document.getElementById('statsGrid');
+    grid.innerHTML = `<div class="sk-item"><div class="sk-line w1"></div><div class="sk-line w2"></div></div>`;
+
+    // Récupère les stats principales
     const { data, error } = await sb.from('admin_stats').select('*').maybeSingle();
     if (error || !data) return;
-    const grid = document.getElementById('statsGrid');
+
+    // Compte les utilisateurs créés aujourd'hui
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const { count: usersToday } = await sb
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', todayStart.toISOString());
+
     const stats = [
       { lbl: 'Utilisateurs totaux', val: data.total_users },
+      { lbl: "Aujourd'hui", val: usersToday || 0 },
       { lbl: 'Nouveaux (7j)', val: data.users_7j },
       { lbl: 'Plans actifs', val: data.plans_actifs },
       { lbl: 'Retraits en attente', val: data.retraits_attente },
@@ -667,7 +710,7 @@
       { lbl: 'Total payé', val: formatF(data.total_paye) }
     ];
     grid.innerHTML = stats.map((s, i) => `
-      <div class="stat-box" style="animation-delay:${i * .06}s">
+      <div class="stat-box" style="animation-delay:${i * .05}s">
         <div class="lbl">${s.lbl}</div>
         <div class="val">${s.val}</div>
       </div>
@@ -676,14 +719,8 @@
 
   // ================= LIEN DE PAIEMENT =================
   async function loadLienPaiement() {
-    const { data, error } = await sb
-      .from('parametres')
-      .select('valeur')
-      .eq('cle', 'lien_paiement')
-      .maybeSingle();
-    if (!error && data?.valeur) {
-      document.getElementById('lienPaiementInput').value = data.valeur;
-    }
+    const { data, error } = await sb.from('parametres').select('valeur').eq('cle', 'lien_paiement').maybeSingle();
+    if (!error && data?.valeur) document.getElementById('lienPaiementInput').value = data.valeur;
   }
 
   async function saveLienPaiement() {
@@ -691,56 +728,57 @@
     const valeur = input.value.trim();
     if (!valeur) return showToast('Lien vide', true);
     if (!/^https?:\/\//i.test(valeur)) return showToast('Le lien doit commencer par http:// ou https://', true);
-
-    const { error } = await sb
-      .from('parametres')
-      .upsert({ cle: 'lien_paiement', valeur, updated_at: new Date().toISOString() }, { onConflict: 'cle' });
-
+    const { error } = await sb.from('parametres').upsert({ cle: 'lien_paiement', valeur, updated_at: new Date().toISOString() }, { onConflict: 'cle' });
     if (error) return showToast('Erreur : ' + error.message, true);
     showToast('✅ Lien de paiement mis à jour');
   }
 
   // ================= RECHARGES =================
   async function loadRecharges() {
-    const { data, error } = await sb
-      .from('recharges')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(200);
-
+    const { data, error } = await sb.from('recharges').select('*').order('created_at', { ascending: false }).limit(200);
     if (error) {
-      console.warn('Erreur recharges:', error);
-      document.getElementById('rechargesList').innerHTML =
-        `<div class="empty"><div>Erreur : ${escapeHtml(error.message)}</div></div>`;
+      document.getElementById('rechargesList').innerHTML = `<div class="empty"><div>Erreur : ${escapeHtml(error.message)}</div></div>`;
       return;
     }
-
     DATA.recharges = data || [];
+
+    // Enrichir avec profils (nom, email)
+    const userIds = [...new Set(DATA.recharges.map(r => r.user_id).filter(Boolean))];
+    if (userIds.length > 0) {
+      const { data: profs } = await sb.from('profiles').select('id, nom, pseudo, email').in('id', userIds);
+      const map = {};
+      (profs || []).forEach(p => { map[p.id] = p; });
+      DATA.recharges = DATA.recharges.map(r => ({
+        ...r,
+        profile: map[r.user_id] || null
+      }));
+    }
 
     const pending = DATA.recharges.filter(r => r.statut === 'en_attente').length;
     document.getElementById('rechargesPendingBadge').textContent = pending + ' en attente';
-
     const badge = document.getElementById('rechargesBadge');
-    if (pending > 0) {
-      badge.textContent = pending;
-      badge.classList.add('show');
-    } else {
-      badge.classList.remove('show');
-    }
+    if (pending > 0) { badge.textContent = pending; badge.classList.add('show'); }
+    else badge.classList.remove('show');
 
     renderRecharges();
   }
 
   function renderRecharges() {
     const list = document.getElementById('rechargesList');
-    const filtered = RECHARGE_FILTER === 'all'
-      ? DATA.recharges
-      : DATA.recharges.filter(r => r.statut === RECHARGE_FILTER);
+    const q = (document.getElementById('rechargesSearch')?.value || '').toLowerCase().trim();
 
-    if (filtered.length === 0) {
-      list.innerHTML = emptyBox('Aucune recharge');
-      return;
+    let filtered = RECHARGE_FILTER === 'all' ? DATA.recharges : DATA.recharges.filter(r => r.statut === RECHARGE_FILTER);
+    if (q) {
+      filtered = filtered.filter(r => {
+        const p = r.profile || {};
+        return (r.user_nom || p.nom || '').toLowerCase().includes(q)
+          || (r.user_pseudo || p.pseudo || '').toLowerCase().includes(q)
+          || (r.user_email || p.email || '').toLowerCase().includes(q)
+          || (r.numero || '').toLowerCase().includes(q);
+      });
     }
+
+    if (filtered.length === 0) { list.innerHTML = emptyBox('Aucune recharge'); return; }
 
     const statusInfo = {
       en_attente: { label: 'En attente', classe: 'orange' },
@@ -751,18 +789,16 @@
 
     list.innerHTML = filtered.map((r, i) => {
       const info = statusInfo[r.statut] || { label: r.statut, classe: 'gray' };
-      const userName = r.user_nom || r.user_pseudo || 'Utilisateur';
-      const userEmail = r.user_email || '';
+      const p = r.profile || {};
+      const userName = r.user_nom || p.nom || r.user_pseudo || p.pseudo || 'Utilisateur';
+      const userEmail = r.user_email || p.email || '';
       const noteHTML = r.note_admin ? `<div class="ic-desc">📝 ${escapeHtml(r.note_admin)}</div>` : '';
 
       return `
         <div class="item-card" style="animation-delay:${i * .025}s">
           <div class="ic-img">${r.mode === 'lien' ? '💳' : (r.mode === 'crypto' ? '₿' : (r.mode === 'manuel' ? '✍️' : '📱'))}</div>
           <div class="ic-body">
-            <div class="ic-name">
-              +${formatF(r.montant)}
-              <span class="badge ${info.classe}">${info.label}</span>
-            </div>
+            <div class="ic-name">+${formatF(r.montant)} <span class="badge ${info.classe}">${info.label}</span></div>
             <div class="ic-meta">
               <span>👤 ${escapeHtml(userName)}</span>
               ${userEmail ? `<span class="dot">•</span><span>${escapeHtml(userEmail)}</span>` : ''}
@@ -772,8 +808,7 @@
               ${r.mode === 'manuel' ? '<span>✍️ Crédit manuel</span>' : ''}
               ${r.mode !== 'lien' && r.mode !== 'manuel' && r.pays_nom ? `<span>${escapeHtml(r.pays_nom)}</span>` : ''}
               ${r.operateur_nom ? `<span class="dot">•</span><span>${escapeHtml(r.operateur_nom)}</span>` : ''}
-              <span class="dot">•</span>
-              <span>${timeAgo(r.created_at)}</span>
+              <span class="dot">•</span><span>${timeAgo(r.created_at)}</span>
             </div>
             ${r.numero && r.numero !== '-' ? `<div class="ic-meta" style="font-size:10.5px;">N° ${escapeHtml(r.numero)}</div>` : ''}
             ${noteHTML}
@@ -781,20 +816,14 @@
           <div class="ic-actions">
             ${r.statut === 'en_attente' ? `
               <button class="icon-btn check" onclick="validerRecharge('${r.id}')" title="Créditer le solde">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
               </button>
               <button class="icon-btn close-x" onclick="rejeterRecharge('${r.id}')" title="Rejeter">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             ` : ''}
             <button class="icon-btn delete" onclick="supprimerRecharge('${r.id}')" title="Supprimer">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/>
-              </svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>
             </button>
           </div>
         </div>
@@ -816,27 +845,17 @@
     if (!r) return;
     const note = prompt('Note interne (optionnel) :', '');
     if (note === null) return;
-
-    const userName = r.user_nom || r.user_pseudo || 'cet utilisateur';
+    const p = r.profile || {};
+    const userName = r.user_nom || p.nom || r.user_pseudo || p.pseudo || 'cet utilisateur';
     if (!confirm(`Créditer ${formatF(r.montant)} à ${userName} ?`)) return;
 
-    const { error: errSolde } = await sb.rpc('ajuster_solde_user', {
-      p_user_id: r.user_id,
-      p_montant: Number(r.montant),
-      p_note: 'Recharge validée'
-    });
+    const { error: errSolde } = await sb.rpc('ajuster_solde_user', { p_user_id: r.user_id, p_montant: Number(r.montant), p_note: 'Recharge validée' });
     if (errSolde) return showToast('Erreur crédit : ' + errSolde.message, true);
-
-    const { error: errUpdate } = await sb.from('recharges').update({
-      statut: 'paye',
-      note_admin: note || null
-    }).eq('id', id);
+    const { error: errUpdate } = await sb.from('recharges').update({ statut: 'paye', note_admin: note || null }).eq('id', id);
     if (errUpdate) return showToast('Erreur statut : ' + errUpdate.message, true);
 
     showToast(`✅ ${formatF(r.montant)} crédités à ${userName}`);
-    await loadRecharges();
-    await loadUsers();
-    await loadStats();
+    await loadRecharges(); await loadUsers(); await loadStats();
   }
 
   async function rejeterRecharge(id) {
@@ -845,19 +864,14 @@
     const note = prompt('Motif du rejet :', '');
     if (note === null) return;
     if (!note.trim()) return showToast('Motif requis', true);
-
-    const { error } = await sb.from('recharges').update({
-      statut: 'rejete',
-      note_admin: note
-    }).eq('id', id);
-
+    const { error } = await sb.from('recharges').update({ statut: 'rejete', note_admin: note }).eq('id', id);
     if (error) return showToast('Erreur : ' + error.message, true);
     showToast('Recharge rejetée');
     await loadRecharges();
   }
 
   async function supprimerRecharge(id) {
-    if (!confirm('Supprimer définitivement cette recharge ? (le solde n\'est PAS retiré si déjà crédité)')) return;
+    if (!confirm('Supprimer définitivement cette recharge ?')) return;
     const { error } = await sb.from('recharges').delete().eq('id', id);
     if (error) return showToast('Erreur : ' + error.message, true);
     showToast('Recharge supprimée');
@@ -866,39 +880,26 @@
 
   function openAjoutRechargeModal() {
     if (!DATA.users || DATA.users.length === 0) return showToast('Aucun utilisateur chargé', true);
-    const options = DATA.users
-      .slice(0, 500)
-      .map(u => `<option value="${u.id}">${escapeHtml(u.nom || u.pseudo || u.email)} — ${formatF(u.solde)}</option>`)
-      .join('');
-
+    const options = DATA.users.slice(0, 500).map(u => `<option value="${u.id}">${escapeHtml(u.nom || u.pseudo || u.email)} — ${formatF(u.solde)}</option>`).join('');
     openModal('Ajouter une recharge manuelle', `
       <div style="font-size:12.5px;color:var(--muted);line-height:1.55;margin-bottom:14px;">
-        Le montant sera <b style="color:var(--wa-dark);">immédiatement crédité</b> au solde de l'utilisateur et une recharge marquée <b>payée</b> sera créée dans l'historique.
+        Le montant sera <b style="color:var(--wa-dark);">immédiatement crédité</b> au solde de l'utilisateur.
       </div>
       <div class="form-group">
         <label>Utilisateur</label>
         <select id="arUser" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;background:#f7faf8;outline:none;">
-          <option value="">— Choisir un utilisateur —</option>
-          ${options}
+          <option value="">— Choisir un utilisateur —</option>${options}
         </select>
       </div>
-      <div class="form-group">
-        <label>Montant (FCFA)</label>
-        <input type="number" id="arMontant" placeholder="Ex: 5000" min="1">
-      </div>
+      <div class="form-group"><label>Montant (FCFA)</label><input type="number" id="arMontant" placeholder="Ex: 5000" min="1"></div>
       <div class="btn-row" style="margin-bottom:10px;">
         <button class="btn-warn" onclick="document.getElementById('arMontant').value=1000">1 000</button>
         <button class="btn-warn" onclick="document.getElementById('arMontant').value=5000">5 000</button>
         <button class="btn-warn" onclick="document.getElementById('arMontant').value=10000">10 000</button>
       </div>
-      <div class="form-group">
-        <label>Note (optionnel)</label>
-        <input type="text" id="arNote" placeholder="Ex: Recharge manuelle admin">
-      </div>
+      <div class="form-group"><label>Note (optionnel)</label><input type="text" id="arNote" placeholder="Ex: Recharge manuelle admin"></div>
       <button class="btn-primary" onclick="ajouterRechargeManuelle()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Créditer maintenant
       </button>
     `);
@@ -908,7 +909,6 @@
     const userId = document.getElementById('arUser').value;
     const montant = Number(document.getElementById('arMontant').value);
     const note = document.getElementById('arNote').value.trim();
-
     if (!userId) return showToast('Choisis un utilisateur', true);
     if (!montant || montant <= 0) return showToast('Montant invalide', true);
 
@@ -916,89 +916,61 @@
     const userName = u?.nom || u?.pseudo || 'utilisateur';
 
     const { error: errInsert } = await sb.from('recharges').insert({
-      user_id: userId,
-      mode: 'manuel',
-      montant: montant,
-      numero: '-',
-      pays_nom: 'Crédit admin',
-      operateur_nom: 'Manuel',
-      statut: 'paye',
-      note_admin: note || 'Crédit manuel admin',
-      user_nom: u?.nom || '',
-      user_pseudo: u?.pseudo || '',
-      user_email: u?.email || ''
+      user_id: userId, mode: 'manuel', montant, numero: '-',
+      pays_nom: 'Crédit admin', operateur_nom: 'Manuel',
+      statut: 'paye', note_admin: note || 'Crédit manuel admin',
+      user_nom: u?.nom || '', user_pseudo: u?.pseudo || '', user_email: u?.email || ''
     });
     if (errInsert) return showToast('Erreur création : ' + errInsert.message, true);
 
-    const { error: errSolde } = await sb.rpc('ajuster_solde_user', {
-      p_user_id: userId,
-      p_montant: montant,
-      p_note: note || 'Recharge manuelle admin'
-    });
+    const { error: errSolde } = await sb.rpc('ajuster_solde_user', { p_user_id: userId, p_montant: montant, p_note: note || 'Recharge manuelle admin' });
     if (errSolde) return showToast('Erreur crédit : ' + errSolde.message, true);
 
     showToast(`✅ ${formatF(montant)} crédités à ${userName}`);
     closeModal();
-    await loadRecharges();
-    await loadUsers();
-    await loadStats();
+    await loadRecharges(); await loadUsers(); await loadStats();
   }
 
   // ================= SUPPORT =================
   async function loadSupport() {
-    const { data, error } = await sb
-      .from('support_tickets')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(200);
-
-    if (error) {
-      console.warn('Support:', error);
-      document.getElementById('supportList').innerHTML = emptyBox('Erreur de chargement');
-      return;
-    }
-
+    const { data, error } = await sb.from('support_tickets').select('*').order('created_at', { ascending: false }).limit(200);
+    if (error) { document.getElementById('supportList').innerHTML = emptyBox('Erreur de chargement'); return; }
     SUPPORT_TICKETS = data || [];
 
     const userIds = [...new Set(SUPPORT_TICKETS.map(t => t.user_id))];
     let profilesMap = {};
     if (userIds.length > 0) {
-      const { data: profs } = await sb
-        .from('profiles')
-        .select('id, nom, pseudo, email')
-        .in('id', userIds);
+      const { data: profs } = await sb.from('profiles').select('id, nom, pseudo, email').in('id', userIds);
       (profs || []).forEach(p => { profilesMap[p.id] = p; });
     }
-
-    SUPPORT_TICKETS = SUPPORT_TICKETS.map(t => ({
-      ...t,
-      profile: profilesMap[t.user_id] || null
-    }));
+    SUPPORT_TICKETS = SUPPORT_TICKETS.map(t => ({ ...t, profile: profilesMap[t.user_id] || null }));
 
     const ouverts = SUPPORT_TICKETS.filter(t => t.statut === 'ouvert').length;
     document.getElementById('supportPendingBadge').textContent = ouverts + ' ouverts';
-
     const badge = document.getElementById('supportBadge');
-    if (ouverts > 0) {
-      badge.textContent = ouverts;
-      badge.classList.add('show');
-    } else {
-      badge.classList.remove('show');
-    }
+    if (ouverts > 0) { badge.textContent = ouverts; badge.classList.add('show'); }
+    else badge.classList.remove('show');
 
     renderSupport();
   }
 
   function renderSupport() {
     const list = document.getElementById('supportList');
-    const filtered = SUPPORT_FILTER === 'all'
-      ? SUPPORT_TICKETS
-      : SUPPORT_TICKETS.filter(t => t.statut === SUPPORT_FILTER);
+    const q = (document.getElementById('supportSearch')?.value || '').toLowerCase().trim();
 
-    if (filtered.length === 0) {
-      list.innerHTML = emptyBox('Aucun ticket');
-      return;
+    let filtered = SUPPORT_FILTER === 'all' ? SUPPORT_TICKETS : SUPPORT_TICKETS.filter(t => t.statut === SUPPORT_FILTER);
+    if (q) {
+      filtered = filtered.filter(t => {
+        const p = t.profile || {};
+        return (p.nom || '').toLowerCase().includes(q)
+          || (p.pseudo || '').toLowerCase().includes(q)
+          || (p.email || '').toLowerCase().includes(q)
+          || (t.sujet || '').toLowerCase().includes(q)
+          || (t.message || '').toLowerCase().includes(q);
+      });
     }
+
+    if (filtered.length === 0) { list.innerHTML = emptyBox('Aucun ticket'); return; }
 
     const statusInfo = {
       ouvert: { label: 'Ouvert', classe: 'orange' },
@@ -1017,41 +989,27 @@
             ${t.statut === 'ouvert' ? '📨' : t.statut === 'en_cours' ? '💬' : '✅'}
           </div>
           <div class="ic-body">
-            <div class="ic-name">
-              ${escapeHtml(t.sujet)}
-              <span class="badge ${info.classe}">${info.label}</span>
-            </div>
+            <div class="ic-name">${escapeHtml(t.sujet)} <span class="badge ${info.classe}">${info.label}</span></div>
             <div class="ic-meta">
               <span>👤 ${escapeHtml(userName)}</span>
               ${userEmail ? `<span class="dot">•</span><span>${escapeHtml(userEmail)}</span>` : ''}
-              <span class="dot">•</span>
-              <span>${timeAgo(t.created_at)}</span>
+              <span class="dot">•</span><span>${timeAgo(t.created_at)}</span>
             </div>
             <div class="ic-desc">${escapeHtml(t.message)}</div>
-            ${t.reponse_admin ? `
-              <div style="margin-top:8px;padding:10px 12px;background:rgba(37,211,102,.08);border-left:3px solid var(--wa-green);border-radius:8px;font-size:12px;color:#166534;line-height:1.5;">
-                <b>Réponse admin :</b><br>${escapeHtml(t.reponse_admin)}
-              </div>
-            ` : ''}
+            ${t.reponse_admin ? `<div style="margin-top:8px;padding:10px 12px;background:rgba(37,211,102,.08);border-left:3px solid var(--wa-green);border-radius:8px;font-size:12px;color:#166534;line-height:1.5;"><b>Réponse admin :</b><br>${escapeHtml(t.reponse_admin)}</div>` : ''}
             ${t.note_admin ? `<div style="font-size:11px;color:var(--muted);margin-top:6px;">📝 ${escapeHtml(t.note_admin)}</div>` : ''}
           </div>
           <div class="ic-actions">
             <button class="icon-btn edit" onclick="repondreTicket('${t.id}')" title="Répondre">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-              </svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             </button>
             ${t.statut !== 'resolu' ? `
               <button class="icon-btn check" onclick="marquerResolu('${t.id}')" title="Marquer résolu">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
               </button>
             ` : ''}
             <button class="icon-btn delete" onclick="supprimerTicket('${t.id}')" title="Supprimer">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/>
-              </svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>
             </button>
           </div>
         </div>
@@ -1072,35 +1030,23 @@
     const t = SUPPORT_TICKETS.find(x => x.id === id);
     if (!t) return;
     const userName = t.profile?.nom || t.profile?.pseudo || 'Utilisateur';
-
     openModal('Répondre au ticket', `
-      <div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;">
-        <b style="color:var(--wa-deep);">${escapeHtml(userName)}</b> · ${timeAgo(t.created_at)}
-      </div>
+      <div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;"><b style="color:var(--wa-deep);">${escapeHtml(userName)}</b> · ${timeAgo(t.created_at)}</div>
       <div style="background:#f7faf8;border-radius:10px;padding:12px 14px;margin-bottom:14px;">
         <div style="font-size:12px;font-weight:800;color:var(--wa-deep);margin-bottom:6px;">Sujet : ${escapeHtml(t.sujet)}</div>
         <div style="font-size:12.5px;color:#4b5563;line-height:1.6;">${escapeHtml(t.message)}</div>
       </div>
-      <div class="form-group">
-        <label>Réponse</label>
-        <textarea id="repTexte" style="min-height:120px;" placeholder="Écris ta réponse ici...">${t.reponse_admin ? escapeHtml(t.reponse_admin) : ''}</textarea>
-      </div>
-      <div class="form-group">
-        <label>Statut</label>
+      <div class="form-group"><label>Réponse</label><textarea id="repTexte" style="min-height:120px;">${t.reponse_admin ? escapeHtml(t.reponse_admin) : ''}</textarea></div>
+      <div class="form-group"><label>Statut</label>
         <select id="repStatut">
           <option value="en_cours" ${t.statut === 'en_cours' ? 'selected' : ''}>En cours</option>
           <option value="resolu" ${t.statut === 'resolu' ? 'selected' : ''}>Résolu</option>
           <option value="ouvert" ${t.statut === 'ouvert' ? 'selected' : ''}>Ouvert</option>
         </select>
       </div>
-      <div class="form-group">
-        <label>Note interne (optionnelle)</label>
-        <input type="text" id="repNote" value="${t.note_admin ? escapeHtml(t.note_admin) : ''}" placeholder="Visible uniquement par les admins">
-      </div>
+      <div class="form-group"><label>Note interne (optionnelle)</label><input type="text" id="repNote" value="${t.note_admin ? escapeHtml(t.note_admin) : ''}" placeholder="Visible uniquement par les admins"></div>
       <button class="btn-primary" onclick="envoyerReponse('${id}')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-        </svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
         Envoyer la réponse
       </button>
     `);
@@ -1110,29 +1056,16 @@
     const reponse = document.getElementById('repTexte').value.trim();
     const statut = document.getElementById('repStatut').value;
     const note = document.getElementById('repNote').value.trim();
-
     if (!reponse) return showToast('Réponse vide', true);
-
-    const { error } = await sb.from('support_tickets').update({
-      reponse_admin: reponse,
-      statut: statut,
-      note_admin: note || null,
-      updated_at: new Date().toISOString()
-    }).eq('id', id);
-
+    const { error } = await sb.from('support_tickets').update({ reponse_admin: reponse, statut, note_admin: note || null, updated_at: new Date().toISOString() }).eq('id', id);
     if (error) return showToast('Erreur : ' + error.message, true);
-
     showToast('✅ Réponse envoyée');
     closeModal();
     await loadSupport();
   }
 
   async function marquerResolu(id) {
-    const { error } = await sb.from('support_tickets').update({
-      statut: 'resolu',
-      updated_at: new Date().toISOString()
-    }).eq('id', id);
-
+    const { error } = await sb.from('support_tickets').update({ statut: 'resolu', updated_at: new Date().toISOString() }).eq('id', id);
     if (error) return showToast('Erreur : ' + error.message, true);
     showToast('Ticket marqué résolu');
     await loadSupport();
@@ -1148,17 +1081,8 @@
 
   // ================= PARRAINAGE =================
   async function loadParrainage() {
-    const { data, error } = await sb
-      .from('profiles')
-      .select('id, nom, pseudo, email, parrain_id, code_parrainage, solde, created_at')
-      .order('created_at', { ascending: false })
-      .limit(1000);
-
-    if (error) {
-      console.warn('Parrainage:', error);
-      document.getElementById('parrainList').innerHTML = emptyBox('Erreur de chargement');
-      return;
-    }
+    const { data, error } = await sb.from('profiles').select('id, nom, pseudo, email, parrain_id, code_parrainage, solde, created_at').order('created_at', { ascending: false }).limit(1000);
+    if (error) { document.getElementById('parrainList').innerHTML = emptyBox('Erreur de chargement'); return; }
 
     const profiles = data || [];
     const map = {};
@@ -1169,38 +1093,22 @@
       if (!p.parrain_id) return;
       if (!groups[p.parrain_id]) {
         const parrain = map[p.parrain_id];
-        groups[p.parrain_id] = {
-          parrain: parrain || { id: p.parrain_id, nom: 'Inconnu', pseudo: '—', email: '—' },
-          filleuls: []
-        };
+        groups[p.parrain_id] = { parrain: parrain || { id: p.parrain_id, nom: 'Inconnu', pseudo: '—', email: '—' }, filleuls: [] };
       }
       groups[p.parrain_id].filleuls.push(p);
     });
 
-    PARRAIN_DATA = Object.values(groups)
-      .sort((a, b) => b.filleuls.length - a.filleuls.length);
+    PARRAIN_DATA = Object.values(groups).sort((a, b) => b.filleuls.length - a.filleuls.length);
 
     const totalParrains = PARRAIN_DATA.length;
     const totalFilleuls = profiles.filter(p => p.parrain_id).length;
     const moyFilleuls = totalParrains > 0 ? Math.round(totalFilleuls / totalParrains) : 0;
 
     document.getElementById('parrainStats').innerHTML = `
-      <div class="stat-box" style="border-color:var(--wa-dark);animation-delay:0s;">
-        <div class="lbl">Parrains actifs</div>
-        <div class="val">${totalParrains}</div>
-      </div>
-      <div class="stat-box" style="border-color:var(--wa-green);animation-delay:.06s;">
-        <div class="lbl">Total filleuls</div>
-        <div class="val">${totalFilleuls}</div>
-      </div>
-      <div class="stat-box" style="border-color:var(--alibaba);animation-delay:.12s;">
-        <div class="lbl">Moyenne/parrain</div>
-        <div class="val">${moyFilleuls}</div>
-      </div>
-      <div class="stat-box" style="border-color:#3b82f6;animation-delay:.18s;">
-        <div class="lbl">Sans parrain</div>
-        <div class="val">${profiles.filter(p => !p.parrain_id).length}</div>
-      </div>
+      <div class="stat-box" style="border-color:var(--wa-dark);animation-delay:0s;"><div class="lbl">Parrains actifs</div><div class="val">${totalParrains}</div></div>
+      <div class="stat-box" style="border-color:var(--wa-green);animation-delay:.06s;"><div class="lbl">Total filleuls</div><div class="val">${totalFilleuls}</div></div>
+      <div class="stat-box" style="border-color:var(--alibaba);animation-delay:.12s;"><div class="lbl">Moyenne/parrain</div><div class="val">${moyFilleuls}</div></div>
+      <div class="stat-box" style="border-color:#3b82f6;animation-delay:.18s;"><div class="lbl">Sans parrain</div><div class="val">${profiles.filter(p => !p.parrain_id).length}</div></div>
     `;
 
     renderParrainage();
@@ -1208,36 +1116,22 @@
 
   function renderParrainage() {
     const list = document.getElementById('parrainList');
-    const q = (document.getElementById('parrainSearch')?.value || '').toLowerCase();
+    const q = (document.getElementById('parrainSearch')?.value || '').toLowerCase().trim();
 
     let filtered = PARRAIN_DATA;
-
-    if (PARRAIN_FILTER === 'with_filleuls') {
-      filtered = filtered.filter(g => g.filleuls.length > 0);
-    } else if (PARRAIN_FILTER === 'top') {
-      filtered = filtered.slice(0, 20);
-    }
+    if (PARRAIN_FILTER === 'with_filleuls') filtered = filtered.filter(g => g.filleuls.length > 0);
+    else if (PARRAIN_FILTER === 'top') filtered = filtered.slice(0, 20);
 
     if (q) {
       filtered = filtered.filter(g => {
         const p = g.parrain;
-        const matchParrain = (p.nom || '').toLowerCase().includes(q)
-          || (p.pseudo || '').toLowerCase().includes(q)
-          || (p.email || '').toLowerCase().includes(q)
-          || (p.code_parrainage || '').toLowerCase().includes(q);
-        const matchFilleul = g.filleuls.some(f =>
-          (f.nom || '').toLowerCase().includes(q)
-          || (f.pseudo || '').toLowerCase().includes(q)
-          || (f.email || '').toLowerCase().includes(q)
-        );
+        const matchParrain = (p.nom || '').toLowerCase().includes(q) || (p.pseudo || '').toLowerCase().includes(q) || (p.email || '').toLowerCase().includes(q) || (p.code_parrainage || '').toLowerCase().includes(q);
+        const matchFilleul = g.filleuls.some(f => (f.nom || '').toLowerCase().includes(q) || (f.pseudo || '').toLowerCase().includes(q) || (f.email || '').toLowerCase().includes(q));
         return matchParrain || matchFilleul;
       });
     }
 
-    if (filtered.length === 0) {
-      list.innerHTML = emptyBox('Aucun parrain trouvé');
-      return;
-    }
+    if (filtered.length === 0) { list.innerHTML = emptyBox('Aucun parrain trouvé'); return; }
 
     list.innerHTML = filtered.map((g, i) => {
       const p = g.parrain;
@@ -1247,40 +1141,24 @@
       return `
         <div class="item-card" style="animation-delay:${i * .03}s;flex-direction:column;align-items:stretch;">
           <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="toggleFilleuls('${p.id}')">
-            <div class="ic-img" style="background:linear-gradient(135deg,var(--wa-dark),var(--wa-green));color:#fff;font-weight:800;font-size:16px;">
-              ${escapeHtml((p.nom || p.pseudo || '?').charAt(0).toUpperCase())}
-            </div>
+            <div class="ic-img" style="background:linear-gradient(135deg,var(--wa-dark),var(--wa-green));color:#fff;font-weight:800;font-size:16px;">${escapeHtml((p.nom || p.pseudo || '?').charAt(0).toUpperCase())}</div>
             <div style="flex:1;min-width:0;">
-              <div class="ic-name">
-                ${escapeHtml(p.nom || '—')}
-                <span class="badge ${badgeClass}">${count} filleul${count > 1 ? 's' : ''}</span>
-              </div>
-              <div class="ic-meta">
-                <span>@${escapeHtml(p.pseudo || '—')}</span>
-                <span class="dot">•</span>
-                <span>${escapeHtml(p.email || '—')}</span>
-              </div>
+              <div class="ic-name">${escapeHtml(p.nom || '—')} <span class="badge ${badgeClass}">${count} filleul${count > 1 ? 's' : ''}</span></div>
+              <div class="ic-meta"><span>@${escapeHtml(p.pseudo || '—')}</span><span class="dot">•</span><span>${escapeHtml(p.email || '—')}</span></div>
               ${p.code_parrainage ? `<div class="ic-meta" style="margin-top:3px;"><span style="font-size:10.5px;color:var(--wa-dark);font-weight:700;">🔗 Code : ${escapeHtml(p.code_parrainage)}</span></div>` : ''}
             </div>
             <div style="font-size:20px;color:var(--muted);">▾</div>
           </div>
-
           <div id="filleuls-${p.id}" style="display:none;margin-top:12px;padding-top:12px;border-top:1px dashed #e5e7eb;">
-            <div style="font-size:11.5px;font-weight:800;color:var(--wa-deep);text-transform:uppercase;letter-spacing:.3px;margin-bottom:8px;">
-              Ses filleuls (${count})
-            </div>
+            <div style="font-size:11.5px;font-weight:800;color:var(--wa-deep);text-transform:uppercase;letter-spacing:.3px;margin-bottom:8px;">Ses filleuls (${count})</div>
             ${g.filleuls.map(f => `
               <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f3f4f6;">
-                <div style="width:32px;height:32px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:var(--wa-dark);flex-shrink:0;">
-                  ${escapeHtml((f.nom || f.pseudo || '?').charAt(0).toUpperCase())}
-                </div>
+                <div style="width:32px;height:32px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:var(--wa-dark);flex-shrink:0;">${escapeHtml((f.nom || f.pseudo || '?').charAt(0).toUpperCase())}</div>
                 <div style="flex:1;min-width:0;">
                   <div style="font-size:12.5px;font-weight:700;color:var(--text);">${escapeHtml(f.nom || '—')}</div>
                   <div style="font-size:10.5px;color:var(--muted);">@${escapeHtml(f.pseudo || '—')} · ${escapeHtml(f.email || '')}</div>
                 </div>
-                <div style="font-size:11px;color:var(--wa-dark);font-weight:800;flex-shrink:0;">
-                  ${formatF(f.solde)}
-                </div>
+                <div style="font-size:11px;color:var(--wa-dark);font-weight:800;flex-shrink:0;">${formatF(f.solde)}</div>
               </div>
             `).join('')}
           </div>
@@ -1306,37 +1184,35 @@
 
   // ================= CANDIDATURES PARTENAIRES =================
   async function loadCandidatures() {
-    const { data, error } = await sb.from('partenaires_candidatures')
-      .select('*, profiles(nom, pseudo)')
-      .order('created_at', { ascending: false })
-      .limit(100);
+    const { data, error } = await sb.from('partenaires_candidatures').select('*').order('created_at', { ascending: false }).limit(100);
     if (error) { console.warn(error); return; }
     DATA.candidatures = data || [];
 
     const pending = DATA.candidatures.filter(c => c.statut === 'nouveau').length;
     document.getElementById('candPendingBadge').textContent = pending + ' en attente';
-
     const badge = document.getElementById('candBadge');
-    if (pending > 0) {
-      badge.textContent = pending;
-      badge.classList.add('show');
-    } else {
-      badge.classList.remove('show');
-    }
+    if (pending > 0) { badge.textContent = pending; badge.classList.add('show'); }
+    else badge.classList.remove('show');
 
     renderCandidatures();
   }
 
   function renderCandidatures() {
     const list = document.getElementById('candList');
-    const filtered = CAND_FILTER === 'all'
-      ? DATA.candidatures
-      : DATA.candidatures.filter(c => c.statut === CAND_FILTER);
+    const q = (document.getElementById('candSearch')?.value || '').toLowerCase().trim();
 
-    if (filtered.length === 0) {
-      list.innerHTML = emptyBox('Aucune candidature');
-      return;
+    let filtered = CAND_FILTER === 'all' ? DATA.candidatures : DATA.candidatures.filter(c => c.statut === CAND_FILTER);
+    if (q) {
+      filtered = filtered.filter(c =>
+        (c.nom || '').toLowerCase().includes(q)
+        || (c.email || '').toLowerCase().includes(q)
+        || (c.telephone || '').toLowerCase().includes(q)
+        || (c.pays_region || '').toLowerCase().includes(q)
+        || (c.type_nom || '').toLowerCase().includes(q)
+      );
     }
+
+    if (filtered.length === 0) { list.innerHTML = emptyBox('Aucune candidature'); return; }
 
     const statutInfo = {
       nouveau: { label: 'Nouveau', classe: 'orange' },
@@ -1348,51 +1224,28 @@
       const info = statutInfo[c.statut] || { label: c.statut, classe: 'gray' };
       const reponses = c.reponses || {};
       const reponsesHTML = Object.keys(reponses).length > 0
-        ? `<div class="candidature-reponses">
-            ${Object.entries(reponses).map(([k, v]) => `
-              <div class="rep-row">
-                <span class="k">${escapeHtml(k.replace(/_/g, ' '))}</span>
-                <span class="v">${escapeHtml(String(v).substring(0, 100))}</span>
-              </div>
-            `).join('')}
-          </div>`
+        ? `<div class="candidature-reponses">${Object.entries(reponses).map(([k, v]) => `
+            <div class="rep-row"><span class="k">${escapeHtml(k.replace(/_/g, ' '))}</span><span class="v">${escapeHtml(String(v).substring(0, 100))}</span></div>
+          `).join('')}</div>`
         : '';
 
       return `
         <div class="item-card" style="animation-delay:${i * .03}s">
           <div class="ic-img">${getTypeIcon(c.type_code)}</div>
           <div class="ic-body">
-            <div class="ic-name">
-              ${escapeHtml(c.nom)}
-              <span class="badge ${info.classe}">${info.label}</span>
-              ${c.type_nom ? `<span class="badge gray">${escapeHtml(c.type_nom)}</span>` : ''}
-            </div>
-            <div class="ic-meta">
-              <span>📞 ${escapeHtml(c.telephone)}</span>
-              <span class="dot">•</span>
-              <span>${escapeHtml(c.pays_region)}</span>
-              <span class="dot">•</span>
-              <span>${timeAgo(c.created_at)}</span>
-            </div>
-            <div class="ic-meta">
-              <span>${escapeHtml(c.email)}</span>
-              ${c.recompense_attendue > 0 ? `<span class="dot">•</span><span style="color:var(--gold);font-weight:800;">+${formatF(c.recompense_attendue)}</span>` : ''}
-              ${c.niveau_vip_attendu > 0 ? `<span class="dot">•</span><span style="color:var(--vip);font-weight:800;">VIP ${c.niveau_vip_attendu}</span>` : ''}
-            </div>
+            <div class="ic-name">${escapeHtml(c.nom)} <span class="badge ${info.classe}">${info.label}</span> ${c.type_nom ? `<span class="badge gray">${escapeHtml(c.type_nom)}</span>` : ''}</div>
+            <div class="ic-meta"><span>📞 ${escapeHtml(c.telephone)}</span><span class="dot">•</span><span>${escapeHtml(c.pays_region)}</span><span class="dot">•</span><span>${timeAgo(c.created_at)}</span></div>
+            <div class="ic-meta"><span>${escapeHtml(c.email)}</span>${c.recompense_attendue > 0 ? `<span class="dot">•</span><span style="color:var(--gold);font-weight:800;">+${formatF(c.recompense_attendue)}</span>` : ''}${c.niveau_vip_attendu > 0 ? `<span class="dot">•</span><span style="color:var(--vip);font-weight:800;">VIP ${c.niveau_vip_attendu}</span>` : ''}</div>
             ${c.message ? `<div class="ic-desc">${escapeHtml(c.message)}</div>` : ''}
             ${reponsesHTML}
           </div>
           <div class="ic-actions">
             ${c.statut === 'nouveau' ? `
               <button class="icon-btn check" onclick="approuverCandidature('${c.id}')" title="Approuver">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
               </button>
               <button class="icon-btn close-x" onclick="rejeterCandidature('${c.id}')" title="Rejeter">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             ` : ''}
           </div>
@@ -1413,14 +1266,8 @@
   async function approuverCandidature(id) {
     const note = prompt('Note interne (optionnel) :', '');
     if (note === null) return;
-
-    const { data, error } = await sb.rpc('approuver_candidature_partenaire', {
-      p_candidature_id: id,
-      p_note: note || null
-    });
-
+    const { data, error } = await sb.rpc('approuver_candidature_partenaire', { p_candidature_id: id, p_note: note || null });
     if (error) return showToast('Erreur : ' + error.message, true);
-
     showToast(`✅ Approuvé ! +${formatF(data.recompense)} crédités · VIP ${data.vip}`);
     await loadCandidatures();
   }
@@ -1429,14 +1276,8 @@
     const note = prompt('Motif du rejet :', '');
     if (note === null) return;
     if (!note.trim()) return showToast('Motif requis', true);
-
-    const { error } = await sb.rpc('rejeter_candidature_partenaire', {
-      p_candidature_id: id,
-      p_note: note
-    });
-
+    const { error } = await sb.rpc('rejeter_candidature_partenaire', { p_candidature_id: id, p_note: note });
     if (error) return showToast('Erreur : ' + error.message, true);
-
     showToast('Candidature rejetée');
     await loadCandidatures();
   }
@@ -1451,21 +1292,19 @@
 
   function renderTypesPartenaires() {
     const list = document.getElementById('typesList');
-    if (DATA.typesPartenaires.length === 0) {
-      list.innerHTML = emptyBox('Aucun type de partenaire');
-      return;
-    }
+    const q = (document.getElementById('typesSearch')?.value || '').toLowerCase().trim();
+    let filtered = DATA.typesPartenaires;
+    if (q) filtered = filtered.filter(t => (t.nom || '').toLowerCase().includes(q) || (t.description || '').toLowerCase().includes(q));
 
-    list.innerHTML = DATA.typesPartenaires.map((t, i) => {
+    if (filtered.length === 0) { list.innerHTML = emptyBox('Aucun type de partenaire'); return; }
+
+    list.innerHTML = filtered.map((t, i) => {
       const criteres = (t.criteres || []).length;
       return `
         <div class="item-card" style="animation-delay:${i * .04}s">
           <div class="ic-img">${t.icone || '🌟'}</div>
           <div class="ic-body">
-            <div class="ic-name">
-              ${escapeHtml(t.nom)}
-              ${t.actif ? '' : '<span class="badge red">Inactif</span>'}
-            </div>
+            <div class="ic-name">${escapeHtml(t.nom)} ${t.actif ? '' : '<span class="badge red">Inactif</span>'}</div>
             <div class="ic-meta">
               <span>${criteres} condition${criteres > 1 ? 's' : ''}</span>
               ${t.recompense_fcfa > 0 ? `<span class="dot">•</span><span style="color:var(--gold);font-weight:800;">+${formatF(t.recompense_fcfa)}</span>` : ''}
@@ -1474,10 +1313,8 @@
             ${t.description ? `<div class="ic-desc">${escapeHtml(t.description)}</div>` : ''}
           </div>
           <div class="ic-actions">
-            <button class="icon-btn edit" onclick="openTypeModal('${t.id}')" title="Modifier">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-              </svg>
+            <button class="icon-btn edit" onclick="openTypeModal('${t.id}')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
             </button>
           </div>
         </div>
@@ -1489,45 +1326,18 @@
     const t = DATA.typesPartenaires.find(x => x.id === id);
     if (!t) return;
     const criteresStr = JSON.stringify(t.criteres || [], null, 2);
-
     openModal('Modifier : ' + t.nom, `
-      <div class="form-group">
-        <label>Nom</label>
-        <input id="tpNom" value="${escapeHtml(t.nom)}">
-      </div>
-      <div class="form-group">
-        <label>Icône (emoji)</label>
-        <input id="tpIcone" value="${escapeHtml(t.icone || '🌟')}" maxlength="4">
-      </div>
-      <div class="form-group">
-        <label>Description</label>
-        <textarea id="tpDesc">${escapeHtml(t.description || '')}</textarea>
-      </div>
+      <div class="form-group"><label>Nom</label><input id="tpNom" value="${escapeHtml(t.nom)}"></div>
+      <div class="form-group"><label>Icône (emoji)</label><input id="tpIcone" value="${escapeHtml(t.icone || '🌟')}" maxlength="4"></div>
+      <div class="form-group"><label>Description</label><textarea id="tpDesc">${escapeHtml(t.description || '')}</textarea></div>
       <div class="form-row">
-        <div class="form-group">
-          <label>Récompense (FCFA)</label>
-          <input id="tpFcfa" type="number" value="${t.recompense_fcfa || 0}">
-        </div>
-        <div class="form-group">
-          <label>Niveau VIP</label>
-          <input id="tpVip" type="number" value="${t.niveau_vip || 0}">
-        </div>
+        <div class="form-group"><label>Récompense (FCFA)</label><input id="tpFcfa" type="number" value="${t.recompense_fcfa || 0}"></div>
+        <div class="form-group"><label>Niveau VIP</label><input id="tpVip" type="number" value="${t.niveau_vip || 0}"></div>
       </div>
-      <div class="form-group">
-        <label>Critères (JSON)</label>
-        <textarea id="tpCriteres" style="font-family:monospace;font-size:11px;min-height:200px;">${escapeHtml(criteresStr)}</textarea>
-        <div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5;">
-          Format : <code>[{"key":"filleuls_actifs","label":"Filleuls actifs","type":"number","min":2,"placeholder":"Ex: 2","required":true}]</code>
-        </div>
-      </div>
-      <div class="form-check">
-        <input type="checkbox" id="tpActif" ${t.actif ? 'checked' : ''}>
-        <label for="tpActif">Actif</label>
-      </div>
+      <div class="form-group"><label>Critères (JSON)</label><textarea id="tpCriteres" style="font-family:monospace;font-size:11px;min-height:200px;">${escapeHtml(criteresStr)}</textarea></div>
+      <div class="form-check"><input type="checkbox" id="tpActif" ${t.actif ? 'checked' : ''}><label for="tpActif">Actif</label></div>
       <button class="btn-primary" onclick="saveType('${id}')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="20 6 9 17 4 12"/>
-        </svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         Enregistrer
       </button>
     `);
@@ -1535,11 +1345,8 @@
 
   async function saveType(id) {
     let criteres;
-    try {
-      criteres = JSON.parse(document.getElementById('tpCriteres').value);
-    } catch (e) {
-      return showToast('JSON invalide : ' + e.message, true);
-    }
+    try { criteres = JSON.parse(document.getElementById('tpCriteres').value); }
+    catch (e) { return showToast('JSON invalide : ' + e.message, true); }
 
     const payload = {
       nom: document.getElementById('tpNom').value.trim(),
@@ -1547,13 +1354,10 @@
       description: document.getElementById('tpDesc').value.trim() || null,
       recompense_fcfa: Number(document.getElementById('tpFcfa').value),
       niveau_vip: Number(document.getElementById('tpVip').value),
-      criteres: criteres,
-      actif: document.getElementById('tpActif').checked
+      criteres, actif: document.getElementById('tpActif').checked
     };
-
     const { error } = await sb.from('types_partenaires').update(payload).eq('id', id);
     if (error) return showToast('Erreur : ' + error.message, true);
-
     showToast('Type mis à jour');
     closeModal();
     await loadTypesPartenaires();
@@ -1566,47 +1370,122 @@
 
   // ================= RETRAITS =================
   async function loadRetraits() {
-    const { data } = await sb.from('retraits').select('*').order('created_at', { ascending: false }).limit(100);
+    const { data, error } = await sb.from('retraits').select('*').order('created_at', { ascending: false }).limit(200);
+    if (error) { document.getElementById('retraitsList').innerHTML = emptyBox('Erreur'); return; }
     DATA.retraits = data || [];
+
+    // Enrichir avec profils
+    const userIds = [...new Set(DATA.retraits.map(r => r.user_id).filter(Boolean))];
+    if (userIds.length > 0) {
+      const { data: profs } = await sb.from('profiles').select('id, nom, pseudo, email').in('id', userIds);
+      const map = {};
+      (profs || []).forEach(p => { map[p.id] = p; });
+      DATA.retraits = DATA.retraits.map(r => ({ ...r, profile: map[r.user_id] || null }));
+    }
+
     const pending = DATA.retraits.filter(r => r.statut === 'en_attente').length;
     document.getElementById('retraitsPendingBadge').textContent = pending + ' en attente';
     renderRetraits();
   }
 
+  // Calcule frais + net depuis note_admin ou depuis le montant
+  function parseRetrait(amount, noteAdmin) {
+    let frais = 0, net = Number(amount);
+    if (noteAdmin && noteAdmin.includes('Frais:')) {
+      const match = noteAdmin.match(/Frais:\s*(\d+)\s*F\s*\|\s*Net à payer:\s*(\d+)/);
+      if (match) {
+        frais = Number(match[1]);
+        net = Number(match[2]);
+      }
+    } else {
+      // Fallback : calcul 8% (min 100)
+      frais = Math.max(Math.round(Number(amount) * 0.08), 100);
+      net = Number(amount) - frais;
+    }
+    return { frais, net };
+  }
+
   function renderRetraits() {
     const list = document.getElementById('retraitsList');
-    if (DATA.retraits.length === 0) { list.innerHTML = emptyBox('Aucun retrait'); return; }
-    list.innerHTML = DATA.retraits.map((r, i) => {
+    const q = (document.getElementById('retraitsSearch')?.value || '').toLowerCase().trim();
+
+    let filtered = RETRAIT_FILTER === 'all' ? DATA.retraits : DATA.retraits.filter(r => r.statut === RETRAIT_FILTER);
+    if (q) {
+      filtered = filtered.filter(r => {
+        const p = r.profile || {};
+        return (p.nom || '').toLowerCase().includes(q)
+          || (p.pseudo || '').toLowerCase().includes(q)
+          || (p.email || '').toLowerCase().includes(q)
+          || (r.numero || '').toLowerCase().includes(q)
+          || (r.pays_nom || '').toLowerCase().includes(q)
+          || (r.operateur_nom || '').toLowerCase().includes(q);
+      });
+    }
+
+    if (filtered.length === 0) { list.innerHTML = emptyBox('Aucun retrait'); return; }
+
+    list.innerHTML = filtered.map((r, i) => {
       const statusLabel = { en_attente: 'En attente', valide: 'Validé', paye: 'Payé', rejete: 'Rejeté' }[r.statut] || r.statut;
       const statusClass = { en_attente: 'orange', valide: 'blue', paye: 'green', rejete: 'red' }[r.statut] || 'gray';
+      const p = r.profile || {};
+      const userName = p.nom || p.pseudo || 'Utilisateur';
+      const userEmail = p.email || '';
+      const { frais, net } = parseRetrait(r.montant, r.note_admin);
+
       return `
-        <div class="item-card" style="animation-delay:${i * .04}s">
-          <div class="ic-body">
-            <div class="ic-name">${formatF(r.montant)} <span class="badge ${statusClass}">${statusLabel}</span></div>
-            <div class="ic-meta">
-              <span>${escapeHtml(r.pays_nom || '')}</span><span class="dot">•</span>
-              <span>${escapeHtml(r.operateur_nom || '')}</span><span class="dot">•</span>
-              <span>${escapeHtml(r.numero || '')}</span>
+        <div class="item-card" style="animation-delay:${i * .03}s;flex-direction:column;align-items:stretch;">
+          <div style="display:flex;align-items:flex-start;gap:12px;">
+            <div class="ic-img" style="background:linear-gradient(135deg,var(--wa-dark),var(--wa-green));color:#fff;font-weight:800;font-size:14px;padding:4px;text-align:center;line-height:1.1;">
+              ${escapeHtml(userName.charAt(0).toUpperCase())}
+            </div>
+            <div class="ic-body">
+              <div class="ic-name">
+                ${escapeHtml(userName)}
+                <span class="badge ${statusClass}">${statusLabel}</span>
+              </div>
+              <div class="ic-meta">
+                ${userEmail ? `<span>📧 ${escapeHtml(userEmail)}</span>` : '<span>📧 —</span>'}
+              </div>
+              <div class="ic-meta">
+                <span>${escapeHtml(r.pays_nom || '')}</span>
+                <span class="dot">•</span>
+                <span>${escapeHtml(r.operateur_nom || '')}</span>
+                <span class="dot">•</span>
+                <span>${timeAgo(r.created_at)}</span>
+              </div>
+              ${r.numero ? `<div class="ic-meta" style="font-size:10.5px;">N° ${escapeHtml(r.numero)}</div>` : ''}
+            </div>
+            <div class="ic-actions">
+              ${r.statut === 'en_attente' ? `
+                <button class="icon-btn check" onclick="payRetrait('${r.id}')" title="Marquer payé">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </button>
+                <button class="icon-btn close-x" onclick="rejectRetrait('${r.id}')" title="Rejeter">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              ` : ''}
             </div>
           </div>
-          <div class="ic-actions">
-            ${r.statut === 'en_attente' ? `
-              <button class="icon-btn edit" onclick="payRetrait('${r.id}')" title="Marquer payé">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
-              </button>
-              <button class="icon-btn delete" onclick="rejectRetrait('${r.id}')" title="Rejeter">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
-              </button>
-            ` : ''}
+
+          <!-- Bloc finances -->
+          <div class="retrait-finances">
+            <div class="rf-row"><span class="k">💵 Montant demandé</span><span class="v">${formatF(r.montant)}</span></div>
+            <div class="rf-row frais"><span class="k">✂️ Frais</span><span class="v">-${formatF(frais)}</span></div>
+            <div class="rf-row net"><span class="k">📤 Net à envoyer</span><span class="v">${formatF(net)}</span></div>
           </div>
         </div>
       `;
     }).join('');
   }
+
+  document.getElementById('retraitsFilters').addEventListener('click', (e) => {
+    const chip = e.target.closest('.filter-chip');
+    if (!chip) return;
+    document.querySelectorAll('#retraitsFilters .filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    RETRAIT_FILTER = chip.dataset.filter;
+    renderRetraits();
+  });
 
   async function payRetrait(id) {
     const note = prompt('Note (optionnelle) :', '');
@@ -1637,7 +1516,7 @@
   }
 
   function renderUsers() {
-    const q = (document.getElementById('userSearch')?.value || '').toLowerCase();
+    const q = (document.getElementById('userSearch')?.value || '').toLowerCase().trim();
     const list = document.getElementById('usersList');
     const filtered = q ? DATA.users.filter(u => u.nom?.toLowerCase().includes(q) || u.pseudo?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q)) : DATA.users;
     if (filtered.length === 0) { list.innerHTML = emptyBox('Aucun utilisateur'); return; }
@@ -1658,19 +1537,13 @@
         </div>
         <div class="ic-actions">
           <button class="icon-btn edit" onclick="editUser('${u.id}')" title="Modifier">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-            </svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
           </button>
           <button class="icon-btn view" onclick="adjustUserBalance('${u.id}', '${escapeHtml(u.nom || u.pseudo)}', ${u.solde})" title="Ajuster solde">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-            </svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
           </button>
           <button class="icon-btn delete" onclick="deleteUser('${u.id}', '${escapeHtml(u.nom || u.pseudo)}')" title="Supprimer">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-            </svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
           </button>
         </div>
       </div>
@@ -1679,14 +1552,8 @@
 
   function adjustUserBalance(userId, name, currentSolde) {
     openModal(`Ajuster le solde de ${name}`, `
-      <div class="form-group">
-        <label>Solde actuel</label>
-        <input type="text" value="${formatF(currentSolde)}" disabled style="background:#f3f4f6;">
-      </div>
-      <div class="form-group">
-        <label>Montant à ajouter (négatif pour retirer)</label>
-        <input type="number" id="adjAmount" placeholder="Ex: 5000 ou -2000">
-      </div>
+      <div class="form-group"><label>Solde actuel</label><input type="text" value="${formatF(currentSolde)}" disabled style="background:#f3f4f6;"></div>
+      <div class="form-group"><label>Montant à ajouter (négatif pour retirer)</label><input type="number" id="adjAmount" placeholder="Ex: 5000 ou -2000"></div>
       <div class="btn-row">
         <button class="btn-warn" onclick="setAdjAmount(5000)">+5 000</button>
         <button class="btn-warn" onclick="setAdjAmount(10000)">+10 000</button>
@@ -1694,9 +1561,7 @@
       </div>
       <div style="height:10px"></div>
       <button class="btn-primary" onclick="applyAdj('${userId}')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="20 6 9 17 4 12"/>
-        </svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         Appliquer
       </button>
     `);
@@ -1728,14 +1593,10 @@
         <div class="form-group"><label>Type partenaire</label><input id="euPartenaire" value="${escapeHtml(u.type_partenaire || '')}"></div>
       </div>
       <div class="form-check"><input type="checkbox" id="euAdmin" ${u.is_admin ? 'checked' : ''}><label for="euAdmin">Administrateur</label></div>
-      <div class="btn-row">
-        <button class="btn-primary" onclick="saveUserEdit('${userId}')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"/>
-          </svg>
-          Enregistrer
-        </button>
-      </div>
+      <button class="btn-primary" onclick="saveUserEdit('${userId}')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Enregistrer
+      </button>
     `);
   }
 
@@ -1751,7 +1612,7 @@
       p_is_admin: document.getElementById('euAdmin').checked
     };
     if (!payload.p_nom) return showToast('Nom requis', true);
-    if (!payload.p_pseudo || payload.p_pseudo.length < 3) return showToast('Pseudo (3 caractères min)', true);
+    if (!payload.p_pseudo || payload.p_pseudo.length < 3) return showToast('Pseudo (3 car. min)', true);
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.p_email)) return showToast('Email invalide', true);
     if (payload.p_solde < 0) return showToast('Solde négatif interdit', true);
 
@@ -1780,16 +1641,12 @@
           </svg>
         </div>
         <div style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:8px;">${escapeHtml(name)}</div>
-        <div style="font-size:13px;color:var(--muted);line-height:1.6;">
-          Cette action est <strong style="color:#dc2626;">irréversible</strong>.
-        </div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.6;">Cette action est <strong style="color:#dc2626;">irréversible</strong>.</div>
       </div>
       <div class="btn-row">
         <button class="btn-warn" onclick="closeModal()">Annuler</button>
         <button class="btn-danger" onclick="confirmDeleteUser('${userId}')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="3 6 5 6 21 6"/>
-          </svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/></svg>
           Supprimer
         </button>
       </div>
@@ -1817,8 +1674,11 @@
 
   function renderPlans() {
     const list = document.getElementById('plansList');
-    if (DATA.plans.length === 0) return list.innerHTML = emptyBox('Aucun plan');
-    list.innerHTML = DATA.plans.map((p, i) => `
+    const q = (document.getElementById('plansSearch')?.value || '').toLowerCase().trim();
+    let filtered = DATA.plans;
+    if (q) filtered = filtered.filter(p => (p.nom || '').toLowerCase().includes(q) || (p.description || '').toLowerCase().includes(q));
+    if (filtered.length === 0) return list.innerHTML = emptyBox('Aucun plan');
+    list.innerHTML = filtered.map((p, i) => `
       <div class="item-card" style="animation-delay:${i * .04}s">
         <img class="ic-img" src="${p.image_url || ''}" alt="">
         <div class="ic-body">
@@ -1831,14 +1691,10 @@
         </div>
         <div class="ic-actions">
           <button class="icon-btn edit" onclick="openPlanModal('${p.id}')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-            </svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
           </button>
           <button class="icon-btn delete" onclick="deletePlan('${p.id}')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/>
-            </svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>
           </button>
         </div>
       </div>
@@ -1848,7 +1704,7 @@
   function openPlanModal(id = null) {
     const p = id ? DATA.plans.find(x => x.id === id) : null;
     openModal(p ? 'Modifier le plan' : 'Nouveau plan', `
-      <div class="form-group"><label>Nom</label><input id="fNom" value="${p ? escapeHtml(p.nom) : ''}" placeholder="Ex: Starter"></div>
+      <div class="form-group"><label>Nom</label><input id="fNom" value="${p ? escapeHtml(p.nom) : ''}"></div>
       <div class="form-row">
         <div class="form-group"><label>Activation (F)</label><input id="fAct" type="number" value="${p ? p.montant_activation : ''}"></div>
         <div class="form-group"><label>Gain/jour (F)</label><input id="fGain" type="number" value="${p ? p.gain_journalier : ''}"></div>
@@ -1861,9 +1717,7 @@
       <div class="form-group"><label>Description</label><textarea id="fDesc">${p ? escapeHtml(p.description || '') : ''}</textarea></div>
       <div class="form-check"><input type="checkbox" id="fActif" ${!p || p.actif ? 'checked' : ''}><label for="fActif">Actif</label></div>
       <button class="btn-primary" onclick="savePlan('${id || ''}')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="20 6 9 17 4 12"/>
-        </svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         ${p ? 'Mettre à jour' : 'Créer'}
       </button>
     `);
@@ -1905,8 +1759,11 @@
 
   function renderPlantations() {
     const list = document.getElementById('plantationsList');
-    if (DATA.plantations.length === 0) return list.innerHTML = emptyBox('Aucune plantation');
-    list.innerHTML = DATA.plantations.map((p, i) => `
+    const q = (document.getElementById('plantationsSearch')?.value || '').toLowerCase().trim();
+    let filtered = DATA.plantations;
+    if (q) filtered = filtered.filter(p => (p.nom || '').toLowerCase().includes(q) || (p.slug || '').toLowerCase().includes(q));
+    if (filtered.length === 0) return list.innerHTML = emptyBox('Aucune plantation');
+    list.innerHTML = filtered.map((p, i) => `
       <div class="item-card" style="animation-delay:${i * .04}s">
         <img class="ic-img" src="${p.image_url}" alt="">
         <div class="ic-body">
@@ -1918,14 +1775,10 @@
         </div>
         <div class="ic-actions">
           <button class="icon-btn edit" onclick="openPlantationModal('${p.id}')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-            </svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
           </button>
           <button class="icon-btn delete" onclick="deletePlantation('${p.id}')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/>
-            </svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>
           </button>
         </div>
       </div>
@@ -1936,7 +1789,7 @@
     const p = id ? DATA.plantations.find(x => x.id === id) : null;
     openModal(p ? 'Modifier la plantation' : 'Nouvelle plantation', `
       <div class="form-group"><label>Nom</label><input id="pfNom" value="${p ? escapeHtml(p.nom) : ''}"></div>
-      <div class="form-group"><label>Slug (unique)</label><input id="pfSlug" value="${p ? escapeHtml(p.slug) : ''}" placeholder="Ex: mais"></div>
+      <div class="form-group"><label>Slug (unique)</label><input id="pfSlug" value="${p ? escapeHtml(p.slug) : ''}"></div>
       <div class="form-row">
         <div class="form-group"><label>Activation (F)</label><input id="pfAct" type="number" value="${p ? p.montant_activation : ''}"></div>
         <div class="form-group"><label>Gain/jour (F)</label><input id="pfGain" type="number" value="${p ? p.gain_journalier : ''}"></div>
@@ -1945,9 +1798,7 @@
       <div class="form-group"><label>Image (URL)</label><input id="pfImg" value="${p ? escapeHtml(p.image_url) : ''}"></div>
       <div class="form-check"><input type="checkbox" id="pfActif" ${!p || p.actif ? 'checked' : ''}><label for="pfActif">Actif</label></div>
       <button class="btn-primary" onclick="savePlantation('${id || ''}')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="20 6 9 17 4 12"/>
-        </svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         ${p ? 'Mettre à jour' : 'Créer'}
       </button>
     `);
@@ -1988,8 +1839,11 @@
 
   function renderActualites() {
     const list = document.getElementById('actualitesList');
-    if (DATA.actualites.length === 0) return list.innerHTML = emptyBox('Aucune actualité');
-    list.innerHTML = DATA.actualites.map((a, i) => `
+    const q = (document.getElementById('actualitesSearch')?.value || '').toLowerCase().trim();
+    let filtered = DATA.actualites;
+    if (q) filtered = filtered.filter(a => (a.titre || '').toLowerCase().includes(q) || (a.categorie || '').toLowerCase().includes(q) || (a.contenu || '').toLowerCase().includes(q));
+    if (filtered.length === 0) return list.innerHTML = emptyBox('Aucune actualité');
+    list.innerHTML = filtered.map((a, i) => `
       <div class="item-card" style="animation-delay:${i * .04}s">
         <img class="ic-img" src="${a.image_url || ''}" alt="">
         <div class="ic-body">
@@ -2002,14 +1856,10 @@
         </div>
         <div class="ic-actions">
           <button class="icon-btn edit" onclick="openActualiteModal('${a.id}')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-            </svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
           </button>
           <button class="icon-btn delete" onclick="deleteActualite('${a.id}')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/>
-            </svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>
           </button>
         </div>
       </div>
@@ -2023,17 +1873,13 @@
       <div class="form-group"><label>Contenu</label><textarea id="afContenu" style="min-height:120px;">${a ? escapeHtml(a.contenu) : ''}</textarea></div>
       <div class="form-group"><label>Image (URL)</label><input id="afImg" value="${a ? escapeHtml(a.image_url || '') : ''}"></div>
       <div class="form-row">
-        <div class="form-group"><label>Catégorie</label>
-          <select id="afCat">${['Marché','Innovation','Export','Prix','Météo','Info'].map(c => `<option ${a && a.categorie === c ? 'selected' : ''}>${c}</option>`).join('')}</select>
-        </div>
+        <div class="form-group"><label>Catégorie</label><select id="afCat">${['Marché','Innovation','Export','Prix','Météo','Info'].map(c => `<option ${a && a.categorie === c ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
         <div class="form-group"><label>Auteur</label><input id="afAuteur" value="${a ? escapeHtml(a.auteur || '') : 'Affinity Network'}"></div>
       </div>
       <div class="form-check"><input type="checkbox" id="afEping" ${a && a.epingle ? 'checked' : ''}><label for="afEping">Épingler</label></div>
       <div class="form-check"><input type="checkbox" id="afPub" ${!a || a.publie ? 'checked' : ''}><label for="afPub">Publié</label></div>
       <button class="btn-primary" onclick="saveActualite('${id || ''}')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="20 6 9 17 4 12"/>
-        </svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         ${a ? 'Mettre à jour' : 'Publier'}
       </button>
     `);
@@ -2074,8 +1920,11 @@
 
   function renderLoteries() {
     const list = document.getElementById('loteriesList');
-    if (DATA.loteries.length === 0) return list.innerHTML = emptyBox('Aucune loterie');
-    list.innerHTML = DATA.loteries.map((l, i) => {
+    const q = (document.getElementById('loteriesSearch')?.value || '').toLowerCase().trim();
+    let filtered = DATA.loteries;
+    if (q) filtered = filtered.filter(l => (l.nom || '').toLowerCase().includes(q) || (l.description || '').toLowerCase().includes(q));
+    if (filtered.length === 0) return list.innerHTML = emptyBox('Aucune loterie');
+    list.innerHTML = filtered.map((l, i) => {
       const drawDate = new Date(l.date_tirage);
       const isFinished = l.statut === 'termine' || drawDate < new Date();
       const dateStr = drawDate.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -2083,36 +1932,14 @@
         <div class="item-card" style="animation-delay:${i * .04}s">
           <img class="ic-img" src="${l.image_url || ''}" alt="">
           <div class="ic-body">
-            <div class="ic-name">
-              ${escapeHtml(l.nom)}
-              <span class="badge ${isFinished ? 'gray' : 'green'}">${isFinished ? 'Terminé' : 'Actif'}</span>
-            </div>
-            <div class="ic-meta">
-              <span>Ticket: ${formatF(l.prix_ticket)}</span><span class="dot">•</span>
-              <span style="color:var(--alibaba);font-weight:700;">Lot: ${formatF(l.montant_lot)}</span>
-            </div>
-            <div class="ic-meta" style="margin-top:4px;">
-              <span style="font-size:10.5px;">📅 ${dateStr}</span>
-            </div>
+            <div class="ic-name">${escapeHtml(l.nom)} <span class="badge ${isFinished ? 'gray' : 'green'}">${isFinished ? 'Terminé' : 'Actif'}</span></div>
+            <div class="ic-meta"><span>Ticket: ${formatF(l.prix_ticket)}</span><span class="dot">•</span><span style="color:var(--alibaba);font-weight:700;">Lot: ${formatF(l.montant_lot)}</span></div>
+            <div class="ic-meta" style="margin-top:4px;"><span style="font-size:10.5px;">📅 ${dateStr}</span></div>
           </div>
           <div class="ic-actions">
-            ${!isFinished ? `
-              <button class="icon-btn view" onclick="drawLoterie('${l.id}', '${escapeHtml(l.nom)}')" title="Tirer">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 2v6M12 22v-4M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M22 12h-4"/>
-                </svg>
-              </button>
-            ` : ''}
-            <button class="icon-btn edit" onclick="openLoterieModal('${l.id}')">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-              </svg>
-            </button>
-            <button class="icon-btn delete" onclick="deleteLoterie('${l.id}')">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/>
-              </svg>
-            </button>
+            ${!isFinished ? `<button class="icon-btn view" onclick="drawLoterie('${l.id}', '${escapeHtml(l.nom)}')" title="Tirer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6M12 22v-4M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M22 12h-4"/></svg></button>` : ''}
+            <button class="icon-btn edit" onclick="openLoterieModal('${l.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
+            <button class="icon-btn delete" onclick="deleteLoterie('${l.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg></button>
           </div>
         </div>
       `;
@@ -2137,9 +1964,7 @@
       <div class="form-group"><label>Image (URL)</label><input id="loImg" value="${l ? escapeHtml(l.image_url || '') : ''}"></div>
       <div class="form-check"><input type="checkbox" id="loActif" ${!l || l.actif ? 'checked' : ''}><label for="loActif">Actif</label></div>
       <button class="btn-primary" onclick="saveLoterie('${id || ''}')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="20 6 9 17 4 12"/>
-        </svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         ${l ? 'Mettre à jour' : 'Créer'}
       </button>
     `);
@@ -2174,7 +1999,7 @@
   }
 
   async function drawLoterie(id, nom) {
-    if (!confirm(`Lancer le tirage "${nom}" ?\n\nCette action désignera les gagnants.`)) return;
+    if (!confirm(`Lancer le tirage "${nom}" ?`)) return;
     const { data, error } = await sb.rpc('tirer_loterie', { p_loterie_id: id });
     if (error) return showToast('Erreur : ' + error.message, true);
     const gagnants = data.gagnants || [];
@@ -2192,8 +2017,11 @@
 
   function renderPays() {
     const list = document.getElementById('paysList');
-    if (DATA.pays.length === 0) return list.innerHTML = emptyBox('Aucun pays');
-    list.innerHTML = DATA.pays.map((p, i) => `
+    const q = (document.getElementById('paysSearch')?.value || '').toLowerCase().trim();
+    let filtered = DATA.pays;
+    if (q) filtered = filtered.filter(p => (p.nom || '').toLowerCase().includes(q) || (p.code || '').toLowerCase().includes(q));
+    if (filtered.length === 0) return list.innerHTML = emptyBox('Aucun pays');
+    list.innerHTML = filtered.map((p, i) => `
       <div class="item-card" style="animation-delay:${i * .02}s">
         <img class="ic-img" style="width:40px;height:28px;border-radius:4px;" src="https://flagcdn.com/w80/${p.code.toLowerCase()}.png" alt="">
         <div class="ic-body">
@@ -2206,9 +2034,7 @@
         </div>
         <div class="ic-actions">
           <button class="icon-btn edit" onclick="openPaysModal('${p.id}')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-            </svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
           </button>
         </div>
       </div>
@@ -2230,9 +2056,7 @@
       <div class="form-group"><label>Ordre</label><input id="pyOrdre" type="number" value="${p.ordre}"></div>
       <div class="form-check"><input type="checkbox" id="pyActif" ${p.actif ? 'checked' : ''}><label for="pyActif">Actif</label></div>
       <button class="btn-primary" onclick="savePays('${id}')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="20 6 9 17 4 12"/>
-        </svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         Mettre à jour
       </button>
     `);
@@ -2272,18 +2096,15 @@
     for (const [catName, keys] of Object.entries(categories)) {
       const items = data.filter(c => keys.includes(c.cle));
       if (items.length === 0) continue;
-      html += `<div class="config-group">
-        <div class="config-group-title">${catName}</div>
-        ${items.map(c => `
-          <div class="config-row">
-            <div class="cr-info">
-              <div class="cr-label">${escapeHtml(c.description || c.cle)}</div>
-              <div class="cr-cle">${c.cle}</div>
-            </div>
-            <input type="number" value="${c.valeur}" data-cle="${c.cle}" class="bonus-input">
+      html += `<div class="config-group"><div class="config-group-title">${catName}</div>${items.map(c => `
+        <div class="config-row">
+          <div class="cr-info">
+            <div class="cr-label">${escapeHtml(c.description || c.cle)}</div>
+            <div class="cr-cle">${c.cle}</div>
           </div>
-        `).join('')}
-      </div>`;
+          <input type="number" value="${c.valeur}" data-cle="${c.cle}" class="bonus-input">
+        </div>
+      `).join('')}</div>`;
     }
     list.innerHTML = html;
   }
@@ -2313,7 +2134,23 @@
     DATA.bonusHistory = data;
     const total = data.reduce((sum, b) => sum + Number(b.montant || 0), 0);
     badge.textContent = formatF(total) + ' distribués';
-    if (data.length === 0) { list.innerHTML = emptyBox('Aucun bonus distribué'); return; }
+    renderBonusHistory();
+  }
+
+  function renderBonusHistory() {
+    const list = document.getElementById('bonusHistoryList');
+    const q = (document.getElementById('bonusHistorySearch')?.value || '').toLowerCase().trim();
+    let filtered = DATA.bonusHistory || [];
+    if (q) filtered = filtered.filter(b => {
+      const p = b.profiles || {};
+      return (b.description || '').toLowerCase().includes(q)
+        || (b.type || '').toLowerCase().includes(q)
+        || (p.nom || '').toLowerCase().includes(q)
+        || (p.pseudo || '').toLowerCase().includes(q);
+    });
+
+    if (filtered.length === 0) { list.innerHTML = emptyBox('Aucun bonus'); return; }
+
     const typeInfo = {
       'bienvenue': { icone: '🎁', label: 'Bienvenue', classe: 'green' },
       'streak': { icone: '🔥', label: 'Streak', classe: 'orange' },
@@ -2326,7 +2163,7 @@
       'mission_10_amis': { icone: '👥', label: 'Mission 2', classe: 'blue' },
       'roue_fortune': { icone: '🎡', label: 'Roue', classe: 'gold' }
     };
-    list.innerHTML = data.map((b, i) => {
+    list.innerHTML = filtered.map((b, i) => {
       const info = typeInfo[b.type] || { icone: '✨', label: b.type, classe: 'gray' };
       const userNom = b.profiles?.nom || b.profiles?.pseudo || 'Utilisateur';
       return `
@@ -2334,10 +2171,7 @@
           <div class="ic-img">${info.icone}</div>
           <div class="ic-body">
             <div class="ic-name">${escapeHtml(b.description || info.label)} <span class="badge ${info.classe}">${info.label}</span></div>
-            <div class="ic-meta">
-              <span>${escapeHtml(userNom)}</span><span class="dot">•</span>
-              <span>${timeAgo(b.created_at)}</span>
-            </div>
+            <div class="ic-meta"><span>${escapeHtml(userNom)}</span><span class="dot">•</span><span>${timeAgo(b.created_at)}</span></div>
           </div>
           <div style="font-size:15px;font-weight:800;color:var(--wa-dark);flex-shrink:0;">+${formatF(b.montant)}</div>
         </div>
@@ -2419,10 +2253,7 @@
           <div class="ic-img">${posMedal}</div>
           <div class="ic-body">
             <div class="ic-name">${escapeHtml(g.user_nom || g.user_pseudo || 'Anonyme')} <span class="badge orange">${moisLabel}</span></div>
-            <div class="ic-meta">
-              <span>${g.filleuls_actifs} filleuls</span><span class="dot">•</span>
-              <span>Position ${g.position}</span>
-            </div>
+            <div class="ic-meta"><span>${g.filleuls_actifs} filleuls</span><span class="dot">•</span><span>Position ${g.position}</span></div>
           </div>
           <div style="font-size:15px;font-weight:800;color:var(--gold);flex-shrink:0;">+${formatF(g.montant_gagne)}</div>
         </div>
